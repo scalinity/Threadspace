@@ -1,0 +1,15 @@
+{
+  "name": "threadspace-observer",
+  "version": "0.1.0",
+  "description": "Passive Threadspace observer: sanitized session, turn, tool and actor observations delivered to the local capture helper.",
+  "author": { "name": "Threadspace" },
+  "userConfig": {
+    "captureArgv": {
+      "type": "string",
+      "multiple": true,
+      "title": "Capture command",
+      "description": "Argument vector of the capture helper's mod-batch command, executable first (for example the threadspace-hook path, then mod-batch). Empty disables delivery.",
+      "default": []
+    }
+  }
+}
