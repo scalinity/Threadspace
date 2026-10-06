@@ -99,6 +99,41 @@ fn stale_session(ctx: &Ctx) -> Option<String> {
         .map(|s| s.session_id.clone())
 }
 
+/// A scheduled wake must be at least this far ahead when the Mac is put to
+/// sleep; nearer ones pass while the Mac is awake and are skipped.
+const MIN_WAKE_AHEAD_S: i64 = 90;
+/// A real sleep, not a nap cut short by something other than the schedule.
+const MIN_SLEEP_S: i64 = 30;
+/// How far the OS-recorded wake may sit from its scheduled time.
+const WAKE_TOLERANCE_S: i64 = 20;
+
+/// Holds an idle-sleep assertion so macOS cannot sleep the Mac before the
+/// harness does; released just before `pmset sleepnow`.
+struct KeepAwake(Option<std::process::Child>);
+
+impl KeepAwake {
+    fn hold() -> Result<Self, String> {
+        std::process::Command::new("/usr/bin/caffeinate")
+            .args(["-i", "-t", "1800"])
+            .spawn()
+            .map(|child| Self(Some(child)))
+            .map_err(|e| format!("caffeinate: {e}"))
+    }
+
+    fn release(&mut self) {
+        if let Some(mut child) = self.0.take() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
+}
+
+impl Drop for KeepAwake {
+    fn drop(&mut self) {
+        self.release();
+    }
+}
+
 pub fn cycles(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "g12-sleep-wake", ctx.channel_name()).map_err(|e| e.to_string())?;
     let wakes = scheduled_wakes();
@@ -109,19 +144,33 @@ pub fn cycles(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     ensure_ui(ctx)?;
     let gui = ctx.gui("g12 sleep/wake cycles")?;
     let mut out = Vec::new();
-    for (index, wake_at) in wakes.iter().take(cycles as usize).enumerate() {
-        let cycle = index + 1;
+    let mut awake = KeepAwake::hold()?;
+    let mut next_wake = 0;
+    for cycle in 1..=cycles as usize {
         let before = facts(ctx);
         let records = admit(ctx, 50);
         let stale = stale_session(ctx);
         let projection_before = compare_projection(ctx, &format!("cycle-{cycle}-before"));
+        let mut skipped = Vec::new();
+        while next_wake < wakes.len() && wakes[next_wake] - now_s() < MIN_WAKE_AHEAD_S {
+            skipped.push(wakes[next_wake]);
+            next_wake += 1;
+        }
+        let Some(&wake_at) = wakes.get(next_wake) else {
+            return Err(format!("cycle {cycle}: no scheduled wake at least {MIN_WAKE_AHEAD_S} s ahead (skipped {skipped:?})"));
+        };
+        next_wake += 1;
         // Sleep shortly before the scheduled wake.
         let lead = wake_at - now_s() - 75;
         if lead > 0 {
             threadspace_harness::pause_ms(lead as u64 * 1000);
         }
+        // The wake-time discovery pass is logged within a second of the wake,
+        // so the cursor must exist before the Mac sleeps.
+        let mut cursor = ctx.companion().log();
         let slept_at = threadspace_harness::now_ms();
         let started = Instant::now();
+        awake.release();
         let sleep = run("/usr/bin/pmset", &["sleepnow"], Duration::from_secs(20));
         // Wait (monotonic time stops while asleep) for the companion to record the wake.
         let wakes_before = before["power"]["wakes"].as_u64().unwrap_or(0);
@@ -135,6 +184,7 @@ pub fn cycles(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
                 break;
             }
         }
+        awake = KeepAwake::hold()?;
         let wall_gap_s = (threadspace_harness::now_ms() - slept_at) / 1000;
         threadspace_harness::pause_ms(12_000);
         let after = facts(ctx);
@@ -143,12 +193,16 @@ pub fn cycles(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         let route = stale.as_ref().map(|session| {
             crate::terminal_gates::route(ctx, session, None)
         });
-        let mut cursor = ctx.companion().log();
         let mut seen = Vec::new();
         let discovery = cursor.wait_for("DISCOVERY_PASS", |_| true, Duration::from_secs(15), &mut seen);
         let checks = json!({
             "sleepCommandOk": sleep.ok,
             "companionRecordedWake": woke.is_some(),
+            "sleptLongEnough": wall_gap_s >= MIN_SLEEP_S,
+            "wokeAtScheduledTime": woke
+                .as_ref()
+                .and_then(|power| power["lastWakeWallMs"].as_i64())
+                .is_some_and(|ms| (ms / 1000 - wake_at).abs() <= WAKE_TOLERANCE_S),
             "sameCompanionIncarnation": before["companion"] == after["companion"],
             "sameBootSession": before["bootId"] == after["bootId"],
             "wakeRevalidationRan": after["power"]["wakeRevalidations"].as_u64() > before["power"]["wakeRevalidations"].as_u64(),
@@ -164,6 +218,7 @@ pub fn cycles(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
             "cycle": cycle,
             "pass": pass,
             "scheduledWakeUnix": wake_at,
+            "skippedWakesUnix": skipped,
             "sleptAtMs": slept_at,
             "wallGapSeconds": wall_gap_s,
             "sleepCommand": { "status": sleep.status, "stderr": sleep.stderr.trim() },
