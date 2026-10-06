@@ -258,3 +258,30 @@ pub fn migrate(conn: &mut Connection, now_ms: i64) -> Result<u32, JournalError> 
     }
     Ok(SCHEMA_VERSION)
 }
+
+/// Checks, without changing anything, that `conn` holds exactly this
+/// binary's migrations 1..=SCHEMA_VERSION with matching checksums.
+pub(crate) fn verify_applied(conn: &Connection) -> Result<u32, String> {
+    let mut statement = conn
+        .prepare("SELECT id, checksum FROM schema_migrations ORDER BY id")
+        .map_err(|error| format!("schema_migrations unreadable: {error}"))?;
+    let applied = statement
+        .query_map([], |row| {
+            Ok((row.get::<_, u32>(0)?, row.get::<_, String>(1)?))
+        })
+        .and_then(Iterator::collect::<Result<Vec<_>, _>>)
+        .map_err(|error| format!("schema_migrations unreadable: {error}"))?;
+    let found = applied.last().map_or(0, |(id, _)| *id);
+    if found != SCHEMA_VERSION || applied.len() != MIGRATIONS.len() {
+        return Err(format!(
+            "schema version {found} ({} migrations) is not the supported {SCHEMA_VERSION}",
+            applied.len()
+        ));
+    }
+    for ((id, recorded), migration) in applied.iter().zip(MIGRATIONS) {
+        if *id != migration.id || *recorded != checksum(migration.sql) {
+            return Err(format!("migration {id} differs from this binary's"));
+        }
+    }
+    Ok(found)
+}

@@ -5,6 +5,10 @@
 //! the linked engine is exactly SQLite 3.53.4 (docs/decisions/D-0001). A
 //! receipt is produced only after `COMMIT` returns.
 
+mod admission;
+mod backup;
+#[cfg(feature = "qualification")]
+mod crash;
 mod identity;
 mod lock;
 mod owner;
@@ -25,6 +29,15 @@ use threadspace_contracts::projection::{FleetSnapshot, NotificationState, Projec
 use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
 use uuid::Uuid;
 
+pub use admission::{AdmissionReceipt, ObservationAdmission};
+#[cfg(feature = "qualification")]
+pub use backup::file_sha256;
+pub use backup::{
+    BackupError, BackupInfo, RestoreOutcome, WalCheckpoint, backup_store_into, restore_backup,
+    verify_backup,
+};
+#[cfg(feature = "qualification")]
+pub use crash::{CRASH_AT_ENV, CRASH_POINT_ENV, CrashPlan, CrashPoint};
 #[cfg(feature = "qualification")]
 pub use identity::ObservationExport;
 pub use identity::{
@@ -132,6 +145,8 @@ pub struct Journal {
     store_generation: String,
     endpoint_id: String,
     source_epoch: String,
+    #[cfg(feature = "qualification")]
+    crash: crash::CrashState,
 }
 
 impl std::fmt::Debug for Journal {
@@ -171,6 +186,8 @@ impl Journal {
     /// Opens (creating if needed) the journal at `path`. The caller must hold
     /// the `WriterLock` for the containing store directory.
     pub fn open(path: &Path, source_epoch: &str, now_ms: i64) -> Result<Self, JournalError> {
+        #[cfg(feature = "qualification")]
+        let crash = crash::CrashState::from_env()?;
         let mut conn = Connection::open_with_flags(
             path,
             OpenFlags::SQLITE_OPEN_READ_WRITE
@@ -214,6 +231,8 @@ impl Journal {
             store_generation,
             endpoint_id,
             source_epoch: source_epoch.to_owned(),
+            #[cfg(feature = "qualification")]
+            crash,
         };
         journal.ensure_fixture(now_ms)?;
         Ok(journal)
