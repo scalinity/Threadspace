@@ -2,6 +2,9 @@
 target = "aarch64-apple-darwin"
 
 [env]
+# Deployment floor (SPEC §18.9). Without this, C dependencies such as the
+# SQLite amalgamation compile for the host SDK version instead of 26.0.
+MACOSX_DEPLOYMENT_TARGET = "26.0"
 # TypeScript definitions generated from crates/contracts (`cargo test -p threadspace-contracts`).
 TS_RS_EXPORT_DIR = { value = "apps/desktop/src/contracts/generated", relative = true }
 # Contract integers that exceed 32 bits are millisecond timestamps (< 2^53).

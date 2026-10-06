@@ -1,0 +1,30 @@
+[package]
+name = "threadspace-agent"
+description = "Rust core of ThreadspaceAgent.app: journal writer, control socket, notification outbox and native intents."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lib]
+name = "threadspace_agent"
+crate-type = ["staticlib", "rlib"]
+
+[features]
+# Qualification builds accept the qualification client role and synthetic
+# attention. Release builds (M15) are built without it.
+qualification = ["threadspace-contracts/qualification", "threadspace-journal/qualification"]
+
+[dependencies]
+threadspace-contracts.workspace = true
+threadspace-journal.workspace = true
+threadspace-relay.workspace = true
+threadspace-surfaces-macos.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+libc.workspace = true
+
+[lints]
+workspace = true

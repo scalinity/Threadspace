@@ -416,6 +416,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "threadspace-agent"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
+ "threadspace-contracts",
+ "threadspace-journal",
+ "threadspace-relay",
+ "threadspace-surfaces-macos",
+ "uuid",
+]
+
+[[package]]
 name = "threadspace-contracts"
 version = "0.1.0"
 dependencies = [
