@@ -8,7 +8,7 @@ pub mod stream;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Weak};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use threadspace_contracts::control::{
     ControlErrorCode, ControlMessage, ControlRequestBody, ControlResponseBody,
@@ -27,6 +27,13 @@ use link::{CompanionLink, LinkError};
 use stream::{AckError, FrameIdentity, StreamError, StreamSender};
 
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
+/// A query/command reply this large went through the framework's per-view
+/// fetch cache; one issued this recently may still be unconsumed there.
+const LARGE_REPLY_BYTES: usize = stream::CHANNEL_CACHE_THRESHOLD;
+const LARGE_REPLY_WINDOW: Duration = Duration::from_secs(30);
+
+/// Asks the shell to retire and recreate the office view (SPEC §18.5).
+pub type RecoveryHook = Box<dyn Fn(Uuid, &'static str) + Send + Sync>;
 /// Bounded memory of epochs already used; a used epoch never reconnects.
 const REMEMBERED_EPOCHS: usize = 1024;
 
@@ -48,6 +55,8 @@ pub struct Bridge {
     subscriptions: Mutex<HashMap<String, Arc<Subscription>>>,
     used_epochs: Mutex<(HashSet<String>, VecDeque<String>)>,
     queries_in_flight: AtomicUsize,
+    large_replies: Mutex<HashMap<Uuid, Instant>>,
+    recovery: Mutex<Option<RecoveryHook>>,
 }
 
 pub fn link_error(error: LinkError) -> UiError {
@@ -105,6 +114,43 @@ impl Bridge {
             subscriptions: Mutex::new(HashMap::new()),
             used_epochs: Mutex::new((HashSet::new(), VecDeque::new())),
             queries_in_flight: AtomicUsize::new(0),
+            large_replies: Mutex::new(HashMap::new()),
+            recovery: Mutex::new(None),
+        }
+    }
+
+    pub fn set_recovery_hook(&self, hook: RecoveryHook) {
+        if let Ok(mut slot) = self.recovery.lock() {
+            *slot = Some(hook);
+        }
+    }
+
+    /// Records a reply sent to `incarnation`; large ones may sit in the
+    /// framework cache until the page fetches them.
+    pub fn note_reply(&self, incarnation: Uuid, bytes: usize) {
+        if bytes >= LARGE_REPLY_BYTES
+            && let Ok(mut map) = self.large_replies.lock()
+        {
+            map.insert(incarnation, Instant::now());
+        }
+    }
+
+    fn recent_large_reply(&self, incarnation: Uuid) -> bool {
+        self.large_replies
+            .lock()
+            .ok()
+            .and_then(|map| map.get(&incarnation).copied())
+            .is_some_and(|at| at.elapsed() < LARGE_REPLY_WINDOW)
+    }
+
+    fn request_recovery(&self, incarnation: Uuid, reason: &'static str) {
+        if !self.views.is_active(incarnation) {
+            return;
+        }
+        if let Ok(slot) = self.recovery.lock()
+            && let Some(hook) = slot.as_ref()
+        {
+            hook(incarnation, reason);
         }
     }
 
@@ -384,8 +430,19 @@ impl Bridge {
             .ok()
             .and_then(|mut map| map.remove(subscription_id));
         let Some(subscription) = removed else { return };
-        if let Ok(mut stream) = subscription.stream.lock() {
-            stream.retire();
+        let cached = subscription
+            .stream
+            .lock()
+            .map(|mut stream| {
+                let cached = stream.may_hold_cached_frames();
+                stream.retire();
+                cached
+            })
+            .unwrap_or(false);
+        // Dropping a Channel or reloading the page does not purge the
+        // framework's per-view cache; only removing the actual view does.
+        if cached || self.recent_large_reply(subscription.incarnation) {
+            self.request_recovery(subscription.incarnation, "UNCONSUMED_DATA_ON_RETIREMENT");
         }
         if let Some(link) = self
             .current_link()

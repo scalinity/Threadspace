@@ -74,6 +74,26 @@ pub struct CompanionDiagnostics {
     pub notification_settings: Option<NotificationSettings>,
     pub accessibility_preferences: Option<AccessibilityPreferences>,
     pub qualification_build: bool,
+    /// The persisted owner preference (SPEC §19.5).
+    pub observation_enabled: bool,
+    /// `NONE`, `PREPARING` or `PREPARED`.
+    pub maintenance_phase: String,
+    /// Sleep/wake transitions observed by this core process (SPEC §19.5).
+    pub power: PowerHistory,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, Default)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct PowerHistory {
+    pub sleeps: u32,
+    pub wakes: u32,
+    pub last_sleep_wall_ms: Option<i64>,
+    pub last_wake_wall_ms: Option<i64>,
+    /// Kernel boot session at the last wake; a change would mean a reboot.
+    pub boot_id_at_last_wake: Option<String>,
+    /// Discovery passes run because of a wake.
+    pub wake_revalidations: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]

@@ -1,8 +1,10 @@
 // Runtime validation of bridge frames and snapshot content. The generated
 // TypeScript types describe the contract; these checks enforce it at runtime.
 
+import type { AttentionPage } from "../contracts/generated/AttentionPage";
 import type { AttentionView } from "../contracts/generated/AttentionView";
 import type { AttentionCounts } from "../contracts/generated/AttentionCounts";
+import type { FleetPage } from "../contracts/generated/FleetPage";
 import type { FleetSnapshot } from "../contracts/generated/FleetSnapshot";
 import type { NativeIntent } from "../contracts/generated/NativeIntent";
 import type { ProjectionPatch } from "../contracts/generated/ProjectionPatch";
@@ -181,12 +183,53 @@ function counts(value: unknown, path: string): AttentionCounts {
 
 export function parseSnapshot(value: unknown): FleetSnapshot {
   const v = object(value, "snapshot");
-  return {
+  const snapshot: FleetSnapshot = {
     viewRevision: cursor(v.viewRevision, "snapshot.viewRevision"),
     sessions: array(v.sessions, "snapshot.sessions", session),
     attention: array(v.attention, "snapshot.attention", attention),
     counts: counts(v.counts, "snapshot.counts"),
+    complete: boolean(v.complete, "snapshot.complete"),
+    totalSessions: integer(v.totalSessions, "snapshot.totalSessions"),
+    totalAttention: integer(v.totalAttention, "snapshot.totalAttention"),
+    sessionsAfter: optionalString(v.sessionsAfter, "snapshot.sessionsAfter"),
+    attentionAfter: optionalString(v.attentionAfter, "snapshot.attentionAfter"),
   };
+  // A complete view holds every row; a bounded one never hides its totals.
+  if (snapshot.complete && (snapshot.sessions.length !== snapshot.totalSessions || snapshot.attention.length !== snapshot.totalAttention)) {
+    fail("snapshot.complete", "row counts equal to totals");
+  }
+  if (snapshot.sessions.length > snapshot.totalSessions || snapshot.attention.length > snapshot.totalAttention) {
+    fail("snapshot.totals", "totals at least the rows present");
+  }
+  return snapshot;
+}
+
+function sessionPage(value: unknown, path: string): FleetPage {
+  const v = object(value, path);
+  return {
+    viewRevision: cursor(v.viewRevision, `${path}.viewRevision`),
+    rows: array(v.rows, `${path}.rows`, session),
+    nextAfter: optionalString(v.nextAfter, `${path}.nextAfter`),
+    total: integer(v.total, `${path}.total`),
+  };
+}
+
+function attentionPage(value: unknown, path: string): AttentionPage {
+  const v = object(value, path);
+  return {
+    viewRevision: cursor(v.viewRevision, `${path}.viewRevision`),
+    rows: array(v.rows, `${path}.rows`, attention),
+    nextAfter: optionalString(v.nextAfter, `${path}.nextAfter`),
+    total: integer(v.total, `${path}.total`),
+  };
+}
+
+/** Validates a page reply before it may touch the projection. */
+export function parsePage(value: unknown): { kind: "FleetPage"; page: FleetPage } | { kind: "AttentionPage"; page: AttentionPage } {
+  const v = object(value, "page");
+  if (v.kind === "FleetPage") return { kind: "FleetPage", page: sessionPage(v, "page") };
+  if (v.kind === "AttentionPage") return { kind: "AttentionPage", page: attentionPage(v, "page") };
+  return fail("page.kind", "FleetPage or AttentionPage");
 }
 
 function patch(value: unknown, path: string): ProjectionPatch {
@@ -202,21 +245,33 @@ function patch(value: unknown, path: string): ProjectionPatch {
       return { entity: oneOf(t.entity, `${entryPath}.entity`, ["SESSION", "ATTENTION"] as const), id: string(t.id, `${entryPath}.id`) };
     }),
     counts: counts(v.counts, `${path}.counts`),
+    pageInvalidations: array(v.pageInvalidations, `${path}.pageInvalidations`, (entry, entryPath) =>
+      oneOf(entry, entryPath, ["SESSION", "ATTENTION"] as const),
+    ),
   };
 }
 
 function intent(value: unknown, path: string): NativeIntent {
   const v = object(value, path);
   const action = object(v.action, `${path}.action`);
-  if (action.kind !== "OpenAttention") fail(`${path}.action.kind`, "OpenAttention");
+  const intentId = string(v.intentId, `${path}.intentId`);
+  if (action.kind === "QualificationCommand") {
+    return {
+      intentId,
+      action: { kind: "QualificationCommand", command: string(action.command, `${path}.action.command`), args: action.args },
+    };
+  }
+  if (action.kind !== "OpenAttention") fail(`${path}.action.kind`, "OpenAttention or QualificationCommand");
   return {
-    intentId: string(v.intentId, `${path}.intentId`),
+    intentId,
     action: {
       kind: "OpenAttention",
       attentionId: string(action.attentionId, `${path}.action.attentionId`),
       sessionId: string(action.sessionId, `${path}.action.sessionId`),
       outstanding: boolean(action.outstanding, `${path}.action.outstanding`),
       source: oneOf(action.source, `${path}.action.source`, ["NOTIFICATION_RESPONSE"] as const),
+      route: action.route === null ? null : routeSummary(action.route, `${path}.action.route`),
+      observationEnabled: boolean(action.observationEnabled, `${path}.action.observationEnabled`),
     },
   };
 }

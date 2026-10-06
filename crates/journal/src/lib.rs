@@ -7,7 +7,11 @@
 
 mod identity;
 mod lock;
+mod owner;
+pub mod paging;
 mod projection;
+#[cfg(feature = "qualification")]
+mod qualification;
 mod schema;
 
 use std::path::{Path, PathBuf};
@@ -247,14 +251,59 @@ impl Journal {
             [],
             |row| row.get(0),
         )?;
-        let snapshot = FleetSnapshot {
-            view_revision: format_cursor(cursor),
-            sessions: projection::sessions(&tx)?,
-            attention: projection::open_attention(&tx)?,
-            counts: projection::counts(&tx)?,
-        };
+        let snapshot = paging::initial_view(&tx, format_cursor(cursor))?;
         tx.finish()?;
         Ok((cursor, snapshot))
+    }
+
+    /// One page of sessions or open attention after `after`, read in a short
+    /// read transaction; `view_revision` is the cursor it was read at.
+    pub fn session_page(
+        &mut self,
+        after: Option<&str>,
+        limit: u32,
+    ) -> Result<
+        (
+            i64,
+            paging::Page<threadspace_contracts::projection::SessionView>,
+        ),
+        JournalError,
+    > {
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Deferred)?;
+        let cursor: i64 = tx.query_row(
+            "SELECT COALESCE(MAX(ingest_seq), 0) FROM observations",
+            [],
+            |row| row.get(0),
+        )?;
+        let page = paging::session_page(&tx, after, limit, paging::PAGE_BUDGET)?;
+        tx.finish()?;
+        Ok((cursor, page))
+    }
+
+    pub fn attention_page(
+        &mut self,
+        after: Option<&str>,
+        limit: u32,
+    ) -> Result<
+        (
+            i64,
+            paging::Page<threadspace_contracts::projection::AttentionView>,
+        ),
+        JournalError,
+    > {
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Deferred)?;
+        let cursor: i64 = tx.query_row(
+            "SELECT COALESCE(MAX(ingest_seq), 0) FROM observations",
+            [],
+            |row| row.get(0),
+        )?;
+        let page = paging::attention_page(&tx, after, limit, paging::PAGE_BUDGET)?;
+        tx.finish()?;
+        Ok((cursor, page))
     }
 
     /// Full upserts for every entity a committed change touched.
@@ -279,6 +328,7 @@ impl Journal {
             attention_upserts,
             tombstones: Vec::new(),
             counts: projection::counts(&self.conn)?,
+            page_invalidations: Vec::new(),
         })
     }
 

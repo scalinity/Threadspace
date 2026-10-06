@@ -19,6 +19,9 @@ pub const CONTROL_PROTOCOL_VERSION: u32 = 1;
 pub enum ClientRole {
     /// The desktop shell's native bridge.
     Ui,
+    /// The outer application's native bootstrap (SPEC §18.9, §19.5): service
+    /// preparation, observation preference and maintenance ordering.
+    Bootstrap,
     /// The qualification harness; accepted only by qualification builds.
     Qualification,
 }
@@ -55,6 +58,15 @@ pub enum ControlRequestBody {
     IntentConsumed {
         intent_id: String,
     },
+    /// A page of sessions/open attention for a bounded view (SPEC §18.4).
+    FleetPage {
+        after: Option<String>,
+        limit: u32,
+    },
+    AttentionPage {
+        after: Option<String>,
+        limit: u32,
+    },
     Diagnostics,
     IntegrationStatus,
     AcknowledgeAttention {
@@ -71,11 +83,68 @@ pub enum ControlRequestBody {
     },
     /// Run one discovery pass now (SPEC §4.4, §4.14) and report it.
     RefreshEvidence,
+    /// Explicit owner resolution ("Mark handled", SPEC §7.2); always carries a reason.
+    ResolveAttention {
+        command_id: String,
+        attention_id: String,
+        expected_revision: Option<String>,
+        reason: String,
+    },
+    /// Bootstrap only (SPEC §19.5): durably record the phase, gate new
+    /// admission, finish accepted work and create a consistent backup while
+    /// still supervised; answers `MaintenancePrepared` and keeps running,
+    /// holding the writer lock. Nothing remains to be done after the answer.
+    PrepareMaintenance {
+        purpose: MaintenancePurpose,
+    },
+    /// Bootstrap only: leave a prepared maintenance phase and reopen admission.
+    CancelMaintenance,
+    /// Bootstrap only: durably record the owner's observation preference
+    /// (`EnableObservation` / the stop half of `StopObservation`).
+    SetObservationEnabled {
+        enabled: bool,
+    },
+    /// Sent by a second companion instance that lost the writer lock: it
+    /// forwards a notification response it received to the verified incumbent.
+    ForwardNotificationResponse {
+        notification_request_id: String,
+        attention_id: String,
+    },
     /// Qualification only: commit a synthetic fixture turn plus a completed-turn
     /// attention item and its notification intent.
     #[cfg(feature = "qualification")]
     QualifyRaiseAttention {
         label: String,
+        /// Attach the item to an existing (for example provider-observed)
+        /// Session instead of the synthetic fixture Session.
+        session_id: Option<String>,
+    },
+    /// Qualification only: commit `count` synthetic fixture changes spread
+    /// over `duration_ms`, each its own transaction and broadcast.
+    #[cfg(feature = "qualification")]
+    QualifySyntheticChanges {
+        count: u32,
+        duration_ms: u32,
+        sessions: u32,
+    },
+    /// Qualification only: add `sessions` synthetic fixture Sessions with
+    /// `name_bytes`-long names (oversized-snapshot fixtures).
+    #[cfg(feature = "qualification")]
+    QualifyPopulate {
+        sessions: u32,
+        name_bytes: u32,
+    },
+    /// Qualification only: deliver a qualification command to hydrated views
+    /// as a native intent (renderer fault injection, self-tests).
+    #[cfg(feature = "qualification")]
+    QualifyViewCommand {
+        command: String,
+        args: serde_json::Value,
+    },
+    /// Qualification only: arm a one-shot fault in the companion.
+    #[cfg(feature = "qualification")]
+    QualifyArmFault {
+        fault: QualificationFault,
     },
     /// Qualification only: journaled identity and route observations after a
     /// cursor, for the evidence ledger.
@@ -101,8 +170,14 @@ pub enum ControlResponseBody {
         snapshot: FleetSnapshot,
     },
     Done,
+    FleetPage {
+        page: crate::ui::FleetPage,
+    },
+    AttentionPage {
+        page: crate::ui::AttentionPage,
+    },
     Diagnostics {
-        report: CompanionDiagnostics,
+        report: Box<CompanionDiagnostics>,
     },
     IntegrationStatus {
         report: CompanionIntegration,
@@ -128,6 +203,24 @@ pub enum ControlResponseBody {
     ObservationsExported {
         observations: Vec<serde_json::Value>,
     },
+    MaintenancePrepared {
+        report: Box<MaintenanceReport>,
+    },
+    #[cfg(feature = "qualification")]
+    SyntheticChangesStarted {
+        run_id: String,
+        first_cursor: String,
+    },
+    #[cfg(feature = "qualification")]
+    Populated {
+        sessions: u32,
+        cursor: String,
+    },
+    #[cfg(feature = "qualification")]
+    ViewCommandQueued {
+        intent_id: String,
+        hydrated_views: u32,
+    },
     #[cfg(feature = "qualification")]
     AttentionRaised {
         attention_id: String,
@@ -135,6 +228,46 @@ pub enum ControlResponseBody {
         notification_request_id: String,
         cursor: String,
     },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all_fields = "camelCase", deny_unknown_fields)]
+pub enum MaintenancePurpose {
+    /// Stop Observation: prepare, then unregister; no migration.
+    Stop,
+    /// A staged update to `target_version` (M15 builds the full updater).
+    Update { target_version: String },
+}
+
+/// Durable maintenance phase recorded by the single writer (SPEC §19.5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum MaintenancePhase {
+    None,
+    Preparing,
+    Prepared,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MaintenanceReport {
+    pub phase: MaintenancePhase,
+    pub purpose: MaintenancePurpose,
+    pub backup_file: String,
+    pub backup_cursor: String,
+    pub backup_sha256: String,
+    pub backup_bytes: u64,
+    pub prepared_at_ms: i64,
+    pub companion: ProcessIdentity,
+}
+
+/// One-shot faults a qualification build can arm (never present in release).
+#[cfg(feature = "qualification")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum QualificationFault {
+    /// The next `PrepareMaintenance` fails while creating its backup.
+    FailNextMaintenanceBackup,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -150,6 +283,10 @@ pub enum ControlErrorCode {
     Conflict,
     Busy,
     Unavailable,
+    /// Admission is gated by a prepared maintenance phase.
+    MaintenanceGated,
+    /// Observation is disabled; only control/inspection operations run.
+    ObservationDisabled,
     Internal,
 }
 

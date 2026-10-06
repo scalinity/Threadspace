@@ -6,14 +6,17 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
+use threadspace_contracts::frames::{CHUNK_BUDGET, chunk_for_frames};
 use threadspace_contracts::limits::{
     FRAME_MAX_BYTES, SNAPSHOT_MAX_BYTES, SNAPSHOT_MAX_FRAMES, WINDOW_MAX_BYTES, WINDOW_MAX_FRAMES,
 };
 use threadspace_contracts::projection::{FleetSnapshot, NativeIntent, ProjectionPatch};
 use threadspace_contracts::ui::{FrameHeader, UI_PROTOCOL_VERSION, UiFrame, UiFrameBody};
 
-/// Envelope reserve for a chunk frame's header and JSON framing.
-const ENVELOPE_RESERVE: usize = 2048;
+/// The pinned Channel sends JSON payloads at or above this size through its
+/// per-webview cache instead of direct evaluation (tauri 3.0.0-alpha.4
+/// `MAX_JSON_DIRECT_EXECUTE_THRESHOLD`).
+pub const CHANNEL_CACHE_THRESHOLD: usize = 8192;
 /// Changes that may arrive between `AttachView` and snapshot emission.
 const MAX_BUFFERED_BEFORE_SNAPSHOT: usize = 32;
 
@@ -100,35 +103,6 @@ pub struct StreamSender<S: FrameSink> {
     state: State,
 }
 
-/// Bytes a character occupies once JSON-escaped inside a string literal.
-fn escaped_len(character: char) -> usize {
-    match character {
-        '"' | '\\' | '\n' | '\r' | '\t' | '\u{08}' | '\u{0c}' => 2,
-        c if (c as u32) < 0x20 => 6,
-        c => c.len_utf8(),
-    }
-}
-
-/// Splits serialized JSON into UTF-8 slices whose escaped size fits `budget`.
-pub fn chunk_for_frames(json: &str, budget: usize) -> Vec<&str> {
-    let mut chunks = Vec::new();
-    let mut start = 0;
-    let mut size = 0;
-    for (index, character) in json.char_indices() {
-        let length = escaped_len(character);
-        if size + length > budget && index > start {
-            chunks.push(&json[start..index]);
-            start = index;
-            size = 0;
-        }
-        size += length;
-    }
-    if start < json.len() {
-        chunks.push(&json[start..]);
-    }
-    chunks
-}
-
 impl<S: FrameSink> StreamSender<S> {
     pub fn new(sink: S, identity: FrameIdentity) -> Self {
         Self {
@@ -152,6 +126,15 @@ impl<S: FrameSink> StreamSender<S> {
 
     pub fn is_hydrated(&self) -> bool {
         self.hydrated
+    }
+
+    /// Whether a sent but unacknowledged frame was large enough to travel
+    /// through the framework's per-view fetch cache (alpha.4 caches JSON
+    /// payloads of 8 KiB or more), so it may remain there unconsumed.
+    pub fn may_hold_cached_frames(&self) -> bool {
+        self.unacked
+            .iter()
+            .any(|sent| sent.bytes >= CHANNEL_CACHE_THRESHOLD)
     }
 
     pub fn retire(&mut self) {
@@ -212,7 +195,7 @@ impl<S: FrameSink> StreamSender<S> {
     ) -> Result<(), StreamError> {
         let json = serde_json::to_string(snapshot)
             .map_err(|error| StreamError::ChannelClosed(error.to_string()))?;
-        let chunks = chunk_for_frames(&json, FRAME_MAX_BYTES - ENVELOPE_RESERVE);
+        let chunks = chunk_for_frames(&json, CHUNK_BUDGET);
         let frames = chunks.len() + 2;
         if json.len() > SNAPSHOT_MAX_BYTES || frames > SNAPSHOT_MAX_FRAMES {
             return Err(StreamError::SnapshotExceedsBound {
@@ -402,6 +385,11 @@ mod tests {
                 needs_attention: padding as u32,
                 awaiting_action: 0,
             },
+            complete: true,
+            total_sessions: 0,
+            total_attention: 0,
+            sessions_after: None,
+            attention_after: None,
         }
     }
 
@@ -417,6 +405,7 @@ mod tests {
                 needs_attention: 0,
                 awaiting_action: 1,
             },
+            page_invalidations: Vec::new(),
         })
     }
 
@@ -497,6 +486,8 @@ mod tests {
                 session_id: "s".into(),
                 outstanding: true,
                 source: IntentSource::NotificationResponse,
+                route: None,
+                observation_enabled: true,
             },
         };
         stream.push_intent("7", intent).expect("intent");
@@ -557,10 +548,12 @@ mod tests {
         let text = "aé\"\\\u{1}b".repeat(1000);
         let chunks = chunk_for_frames(&text, 100);
         assert_eq!(chunks.concat(), text);
-        assert!(
-            chunks
-                .iter()
-                .all(|chunk| chunk.chars().map(escaped_len).sum::<usize>() <= 100)
-        );
+        assert!(chunks.iter().all(|chunk| {
+            chunk
+                .chars()
+                .map(threadspace_contracts::frames::escaped_len)
+                .sum::<usize>()
+                <= 100
+        }));
     }
 }

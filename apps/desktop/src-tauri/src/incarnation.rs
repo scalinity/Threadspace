@@ -42,6 +42,14 @@ impl ViewRegistry {
         }
     }
 
+    pub fn is_active(&self, id: Uuid) -> bool {
+        self.active
+            .lock()
+            .ok()
+            .and_then(|active| *active)
+            .is_some_and(|view| view.id == id)
+    }
+
     /// Returns the caller's incarnation only if it is the active office view.
     pub fn verify<R: Runtime>(&self, webview: &Webview<R>) -> Result<Uuid, UiError> {
         let stale = || {

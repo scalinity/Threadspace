@@ -105,12 +105,23 @@ fn later_milestone_queries_are_typed_not_implemented() {
     let reply = invoke(
         &office(&app),
         "ui_query",
-        json!({ "request": { "query": { "kind": "FleetPage" }, "context": null } }),
+        json!({ "request": { "query": { "kind": "SessionDetail" }, "context": null } }),
     );
     assert_eq!(
         code(&reply.expect_err("not implemented")),
         "NOT_IMPLEMENTED_FOR_MILESTONE"
     );
+}
+
+#[test]
+fn pages_require_a_subscription_context() {
+    let (app, _bridge) = app();
+    let reply = invoke(
+        &office(&app),
+        "ui_query",
+        json!({ "request": { "query": { "kind": "FleetPage", "after": null, "limit": 10 }, "context": null } }),
+    );
+    assert_eq!(code(&reply.expect_err("needs context")), "INVALID_REQUEST");
 }
 
 #[test]

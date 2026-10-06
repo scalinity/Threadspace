@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { BridgeClient } from "./bridge/client";
 import { launch } from "./launch";
 import { runAclProbe } from "./qualification/aclProbe";
+import { installQualificationCommands } from "./qualification/commands";
 import { runIpcSelfTest } from "./qualification/ipcSelfTest";
 import { App } from "./ui/App";
 import "./styles.css";
@@ -25,6 +26,7 @@ if (launch.probe === "acl") {
       void runIpcSelfTest(hydrated);
     });
   }
+  if (launch.qualificationBuild) installQualificationCommands(client);
   client.start();
   createRoot(root).render(
     <StrictMode>

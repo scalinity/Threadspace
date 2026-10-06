@@ -4,6 +4,8 @@ import AppKit
 /// in its run loop for as long as it is enabled. A startup failure exits
 /// nonzero, which ServiceManagement treats as a crash and relaunches.
 final class AgentAppDelegate: NSObject, NSApplicationDelegate {
+    private var powerObservers: [NSObjectProtocol] = []
+
     func applicationWillFinishLaunching(_ notification: Notification) {
         let bundle = Bundle.main
         let config: [String: String] = [
@@ -21,6 +23,21 @@ final class AgentAppDelegate: NSObject, NSApplicationDelegate {
         if status != 0 {
             exit(status)
         }
+        observePower()
+    }
+
+    /// Sleep/wake transitions go to the core, which suspends provider polling
+    /// on sleep and revalidates native evidence on wake (SPEC §19.5).
+    private func observePower() {
+        let center = NSWorkspace.shared.notificationCenter
+        powerObservers = [
+            center.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { _ in
+                deliverToCore(["kind": "Power", "phase": "WILL_SLEEP"])
+            },
+            center.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in
+                deliverToCore(["kind": "Power", "phase": "DID_WAKE"])
+            },
+        ]
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

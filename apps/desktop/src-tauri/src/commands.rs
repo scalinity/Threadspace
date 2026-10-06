@@ -69,10 +69,15 @@ pub async fn ui_disconnect<R: Runtime>(
     bridge.inner().disconnect(incarnation, &request)
 }
 
-fn bounded<T: serde::Serialize>(value: T) -> Result<T, UiError> {
+fn bounded<T: serde::Serialize>(
+    bridge: &Bridge,
+    incarnation: uuid::Uuid,
+    value: T,
+) -> Result<T, UiError> {
     let size = serde_json::to_vec(&value)
         .map(|bytes| bytes.len())
         .unwrap_or(usize::MAX);
+    bridge.note_reply(incarnation, size);
     if size > QUERY_REPLY_MAX_BYTES {
         return Err(UiError::new(
             UiErrorCode::ReplyTooLarge,
@@ -130,7 +135,7 @@ pub async fn ui_query<R: Runtime>(
                 .request(ControlRequestBody::Diagnostics, QUICK)
                 .await
             {
-                Ok(ControlResponseBody::Diagnostics { report }) => Some(report),
+                Ok(ControlResponseBody::Diagnostics { report }) => Some(*report),
                 _ => None,
             };
             UiQueryResult::Diagnostics(Box::new(DiagnosticsReport {
@@ -151,16 +156,67 @@ pub async fn ui_query<R: Runtime>(
             };
             UiQueryResult::IntegrationStatus(Box::new(IntegrationReport { service, companion }))
         }
-        UiQuery::FleetPage {}
-        | UiQuery::AttentionPage {}
-        | UiQuery::SessionDetail {}
-        | UiQuery::ProjectDetail {} => {
+        UiQuery::FleetPage { after, limit } | UiQuery::AttentionPage { after, limit } => {
+            let subscription = bridge.validate_context(
+                incarnation,
+                request.context.as_ref().ok_or_else(|| {
+                    UiError::invalid("this query requires a subscription context")
+                })?,
+            )?;
+            if let Some(after) = after {
+                parse_uuid(after, "after")?;
+            }
+            if *limit == 0 || *limit > 500 {
+                return Err(UiError::invalid("limit must be 1-500"));
+            }
+            let link = bridge.link()?;
+            if link.id != subscription.link_id {
+                return Err(UiError::new(
+                    UiErrorCode::StaleContext,
+                    "companion connection changed",
+                ));
+            }
+            let attention = matches!(request.query, UiQuery::AttentionPage { .. });
+            let body = if attention {
+                ControlRequestBody::AttentionPage {
+                    after: after.clone(),
+                    limit: *limit,
+                }
+            } else {
+                ControlRequestBody::FleetPage {
+                    after: after.clone(),
+                    limit: *limit,
+                }
+            };
+            let reply = link.request(body, QUICK).await.map_err(link_error)?;
+            // The view may have been retired while the page was read; a stale
+            // reply never reaches the new view (SPEC §18.3).
+            bridge.validate_context(
+                incarnation,
+                request
+                    .context
+                    .as_ref()
+                    .ok_or_else(|| UiError::invalid("context"))?,
+            )?;
+            match reply {
+                ControlResponseBody::FleetPage { page } => UiQueryResult::FleetPage(page),
+                ControlResponseBody::AttentionPage { page } => UiQueryResult::AttentionPage(page),
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
+            }
+        }
+        UiQuery::WindowState {} => UiQueryResult::WindowState(crate::window::state_of(&webview)?),
+        UiQuery::SessionDetail {} | UiQuery::ProjectDetail {} => {
             return Err(UiError::not_implemented(
                 &format!("{:?}", request.query).replace(" {}", ""),
             ));
         }
     };
-    bounded(result)
+    bounded(bridge, incarnation, result)
 }
 
 #[tauri::command]
@@ -173,6 +229,32 @@ pub async fn ui_action<R: Runtime>(
     let request: UiActionRequest = parse_request(request)?;
     parse_uuid(&request.request_id, "requestId")?;
     let bridge = bridge.inner();
+    // Observation enable/stop run the outer bootstrap ordering (SPEC §19.5)
+    // and must work while no companion is reachable; they need only the
+    // verified current view.
+    if let UiAction::EnableObservation {} | UiAction::StopObservation {} = request.action {
+        let enable = matches!(request.action, UiAction::EnableObservation {});
+        let agent = bridge.agent_identifier();
+        let (ok, detail) = tauri::async_runtime::spawn_blocking(move || {
+            if enable {
+                bootstrap::enable(&agent)
+            } else {
+                bootstrap::stop(&agent)
+            }
+        })
+        .await
+        .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
+        let service = bootstrap::report(&bridge.agent_identifier());
+        let summary: String = detail.to_string().chars().take(240).collect();
+        if !ok {
+            return Err(UiError::new(UiErrorCode::CompanionRejected, summary));
+        }
+        return Ok(UiActionResult::ObservationChanged {
+            enabled: enable,
+            service,
+            detail: summary,
+        });
+    }
     let subscription = bridge.validate_context(incarnation, &request.context)?;
     let link = bridge.link()?;
     if link.id != subscription.link_id {
@@ -195,6 +277,39 @@ pub async fn ui_action<R: Runtime>(
                 command_id: request.request_id,
                 attention_id,
                 expected_revision: request.expected_revision,
+            };
+            match link.request(body, QUICK).await.map_err(link_error)? {
+                ControlResponseBody::CommandReceipt { receipt } => {
+                    UiActionResult::CommandCommitted { receipt }
+                }
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
+            }
+        }
+        UiAction::ResolveAttention {
+            attention_id,
+            reason,
+        } => {
+            parse_uuid(&attention_id, "attentionId")?;
+            if reason.trim().is_empty() {
+                return Err(UiError::invalid("a resolution reason is required"));
+            }
+            if let Some(revision) = &request.expected_revision
+                && parse_cursor(revision).is_none()
+            {
+                return Err(UiError::invalid(
+                    "expectedRevision must be a canonical cursor",
+                ));
+            }
+            let body = ControlRequestBody::ResolveAttention {
+                command_id: request.request_id,
+                attention_id,
+                expected_revision: request.expected_revision,
+                reason,
             };
             match link.request(body, QUICK).await.map_err(link_error)? {
                 ControlResponseBody::CommandReceipt { receipt } => {

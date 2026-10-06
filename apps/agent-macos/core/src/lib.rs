@@ -13,11 +13,15 @@
 
 mod bridge;
 mod discovery;
+mod forward;
 mod log;
+mod maintenance;
 mod native_ops;
 mod notify;
+mod respond;
 mod route;
 mod server;
+mod state;
 mod writer;
 
 use std::collections::VecDeque;
@@ -41,7 +45,9 @@ use threadspace_surfaces_macos::process;
 use uuid::Uuid;
 
 use crate::bridge::{BridgeCallback, BridgeEvent};
-use crate::writer::WriterCommand;
+use crate::state::RUNTIME;
+use crate::writer::{WriterCommand, WriterSetup};
+use threadspace_contracts::control::MaintenancePhase;
 
 pub const EXIT_RUNNING: i32 = 0;
 pub const EXIT_CONFIG: i32 = 64;
@@ -63,6 +69,7 @@ struct StartConfig {
 
 struct Running {
     writer: SyncSender<WriterCommand>,
+    discovery: Option<SyncSender<discovery::Trigger>>,
     _lock: WriterLock,
 }
 
@@ -92,6 +99,10 @@ fn private_dir(path: &Path) -> std::io::Result<()> {
 /// Validated, ID-only handling of notification responses; queued until the
 /// writer exists (SPEC §7.5).
 fn handle_event(event: BridgeEvent) {
+    if let BridgeEvent::Power { phase } = &event {
+        power_transition(phase);
+        return;
+    }
     let BridgeEvent::NotificationResponse {
         schema,
         request_id,
@@ -107,6 +118,10 @@ fn handle_event(event: BridgeEvent) {
             "NOTIFICATION_RESPONSE_IGNORED",
             json!({ "schema": schema, "actionIdentifier": action_identifier, "requestId": request_id }),
         );
+        return;
+    }
+    if forward::active() {
+        forward::notification_response(&request_id, &attention_id);
         return;
     }
     match RUNNING.get() {
@@ -170,8 +185,19 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     let lock = match WriterLock::acquire(&paths.store_dir) {
         Ok(lock) => lock,
         Err(LockError::Held { .. }) => {
-            log::warn("WRITER_LOCK_HELD", json!({}));
-            return EXIT_WRITER_LOCK_HELD;
+            // Another instance owns the store. This one only forwards a
+            // notification response it may have been launched for, then
+            // exits; it never becomes a second writer (SPEC §7.5).
+            log::warn("WRITER_LOCK_HELD", json!({ "mode": "forwarder" }));
+            forward::enter(paths.locator.clone());
+            let queued: Vec<BridgeEvent> = PRESTART
+                .lock()
+                .map(|mut queue| queue.drain(..).collect())
+                .unwrap_or_default();
+            for event in queued {
+                handle_event(event);
+            }
+            return EXIT_RUNNING;
         }
         Err(error) => {
             log::error("WRITER_LOCK_FAILED", json!({ "error": error.to_string() }));
@@ -182,7 +208,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
 
     let core_generation = Uuid::new_v4().to_string();
     let started_at_ms = log::now_ms();
-    let journal = match Journal::open(&paths.journal, &core_generation, started_at_ms) {
+    let mut journal = match Journal::open(&paths.journal, &core_generation, started_at_ms) {
         Ok(journal) => journal,
         Err(error) => {
             log::error("JOURNAL_OPEN_FAILED", json!({ "error": error.to_string() }));
@@ -208,6 +234,32 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         ),
     }
     let store_generation = journal.store_generation().to_owned();
+    let observation_enabled = journal.observation_enabled().unwrap_or(true);
+    let maintenance = match journal.maintenance_phase() {
+        Ok((phase, _)) if phase == "PREPARED" => MaintenancePhase::Prepared,
+        // A crash while preparing leaves no completed backup: reopen.
+        Ok((phase, _)) if phase == "PREPARING" => {
+            let _ = journal.record_maintenance_phase(
+                "NONE",
+                None,
+                json!({ "reason": "preparation interrupted by restart" }),
+                log::now_ms(),
+            );
+            MaintenancePhase::None
+        }
+        _ => MaintenancePhase::None,
+    };
+    if maintenance == MaintenancePhase::Prepared {
+        // Quiescent: a companion restarted inside a prepared maintenance
+        // transaction cannot resume writes by itself (SPEC §19.5).
+        log::warn("MAINTENANCE_QUIESCENT_START", json!({}));
+    }
+    RUNTIME.set_observation_enabled(observation_enabled);
+    RUNTIME.set_maintenance(maintenance);
+    log::info(
+        "OBSERVATION_STATE",
+        json!({ "observationEnabled": observation_enabled, "maintenance": maintenance }),
+    );
     let identity = match own_identity() {
         Ok(identity) => identity,
         Err(error) => {
@@ -231,6 +283,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
 
     let (writer_tx, writer_rx) = mpsc::sync_channel(256);
     let (notify_tx, notify_rx) = mpsc::sync_channel(64);
+    let (respond_tx, respond_rx) = mpsc::sync_channel(16);
     let Some(home) = threadspace_relay::paths::home_dir() else {
         log::error("HOME_UNAVAILABLE", json!({}));
         return EXIT_FATAL;
@@ -241,23 +294,41 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         home,
         resources_dir: PathBuf::from(&config.resources_path),
     };
-    let spawned = writer::spawn(journal, writer_rx, notify_tx)
-        .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
-        .and_then(|_| discovery::spawn(claude.clone()))
-        .and_then(|discovery| {
-            let context = Arc::new(server::CoreContext {
-                bundle_identifier: config.bundle_identifier.clone(),
-                core_generation: core_generation.clone(),
-                store_generation: store_generation.clone(),
-                identity: identity.clone(),
-                started_at_ms,
-                resources_dir: PathBuf::from(&config.resources_path),
-                writer: writer_tx.clone(),
-                claude,
-                discovery,
-            });
-            server::spawn(listener, context)
+    let mut discovery_trigger = None;
+    let spawned = writer::spawn(WriterSetup {
+        journal,
+        commands: writer_rx,
+        notifier: notify_tx,
+        responder: respond_tx,
+        identity: identity.clone(),
+        store_dir: paths.store_dir.clone(),
+    })
+    .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
+    .and_then(|_| discovery::spawn(claude.clone()))
+    .and_then(|discovery| {
+        discovery_trigger = Some(discovery.clone());
+        respond::spawn(
+            respond_rx,
+            writer_tx.clone(),
+            claude.clone(),
+            discovery.clone(),
+        )
+        .map(|_| discovery)
+    })
+    .and_then(|discovery| {
+        let context = Arc::new(server::CoreContext {
+            bundle_identifier: config.bundle_identifier.clone(),
+            core_generation: core_generation.clone(),
+            store_generation: store_generation.clone(),
+            identity: identity.clone(),
+            started_at_ms,
+            resources_dir: PathBuf::from(&config.resources_path),
+            writer: writer_tx.clone(),
+            claude,
+            discovery,
         });
+        server::spawn(listener, context)
+    });
     if let Err(error) = spawned {
         log::error("THREAD_SPAWN_FAILED", json!({ "error": error.to_string() }));
         return EXIT_FATAL;
@@ -283,6 +354,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     if RUNNING
         .set(Running {
             writer: writer_tx,
+            discovery: discovery_trigger,
             _lock: lock,
         })
         .is_err()
@@ -308,7 +380,55 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     for event in queued {
         handle_event(event);
     }
+    if !observation_enabled {
+        server::spawn_idle_exit();
+    }
     EXIT_RUNNING
+}
+
+/// Sleep/wake (SPEC §19.5): suspend polling on sleep; on wake resample the
+/// boot session, journal the transition and revalidate through a fresh
+/// discovery pass. Monotonic clocks are never compared across boots.
+fn power_transition(phase: &str) {
+    let now = log::now_ms();
+    let boot = process::boot_session_id().ok();
+    match phase {
+        "WILL_SLEEP" => {
+            RUNTIME.note_sleep(now);
+            log::info("POWER_WILL_SLEEP", json!({ "bootId": boot }));
+        }
+        "DID_WAKE" => {
+            RUNTIME.note_wake(now, boot.clone());
+            log::info("POWER_DID_WAKE", json!({ "bootId": boot }));
+        }
+        other => {
+            log::warn("POWER_EVENT_UNKNOWN", json!({ "phase": other }));
+            return;
+        }
+    }
+    let Some(running) = RUNNING.get() else {
+        return;
+    };
+    let event = if phase == "WILL_SLEEP" {
+        "OBSERVER_SUSPENDED_FOR_SLEEP"
+    } else {
+        "OBSERVER_RESUMED_AFTER_WAKE"
+    };
+    let _ = running.writer.try_send(WriterCommand::RecordLifecycle {
+        native_event: event,
+        payload: json!({ "bootId": boot, "wallMs": now }),
+    });
+    if phase == "DID_WAKE"
+        && let Some(discovery) = running.discovery.as_ref()
+        && discovery
+            .try_send(discovery::Trigger::Refresh {
+                force_surface: true,
+                reply: None,
+            })
+            .is_ok()
+    {
+        RUNTIME.note_wake_revalidation();
+    }
 }
 
 /// Starts the companion core.

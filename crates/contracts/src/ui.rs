@@ -163,8 +163,20 @@ pub struct UiCallContext {
 pub enum UiQuery {
     /// Bootstrap status; may omit context.
     ConnectionStatus {},
-    FleetPage {},
-    AttentionPage {},
+    /// Sessions after the opaque position `after` (from a bounded snapshot
+    /// or a previous page), at most `limit` rows and 64 KiB.
+    FleetPage {
+        after: Option<String>,
+        limit: u32,
+    },
+    /// Open attention items after `after`, at most `limit` rows and 64 KiB.
+    AttentionPage {
+        after: Option<String>,
+        limit: u32,
+    },
+    /// Bootstrap scope: the calling view's native window state, so the
+    /// renderer acts only on a confirmed hidden/minimized transition.
+    WindowState {},
     SessionDetail {},
     ProjectDetail {},
     Diagnostics {},
@@ -224,8 +236,50 @@ pub struct IntegrationReport {
 #[ts(export)]
 pub enum UiQueryResult {
     ConnectionStatus(ConnectionStatus),
+    FleetPage(FleetPage),
+    AttentionPage(AttentionPage),
+    WindowState(WindowState),
     Diagnostics(Box<DiagnosticsReport>),
     IntegrationStatus(Box<IntegrationReport>),
+}
+
+/// Page rows carry their own revisions; a page never overwrites a newer row
+/// the subscription already holds.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct FleetPage {
+    pub view_revision: String,
+    pub rows: Vec<crate::projection::SessionView>,
+    pub next_after: Option<String>,
+    pub total: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct AttentionPage {
+    pub view_revision: String,
+    pub rows: Vec<crate::projection::AttentionView>,
+    pub next_after: Option<String>,
+    pub total: u32,
+}
+
+/// The office window as AppKit reports it. Sizes are logical points;
+/// `scale_factor_milli` is the backing scale ×1000.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct WindowState {
+    pub visible: bool,
+    pub minimized: bool,
+    pub fullscreen: bool,
+    pub focused: bool,
+    pub scale_factor_milli: u32,
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
 }
 
 // ----------------------------------------------------------------- action
@@ -258,15 +312,23 @@ pub enum UiAction {
         expected_binding_revision: Option<String>,
     },
     RefreshEvidence {},
+    /// Explicit "Mark handled" (SPEC §7.2): resolution always records a reason.
+    ResolveAttention {
+        attention_id: String,
+        reason: String,
+    },
+    /// SPEC §19.5: register/start the companion and durably record the
+    /// enabled preference through its single writer.
+    EnableObservation {},
+    /// SPEC §19.5: record the disabled preference, prepare while supervised,
+    /// then unregister and verify exit and writer-lock release.
+    StopObservation {},
     // Defined by SPEC §18.3 and §19; implemented in later milestones.
-    ResolveAttention {},
     SnoozeAttention {},
     UpdateLayout {},
     UpdatePreferences {},
     SetProjectHome {},
     LinkSurface {},
-    EnableObservation {},
-    StopObservation {},
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
@@ -324,6 +386,11 @@ pub enum UiActionResult {
     EvidenceRefreshed {
         summary: DiscoverySummary,
     },
+    ObservationChanged {
+        enabled: bool,
+        service: ServiceReport,
+        detail: String,
+    },
 }
 
 // ------------------------------------------------------------------ error
@@ -347,6 +414,10 @@ pub enum UiErrorCode {
     ReplyTooLarge,
     SnapshotExceedsBound,
     AckRejected,
+    /// Observation is disabled or under maintenance; the action needs it.
+    ObservationUnavailable,
+    /// The office view is being recreated (SPEC §18.5); connect again shortly.
+    ViewRecovering,
     Internal,
 }
 
@@ -450,8 +521,13 @@ mod tests {
             UiErrorCode::InvalidRequest
         );
 
-        let later: UiAction = parse_request(json!({ "kind": "ResolveAttention" })).expect("parses");
-        assert_eq!(later, UiAction::ResolveAttention {});
+        let later: UiAction = parse_request(json!({ "kind": "SnoozeAttention" })).expect("parses");
+        assert_eq!(later, UiAction::SnoozeAttention {});
+        let resolve: Result<UiAction, _> = parse_request(json!({ "kind": "ResolveAttention" }));
+        assert!(
+            resolve.is_err(),
+            "Mark handled requires its item and a reason"
+        );
     }
 
     #[test]

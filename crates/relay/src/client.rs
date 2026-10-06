@@ -179,6 +179,10 @@ pub struct BlockingClient {
 }
 
 impl BlockingClient {
+    pub fn connection(&self) -> &VerifiedConnection {
+        &self.connection
+    }
+
     pub fn new(connection: VerifiedConnection) -> Self {
         Self {
             connection,

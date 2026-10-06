@@ -89,6 +89,10 @@ pub enum BridgeEvent {
         bundle_identifier: Option<String>,
         pid: i32,
     },
+    /// `NSWorkspace` will-sleep / did-wake (`WILL_SLEEP`, `DID_WAKE`).
+    Power {
+        phase: String,
+    },
     /// The user interacted with a delivered notification. Only internal IDs.
     NotificationResponse {
         schema: u32,
@@ -109,7 +113,7 @@ impl BridgeEvent {
             | Self::RunningApplication { correlation_id, .. }
             | Self::AccessibilityPreferences { correlation_id, .. }
             | Self::FrontmostApplication { correlation_id, .. } => Some(*correlation_id),
-            Self::NotificationResponse { .. } => None,
+            Self::NotificationResponse { .. } | Self::Power { .. } => None,
         }
     }
 }

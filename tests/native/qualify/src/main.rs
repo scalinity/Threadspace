@@ -428,6 +428,7 @@ fn main() -> ExitCode {
                 .get(2)
                 .cloned()
                 .unwrap_or_else(|| "qualification".into()),
+            session_id: args.get(3).cloned(),
         },
         "request-notifications" => ControlRequestBody::RequestNotificationAuthorization,
         "request-terminal" => ControlRequestBody::RequestTerminalAutomation,

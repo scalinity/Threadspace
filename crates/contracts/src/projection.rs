@@ -149,7 +149,11 @@ pub struct AttentionCounts {
     pub awaiting_action: u32,
 }
 
-/// A complete projection at one committed cursor.
+/// A projection at one committed cursor (SPEC §18.4). When the complete view
+/// would exceed the snapshot bound it is a bounded initial view: `complete`
+/// is false, the totals stay exact, and the remaining rows are paged through
+/// `ui_query` from the continuation positions. Outstanding counts are never
+/// omitted.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
@@ -158,6 +162,13 @@ pub struct FleetSnapshot {
     pub sessions: Vec<SessionView>,
     pub attention: Vec<AttentionView>,
     pub counts: AttentionCounts,
+    pub complete: bool,
+    pub total_sessions: u32,
+    pub total_attention: u32,
+    /// Page from here (`FleetPage.after`) when `sessions` is partial.
+    pub sessions_after: Option<String>,
+    /// Page from here (`AttentionPage.after`) when `attention` is partial.
+    pub attention_after: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -189,6 +200,9 @@ pub struct ProjectionPatch {
     pub attention_upserts: Vec<AttentionView>,
     pub tombstones: Vec<EntityRef>,
     pub counts: AttentionCounts,
+    /// Paged lists of these kinds are stale and must be re-read; sent when a
+    /// change touches more entities than fit as full upserts in one frame.
+    pub page_invalidations: Vec<EntityKind>,
 }
 
 /// A validated internal intent, queued natively until a view has applied its
@@ -212,6 +226,19 @@ pub enum IntentAction {
         session_id: String,
         outstanding: bool,
         source: IntentSource,
+        /// The verified Return the companion attempted for this response, if
+        /// the item was outstanding and observation enabled.
+        route: Option<RouteSummary>,
+        /// False when observation is disabled or in maintenance: the view
+        /// shows the service state, and nothing was routed.
+        observation_enabled: bool,
+    },
+    /// Qualification builds only: a command for the view's qualification
+    /// harness (renderer fault injection, self-tests). Release views ignore it.
+    QualificationCommand {
+        command: String,
+        #[ts(type = "unknown")]
+        args: serde_json::Value,
     },
 }
 

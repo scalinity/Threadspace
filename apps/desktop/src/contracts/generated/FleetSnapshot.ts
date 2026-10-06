@@ -4,6 +4,18 @@ import type { AttentionView } from "./AttentionView";
 import type { SessionView } from "./SessionView";
 
 /**
- * A complete projection at one committed cursor.
+ * A projection at one committed cursor (SPEC §18.4). When the complete view
+ * would exceed the snapshot bound it is a bounded initial view: `complete`
+ * is false, the totals stay exact, and the remaining rows are paged through
+ * `ui_query` from the continuation positions. Outstanding counts are never
+ * omitted.
  */
-export type FleetSnapshot = { viewRevision: string, sessions: Array<SessionView>, attention: Array<AttentionView>, counts: AttentionCounts, };
+export type FleetSnapshot = { viewRevision: string, sessions: Array<SessionView>, attention: Array<AttentionView>, counts: AttentionCounts, complete: boolean, totalSessions: number, totalAttention: number, 
+/**
+ * Page from here (`FleetPage.after`) when `sessions` is partial.
+ */
+sessionsAfter: string | null, 
+/**
+ * Page from here (`AttentionPage.after`) when `attention` is partial.
+ */
+attentionAfter: string | null, };

@@ -348,6 +348,11 @@ fn summary_error(started: i64, error: String) -> DiscoverySummary {
 
 fn run_pass(state: &mut State, force_surface: bool) -> DiscoverySummary {
     let started = log::now_ms();
+    // Provider polling runs only while capture admission is open: observation
+    // enabled, no maintenance phase, machine awake (SPEC §19.5).
+    if !crate::state::RUNTIME.admission_open() {
+        return summary_error(started, "ADMISSION_CLOSED".into());
+    }
     let Some(install) = ClaudeInstall::resolve(&state.context.launcher()) else {
         return summary_error(started, "CLAUDE_NOT_INSTALLED".into());
     };

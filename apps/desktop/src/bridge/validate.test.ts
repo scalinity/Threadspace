@@ -2,7 +2,7 @@
 // the real Tauri application, not here.
 import { describe, expect, it } from "vitest";
 
-import { ValidationError, compareCursors, isCursor, parseFrame, parseSnapshot } from "./validate";
+import { ValidationError, compareCursors, isCursor, parseFrame, parsePage, parseSnapshot } from "./validate";
 
 const header = {
   protocolVersion: 1,
@@ -102,7 +102,17 @@ describe("provider sessions", () => {
     fixture: false,
     revision: "42",
   };
-  const snapshot = (sessions: unknown[]) => ({ viewRevision: "42", sessions, attention: [], counts: { needsAttention: 0, awaitingAction: 0 } });
+  const snapshot = (sessions: unknown[]) => ({
+    viewRevision: "42",
+    sessions,
+    attention: [],
+    counts: { needsAttention: 0, awaitingAction: 0 },
+    complete: true,
+    totalSessions: sessions.length,
+    totalAttention: 0,
+    sessionsAfter: null,
+    attentionAfter: null,
+  });
 
   it("accepts bindings and the three route axes", () => {
     const parsed = parseSnapshot(snapshot([session]));
@@ -113,5 +123,35 @@ describe("provider sessions", () => {
   it("rejects an unknown route axis value", () => {
     const bad = { ...session, lastRoute: { ...session.lastRoute, surfaceResult: "CONNECTED" } };
     expect(() => parseSnapshot(snapshot([bad]))).toThrow(ValidationError);
+  });
+});
+
+describe("bounded views and pages", () => {
+  const base = { viewRevision: "9", sessions: [], attention: [], counts: { needsAttention: 3, awaitingAction: 0 } };
+
+  it("rejects a complete snapshot whose rows disagree with its totals", () => {
+    expect(() =>
+      parseSnapshot({ ...base, complete: true, totalSessions: 2, totalAttention: 0, sessionsAfter: null, attentionAfter: null }),
+    ).toThrow(ValidationError);
+  });
+
+  it("accepts a bounded snapshot that keeps exact totals and a continuation", () => {
+    const parsed = parseSnapshot({
+      ...base,
+      complete: false,
+      totalSessions: 5000,
+      totalAttention: 3,
+      sessionsAfter: "00000000-0000-4000-8000-000000000000",
+      attentionAfter: null,
+    });
+    expect(parsed.complete).toBe(false);
+    expect(parsed.totalSessions).toBe(5000);
+    expect(parsed.counts.needsAttention).toBe(3);
+  });
+
+  it("validates page replies by kind", () => {
+    const page = parsePage({ kind: "FleetPage", viewRevision: "10", rows: [], nextAfter: null, total: 0 });
+    expect(page.kind).toBe("FleetPage");
+    expect(() => parsePage({ kind: "Diagnostics" })).toThrow(ValidationError);
   });
 });

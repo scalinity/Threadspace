@@ -9,6 +9,7 @@
 pub mod control;
 pub mod cursor;
 pub mod diagnostics;
+pub mod frames;
 pub mod limits;
 pub mod projection;
 pub mod route;

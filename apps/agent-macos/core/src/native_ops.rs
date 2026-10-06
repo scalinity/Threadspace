@@ -22,6 +22,7 @@ use crate::discovery::{DiscoveryContext, Trigger};
 use crate::log;
 use crate::route;
 use crate::server::CoreContext;
+use crate::state::RUNTIME;
 use crate::writer::WriterCommand;
 
 const QUICK: Duration = Duration::from_secs(5);
@@ -110,7 +111,7 @@ fn diagnostics(
     let mut process = context.identity.clone();
     process.executable_path = redact_home(&process.executable_path);
     Ok(ControlResponseBody::Diagnostics {
-        report: CompanionDiagnostics {
+        report: Box::new(CompanionDiagnostics {
             bundle_identifier: context.bundle_identifier.clone(),
             process,
             core_generation: context.core_generation.clone(),
@@ -121,7 +122,13 @@ fn diagnostics(
             notification_settings: bridge::notification_settings(QUICK),
             accessibility_preferences: bridge::accessibility_preferences(QUICK),
             qualification_build: cfg!(feature = "qualification"),
-        },
+            observation_enabled: RUNTIME.observation_enabled(),
+            maintenance_phase: serde_json::to_value(RUNTIME.maintenance())
+                .ok()
+                .and_then(|value| value.as_str().map(str::to_owned))
+                .unwrap_or_default(),
+            power: RUNTIME.power(),
+        }),
     })
 }
 

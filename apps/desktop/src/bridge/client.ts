@@ -25,7 +25,8 @@ import type { UiQueryResult } from "../contracts/generated/UiQueryResult";
 import type { RendererAttestation } from "@threadspace/scene";
 import { launch } from "../launch";
 import { BridgeError, ipc, normalizeFailure } from "./ipc";
-import { UI_PROTOCOL_VERSION, ValidationError, compareCursors, parseFrame, parseSnapshot } from "./validate";
+import { UI_PROTOCOL_VERSION, ValidationError, compareCursors, parseFrame, parsePage, parseSnapshot } from "./validate";
+import type { RouteSummary } from "../contracts/generated/RouteSummary";
 
 export type Phase = "connecting" | "hydrating" | "live" | "unavailable";
 
@@ -36,7 +37,23 @@ export interface Inspector {
   outstandingAtOpen: boolean | null;
   intentId: string | null;
   openedAtMs: number;
+  /** The Return the companion attempted for a notification response. */
+  route: RouteSummary | null;
+  /** False when the response arrived with observation disabled or in maintenance. */
+  observationEnabled: boolean | null;
 }
+
+/** Bounded-view paging state (SPEC §18.4). */
+export interface Paging {
+  complete: boolean;
+  totalSessions: number;
+  totalAttention: number;
+  pagesLoaded: number;
+  staleRepliesIgnored: number;
+  invalidations: number;
+}
+
+export type QualificationHandler = (command: string, args: unknown) => Promise<unknown> | unknown;
 
 export interface ConnectionInfo {
   subscriptionId: string;
@@ -77,10 +94,16 @@ export interface ViewState {
   /** Session whose Return is in flight. */
   routing: string | null;
   discovery: DiscoverySummary | null;
+  paging: Paging;
+  /** Times the view revalidated after timers were suspended (sleep, hidden). */
+  resumes: number;
 }
 
 const HYDRATION_DEADLINE_MS = 5_000;
 const STALL_MS = 5_000;
+/** A watchdog tick this late means timers were suspended (sleep or hidden). */
+const SUSPENSION_GAP_MS = 10_000;
+const PAGE_LIMIT = 200;
 const MAX_NOTICES = 6;
 
 interface Staging {
@@ -132,6 +155,8 @@ const initialState: ViewState = {
   routes: {},
   routing: null,
   discovery: null,
+  paging: { complete: true, totalSessions: 0, totalAttention: 0, pagesLoaded: 0, staleRepliesIgnored: 0, invalidations: 0 },
+  resumes: 0,
 };
 
 function upsert<T>(list: T[], items: T[], key: (item: T) => string): T[] {
@@ -155,8 +180,17 @@ export class BridgeClient {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectDelayMs = 1_000;
   private ackInFlight = false;
+  private ackedThrough = 0;
   private ackPending: FrameHeader | null = null;
   private readonly pendingReports: Array<{ kind: string; report: unknown }> = [];
+  private lastWatchdogMs = Date.now();
+  /**
+   * Qualification-only stream faults (inert unless `launch.qualificationBuild`):
+   * drop frames as though lost in transit, withhold or delay ACKs.
+   */
+  readonly faults = { dropFrames: "none" as "none" | "next" | "all", withholdAcks: false, ackDelayMs: 0, dropped: 0 };
+  private qualificationHandler: QualificationHandler | null = null;
+  private pagingEpoch: string | null = null;
 
   readonly subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
@@ -178,7 +212,30 @@ export class BridgeClient {
   /** Called once at startup, outside React. */
   start(): void {
     setInterval(() => this.watchdog(), 1_000);
+    // Hidden→visible: browser timers may have been suspended, so validate
+    // the stream explicitly instead of trusting it (SPEC §18.5).
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") void this.revalidate("view became visible");
+    });
     void this.connect("initial connection");
+  }
+
+  /** Qualification builds only: receives QualificationCommand intents. */
+  setQualificationHandler(handler: QualificationHandler): void {
+    this.qualificationHandler = handler;
+  }
+
+  private async revalidate(reason: string): Promise<void> {
+    this.set({ resumes: this.state.resumes + 1 });
+    const active = this.active;
+    if (!active) return;
+    if (!active.hydrated || performance.now() - this.state.stream.lastFrameAtMs > STALL_MS) {
+      const status = await ipc
+        .query({ query: { kind: "ConnectionStatus" }, context: null })
+        .then((result) => (result.kind === "ConnectionStatus" ? result.companion.state : "unknown"))
+        .catch(() => "query failed");
+      if (this.active === active) this.reconnect(`${reason}; stream stale (companion ${status})`);
+    }
   }
 
   onHydrated(listener: HydrationListener): void {
@@ -204,6 +261,7 @@ export class BridgeClient {
       this.reconnectTimer = null;
     }
     this.teardown();
+    this.ackedThrough = 0;
     const attempt = ++this.attempts;
     const viewEpoch = crypto.randomUUID();
     const channel = new Channel<unknown>();
@@ -261,6 +319,14 @@ export class BridgeClient {
   }
 
   private watchdog(): void {
+    const wall = Date.now();
+    const suspended = wall - this.lastWatchdogMs > SUSPENSION_GAP_MS;
+    this.lastWatchdogMs = wall;
+    if (suspended) {
+      // Sleep/wake or a long hidden period: never compare stale timers.
+      void this.revalidate("timers resumed after suspension");
+      return;
+    }
     const active = this.active;
     if (!active) return;
     const now = performance.now();
@@ -268,6 +334,8 @@ export class BridgeClient {
       this.reconnect("hydration deadline exceeded");
       return;
     }
+    // The bridge heartbeat runs only while the office is visible.
+    if (document.visibilityState !== "visible") return;
     if (active.hydrated && now - this.state.stream.lastFrameAtMs > STALL_MS) {
       // Independent status check: a stalled Channel cannot deliver its own reset.
       void ipc
@@ -285,6 +353,11 @@ export class BridgeClient {
   private onFrame(attempt: number, raw: unknown): void {
     const active = this.active;
     if (!active || active.attempt !== attempt) return;
+    if (launch.qualificationBuild && this.faults.dropFrames !== "none") {
+      if (this.faults.dropFrames === "next") this.faults.dropFrames = "none";
+      this.faults.dropped += 1;
+      return;
+    }
     let frame;
     try {
       frame = parseFrame(raw);
@@ -368,9 +441,67 @@ export class BridgeClient {
       attention: snapshot.attention,
       counts: snapshot.counts,
       stream: { ...stream, snapshotsApplied: stream.snapshotsApplied + 1, hydratedAtMs: now },
+      paging: {
+        ...this.state.paging,
+        complete: snapshot.complete,
+        totalSessions: snapshot.totalSessions,
+        totalAttention: snapshot.totalAttention,
+      },
     });
     this.ackFrame(header);
     this.announceIfReady(active);
+    if (!snapshot.complete) {
+      this.pagingEpoch = active.viewEpoch;
+      void this.pageFrom("FleetPage", snapshot.sessionsAfter);
+      void this.pageFrom("AttentionPage", snapshot.attentionAfter);
+    }
+  }
+
+  /**
+   * Reads the rest of a bounded view. A reply for an older view epoch is
+   * ignored, and a page row never replaces a newer row this view already
+   * holds (SPEC §18.4).
+   */
+  private async pageFrom(kind: "FleetPage" | "AttentionPage", after: string | null): Promise<void> {
+    const epoch = this.active?.viewEpoch;
+    let next = after;
+    while (epoch && this.active?.viewEpoch === epoch && this.pagingEpoch === epoch) {
+      let raw: unknown;
+      try {
+        raw = await ipc.query({ query: { kind, after: next, limit: PAGE_LIMIT }, context: this.context() });
+      } catch (error) {
+        this.notice(`Paging ${kind} failed: ${error instanceof Error ? error.message : String(error)}`);
+        return;
+      }
+      if (this.active?.viewEpoch !== epoch) {
+        this.set({ paging: { ...this.state.paging, staleRepliesIgnored: this.state.paging.staleRepliesIgnored + 1 } });
+        return;
+      }
+      const parsed = parsePage(raw);
+      const newer = <T extends { revision: string }>(current: T | undefined, row: T) =>
+        current === undefined || compareCursors(row.revision, current.revision) >= 0;
+      if (parsed.kind === "FleetPage") {
+        const held = new Map(this.state.sessions.map((row) => [row.sessionId, row]));
+        const rows = parsed.page.rows.filter((row) => newer(held.get(row.sessionId), row));
+        this.set({ sessions: upsert(this.state.sessions, rows, (row) => row.sessionId) });
+      } else {
+        const held = new Map(this.state.attention.map((row) => [row.attentionId, row]));
+        const rows = parsed.page.rows.filter((row) => newer(held.get(row.attentionId), row));
+        this.set({ attention: upsert(this.state.attention, rows, (row) => row.attentionId) });
+      }
+      this.set({ paging: { ...this.state.paging, pagesLoaded: this.state.paging.pagesLoaded + 1 } });
+      next = parsed.page.nextAfter;
+      if (next === null) {
+        this.recordQualificationReport("paging-complete", {
+          kind,
+          viewEpoch: epoch,
+          sessionsHeld: this.state.sessions.length,
+          attentionHeld: this.state.attention.length,
+          paging: this.state.paging,
+        });
+        return;
+      }
+    }
   }
 
   /** Frames may precede the connect reply; the view is live once both exist. */
@@ -400,11 +531,37 @@ export class BridgeClient {
       stream: { ...stream, patchesApplied: stream.patchesApplied + 1 },
     });
     this.ackFrame(header);
+    if (patch.pageInvalidations.length > 0 && this.active) {
+      // The change was too large for entity upserts: re-read affected lists.
+      this.set({ paging: { ...this.state.paging, complete: false, invalidations: this.state.paging.invalidations + 1 } });
+      this.pagingEpoch = this.active.viewEpoch;
+      if (patch.pageInvalidations.includes("SESSION")) void this.pageFrom("FleetPage", null);
+      if (patch.pageInvalidations.includes("ATTENTION")) void this.pageFrom("AttentionPage", null);
+    }
   }
 
   private applyIntent(header: FrameHeader, intent: NativeIntent, stream: StreamStats): void {
     const action = intent.action;
     const appliedAtMs = performance.now();
+    if (action.kind === "QualificationCommand") {
+      this.set({ stream: { ...stream, intentsApplied: stream.intentsApplied + 1 } });
+      this.ackFrame(header);
+      // Release views never act on qualification commands.
+      if (!launch.qualificationBuild || !this.qualificationHandler) return;
+      void Promise.resolve()
+        .then(() => this.qualificationHandler?.(action.command, action.args))
+        .then(
+          (result) => this.recordQualificationReport("qualification-command", { intentId: intent.intentId, command: action.command, ok: true, result }),
+          (error: unknown) =>
+            this.recordQualificationReport("qualification-command", {
+              intentId: intent.intentId,
+              command: action.command,
+              ok: false,
+              error: error instanceof Error ? error.message : String(error),
+            }),
+        );
+      return;
+    }
     this.set({
       inspector: {
         attentionId: action.attentionId,
@@ -413,27 +570,45 @@ export class BridgeClient {
         outstandingAtOpen: action.outstanding,
         intentId: intent.intentId,
         openedAtMs: Date.now(),
+        route: action.route,
+        observationEnabled: action.observationEnabled,
       },
       stream: { ...stream, intentsApplied: stream.intentsApplied + 1 },
     });
-    this.notice(`Opened from notification: attention ${action.attentionId.slice(0, 8)}`);
+    const routed = action.route ? ` — Return ${action.route.surfaceResult}/${action.route.reasonCode}` : "";
+    this.notice(`Opened from notification: attention ${action.attentionId.slice(0, 8)}${routed}`);
     this.ackFrame(header);
     this.recordQualificationReport("notification-intent", {
       intentId: intent.intentId,
       attentionId: action.attentionId,
+      sessionId: action.sessionId,
       outstanding: action.outstanding,
       source: action.source,
+      route: action.route,
+      observationEnabled: action.observationEnabled,
       streamSeq: header.streamSeq,
       cursor: header.cursor,
       hydratedAtMs: this.state.stream.hydratedAtMs,
       appliedAtMs,
       appliedAfterHydration: this.state.stream.hydratedAtMs !== null && appliedAtMs >= this.state.stream.hydratedAtMs,
       inspectorAttentionPresent: this.state.attention.some((item) => item.attentionId === action.attentionId),
+      inspectorItemAcknowledged: this.state.attention.find((item) => item.attentionId === action.attentionId)?.acknowledgedAtMs ?? null,
     });
   }
 
   /** One ACK in flight; later ACKs coalesce (an ACK releases everything up to it). */
   private ackFrame(header: FrameHeader): void {
+    if (launch.qualificationBuild && this.faults.withholdAcks) return;
+    if (launch.qualificationBuild && this.faults.ackDelayMs > 0) {
+      setTimeout(() => {
+        // A later frame's ACK may already have covered this one.
+        if (header.viewEpoch !== this.active?.viewEpoch || header.streamSeq <= this.ackedThrough) return;
+        if (this.ackPending && this.ackPending.streamSeq >= header.streamSeq) return;
+        this.ackPending = header;
+        if (!this.ackInFlight) void this.flushAcks();
+      }, this.faults.ackDelayMs);
+      return;
+    }
     this.ackPending = header;
     if (!this.ackInFlight) void this.flushAcks();
   }
@@ -452,6 +627,7 @@ export class BridgeClient {
             highestAppliedStreamSeq: header.streamSeq,
             appliedJournalCursor: header.cursor,
           });
+          this.ackedThrough = header.streamSeq;
         } catch (error) {
           const failure = error instanceof BridgeError ? error.failure : normalizeFailure(error);
           if (this.active && header.viewEpoch === this.active.viewEpoch) {
@@ -501,6 +677,37 @@ export class BridgeClient {
     } catch (error) {
       this.notice(`Acknowledge failed: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  /** "Mark handled": explicit resolution with a reason (SPEC §7.2). */
+  async resolve(attentionId: string, reason: string): Promise<void> {
+    const item = this.state.attention.find((entry) => entry.attentionId === attentionId);
+    try {
+      const result = await this.action({ kind: "ResolveAttention", attentionId, reason }, item?.revision ?? null);
+      if (result.kind === "CommandCommitted") {
+        this.notice(`Marked handled ${attentionId.slice(0, 8)} — ${result.receipt.status}`);
+      }
+    } catch (error) {
+      this.notice(`Mark handled failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /** Enable/Stop Observation run the native bootstrap ordering (SPEC §19.5). */
+  async setObservation(enabled: boolean): Promise<void> {
+    const connection = this.state.connection;
+    const context = connection ?? { subscriptionId: crypto.randomUUID(), viewEpoch: crypto.randomUUID(), coreGeneration: "", storeGeneration: "" };
+    try {
+      const result = await ipc.action({
+        action: enabled ? { kind: "EnableObservation" } : { kind: "StopObservation" },
+        expectedRevision: null,
+        requestId: crypto.randomUUID(),
+        context,
+      });
+      if (result.kind === "ObservationChanged") this.notice(`Observation ${result.enabled ? "enabled" : "stopped"} (${result.service.status})`);
+    } catch (error) {
+      this.notice(`${enabled ? "Enable" : "Stop"} observation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    await this.refreshDiagnostics();
   }
 
   /** Return-to-Agent. The companion revalidates and focuses; this only asks. */
@@ -581,6 +788,8 @@ export class BridgeClient {
         outstandingAtOpen: outstanding ? true : null,
         intentId: null,
         openedAtMs: Date.now(),
+        route: null,
+        observationEnabled: null,
       },
     });
   }
@@ -596,6 +805,8 @@ export class BridgeClient {
         outstandingAtOpen: item.resolvedAtMs === null,
         intentId: null,
         openedAtMs: Date.now(),
+        route: null,
+        observationEnabled: null,
       },
     });
   }
