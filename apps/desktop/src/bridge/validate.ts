@@ -6,6 +6,7 @@ import type { AttentionCounts } from "../contracts/generated/AttentionCounts";
 import type { FleetSnapshot } from "../contracts/generated/FleetSnapshot";
 import type { NativeIntent } from "../contracts/generated/NativeIntent";
 import type { ProjectionPatch } from "../contracts/generated/ProjectionPatch";
+import type { RouteSummary } from "../contracts/generated/RouteSummary";
 import type { SessionView } from "../contracts/generated/SessionView";
 import type { UiFrame } from "../contracts/generated/UiFrame";
 
@@ -87,6 +88,32 @@ const CATEGORIES = [
   "OWNER_DECISION_REQUIRED",
 ] as const;
 const NOTIFICATION = ["NOT_REQUESTED", "PENDING", "SUBMITTED", "CONFIRMED_PRESENT", "UNCERTAIN", "FAILED"] as const;
+const SURFACE = [
+  "EXACT_NATIVE_SURFACE",
+  "EXACT_WINDOW",
+  "APP_ONLY",
+  "URL_DISPATCHED",
+  "PROJECT_ONLY",
+  "INSPECTOR_ONLY",
+  "AMBIGUOUS",
+  "UNAVAILABLE",
+] as const;
+const VERIFICATION = ["CURRENT_NATIVE_REVALIDATED", "NATIVE_BOUND_LAST_KNOWN", "USER_ATTESTED", "UNBOUND", "CONFLICT"] as const;
+const READINESS = ["FOREGROUND_COMPATIBLE", "BACKGROUND_JOB", "UNKNOWN"] as const;
+
+function routeSummary(value: unknown, path: string): RouteSummary {
+  const v = object(value, path);
+  return {
+    requestId: string(v.requestId, `${path}.requestId`),
+    surfaceResult: oneOf(v.surfaceResult, `${path}.surfaceResult`, SURFACE),
+    sessionVerification: oneOf(v.sessionVerification, `${path}.sessionVerification`, VERIFICATION),
+    inputReadiness: oneOf(v.inputReadiness, `${path}.inputReadiness`, READINESS),
+    reasonCode: string(v.reasonCode, `${path}.reasonCode`),
+    focusPerformed: boolean(v.focusPerformed, `${path}.focusPerformed`),
+    latencyMs: integer(v.latencyMs, `${path}.latencyMs`),
+    recordedAtMs: integer(v.recordedAtMs, `${path}.recordedAtMs`),
+  };
+}
 
 function session(value: unknown, path: string): SessionView {
   const v = object(value, path);
@@ -113,7 +140,15 @@ function session(value: unknown, path: string): SessionView {
       surfaceKind: string(binding.surfaceKind, `${path}.binding.surfaceKind`),
       proof: string(binding.proof, `${path}.binding.proof`),
       revision: cursor(binding.revision, `${path}.binding.revision`),
+      locator: string(binding.locator, `${path}.binding.locator`),
+      deviceNumber: optionalInteger(binding.deviceNumber, `${path}.binding.deviceNumber`),
+      pid: optionalInteger(binding.pid, `${path}.binding.pid`),
     },
+    liveBindings: integer(v.liveBindings, `${path}.liveBindings`),
+    lastInvalidation: optionalString(v.lastInvalidation, `${path}.lastInvalidation`),
+    providerStatus: optionalString(v.providerStatus, `${path}.providerStatus`),
+    providerWaitingFor: optionalString(v.providerWaitingFor, `${path}.providerWaitingFor`),
+    lastRoute: v.lastRoute === null ? null : routeSummary(v.lastRoute, `${path}.lastRoute`),
     fixture: boolean(v.fixture, `${path}.fixture`),
     revision: cursor(v.revision, `${path}.revision`),
   };

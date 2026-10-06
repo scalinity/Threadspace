@@ -10,10 +10,12 @@ import { Channel } from "@tauri-apps/api/core";
 import type { AttentionCounts } from "../contracts/generated/AttentionCounts";
 import type { AttentionView } from "../contracts/generated/AttentionView";
 import type { DiagnosticsReport } from "../contracts/generated/DiagnosticsReport";
+import type { DiscoverySummary } from "../contracts/generated/DiscoverySummary";
 import type { FrameHeader } from "../contracts/generated/FrameHeader";
 import type { IntegrationReport } from "../contracts/generated/IntegrationReport";
 import type { NativeIntent } from "../contracts/generated/NativeIntent";
 import type { ProjectionPatch } from "../contracts/generated/ProjectionPatch";
+import type { RouteResult } from "../contracts/generated/RouteResult";
 import type { SessionView } from "../contracts/generated/SessionView";
 import type { UiAction } from "../contracts/generated/UiAction";
 import type { UiActionResult } from "../contracts/generated/UiActionResult";
@@ -70,6 +72,11 @@ export interface ViewState {
   renderer: RendererAttestation | null;
   rendererError: string | null;
   notices: string[];
+  /** Latest Return result per session, with its evidence chain. */
+  routes: Record<string, RouteResult>;
+  /** Session whose Return is in flight. */
+  routing: string | null;
+  discovery: DiscoverySummary | null;
 }
 
 const HYDRATION_DEADLINE_MS = 5_000;
@@ -122,6 +129,9 @@ const initialState: ViewState = {
   renderer: null,
   rendererError: null,
   notices: [],
+  routes: {},
+  routing: null,
+  discovery: null,
 };
 
 function upsert<T>(list: T[], items: T[], key: (item: T) => string): T[] {
@@ -490,6 +500,39 @@ export class BridgeClient {
       }
     } catch (error) {
       this.notice(`Acknowledge failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /** Return-to-Agent. The companion revalidates and focuses; this only asks. */
+  async returnTo(sessionId: string, chosenBindingId: string | null = null): Promise<void> {
+    if (this.state.routing !== null) return;
+    this.set({ routing: sessionId });
+    try {
+      const result = await this.action({
+        kind: "ReturnToSession",
+        sessionId,
+        chosenBindingId,
+        expectedBindingRevision: null,
+      });
+      if (result.kind === "Routed") {
+        this.set({ routes: { ...this.state.routes, [sessionId]: result.result } });
+      }
+    } catch (error) {
+      this.notice(`Return failed: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      this.set({ routing: null });
+    }
+  }
+
+  async refreshEvidence(): Promise<void> {
+    try {
+      const result = await this.action({ kind: "RefreshEvidence" });
+      if (result.kind === "EvidenceRefreshed") {
+        this.set({ discovery: result.summary });
+        if (result.summary.error) this.notice(`Discovery: ${result.summary.error}`);
+      }
+    } catch (error) {
+      this.notice(`Refresh failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

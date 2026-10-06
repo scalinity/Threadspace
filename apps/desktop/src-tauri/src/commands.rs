@@ -11,6 +11,7 @@ use tauri::{Manager, Runtime, State, Webview};
 use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody};
 use threadspace_contracts::cursor::parse_cursor;
 use threadspace_contracts::limits::QUERY_REPLY_MAX_BYTES;
+use threadspace_contracts::route::RouteRequest;
 use threadspace_contracts::ui::{
     CompanionLink, ConnectionStatus, DiagnosticsReport, IntegrationReport, UI_PROTOCOL_VERSION,
     UiAckReply, UiAckRequest, UiAction, UiActionRequest, UiActionResult, UiConnectReply,
@@ -23,6 +24,11 @@ use crate::bridge::{Bridge, link_error};
 use crate::diagnostics;
 
 const QUICK: Duration = Duration::from_secs(5);
+/// A route has a two-second native budget; this bounds the whole round trip,
+/// including a wait behind another route.
+const ROUTE: Duration = Duration::from_secs(15);
+/// One discovery pass, including a Terminal surface join.
+const DISCOVERY: Duration = Duration::from_secs(35);
 /// Upper bound on the owner answering a native permission prompt.
 const PROMPT: Duration = Duration::from_secs(190);
 
@@ -232,6 +238,57 @@ pub async fn ui_action<R: Runtime>(
                     automation,
                     status_code,
                 },
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
+            }
+        }
+        UiAction::ReturnToSession {
+            session_id,
+            chosen_binding_id,
+            expected_binding_revision,
+        } => {
+            parse_uuid(&session_id, "sessionId")?;
+            if let Some(binding) = &chosen_binding_id {
+                parse_uuid(binding, "chosenBindingId")?;
+            }
+            if let Some(revision) = &expected_binding_revision
+                && parse_cursor(revision).is_none()
+            {
+                return Err(UiError::invalid(
+                    "expectedBindingRevision must be a canonical cursor",
+                ));
+            }
+            let body = ControlRequestBody::ReturnToSession {
+                route: RouteRequest {
+                    request_id: request.request_id,
+                    session_id,
+                    chosen_binding_id,
+                    expected_binding_revision,
+                },
+            };
+            match link.request(body, ROUTE).await.map_err(link_error)? {
+                ControlResponseBody::Routed { result } => UiActionResult::Routed { result },
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
+            }
+        }
+        UiAction::RefreshEvidence {} => {
+            match link
+                .request(ControlRequestBody::RefreshEvidence, DISCOVERY)
+                .await
+                .map_err(link_error)?
+            {
+                ControlResponseBody::EvidenceRefreshed { summary } => {
+                    UiActionResult::EvidenceRefreshed { summary }
+                }
                 _ => {
                     return Err(UiError::new(
                         UiErrorCode::Internal,

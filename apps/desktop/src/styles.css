@@ -188,6 +188,68 @@ body {
   font-size: 12px;
 }
 
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.row--worker {
+  align-items: flex-start;
+}
+
+.row__id {
+  margin-left: 6px;
+  color: var(--text-tertiary);
+}
+
+.row__action {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* The three route axes (SPEC 4.10): settled values in teal, anything weaker
+   stays visibly uncertain. */
+.axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 2px;
+}
+
+.axis {
+  padding: 1px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.axis__label {
+  color: var(--text-tertiary);
+}
+
+.axis--ok {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.axis--uncertain {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.axis--reason {
+  color: var(--text-secondary);
+}
+
+.chooser {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+
 .section-title {
   margin: 14px 0 6px;
   color: var(--text-tertiary);

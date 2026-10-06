@@ -38,8 +38,8 @@ export async function runIpcSelfTest(client: BridgeClient): Promise<void> {
     o.ok && (o.value as { kind?: string }).kind === "Diagnostics");
   await check("typed error", "FleetPage is NOT_IMPLEMENTED_FOR_MILESTONE", () => ipc.query({ query: { kind: "FleetPage" }, context }), (o) =>
     !o.ok && o.code === "NOT_IMPLEMENTED_FOR_MILESTONE");
-  await check("typed error (action)", "ReturnToSession is NOT_IMPLEMENTED_FOR_MILESTONE", () =>
-    ipc.action({ action: { kind: "ReturnToSession" }, expectedRevision: null, requestId: crypto.randomUUID(), context }), (o) =>
+  await check("typed error (action)", "ResolveAttention is NOT_IMPLEMENTED_FOR_MILESTONE", () =>
+    ipc.action({ action: { kind: "ResolveAttention" }, expectedRevision: null, requestId: crypto.randomUUID(), context }), (o) =>
     !o.ok && o.code === "NOT_IMPLEMENTED_FOR_MILESTONE");
   await check("malformed: extra field", "INVALID_REQUEST", () =>
     ipc.raw("ui_query", { request: { query: { kind: "Diagnostics", sql: "select 1" }, context } }), (o) => !o.ok && o.code === "INVALID_REQUEST");
