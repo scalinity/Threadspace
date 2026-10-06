@@ -1,0 +1,2541 @@
+{
+  "items": {
+    "daemon": {
+      "cliDaemonVersion": {
+        "aliasCreated": true,
+        "aliasPath": "/private/tmp/claude-501/cp-8d599189/h/app-server-control/app-server-control.sock",
+        "aliasTarget": "~/.codex/app-server-control/app-server-control.sock",
+        "command": {
+          "argv": [
+            "~/.local/bin/codex",
+            "app-server",
+            "daemon",
+            "version"
+          ],
+          "cwd": "/private/tmp/claude-501/cp-8d599189",
+          "elapsedMs": 14,
+          "env": {
+            "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "LANG": "en_US.UTF-8",
+            "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+            "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+          },
+          "environmentCleared": true,
+          "exitStatus": 1,
+          "pid": 27335,
+          "startedAt": {
+            "ms": 1791281026632,
+            "utc": "2026-10-06T10:03:46.632Z"
+          },
+          "stderrBytes": 164,
+          "stderrTruncated": false,
+          "stdoutBytes": 0,
+          "stdoutTruncated": false,
+          "timedOut": false
+        },
+        "stderr": "Error: failed to connect to /private/tmp/claude-501/cp-8d599189/h/app-server-control/app-server-control.sock\n\nCaused by:\n    No such file or directory (os error 2)",
+        "stdout": "",
+        "stdoutJson": null,
+        "succeeded": false,
+        "whyNotOwnerCodexHome": "every CLI start creates CODEX_HOME/tmp/arg0/codex-arg0* (and may leave it behind) and runs a janitor over stale arg0 dirs (rust-v0.160.0 codex-rs/arg0/src/lib.rs prepare_path_entry_for_codex_aliases/janitor_cleanup); the owner's ~/.codex is never written"
+      },
+      "directConnect": {
+        "attemptedAt": {
+          "ms": 1791281026647,
+          "utc": "2026-10-06T10:03:46.647Z"
+        },
+        "connected": false,
+        "errno": 2,
+        "errorKind": "NotFound",
+        "observerRun": false
+      },
+      "disposableHomeAfter": [
+        {
+          "kind": "dir",
+          "path": "app-server-control"
+        },
+        {
+          "kind": "symlink",
+          "path": "app-server-control/app-server-control.sock"
+        },
+        {
+          "kind": "dir",
+          "path": "tmp"
+        },
+        {
+          "kind": "dir",
+          "path": "tmp/arg0"
+        }
+      ],
+      "finishedAt": {
+        "ms": 1791281026647,
+        "utc": "2026-10-06T10:03:46.647Z"
+      },
+      "item": "daemon",
+      "recordedState": {
+        "pidRecords": [
+          {
+            "executableIdentityDigest": "d2c0eecff8c05204484fd297908a6527f6130dd50861d4e25c1b9b09b027a3b9",
+            "livePidIsRecordedIncarnation": null,
+            "path": "~/.codex/app-server-daemon/daemon.pid",
+            "pid": 17412,
+            "pidLiveNow": false,
+            "pidLookupError": "PROCESS_VANISHED",
+            "present": true,
+            "processStartTime": "Wed Sep 30 19:26:47 2026",
+            "recordedOnCurrentBoot": false,
+            "startSeconds": 1790810807
+          },
+          {
+            "executableIdentityDigest": null,
+            "livePidIsRecordedIncarnation": null,
+            "path": "~/.codex/app-server-daemon/daemon-updater.pid",
+            "pid": 4527,
+            "pidLiveNow": false,
+            "pidLookupError": "PROCESS_VANISHED",
+            "present": true,
+            "processStartTime": "Sat Sep 26 12:59:33 2026",
+            "recordedOnCurrentBoot": false,
+            "startSeconds": 1790441973
+          },
+          {
+            "path": "~/.codex/app-server-daemon/app-server.pid",
+            "present": false
+          },
+          {
+            "path": "~/.codex/app-server-daemon/app-server-updater.pid",
+            "present": false
+          }
+        ],
+        "rendezvous": {
+          "derivedTarget": "/private/tmp/codex-daemon-501/2ef99283e301149636c7e287a64da2759f91fc5e773a7f7f3efef351001ca7b7",
+          "exists": true,
+          "isSymlink": true,
+          "path": "~/.codex/app-server-control/app-server-control.sock",
+          "target": "/private/tmp/codex-daemon-501/2ef99283e301149636c7e287a64da2759f91fc5e773a7f7f3efef351001ca7b7",
+          "targetExists": false,
+          "targetMatchesDerivation": true
+        },
+        "selectedDaemonPackage": {
+          "autoUpdateVersion": "0.159.3-aarch64-apple-darwin",
+          "current": "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin",
+          "currentManifest": {
+            "layoutVersion": 1,
+            "path": "~/.codex/packages/app-server-daemon/current/codex-package.json",
+            "target": "aarch64-apple-darwin",
+            "variant": "codex",
+            "version": "0.159.3"
+          },
+          "installedReleases": [
+            "0.157.1-aarch64-apple-darwin",
+            "0.158.0-aarch64-apple-darwin",
+            "0.159.0-aarch64-apple-darwin",
+            "0.159.1-aarch64-apple-darwin",
+            "0.159.2-aarch64-apple-darwin",
+            "0.159.3-aarch64-apple-darwin"
+          ],
+          "present": true,
+          "root": "~/.codex/packages/app-server-daemon"
+        },
+        "settingsFilePresent": false,
+        "sharedDirectory": "/private/tmp/codex-daemon-501"
+      },
+      "runningAppServerVersion": null,
+      "sharedDirectoryAppearedDuringProbe": false,
+      "sharedDirectoryExistedBefore": false,
+      "sharedDirectoryExistsAfter": false,
+      "startedAt": {
+        "ms": 1791281026631,
+        "utc": "2026-10-06T10:03:46.631Z"
+      },
+      "status": "NO_DAEMON_ANSWERING"
+    },
+    "hookAncestry": {
+      "blocker": "Every released Codex hook event is dispatched from a live session (thread), and every event except SessionEnd only inside a running turn. No hook fires at CLI or TUI startup alone, so capturing a hook process requires creating a thread (and, for all events but SessionEnd, a turn that proceeds to model sampling) plus an authenticated account for the TUI to start a session. All of that is outside this probe's limits: no task start, thread or rollout creation, prompt submission, model call or login.",
+      "finishedAt": {
+        "ms": 1791281026631,
+        "utc": "2026-10-06T10:03:46.631Z"
+      },
+      "item": "hook-ancestry",
+      "notAttempted": [
+        "codex TUI (headless pty or otherwise): an empty disposable CODEX_HOME has no credentials, and starting a session would create a thread",
+        "codex exec, resume, fork, review",
+        "app-server thread/start or turn/start",
+        "installing any hook into the owner's ~/.codex or a project .codex"
+      ],
+      "sourceEvidence": [
+        {
+          "fact": "SessionStart runs from run_turn after the turn's input, MCP requirements and step context are captured, immediately before the first sampling request.",
+          "source": "openai/codex d27764b (rust-v0.160.1) codex-rs/core/src/session/turn.rs L163 run_turn, L322 run_pending_session_start_hooks"
+        },
+        {
+          "fact": "SessionStart takes a pending source from the Session; SessionEnd needs a live Session, builds a default turn context and flushes the rollout before running.",
+          "source": "openai/codex d27764b codex-rs/core/src/hook_runtime.rs L128 run_pending_session_start_hooks, L471-499 run_session_end_hooks"
+        },
+        {
+          "fact": "Every event other than SessionStart and SessionEnd carries a required turn_id.",
+          "source": "released hook input fixtures (raw/hook-input-schema-0.160.0)"
+        },
+        {
+          "fact": "Hook runs are scoped to thread or turn.",
+          "source": "installed app-server schema HookScope"
+        },
+        {
+          "fact": "rust-v0.160.0 and rust-v0.160.1 differ only in codex-rs/rmcp-client/src/stdio_server_launcher.rs and the version string, so the cited files are identical in the installed build.",
+          "source": "raw/release-diff-0.160.0-0.160.1.json"
+        }
+      ],
+      "startedAt": {
+        "ms": 1791281026631,
+        "utc": "2026-10-06T10:03:46.631Z"
+      },
+      "status": "NOT_RUN",
+      "toUnblock": "An owner-authorized qualification run that may create one disposable Codex thread: a SessionStart command hook in a disposable CODEX_HOME hooks.json, an authenticated account, one prompt in a pty the harness owns, and a Codex executable-identity selection rule for the M0B capture (tests/native/hook-probe selects the provider by the Claude versions directory). Run it once with --no-daemon (CODEX_EMBEDDED: nearest provider ancestor is the TUI) and once attached to the shared daemon (CODEX_SHARED_DAEMON: nearest provider ancestor is the daemon, no source TTY)."
+    },
+    "hooks": {
+      "appServerSchema": {
+        "HookEventName": [
+          "interrupt",
+          "permissionRequest",
+          "postCompact",
+          "postToolUse",
+          "preCompact",
+          "preToolUse",
+          "sessionEnd",
+          "sessionStart",
+          "stop",
+          "subagentStart",
+          "subagentStop",
+          "userPromptSubmit"
+        ],
+        "HookExecutionMode": [
+          "async",
+          "sync"
+        ],
+        "HookHandlerType": [
+          "agent",
+          "command",
+          "mcpTool",
+          "prompt"
+        ],
+        "HookRunStatus": [
+          "blocked",
+          "completed",
+          "failed",
+          "running",
+          "stopped"
+        ],
+        "HookScope": [
+          "thread",
+          "turn"
+        ],
+        "HookSource": [
+          "cloudManagedConfig",
+          "cloudRequirements",
+          "legacyManagedConfigFile",
+          "legacyManagedConfigMdm",
+          "mdm",
+          "plugin",
+          "project",
+          "sessionFlags",
+          "system",
+          "unknown",
+          "user"
+        ],
+        "HookTrustStatus": [
+          "managed",
+          "modified",
+          "trusted",
+          "untrusted"
+        ],
+        "hookMetadataFields": [
+          "additionalContextLimit",
+          "currentHash",
+          "displayOrder",
+          "enabled",
+          "eventName",
+          "isManaged",
+          "key",
+          "matcher",
+          "pluginId",
+          "source",
+          "sourcePath",
+          "statusMessage",
+          "timeoutSec",
+          "trustStatus"
+        ],
+        "hookNotifications": [
+          "hook/completed",
+          "hook/started"
+        ],
+        "hooksListMethod": true,
+        "hooksListParams": [
+          "cwds"
+        ]
+      },
+      "cliFlags": {
+        "command": {
+          "argv": [
+            "~/.local/bin/codex",
+            "--help"
+          ],
+          "cwd": "/private/tmp/claude-501/cp-8d599189",
+          "elapsedMs": 14,
+          "env": {
+            "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "LANG": "en_US.UTF-8",
+            "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+            "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+          },
+          "environmentCleared": true,
+          "exitStatus": 0,
+          "pid": 26324,
+          "startedAt": {
+            "ms": 1791281025487,
+            "utc": "2026-10-06T10:03:45.487Z"
+          },
+          "stderrBytes": 0,
+          "stderrTruncated": false,
+          "stdoutBytes": 5849,
+          "stdoutTruncated": false,
+          "timedOut": false
+        },
+        "dangerouslyBypassHookTrust": true,
+        "noDaemon": true
+      },
+      "configurationLocations": {
+        "bothFormsInOneLayer": "loaded together with a warning",
+        "executableCarriesHooksJsonName": {
+          "grepExit": 0,
+          "identifier": "hooks.json",
+          "present": true
+        },
+        "handlerTypesExecuted": [
+          "command",
+          "mcpTool (not for SessionEnd)"
+        ],
+        "handlerTypesSkipped": [
+          "prompt (\"not supported yet\")",
+          "agent (\"not supported yet\")"
+        ],
+        "layers": "system, user (CODEX_HOME), project (.codex/), MDM, enterprise-managed, legacy managed config, session flags; plus managed requirements and plugin hook sources",
+        "perConfigLayer": [
+          "<layer hooks folder>/hooks.json (JSON {\"hooks\": {...}})",
+          "[hooks] table in the same layer's config.toml"
+        ],
+        "source": "openai/codex rust-v0.160.0 (a956835d) codex-rs/hooks/src/engine/discovery.rs: load_hooks_json L339-344, load_toml_hooks_from_layer L382-387, layer source mapping L825-836, unsupported handlers L592/L638/L648",
+        "trust": "non-managed hooks run only when enabled and trusted for their current hash, unless --dangerously-bypass-hook-trust"
+      },
+      "eventSetVsSpec": {
+        "extra": [],
+        "installedHookEventName": [
+          "interrupt",
+          "permissionRequest",
+          "postCompact",
+          "postToolUse",
+          "preCompact",
+          "preToolUse",
+          "sessionEnd",
+          "sessionStart",
+          "stop",
+          "subagentStart",
+          "subagentStop",
+          "userPromptSubmit"
+        ],
+        "missing": [],
+        "spec": [
+          "sessionStart",
+          "sessionEnd",
+          "userPromptSubmit",
+          "preToolUse",
+          "permissionRequest",
+          "postToolUse",
+          "preCompact",
+          "postCompact",
+          "subagentStart",
+          "subagentStop",
+          "stop",
+          "interrupt"
+        ]
+      },
+      "featureFlags": {
+        "command": {
+          "argv": [
+            "~/.local/bin/codex",
+            "features",
+            "list"
+          ],
+          "cwd": "/private/tmp/claude-501/cp-8d599189",
+          "elapsedMs": 21,
+          "env": {
+            "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+            "LANG": "en_US.UTF-8",
+            "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+            "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+          },
+          "environmentCleared": true,
+          "exitStatus": 0,
+          "pid": 26302,
+          "startedAt": {
+            "ms": 1791281025465,
+            "utc": "2026-10-06T10:03:45.465Z"
+          },
+          "stderrBytes": 0,
+          "stderrTruncated": false,
+          "stdoutBytes": 10112,
+          "stdoutTruncated": false,
+          "timedOut": false
+        },
+        "raw": "raw/features-list-empty-codex-home.txt",
+        "rows": {
+          "daemon_auto_start": {
+            "enabled": true,
+            "stage": "stable"
+          },
+          "hooks": {
+            "enabled": true,
+            "stage": "stable"
+          },
+          "plugin_hooks": {
+            "enabled": false,
+            "stage": "removed"
+          },
+          "plugins": {
+            "enabled": true,
+            "stage": "stable"
+          }
+        },
+        "source": "codex features list in an empty disposable CODEX_HOME (build defaults, not the owner's effective configuration)"
+      },
+      "finishedAt": {
+        "ms": 1791281025508,
+        "utc": "2026-10-06T10:03:45.508Z"
+      },
+      "item": "hooks",
+      "ownerConfiguration": "not read and not modified; nothing was installed",
+      "startedAt": {
+        "ms": 1791281025465,
+        "utc": "2026-10-06T10:03:45.465Z"
+      },
+      "status": "OBSERVED"
+    },
+    "modes": {
+      "derivedAt": {
+        "ms": 1791281026647,
+        "utc": "2026-10-06T10:03:46.647Z"
+      },
+      "item": "modes",
+      "modes": [
+        {
+          "availableNow": false,
+          "evidence": {
+            "daemonAutoStartFeature": {
+              "enabled": true,
+              "stage": "stable"
+            },
+            "daemonVersionExit": 1,
+            "daemonVersionStderr": "Error: failed to connect to /private/tmp/claude-501/cp-8d599189/h/app-server-control/app-server-control.sock\n\nCaused by:\n    No such file or directory (os error 2)",
+            "directConnect": {
+              "connected": false,
+              "errorKind": "NotFound"
+            },
+            "installedCliVersion": "0.160.0",
+            "pidRecords": [
+              {
+                "path": "~/.codex/app-server-daemon/daemon.pid",
+                "pidLiveNow": false,
+                "processStartTime": "Wed Sep 30 19:26:47 2026",
+                "recordedOnCurrentBoot": false
+              },
+              {
+                "path": "~/.codex/app-server-daemon/daemon-updater.pid",
+                "pidLiveNow": false,
+                "processStartTime": "Sat Sep 26 12:59:33 2026",
+                "recordedOnCurrentBoot": false
+              }
+            ],
+            "rendezvous": {
+              "derivedTarget": "/private/tmp/codex-daemon-501/2ef99283e301149636c7e287a64da2759f91fc5e773a7f7f3efef351001ca7b7",
+              "exists": true,
+              "isSymlink": true,
+              "path": "~/.codex/app-server-control/app-server-control.sock",
+              "target": "/private/tmp/codex-daemon-501/2ef99283e301149636c7e287a64da2759f91fc5e773a7f7f3efef351001ca7b7",
+              "targetExists": false,
+              "targetMatchesDerivation": true
+            },
+            "runningAppServerVersion": null,
+            "selectedDaemonPackageVersion": "0.159.3"
+          },
+          "limitations": [
+            "No daemon answered, so the live wire (AF_UNIX WebSocket upgrade, initialize/initialized, thread/loaded/list) was not exercised against Codex; the hand-written client is verified only against the in-process RFC 6455 fake in the crate's tests.",
+            "The selected managed daemon package differs from the installed CLI; per the released daemon README, lifecycle commands (and TUI auto-start) use the selected package regardless of the invoking CLI, so a newly started daemon would run that package's version, which must be qualified separately from 0.160.1.",
+            "daemon_auto_start is on by default: an ordinary `codex` TUI launch starts or attaches to this daemon with no embedded fallback (rust-v0.160.1 codex-rs/tui/src/startup_orchestration.rs L494 auto_start_daemon, L530 codex_app_server_daemon::start_with_features, L547 LocalDaemon allow_embedded_fallback=false); embedded mode follows only from an exclusion such as --no-daemon, --oss, --profile, non-feature -c overrides, --strict-config or --dangerously-bypass-hook-trust (daemon_startup.rs exclusion())."
+          ],
+          "mode": "CODEX_SHARED_DAEMON",
+          "status": "NOT_RUNNING"
+        },
+        {
+          "availableNow": true,
+          "evidence": {
+            "cliSha256": "112fae7a5a1223e673c8a1791d32338f37df8b527ff1159bb8adac6c4dbf1b4b",
+            "hooksFeature": {
+              "enabled": true,
+              "stage": "stable"
+            },
+            "installedCliVersion": "0.160.0",
+            "liveStandaloneTuiProcesses": 0,
+            "noDaemonFlag": true
+          },
+          "limitations": [
+            "Detached-hook ancestry: NOT_RUN.",
+            "Embedded CLI exposes no app-server endpoint for history or status (SPEC §12.6); coverage is hooks plus optional legacy notify."
+          ],
+          "mode": "CODEX_EMBEDDED",
+          "status": "INSTALLED_NO_LIVE_SESSION"
+        },
+        {
+          "availableNow": true,
+          "evidence": {
+            "bundle": "/Applications/ChatGPT.app",
+            "bundleInfo": {
+              "CFBundleIdentifier": "com.openai.codex",
+              "CFBundleName": "ChatGPT",
+              "CFBundleShortVersionString": "26.930.31730",
+              "CFBundleVersion": "12947"
+            },
+            "bundledRuntimeSha256": "6b582e8813ce7e8ed4c52814ee5cf230dba647bf2292df747a4003f2657ef201",
+            "bundledRuntimeVersion": "0.160.0",
+            "desktopAppServerPathBoundUnixSockets": 0,
+            "desktopAppServerProcesses": 3,
+            "desktopAppServersOnStdio": 3,
+            "otherDesktopRuntimeProcesses": 1,
+            "sameExecutableAsStandaloneCli": false
+          },
+          "limitations": [
+            "The desktop runtime's app-servers use stdio pipes owned by the desktop app (and its helpers); there is no socket a passive observer can attach to.",
+            "App activation and a verified current-conversation route were not probed (SPEC §12.1 qualifies them separately)."
+          ],
+          "mode": "CODEX_DESKTOP_LOCAL",
+          "status": "RUNNING_STDIO_ONLY_NO_PASSIVE_ENDPOINT"
+        }
+      ],
+      "status": "DERIVED"
+    },
+    "runtime": {
+      "cli": {
+        "canonicalPath": "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex",
+        "entry": "~/.local/bin/codex",
+        "executable": {
+          "codeSignature": {
+            "display": {
+              "command": {
+                "argv": [
+                  "/usr/bin/codesign",
+                  "-d",
+                  "--verbose=4",
+                  "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex"
+                ],
+                "elapsedMs": 19,
+                "exitStatus": 0,
+                "pid": 18910,
+                "startedAt": {
+                  "ms": 1791281017172,
+                  "utc": "2026-10-06T10:03:37.172Z"
+                },
+                "stderrBytes": 1097,
+                "stderrTruncated": false,
+                "stdoutBytes": 0,
+                "stdoutTruncated": false,
+                "timedOut": false
+              },
+              "fields": {
+                "Authority": [
+                  "Developer ID Application: OpenAI OpCo, LLC (2DC432GLL2)",
+                  "Developer ID Certification Authority",
+                  "Apple Root CA"
+                ],
+                "CDHash": "4684feae17bed05191fd828bb819c61cb70db4f9",
+                "CandidateCDHashFull sha256": "4684feae17bed05191fd828bb819c61cb70db4f988b772a77b640ec57e188b2d",
+                "CodeDirectory v": "20500 size=1872753 flags=0x10000(runtime) hashes=58513+7 location=embedded",
+                "Executable": "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex",
+                "Format": "Mach-O thin (arm64)",
+                "Hash type": "sha256 size=32",
+                "Identifier": "codex",
+                "Info.plist": "not bound",
+                "Internal requirements count": "1 size=168",
+                "Runtime Version": "15.5.0",
+                "Sealed Resources": "none",
+                "Signature size": "9047",
+                "TeamIdentifier": "2DC432GLL2",
+                "Timestamp": "Oct 1, 2026 at 1:49:46 PM"
+              }
+            },
+            "verify": {
+              "command": {
+                "argv": [
+                  "/usr/bin/codesign",
+                  "--verify",
+                  "--strict",
+                  "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex"
+                ],
+                "elapsedMs": 117,
+                "exitStatus": 0,
+                "pid": 18935,
+                "startedAt": {
+                  "ms": 1791281017191,
+                  "utc": "2026-10-06T10:03:37.191Z"
+                },
+                "stderrBytes": 0,
+                "stderrTruncated": false,
+                "stdoutBytes": 0,
+                "stdoutTruncated": false,
+                "timedOut": false
+              },
+              "stderr": "",
+              "valid": true
+            }
+          },
+          "path": "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex",
+          "readError": null,
+          "sha256": "112fae7a5a1223e673c8a1791d32338f37df8b527ff1159bb8adac6c4dbf1b4b",
+          "sizeBytes": 241555024
+        },
+        "packageManifest": {
+          "layoutVersion": 1,
+          "path": "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/codex-package.json",
+          "target": "aarch64-apple-darwin",
+          "variant": "codex",
+          "version": "0.160.0"
+        },
+        "symlinkChain": [
+          {
+            "link": "~/.local/bin/codex",
+            "target": "~/.codex/packages/standalone/current/bin/codex"
+          }
+        ],
+        "versionCommand": {
+          "command": {
+            "argv": [
+              "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin/bin/codex",
+              "--version"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 14,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 19044,
+            "startedAt": {
+              "ms": 1791281017308,
+              "utc": "2026-10-06T10:03:37.308Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 18,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "stderr": "",
+          "stdout": "codex-cli 0.160.0",
+          "version": "0.160.0"
+        }
+      },
+      "disposableHomeAfter": [
+        {
+          "kind": "dir",
+          "path": "tmp"
+        },
+        {
+          "kind": "dir",
+          "path": "tmp/arg0"
+        },
+        {
+          "kind": "dir",
+          "path": "tmp/arg0/codex-arg0jANfMA"
+        },
+        {
+          "kind": "file",
+          "path": "tmp/arg0/codex-arg0jANfMA/.lock"
+        },
+        {
+          "kind": "symlink",
+          "path": "tmp/arg0/codex-arg0jANfMA/apply_patch"
+        },
+        {
+          "kind": "symlink",
+          "path": "tmp/arg0/codex-arg0jANfMA/applypatch"
+        },
+        {
+          "kind": "symlink",
+          "path": "tmp/arg0/codex-arg0jANfMA/codex-execve-wrapper"
+        }
+      ],
+      "finishedAt": {
+        "ms": 1791281019598,
+        "utc": "2026-10-06T10:03:39.598Z"
+      },
+      "item": "runtime",
+      "otherRuntimes": [
+        {
+          "bundle": "/Applications/ChatGPT.app",
+          "info": {
+            "CFBundleIdentifier": "com.openai.codex",
+            "CFBundleName": "ChatGPT",
+            "CFBundleShortVersionString": "26.930.31730",
+            "CFBundleVersion": "12947"
+          },
+          "kind": "CODEX_DESKTOP_BUNDLED",
+          "runtime": {
+            "executable": {
+              "codeSignature": {
+                "display": {
+                  "command": {
+                    "argv": [
+                      "/usr/bin/codesign",
+                      "-d",
+                      "--verbose=4",
+                      "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"
+                    ],
+                    "elapsedMs": 24,
+                    "exitStatus": 0,
+                    "pid": 19795,
+                    "startedAt": {
+                      "ms": 1791281018196,
+                      "utc": "2026-10-06T10:03:38.196Z"
+                    },
+                    "stderrBytes": 1164,
+                    "stderrTruncated": false,
+                    "stdoutBytes": 0,
+                    "stdoutTruncated": false,
+                    "timedOut": false
+                  },
+                  "fields": {
+                    "Authority": [
+                      "Developer ID Application: OpenAI OpCo, LLC (2DC432GLL2)",
+                      "Developer ID Certification Authority",
+                      "Apple Root CA"
+                    ],
+                    "CDHash": "1f082430a02904526079f93a9e8fabc8d00dbd3d",
+                    "CandidateCDHashFull sha256": "1f082430a02904526079f93a9e8fabc8d00dbd3ddd156ff8645a428b5a43d959",
+                    "CodeDirectory v": "20500 size=1872753 flags=0x10000(runtime) hashes=58513+7 location=embedded",
+                    "Executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+                    "Format": "app bundle with Mach-O thin (arm64)",
+                    "Hash type": "sha256 size=32",
+                    "Identifier": "codex",
+                    "Info.plist entries": "6",
+                    "Internal requirements count": "1 size=168",
+                    "Runtime Version": "15.5.0",
+                    "Sealed Resources version": "2 rules=13 files=1",
+                    "Signature size": "9047",
+                    "TeamIdentifier": "2DC432GLL2",
+                    "Timestamp": "Oct 1, 2026 at 2:02:11 PM"
+                  }
+                },
+                "verify": {
+                  "command": {
+                    "argv": [
+                      "/usr/bin/codesign",
+                      "--verify",
+                      "--strict",
+                      "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"
+                    ],
+                    "elapsedMs": 121,
+                    "exitStatus": 0,
+                    "pid": 19822,
+                    "startedAt": {
+                      "ms": 1791281018220,
+                      "utc": "2026-10-06T10:03:38.220Z"
+                    },
+                    "stderrBytes": 0,
+                    "stderrTruncated": false,
+                    "stdoutBytes": 0,
+                    "stdoutTruncated": false,
+                    "timedOut": false
+                  },
+                  "stderr": "",
+                  "valid": true
+                }
+              },
+              "path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+              "readError": null,
+              "sha256": "6b582e8813ce7e8ed4c52814ee5cf230dba647bf2292df747a4003f2657ef201",
+              "sizeBytes": 241555024
+            },
+            "manifest": {
+              "layoutVersion": 1,
+              "path": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-package.json",
+              "target": "aarch64-apple-darwin",
+              "variant": "codex",
+              "version": "0.160.0"
+            },
+            "versionCommand": {
+              "command": {
+                "argv": [
+                  "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+                  "--version"
+                ],
+                "cwd": "/private/tmp/claude-501/cp-8d599189",
+                "elapsedMs": 12,
+                "env": {
+                  "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+                  "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+                  "LANG": "en_US.UTF-8",
+                  "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                  "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+                },
+                "environmentCleared": true,
+                "exitStatus": 0,
+                "pid": 19952,
+                "startedAt": {
+                  "ms": 1791281018342,
+                  "utc": "2026-10-06T10:03:38.342Z"
+                },
+                "stderrBytes": 0,
+                "stderrTruncated": false,
+                "stdoutBytes": 18,
+                "stdoutTruncated": false,
+                "timedOut": false
+              },
+              "stderr": "",
+              "stdout": "codex-cli 0.160.0",
+              "version": "0.160.0"
+            }
+          }
+        },
+        {
+          "bundle": "/Applications/Codex.app",
+          "kind": "CODEX_DESKTOP_BUNDLED",
+          "present": false
+        },
+        {
+          "executable": {
+            "codeSignature": {
+              "display": {
+                "command": {
+                  "argv": [
+                    "/usr/bin/codesign",
+                    "-d",
+                    "--verbose=4",
+                    "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin/bin/codex"
+                  ],
+                  "elapsedMs": 25,
+                  "exitStatus": 0,
+                  "pid": 20842,
+                  "startedAt": {
+                    "ms": 1791281019215,
+                    "utc": "2026-10-06T10:03:39.215Z"
+                  },
+                  "stderrBytes": 1105,
+                  "stderrTruncated": false,
+                  "stdoutBytes": 0,
+                  "stdoutTruncated": false,
+                  "timedOut": false
+                },
+                "fields": {
+                  "Authority": [
+                    "Developer ID Application: OpenAI OpCo, LLC (2DC432GLL2)",
+                    "Developer ID Certification Authority",
+                    "Apple Root CA"
+                  ],
+                  "CDHash": "dcfc226a89d9cf1c997395978f9bc26308038ca5",
+                  "CandidateCDHashFull sha256": "dcfc226a89d9cf1c997395978f9bc26308038ca57d0e65b9a1d9423367a48d29",
+                  "CodeDirectory v": "20500 size=1863409 flags=0x10000(runtime) hashes=58221+7 location=embedded",
+                  "Executable": "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin/bin/codex",
+                  "Format": "Mach-O thin (arm64)",
+                  "Hash type": "sha256 size=32",
+                  "Identifier": "codex",
+                  "Info.plist": "not bound",
+                  "Internal requirements count": "1 size=168",
+                  "Runtime Version": "15.5.0",
+                  "Sealed Resources": "none",
+                  "Signature size": "9046",
+                  "TeamIdentifier": "2DC432GLL2",
+                  "Timestamp": "Sep 30, 2026 at 6:21:14 PM"
+                }
+              },
+              "verify": {
+                "command": {
+                  "argv": [
+                    "/usr/bin/codesign",
+                    "--verify",
+                    "--strict",
+                    "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin/bin/codex"
+                  ],
+                  "elapsedMs": 128,
+                  "exitStatus": 0,
+                  "pid": 20866,
+                  "startedAt": {
+                    "ms": 1791281019240,
+                    "utc": "2026-10-06T10:03:39.240Z"
+                  },
+                  "stderrBytes": 0,
+                  "stderrTruncated": false,
+                  "stdoutBytes": 0,
+                  "stdoutTruncated": false,
+                  "timedOut": false
+                },
+                "stderr": "",
+                "valid": true
+              }
+            },
+            "path": "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin/bin/codex",
+            "readError": null,
+            "sha256": "4d210f7c5a18fd0386434df23b5bdbb8c0e7257d3e8a2b30b0769c8bbe99a878",
+            "sizeBytes": 240351424
+          },
+          "kind": "CODEX_MANAGED_DAEMON_PACKAGE",
+          "selection": {
+            "autoUpdateVersion": "0.159.3-aarch64-apple-darwin",
+            "current": "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin",
+            "currentManifest": {
+              "layoutVersion": 1,
+              "path": "~/.codex/packages/app-server-daemon/current/codex-package.json",
+              "target": "aarch64-apple-darwin",
+              "variant": "codex",
+              "version": "0.159.3"
+            },
+            "installedReleases": [
+              "0.157.1-aarch64-apple-darwin",
+              "0.158.0-aarch64-apple-darwin",
+              "0.159.0-aarch64-apple-darwin",
+              "0.159.1-aarch64-apple-darwin",
+              "0.159.2-aarch64-apple-darwin",
+              "0.159.3-aarch64-apple-darwin"
+            ],
+            "present": true,
+            "root": "~/.codex/packages/app-server-daemon"
+          },
+          "versionCommand": {
+            "command": {
+              "argv": [
+                "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin/bin/codex",
+                "--version"
+              ],
+              "cwd": "/private/tmp/claude-501/cp-8d599189",
+              "elapsedMs": 14,
+              "env": {
+                "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+                "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+                "LANG": "en_US.UTF-8",
+                "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+                "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+              },
+              "environmentCleared": true,
+              "exitStatus": 0,
+              "pid": 20973,
+              "startedAt": {
+                "ms": 1791281019369,
+                "utc": "2026-10-06T10:03:39.369Z"
+              },
+              "stderrBytes": 0,
+              "stderrTruncated": false,
+              "stdoutBytes": 18,
+              "stdoutTruncated": false,
+              "timedOut": false
+            },
+            "stderr": "",
+            "stdout": "codex-cli 0.159.3",
+            "version": "0.159.3"
+          }
+        }
+      ],
+      "packages": {
+        "appServerDaemon": {
+          "autoUpdateVersion": "0.159.3-aarch64-apple-darwin",
+          "current": "~/.codex/packages/app-server-daemon/releases/0.159.3-aarch64-apple-darwin",
+          "currentManifest": {
+            "layoutVersion": 1,
+            "path": "~/.codex/packages/app-server-daemon/current/codex-package.json",
+            "target": "aarch64-apple-darwin",
+            "variant": "codex",
+            "version": "0.159.3"
+          },
+          "installedReleases": [
+            "0.157.1-aarch64-apple-darwin",
+            "0.158.0-aarch64-apple-darwin",
+            "0.159.0-aarch64-apple-darwin",
+            "0.159.1-aarch64-apple-darwin",
+            "0.159.2-aarch64-apple-darwin",
+            "0.159.3-aarch64-apple-darwin"
+          ],
+          "present": true,
+          "root": "~/.codex/packages/app-server-daemon"
+        },
+        "standalone": {
+          "autoUpdateVersion": "0.160.0-aarch64-apple-darwin",
+          "current": "~/.codex/packages/standalone/releases/0.160.0-aarch64-apple-darwin",
+          "currentManifest": {
+            "layoutVersion": 1,
+            "path": "~/.codex/packages/standalone/current/codex-package.json",
+            "target": "aarch64-apple-darwin",
+            "variant": "codex",
+            "version": "0.160.0"
+          },
+          "installedReleases": [
+            "0.145.0-aarch64-apple-darwin",
+            "0.154.0-aarch64-apple-darwin",
+            "0.157.1-aarch64-apple-darwin",
+            "0.160.0-aarch64-apple-darwin"
+          ],
+          "present": true,
+          "root": "~/.codex/packages/standalone"
+        }
+      },
+      "processes": [
+        {
+          "argv": {
+            "appServerSubcommand": null,
+            "argvRecorded": "allowlisted tokens only; option values other than --listen are withheld",
+            "configOverrideCount": 0,
+            "listen": "stdio://",
+            "listenEffective": "stdio://",
+            "noDaemon": false,
+            "remoteGiven": false,
+            "subcommand": "app-server"
+          },
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+          "pid": 22360,
+          "process": {
+            "hasControllingTerminal": false,
+            "ppid": 14925,
+            "startMicroseconds": 933138,
+            "startSeconds": "1791263250"
+          },
+          "runtime": "desktop:/Applications/ChatGPT.app",
+          "unixSockets": {
+            "command": {
+              "argv": [
+                "/usr/sbin/lsof",
+                "-a",
+                "-p",
+                "22360",
+                "-U",
+                "-F",
+                "n"
+              ],
+              "elapsedMs": 42,
+              "exitStatus": 0,
+              "pid": 20986,
+              "startedAt": {
+                "ms": 1791281019401,
+                "utc": "2026-10-06T10:03:39.401Z"
+              },
+              "stderrBytes": 0,
+              "stderrTruncated": false,
+              "stdoutBytes": 160,
+              "stdoutTruncated": false,
+              "timedOut": false
+            },
+            "pathBound": 0,
+            "total": 6
+          }
+        },
+        {
+          "argv": {
+            "appServerSubcommand": null,
+            "argvRecorded": "allowlisted tokens only; option values other than --listen are withheld",
+            "configOverrideCount": 0,
+            "listen": "stdio://",
+            "listenEffective": "stdio://",
+            "noDaemon": false,
+            "remoteGiven": false,
+            "subcommand": "app-server"
+          },
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+          "pid": 66756,
+          "process": {
+            "hasControllingTerminal": false,
+            "ppid": 60847,
+            "startMicroseconds": 478586,
+            "startSeconds": "1791113942"
+          },
+          "runtime": "desktop:/Applications/ChatGPT.app",
+          "unixSockets": {
+            "command": {
+              "argv": [
+                "/usr/sbin/lsof",
+                "-a",
+                "-p",
+                "66756",
+                "-U",
+                "-F",
+                "n"
+              ],
+              "elapsedMs": 43,
+              "exitStatus": 0,
+              "pid": 21011,
+              "startedAt": {
+                "ms": 1791281019450,
+                "utc": "2026-10-06T10:03:39.450Z"
+              },
+              "stderrBytes": 0,
+              "stderrTruncated": false,
+              "stdoutBytes": 160,
+              "stdoutTruncated": false,
+              "timedOut": false
+            },
+            "pathBound": 0,
+            "total": 6
+          }
+        },
+        {
+          "argv": {
+            "appServerSubcommand": null,
+            "argvRecorded": "allowlisted tokens only; option values other than --listen are withheld",
+            "configOverrideCount": 0,
+            "listen": null,
+            "listenEffective": null,
+            "noDaemon": false,
+            "remoteGiven": true,
+            "subcommand": "exec-server"
+          },
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+          "pid": 60076,
+          "process": {
+            "hasControllingTerminal": false,
+            "ppid": 59696,
+            "startMicroseconds": 926694,
+            "startSeconds": "1791112722"
+          },
+          "runtime": "desktop:/Applications/ChatGPT.app",
+          "unixSockets": {
+            "command": {
+              "argv": [
+                "/usr/sbin/lsof",
+                "-a",
+                "-p",
+                "60076",
+                "-U",
+                "-F",
+                "n"
+              ],
+              "elapsedMs": 44,
+              "exitStatus": 0,
+              "pid": 21043,
+              "startedAt": {
+                "ms": 1791281019501,
+                "utc": "2026-10-06T10:03:39.501Z"
+              },
+              "stderrBytes": 0,
+              "stderrTruncated": false,
+              "stdoutBytes": 183,
+              "stdoutTruncated": false,
+              "timedOut": false
+            },
+            "pathBound": 0,
+            "total": 7
+          }
+        },
+        {
+          "argv": {
+            "appServerSubcommand": null,
+            "argvRecorded": "allowlisted tokens only; option values other than --listen are withheld",
+            "configOverrideCount": 3,
+            "listen": null,
+            "listenEffective": "stdio://",
+            "noDaemon": false,
+            "remoteGiven": false,
+            "subcommand": "app-server"
+          },
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+          "pid": 59764,
+          "process": {
+            "hasControllingTerminal": false,
+            "ppid": 59696,
+            "startMicroseconds": 292168,
+            "startSeconds": "1791112715"
+          },
+          "runtime": "desktop:/Applications/ChatGPT.app",
+          "unixSockets": {
+            "command": {
+              "argv": [
+                "/usr/sbin/lsof",
+                "-a",
+                "-p",
+                "59764",
+                "-U",
+                "-F",
+                "n"
+              ],
+              "elapsedMs": 46,
+              "exitStatus": 0,
+              "pid": 21076,
+              "startedAt": {
+                "ms": 1791281019551,
+                "utc": "2026-10-06T10:03:39.551Z"
+              },
+              "stderrBytes": 0,
+              "stderrTruncated": false,
+              "stdoutBytes": 234,
+              "stdoutTruncated": false,
+              "timedOut": false
+            },
+            "pathBound": 0,
+            "total": 9
+          }
+        }
+      ],
+      "startedAt": {
+        "ms": 1791281016323,
+        "utc": "2026-10-06T10:03:36.323Z"
+      },
+      "status": "OBSERVED",
+      "versionDrift": {
+        "installedCliVersion": "0.160.0",
+        "matchesSpec": false,
+        "releaseComparison": "raw/release-diff-0.160.0-0.160.1.json (GitHub tag/compare readback; not produced by this binary)",
+        "specReleaseCommit": "d27764b82f7118f674371e6d6e76271d9d606edb",
+        "specResearchedVersion": "0.160.1"
+      }
+    },
+    "schema": {
+      "appServerSchema": {
+        "comparison": {
+          "checks": [
+            {
+              "expected": [
+                "initialize"
+              ],
+              "id": "initialize.method",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ClientRequest.json",
+              "spec": "§12.4 step 1",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "initialized"
+              ],
+              "id": "initialized.notification",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ClientNotification.json",
+              "spec": "§12.4 step 1",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "clientInfo",
+                "capabilities"
+              ],
+              "id": "initialize.params",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v1/InitializeParams.json",
+              "spec": "§12.4 step 1",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "name",
+                "title",
+                "version"
+              ],
+              "id": "initialize.clientInfo",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v1/InitializeParams.json#/definitions/ClientInfo",
+              "spec": "§12.4 step 1 (distinct observer client identity)",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "userAgent"
+              ],
+              "id": "initialize.response.userAgent",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v1/InitializeResponse.json",
+              "spec": "§12.4 (record the running daemon version)",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "thread/loaded/list"
+              ],
+              "id": "thread/loaded/list.method",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ClientRequest.json",
+              "spec": "§12.4 step 3",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "limit",
+                "cursor"
+              ],
+              "id": "thread/loaded/list.params",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadLoadedListParams.json",
+              "spec": "§12.4 step 3 (explicit bounded limit and cursor)",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "data",
+                "nextCursor"
+              ],
+              "id": "thread/loaded/list.response",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadLoadedListResponse.json",
+              "spec": "§12.4 step 3",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "thread/read"
+              ],
+              "id": "thread/read.method",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ClientRequest.json",
+              "spec": "§12.4 step 3",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "threadId",
+                "includeTurns"
+              ],
+              "id": "thread/read.params",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadParams.json",
+              "spec": "§12.4 step 3",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "historyMode"
+              ],
+              "id": "thread/read.params.historyMode",
+              "missing": [
+                "historyMode"
+              ],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadParams.json",
+              "spec": "§12.4 step 3 (\"including the supported historyMode field\")",
+              "status": "MISSING"
+            },
+            {
+              "expected": [
+                "id",
+                "sessionId",
+                "parentThreadId",
+                "forkedFromId",
+                "ephemeral",
+                "historyMode",
+                "status",
+                "turns"
+              ],
+              "id": "thread.fields",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/Thread",
+              "spec": "§12.3, §12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "canAcceptDirectInput"
+              ],
+              "id": "thread.canAcceptDirectInput",
+              "missing": [
+                "canAcceptDirectInput"
+              ],
+              "presentOnlyWithExperimental": [
+                "canAcceptDirectInput"
+              ],
+              "schema": "v2/ThreadReadResponse.json#/definitions/Thread",
+              "spec": "§12.3 (\"when present\")",
+              "status": "EXPERIMENTAL_ONLY"
+            },
+            {
+              "expected": [
+                "legacy",
+                "paginated"
+              ],
+              "id": "thread.historyMode.values",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/ThreadHistoryMode",
+              "spec": "§12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "notLoaded",
+                "idle",
+                "active",
+                "systemError"
+              ],
+              "id": "threadStatus.values",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/ThreadStatus",
+              "spec": "§12.5",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "waitingOnApproval",
+                "waitingOnUserInput"
+              ],
+              "id": "threadStatus.activeFlags",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/ThreadActiveFlag",
+              "spec": "§12.5",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "id",
+                "status",
+                "startedAt",
+                "completedAt"
+              ],
+              "id": "turn.fields",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/Turn",
+              "spec": "§12.5, §12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "completed",
+                "interrupted",
+                "failed",
+                "inProgress"
+              ],
+              "id": "turn.status.values",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadReadResponse.json#/definitions/TurnStatus",
+              "spec": "§12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "thread/turns/list"
+              ],
+              "id": "thread/turns/list.method",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ClientRequest.json",
+              "spec": "§12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "threadId",
+                "limit",
+                "cursor",
+                "sortDirection",
+                "itemsView"
+              ],
+              "id": "thread/turns/list.params",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadTurnsListParams.json",
+              "spec": "§12.6",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "notLoaded"
+              ],
+              "id": "thread/turns/list.itemsView",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadTurnsListParams.json#/definitions/TurnItemsView",
+              "spec": "§12.6 (itemsView \"notLoaded\")",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "thread/status/changed"
+              ],
+              "id": "thread/status/changed",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ServerNotification.json",
+              "spec": "§12.4 step 4",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "threadId",
+                "status"
+              ],
+              "id": "thread/status/changed.params",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ThreadStatusChangedNotification.json",
+              "spec": "§12.4 step 4",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "turn/started",
+                "turn/completed",
+                "error",
+                "thread/closed",
+                "thread/archived",
+                "thread/unarchived",
+                "thread/deleted",
+                "item/started",
+                "item/completed",
+                "serverRequest/resolved"
+              ],
+              "id": "status.notifications",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "ServerNotification.json",
+              "spec": "§12.5",
+              "status": "MATCH"
+            },
+            {
+              "expected": [
+                "willRetry"
+              ],
+              "id": "error.willRetry",
+              "missing": [],
+              "presentOnlyWithExperimental": [],
+              "schema": "v2/ErrorNotification.json",
+              "spec": "§12.5",
+              "status": "MATCH"
+            }
+          ],
+          "counts": {
+            "experimentalClientRequests": 167,
+            "stableClientRequests": 104,
+            "stableServerNotifications": 83
+          },
+          "extra": {
+            "experimentalOnlyClientRequests": [
+              "account/bedrock/discover",
+              "account/bedrock/setup",
+              "collaborationMode/list",
+              "environment/add",
+              "environment/info",
+              "environment/status",
+              "fuzzyFileSearch/sessionStart",
+              "fuzzyFileSearch/sessionStop",
+              "fuzzyFileSearch/sessionUpdate",
+              "mcpServer/event/stream/start",
+              "mcpServer/event/stream/stop",
+              "memory/reset",
+              "memory/status",
+              "mock/experimentalMethod",
+              "plugin/search",
+              "process/kill",
+              "process/resizePty",
+              "process/spawn",
+              "process/writeStdin",
+              "project/create",
+              "project/delete",
+              "project/import",
+              "project/list",
+              "project/move",
+              "project/read",
+              "project/update",
+              "remoteControl/client/list",
+              "remoteControl/client/revoke",
+              "remoteControl/disable",
+              "remoteControl/enable",
+              "remoteControl/pairing/start",
+              "remoteControl/pairing/status",
+              "remoteControl/status/read",
+              "rollout/compress",
+              "server/diagnostics",
+              "thread/backgroundTerminals/clean",
+              "thread/backgroundTerminals/list",
+              "thread/backgroundTerminals/terminate",
+              "thread/decrement_elicitation",
+              "thread/increment_elicitation",
+              "thread/memoryMode/set",
+              "thread/queue/add",
+              "thread/queue/delete",
+              "thread/queue/list",
+              "thread/queue/reorder",
+              "thread/queue/start",
+              "thread/queue/update",
+              "thread/realtime/appendAudio",
+              "thread/realtime/appendSpeech",
+              "thread/realtime/appendText",
+              "thread/realtime/listVoices",
+              "thread/realtime/start",
+              "thread/realtime/stop",
+              "thread/search",
+              "thread/searchOccurrences",
+              "thread/settings/update",
+              "thread/timeline/list",
+              "turn/settings/update",
+              "userVerification/cancel",
+              "userVerification/delete",
+              "userVerification/enroll",
+              "userVerification/status",
+              "userVerification/verify"
+            ],
+            "experimentalOnlyThreadFields": [
+              "canAcceptDirectInput",
+              "daybreakEnabled",
+              "environments",
+              "extra"
+            ],
+            "initializeCapabilities": [
+              "experimentalApi",
+              "explicitGatewayOauth",
+              "extensions",
+              "mcpServerOpenaiFormElicitation",
+              "optOutNotificationMethods",
+              "requestAttestation"
+            ],
+            "initializeResponseFields": [
+              "codexHome",
+              "platformFamily",
+              "platformOs",
+              "userAgent"
+            ],
+            "threadHookClientRequestsNotCitedBySpec": [
+              "hooks/list",
+              "thread/approveGuardianDeniedAction",
+              "thread/archive",
+              "thread/attachment/add",
+              "thread/attachment/list",
+              "thread/attachment/remove",
+              "thread/compact/start",
+              "thread/delete",
+              "thread/fork",
+              "thread/goal/clear",
+              "thread/goal/get",
+              "thread/goal/set",
+              "thread/inject_items",
+              "thread/items/list",
+              "thread/list",
+              "thread/metadata/update",
+              "thread/name/set",
+              "thread/revert",
+              "thread/section/move",
+              "thread/shellCommand",
+              "thread/start",
+              "thread/unarchive",
+              "thread/unsubscribe"
+            ],
+            "threadTurnItemHookNotificationsNotCitedBySpec": [
+              "hook/completed",
+              "hook/started",
+              "item/agentMessage/delta",
+              "item/autoApprovalReview/completed",
+              "item/autoApprovalReview/started",
+              "item/commandExecution/outputDelta",
+              "item/commandExecution/terminalInteraction",
+              "item/fileChange/outputDelta",
+              "item/fileChange/patchUpdated",
+              "item/mcpToolCall/progress",
+              "item/plan/delta",
+              "item/reasoning/summaryPartAdded",
+              "item/reasoning/summaryTextDelta",
+              "item/reasoning/textDelta",
+              "thread/attachment/updated",
+              "thread/compacted",
+              "thread/environment/connected",
+              "thread/environment/disconnected",
+              "thread/goal/cleared",
+              "thread/goal/updated",
+              "thread/name/updated",
+              "thread/project/updated",
+              "thread/queue/changed",
+              "thread/realtime/closed",
+              "thread/realtime/error",
+              "thread/realtime/item/completed",
+              "thread/realtime/item/started",
+              "thread/realtime/item/transcript/delta",
+              "thread/realtime/itemAdded",
+              "thread/realtime/outputAudio/delta",
+              "thread/realtime/sdp",
+              "thread/realtime/started",
+              "thread/realtime/transcript/delta",
+              "thread/realtime/transcript/done",
+              "thread/reverted",
+              "thread/settings/updated",
+              "thread/started",
+              "thread/tokenUsage/updated",
+              "turn/diff/updated",
+              "turn/moderationMetadata",
+              "turn/plan/updated"
+            ]
+          },
+          "methodLists": "raw/app-server-schema/methods.json",
+          "statusCounts": {
+            "EXPERIMENTAL_ONLY": 1,
+            "MATCH": 23,
+            "MISSING": 1
+          }
+        },
+        "experimental": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "generate-json-schema",
+              "--experimental",
+              "--out",
+              "/private/tmp/claude-501/cp-8d599189/schema-experimental"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 48,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21247,
+            "startedAt": {
+              "ms": 1791281019744,
+              "utc": "2026-10-06T10:03:39.744Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 0,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "copiedFiles": [
+            "raw/app-server-schema/experimental/v2/ThreadReadResponse.json"
+          ],
+          "fileCount": 440,
+          "generated": true,
+          "manifest": "raw/app-server-schema/experimental-manifest.json",
+          "totalBytes": 4286533
+        },
+        "stable": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "generate-json-schema",
+              "--out",
+              "/private/tmp/claude-501/cp-8d599189/schema-stable"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 44,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21190,
+            "startedAt": {
+              "ms": 1791281019673,
+              "utc": "2026-10-06T10:03:39.673Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 0,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "copiedFiles": [
+            "raw/app-server-schema/stable/ClientNotification.json",
+            "raw/app-server-schema/stable/v1/InitializeParams.json",
+            "raw/app-server-schema/stable/v1/InitializeResponse.json",
+            "raw/app-server-schema/stable/v2/ThreadLoadedListParams.json",
+            "raw/app-server-schema/stable/v2/ThreadLoadedListResponse.json",
+            "raw/app-server-schema/stable/v2/ThreadReadParams.json",
+            "raw/app-server-schema/stable/v2/ThreadReadResponse.json",
+            "raw/app-server-schema/stable/v2/ThreadTurnsListParams.json",
+            "raw/app-server-schema/stable/v2/ThreadStatusChangedNotification.json",
+            "raw/app-server-schema/stable/v2/ErrorNotification.json",
+            "raw/app-server-schema/stable/v2/HooksListParams.json",
+            "raw/app-server-schema/stable/v2/HooksListResponse.json",
+            "raw/app-server-schema/stable/v2/HookStartedNotification.json",
+            "raw/app-server-schema/stable/v2/HookCompletedNotification.json"
+          ],
+          "fileCount": 314,
+          "generated": true,
+          "manifest": "raw/app-server-schema/stable-manifest.json",
+          "totalBytes": 3540819
+        }
+      },
+      "finishedAt": {
+        "ms": 1791281025465,
+        "utc": "2026-10-06T10:03:45.465Z"
+      },
+      "help": {
+        "appServer": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "--help"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 15,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21131,
+            "startedAt": {
+              "ms": 1791281019613,
+              "utc": "2026-10-06T10:03:39.613Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 3214,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "raw": "raw/help/app-server.txt",
+          "stderr": ""
+        },
+        "appServerDaemon": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "daemon",
+              "--help"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 14,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21148,
+            "startedAt": {
+              "ms": 1791281019629,
+              "utc": "2026-10-06T10:03:39.629Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 1668,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "raw": "raw/help/app-server-daemon.txt",
+          "stderr": ""
+        },
+        "appServerDaemonVersion": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "daemon",
+              "version",
+              "--help"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 14,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21162,
+            "startedAt": {
+              "ms": 1791281019643,
+              "utc": "2026-10-06T10:03:39.643Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 867,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "raw": "raw/help/app-server-daemon-version.txt",
+          "stderr": ""
+        },
+        "codex": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "--help"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 14,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21116,
+            "startedAt": {
+              "ms": 1791281019598,
+              "utc": "2026-10-06T10:03:39.598Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 5849,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "raw": "raw/help/codex.txt",
+          "stderr": ""
+        },
+        "generateJsonSchema": {
+          "command": {
+            "argv": [
+              "~/.local/bin/codex",
+              "app-server",
+              "generate-json-schema",
+              "--help"
+            ],
+            "cwd": "/private/tmp/claude-501/cp-8d599189",
+            "elapsedMs": 14,
+            "env": {
+              "CODEX_HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "HOME": "/private/tmp/claude-501/cp-8d599189/h",
+              "LANG": "en_US.UTF-8",
+              "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+              "TMPDIR": "/private/tmp/claude-501/cp-8d599189/t/"
+            },
+            "environmentCleared": true,
+            "exitStatus": 0,
+            "pid": 21177,
+            "startedAt": {
+              "ms": 1791281019658,
+              "utc": "2026-10-06T10:03:39.658Z"
+            },
+            "stderrBytes": 0,
+            "stderrTruncated": false,
+            "stdoutBytes": 1075,
+            "stdoutTruncated": false,
+            "timedOut": false
+          },
+          "raw": "raw/help/app-server-generate-json-schema.txt",
+          "stderr": ""
+        }
+      },
+      "hookInputSchema": {
+        "comparison": {
+          "allRowsMatch": true,
+          "events": [
+            {
+              "event": "SessionStart",
+              "extraFields": [],
+              "file": "session-start.command.input.schema.json",
+              "hookEventNameConst": "SessionStart",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "source",
+                "transcript_path"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "source"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {
+                "source": [
+                  "startup",
+                  "resume",
+                  "clear",
+                  "compact",
+                  "fork"
+                ]
+              }
+            },
+            {
+              "event": "SessionEnd",
+              "extraFields": [],
+              "file": "session-end.command.input.schema.json",
+              "hookEventNameConst": "SessionEnd",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "reason",
+                "session_id",
+                "transcript_path"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "reason"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {
+                "reason": [
+                  "other"
+                ]
+              }
+            },
+            {
+              "event": "UserPromptSubmit",
+              "extraFields": [
+                "model",
+                "permission_mode"
+              ],
+              "file": "user-prompt-submit.command.input.schema.json",
+              "hookEventNameConst": "UserPromptSubmit",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "prompt",
+                "session_id",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "prompt",
+                "agent_id",
+                "agent_type"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "PreToolUse",
+              "extraFields": [
+                "agent_id",
+                "agent_type",
+                "model",
+                "permission_mode"
+              ],
+              "file": "pre-tool-use.command.input.schema.json",
+              "hookEventNameConst": "PreToolUse",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "tool_input",
+                "tool_name",
+                "tool_use_id",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "tool_use_id",
+                "tool_name",
+                "tool_input"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "PermissionRequest",
+              "extraFields": [
+                "agent_id",
+                "agent_type",
+                "model",
+                "permission_mode"
+              ],
+              "file": "permission-request.command.input.schema.json",
+              "hookEventNameConst": "PermissionRequest",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "tool_input",
+                "tool_name",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "tool_name",
+                "tool_input"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "PostToolUse",
+              "extraFields": [
+                "agent_id",
+                "agent_type",
+                "model",
+                "permission_mode",
+                "tool_input",
+                "tool_name"
+              ],
+              "file": "post-tool-use.command.input.schema.json",
+              "hookEventNameConst": "PostToolUse",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "tool_input",
+                "tool_name",
+                "tool_response",
+                "tool_use_id",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "tool_use_id",
+                "tool_response"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "PreCompact",
+              "extraFields": [
+                "agent_id",
+                "agent_type",
+                "model"
+              ],
+              "file": "pre-compact.command.input.schema.json",
+              "hookEventNameConst": "PreCompact",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "session_id",
+                "transcript_path",
+                "trigger",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "trigger"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {
+                "trigger": [
+                  "manual",
+                  "auto"
+                ]
+              }
+            },
+            {
+              "event": "PostCompact",
+              "extraFields": [
+                "agent_id",
+                "agent_type",
+                "model"
+              ],
+              "file": "post-compact.command.input.schema.json",
+              "hookEventNameConst": "PostCompact",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "session_id",
+                "transcript_path",
+                "trigger",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "trigger"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {
+                "trigger": [
+                  "manual",
+                  "auto"
+                ]
+              }
+            },
+            {
+              "event": "SubagentStart",
+              "extraFields": [
+                "model",
+                "permission_mode"
+              ],
+              "file": "subagent-start.command.input.schema.json",
+              "hookEventNameConst": "SubagentStart",
+              "missing": [],
+              "required": [
+                "agent_id",
+                "agent_type",
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "agent_id",
+                "agent_type"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "SubagentStop",
+              "extraFields": [
+                "last_assistant_message",
+                "model",
+                "permission_mode"
+              ],
+              "file": "subagent-stop.command.input.schema.json",
+              "hookEventNameConst": "SubagentStop",
+              "missing": [],
+              "required": [
+                "agent_id",
+                "agent_transcript_path",
+                "agent_type",
+                "cwd",
+                "hook_event_name",
+                "last_assistant_message",
+                "model",
+                "permission_mode",
+                "session_id",
+                "stop_hook_active",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "agent_id",
+                "agent_type",
+                "agent_transcript_path",
+                "stop_hook_active"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "Stop",
+              "extraFields": [
+                "model",
+                "permission_mode"
+              ],
+              "file": "stop.command.input.schema.json",
+              "hookEventNameConst": "Stop",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "last_assistant_message",
+                "model",
+                "permission_mode",
+                "session_id",
+                "stop_hook_active",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "stop_hook_active",
+                "last_assistant_message"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            },
+            {
+              "event": "Interrupt",
+              "extraFields": [],
+              "file": "interrupt.command.input.schema.json",
+              "hookEventNameConst": "Interrupt",
+              "missing": [],
+              "required": [
+                "cwd",
+                "hook_event_name",
+                "model",
+                "permission_mode",
+                "session_id",
+                "transcript_path",
+                "turn_id"
+              ],
+              "specAbsentButPresent": [],
+              "specFields": [
+                "session_id",
+                "transcript_path",
+                "cwd",
+                "hook_event_name",
+                "turn_id",
+                "model",
+                "permission_mode"
+              ],
+              "status": "MATCH",
+              "transcriptPathNullable": true,
+              "values": {}
+            }
+          ],
+          "executableIdentifiers": [
+            {
+              "grepExit": 0,
+              "identifier": "transcript_path",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "hook_event_name",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "tool_use_id",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "permission_mode",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "stop_hook_active",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "last_assistant_message",
+              "present": true
+            },
+            {
+              "grepExit": 0,
+              "identifier": "agent_transcript_path",
+              "present": true
+            }
+          ],
+          "fixtureSha256": [
+            {
+              "file": "session-start.command.input.schema.json",
+              "sha256": "54168cf0bb3641bbc55dcdc58aa3803651d4f24499339061f3e9bb0ef9095633"
+            },
+            {
+              "file": "session-end.command.input.schema.json",
+              "sha256": "23b1b69f92fa8ac29f8319478984b5aa5aaf09e5ca355ce90aa010452937e41c"
+            },
+            {
+              "file": "user-prompt-submit.command.input.schema.json",
+              "sha256": "e6b923bc519896197c44c4fc267a9d115cef24ac418dde9c27db699f4e3b65fd"
+            },
+            {
+              "file": "pre-tool-use.command.input.schema.json",
+              "sha256": "fabed428f0fe75767c5700208b166da5faef4e031d601dfc8bff2f96d340c682"
+            },
+            {
+              "file": "permission-request.command.input.schema.json",
+              "sha256": "75c73d7a38cfc0e73ef06bd1fc506a44d25874522069ec4fb85e0bf1e7d6b8fb"
+            },
+            {
+              "file": "post-tool-use.command.input.schema.json",
+              "sha256": "8ea1e4bccb262fad05b85c300d562d2653c5a64118d6a2c5704468fc4ea836a9"
+            },
+            {
+              "file": "pre-compact.command.input.schema.json",
+              "sha256": "065f0ae3cd628ac9af8c0cf9bd1d5a673bcbd5ea1d7dcdc0c6437f34dd0189d9"
+            },
+            {
+              "file": "post-compact.command.input.schema.json",
+              "sha256": "4a4b3f3022c939a15ab12e95f5c5c17b18bb20f74fe962ae0a51b2a3e76e63f9"
+            },
+            {
+              "file": "subagent-start.command.input.schema.json",
+              "sha256": "ce7dc9b5ae8826d1e0c59ffcea793e558aebceb7917a2eb9bb2edd8a7ac37aa9"
+            },
+            {
+              "file": "subagent-stop.command.input.schema.json",
+              "sha256": "94dc8df29f4691195ac2338ae6de876230e5100a10b94ef48df4e732424b5df5"
+            },
+            {
+              "file": "stop.command.input.schema.json",
+              "sha256": "7db4793c404b5c46b230c27b9507eb1a558fd958689d8715221c5dd81351a06a"
+            },
+            {
+              "file": "interrupt.command.input.schema.json",
+              "sha256": "be37402db3524543efe1e4058e6b9a3a53f7dd8f7791a9b75bb2accf7842196e"
+            }
+          ],
+          "fixtures": "~/Documents/Tools/Threadspace/.claude/worktrees/agent-aaa618c1d061ba14a/evidence/M0C/codex/raw/hook-input-schema-0.160.0",
+          "sessionStartSource": {
+            "extra": [
+              "fork"
+            ],
+            "released": [
+              "startup",
+              "resume",
+              "clear",
+              "compact",
+              "fork"
+            ],
+            "spec": [
+              "startup",
+              "resume",
+              "clear",
+              "compact"
+            ]
+          }
+        },
+        "emittedByInstalledBuild": false,
+        "why": "the CLI has no hook-schema generator; generate-json-schema covers only the app-server protocol"
+      },
+      "item": "schema",
+      "startedAt": {
+        "ms": 1791281019598,
+        "utc": "2026-10-06T10:03:39.598Z"
+      },
+      "status": "OBSERVED"
+    }
+  },
+  "probe": {
+    "argv": [
+      "./target/aarch64-apple-darwin/debug/threadspace-codex-probe",
+      "all",
+      "--out",
+      "evidence/M0C/codex",
+      "--hook-schemas",
+      "evidence/M0C/codex/raw/hook-input-schema-0.160.0"
+    ],
+    "command": "all",
+    "disposable": {
+      "codexHome": "/private/tmp/claude-501/cp-8d599189/h",
+      "createdAt": {
+        "ms": 1791281017308,
+        "utc": "2026-10-06T10:03:37.308Z"
+      },
+      "existsAfterCleanup": false,
+      "removed": true,
+      "removedAt": {
+        "ms": 1791281026675,
+        "utc": "2026-10-06T10:03:46.675Z"
+      },
+      "root": "/private/tmp/claude-501/cp-8d599189"
+    },
+    "finishedAt": {
+      "ms": 1791281026675,
+      "utc": "2026-10-06T10:03:46.675Z"
+    },
+    "host": {
+      "macosBuild": "26B5091g",
+      "macosProductVersion": "27.2.0"
+    },
+    "name": "threadspace-codex-probe",
+    "redaction": "$HOME prefix replaced with ~",
+    "startedAt": {
+      "ms": 1791281016323,
+      "utc": "2026-10-06T10:03:36.323Z"
+    },
+    "version": "0.1.0"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "purpose": "Precise drift between the installed Codex CLI (0.160.0) and the release SPEC researched (0.160.1).",
+  "commands": [
+    "curl -fsSL https://api.github.com/repos/openai/codex/git/ref/tags/rust-v0.160.0",
+    "curl -fsSL https://api.github.com/repos/openai/codex/git/tags/79b1b666f2e8551f8abbbca34957227f67f3f553",
+    "curl -fsSL https://api.github.com/repos/openai/codex/git/ref/tags/rust-v0.160.1",
+    "curl -fsSL https://api.github.com/repos/openai/codex/git/tags/c3e23d4c4385619ecec78408766e46b7fa7dd9ad",
+    "curl -fsSL https://api.github.com/repos/openai/codex/compare/a956835d020762cb2b570053af06f643a11c0ecc...d27764b82f7118f674371e6d6e76271d9d606edb",
+    "curl -fsSL https://api.github.com/repos/openai/codex/compare/d27764b82f7118f674371e6d6e76271d9d606edb...a956835d020762cb2b570053af06f643a11c0ecc"
+  ],
+  "tags": {
+    "rust-v0.160.0": {
+      "tagObject": "79b1b666f2e8551f8abbbca34957227f67f3f553",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc"
+    },
+    "rust-v0.160.1": {
+      "tagObject": "c3e23d4c4385619ecec78408766e46b7fa7dd9ad",
+      "commit": "d27764b82f7118f674371e6d6e76271d9d606edb"
+    }
+  },
+  "specPinMatchesTag": "rust-v0.160.1",
+  "fromInstalledToSpec": {
+    "status": "diverged",
+    "aheadBy": 2,
+    "behindBy": 1,
+    "mergeBase": "cb7799623b2241f536d799f2d46259148fb987ce",
+    "commits": [
+      {
+        "sha": "91c0ea5dd1e12b9b767e02ccdce65fdcc8b9ba94",
+        "title": "Backport Windows remote MCP environment preservation to 0.160 (#51121)"
+      },
+      {
+        "sha": "d27764b82f7118f674371e6d6e76271d9d606edb",
+        "title": "## Bug Fixes"
+      }
+    ],
+    "files": [
+      {
+        "filename": "codex-rs/Cargo.toml",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "filename": "codex-rs/rmcp-client/src/stdio_server_launcher.rs",
+        "status": "modified",
+        "additions": 23,
+        "deletions": 0
+      }
+    ]
+  },
+  "fromSpecToInstalled": {
+    "status": "diverged",
+    "aheadBy": 1,
+    "behindBy": 2,
+    "mergeBase": "cb7799623b2241f536d799f2d46259148fb987ce",
+    "commits": [
+      {
+        "sha": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "title": "## New Features"
+      }
+    ],
+    "files": [
+      {
+        "filename": "codex-rs/Cargo.toml",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      }
+    ]
+  },
+  "conclusion": "Both releases branch from the same merge base. rust-v0.160.1 adds only a Windows remote-stdio-MCP environment backport (codex-rs/rmcp-client/src/stdio_server_launcher.rs) and its version bump; rust-v0.160.0 adds only its version bump. Every source file SPEC \u00a712 cites is byte-identical in the installed build."
+}
