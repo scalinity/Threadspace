@@ -536,6 +536,11 @@ mod tests {
             observation: ObservationState::Unknown,
             process: None,
             binding: None,
+            live_bindings: 0,
+            last_invalidation: None,
+            provider_status: None,
+            provider_waiting_for: None,
+            last_route: None,
             fixture: true,
             revision: "1".into(),
         });

@@ -9,6 +9,7 @@ use threadspace_contracts::projection::{
     AttentionCounts, AttentionView, BindingView, ExecutionPresence, ObservationState, ProcessView,
     SessionView, TurnState,
 };
+use threadspace_contracts::route::RouteSummary;
 
 use crate::JournalError;
 
@@ -20,10 +21,23 @@ fn parse_enum<T: DeserializeOwned>(text: String) -> Result<T, JournalError> {
     })
 }
 
+type SessionRow = (
+    String,
+    String,
+    String,
+    bool,
+    i64,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    i64,
+);
+
 pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, JournalError> {
-    let row: Option<(String, String, String, bool, i64)> = conn
+    let row: Option<SessionRow> = conn
         .query_row(
-            "SELECT n.provider, s.native_session_id, s.display_name, s.fixture, s.revision
+            "SELECT n.provider, s.native_session_id, s.display_name, s.fixture, s.revision,
+                    s.provider_kind, s.provider_status, s.provider_waiting_for, s.inventory_present
                FROM sessions s JOIN provider_namespaces n ON n.id = s.namespace_id
               WHERE s.id = ?1",
             params![session_id],
@@ -34,21 +48,37 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
                     row.get(2)?,
                     row.get(3)?,
                     row.get(4)?,
+                    row.get(5)?,
+                    row.get(6)?,
+                    row.get(7)?,
+                    row.get(8)?,
                 ))
             },
         )
         .optional()?;
-    let Some((provider, native_session_id, display_name, fixture, revision)) = row else {
+    let Some((
+        provider,
+        native_session_id,
+        display_name,
+        fixture,
+        revision,
+        provider_kind,
+        provider_status,
+        provider_waiting_for,
+        inventory_present,
+    )) = row
+    else {
         return Err(JournalError::NotFound {
             entity: "session",
             id: session_id.to_owned(),
         });
     };
 
+    // The displayed activation: the newest live one, else the newest.
     let execution: Option<(String, i64, String)> = conn
         .query_row(
             "SELECT id, activation, presence FROM executions WHERE session_id = ?1
-              ORDER BY activation DESC LIMIT 1",
+              ORDER BY presence = 'LIVE' DESC, activation DESC LIMIT 1",
             params![session_id],
             |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
         )
@@ -80,8 +110,9 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
             .optional()?;
         binding = conn
             .query_row(
-                "SELECT id, surface_kind, proof, revision FROM surface_bindings
-                  WHERE execution_id = ?1 AND valid = 1 ORDER BY revision DESC LIMIT 1",
+                "SELECT b.id, b.surface_kind, b.proof, b.revision, b.native_locator, b.device_number, p.pid
+                   FROM surface_bindings b LEFT JOIN process_incarnations p ON p.id = b.process_id
+                  WHERE b.execution_id = ?1 AND b.valid = 1 ORDER BY b.revision DESC LIMIT 1",
                 params![execution_id],
                 |row| {
                     Ok(BindingView {
@@ -89,11 +120,65 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
                         surface_kind: row.get(1)?,
                         proof: row.get(2)?,
                         revision: format_cursor(row.get(3)?),
+                        locator: row.get(4)?,
+                        device_number: row.get(5)?,
+                        pid: row.get(6)?,
                     })
                 },
             )
             .optional()?;
     }
+
+    let live_bindings: u32 = conn.query_row(
+        "SELECT COUNT(*) FROM surface_bindings b JOIN executions e ON e.id = b.execution_id
+          WHERE b.session_id = ?1 AND b.valid = 1 AND e.presence = 'LIVE'",
+        params![session_id],
+        |row| row.get(0),
+    )?;
+    let last_invalidation: Option<String> = conn
+        .query_row(
+            "SELECT invalidated_reason FROM surface_bindings
+              WHERE session_id = ?1 AND valid = 0 AND invalidated_reason IS NOT NULL
+              ORDER BY invalidated_cursor DESC LIMIT 1",
+            params![session_id],
+            |row| row.get(0),
+        )
+        .optional()?;
+    let last_route = conn
+        .query_row(
+            "SELECT request_id, surface_result, session_verification, input_readiness, reason_code,
+                    focus_performed, latency_ms, recorded_at_ms
+               FROM route_results WHERE session_id = ?1 ORDER BY recorded_at_ms DESC, rowid DESC LIMIT 1",
+            params![session_id],
+            |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, String>(4)?,
+                    row.get::<_, bool>(5)?,
+                    row.get::<_, u32>(6)?,
+                    row.get::<_, i64>(7)?,
+                ))
+            },
+        )
+        .optional()?;
+    let last_route = match last_route {
+        Some((request_id, surface, verification, readiness, reason, focus, latency, at)) => {
+            Some(RouteSummary {
+                request_id,
+                surface_result: parse_enum(surface)?,
+                session_verification: parse_enum(verification)?,
+                input_readiness: parse_enum(readiness)?,
+                reason_code: reason,
+                focus_performed: focus,
+                latency_ms: latency,
+                recorded_at_ms: at,
+            })
+        }
+        None => None,
+    };
 
     let turn_state: Option<String> = conn
         .query_row(
@@ -107,6 +192,17 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
         None => TurnState::Unknown,
     };
 
+    // A fixture is never observed. A provider session is CURRENT while its
+    // row is in the latest applied inventory and STALE once it is not: the
+    // record persists either way (SPEC §3.2, §4.15).
+    let observation = if fixture || provider_kind.is_none() && inventory_present == 0 {
+        ObservationState::Unknown
+    } else if inventory_present == 1 {
+        ObservationState::Current
+    } else {
+        ObservationState::Stale
+    };
+
     Ok(SessionView {
         session_id: session_id.to_owned(),
         provider,
@@ -115,10 +211,14 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
         activation,
         turn_state,
         execution_presence,
-        // A fixture is never observed; real observation state arrives with M1.
-        observation: ObservationState::Unknown,
+        observation,
         process,
         binding,
+        live_bindings,
+        last_invalidation,
+        provider_status,
+        provider_waiting_for,
+        last_route,
         fixture,
         revision: format_cursor(revision),
     })

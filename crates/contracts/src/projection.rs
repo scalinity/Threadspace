@@ -4,6 +4,8 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::route::RouteSummary;
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export)]
@@ -85,6 +87,11 @@ pub struct BindingView {
     pub surface_kind: String,
     pub proof: String,
     pub revision: String,
+    /// Native locator (a Terminal tab's TTY path). A locator, not identity.
+    pub locator: String,
+    /// Controlling device (`e_tdev`) the binding was proven against.
+    pub device_number: Option<u32>,
+    pub pid: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -101,6 +108,15 @@ pub struct SessionView {
     pub observation: ObservationState,
     pub process: Option<ProcessView>,
     pub binding: Option<BindingView>,
+    /// Valid bindings across live attachments; more than one requires a chooser.
+    pub live_bindings: u32,
+    /// Why the most recent binding stopped being valid, if it did.
+    pub last_invalidation: Option<String>,
+    /// Provider-reported activity from native inventory (`busy`, `idle`,
+    /// `waiting`), shown as reported, not as a turn outcome.
+    pub provider_status: Option<String>,
+    pub provider_waiting_for: Option<String>,
+    pub last_route: Option<RouteSummary>,
     /// True for M0 fixture records; never true for provider-observed sessions.
     pub fixture: bool,
     pub revision: String,

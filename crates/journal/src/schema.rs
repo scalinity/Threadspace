@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 
 use crate::JournalError;
 
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 
 const MIGRATION_0001: &str = r"
 CREATE TABLE store_meta (
@@ -139,17 +139,77 @@ CREATE TABLE notification_outbox (
 ) STRICT;
 ";
 
+/// M0B: the proof records a direct-Claude identity join and an exact Terminal
+/// route need (SPEC §4.4, §4.6, §13.3). A binding keeps the ProcessKey,
+/// executable, controlling device and Terminal incarnation it was proven
+/// with; the TTY path is only its locator. Activations end by ID with a
+/// reason, and every Return attempt is journaled with its evidence.
+const MIGRATION_0002: &str = r"
+ALTER TABLE sessions ADD COLUMN provider_kind TEXT;
+ALTER TABLE sessions ADD COLUMN provider_status TEXT;
+ALTER TABLE sessions ADD COLUMN provider_waiting_for TEXT;
+-- 1 while the session's row is in the latest applied inventory.
+ALTER TABLE sessions ADD COLUMN inventory_present INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE executions ADD COLUMN process_id TEXT REFERENCES process_incarnations(id);
+ALTER TABLE executions ADD COLUMN device_number INTEGER;
+ALTER TABLE executions ADD COLUMN started_cursor INTEGER;
+ALTER TABLE executions ADD COLUMN ended_cursor INTEGER;
+ALTER TABLE executions ADD COLUMN end_reason TEXT;
+-- Why the activation has no valid binding (e.g. NO_MATCHING_TAB).
+ALTER TABLE executions ADD COLUMN surface_status TEXT;
+
+ALTER TABLE surface_bindings ADD COLUMN process_id TEXT REFERENCES process_incarnations(id);
+ALTER TABLE surface_bindings ADD COLUMN executable_identity TEXT;
+ALTER TABLE surface_bindings ADD COLUMN device_number INTEGER;
+ALTER TABLE surface_bindings ADD COLUMN terminal_generation TEXT;
+ALTER TABLE surface_bindings ADD COLUMN window_hint INTEGER;
+ALTER TABLE surface_bindings ADD COLUMN tab_hint INTEGER;
+ALTER TABLE surface_bindings ADD COLUMN evidence_observation TEXT REFERENCES observations(observation_id);
+ALTER TABLE surface_bindings ADD COLUMN proof_json TEXT NOT NULL DEFAULT '{}';
+ALTER TABLE surface_bindings ADD COLUMN invalidated_reason TEXT;
+ALTER TABLE surface_bindings ADD COLUMN invalidated_cursor INTEGER;
+
+CREATE INDEX executions_live ON executions(presence, session_id);
+CREATE INDEX surface_bindings_execution ON surface_bindings(execution_id, valid);
+
+CREATE TABLE route_results (
+  request_id            TEXT PRIMARY KEY,
+  session_id            TEXT NOT NULL REFERENCES sessions(id),
+  binding_id            TEXT REFERENCES surface_bindings(id),
+  binding_revision      INTEGER,
+  surface_result        TEXT NOT NULL,
+  session_verification  TEXT NOT NULL,
+  input_readiness       TEXT NOT NULL,
+  reason_code           TEXT NOT NULL,
+  focus_performed       INTEGER NOT NULL,
+  latency_ms            INTEGER NOT NULL,
+  started_at_ms         INTEGER NOT NULL,
+  recorded_at_ms        INTEGER NOT NULL,
+  observation_id        TEXT NOT NULL UNIQUE REFERENCES observations(observation_id),
+  evidence_json         TEXT NOT NULL
+) STRICT;
+CREATE INDEX route_results_session ON route_results(session_id, recorded_at_ms);
+";
+
 struct Migration {
     id: u32,
     name: &'static str,
     sql: &'static str,
 }
 
-const MIGRATIONS: &[Migration] = &[Migration {
-    id: 1,
-    name: "m0-fixture-schema",
-    sql: MIGRATION_0001,
-}];
+const MIGRATIONS: &[Migration] = &[
+    Migration {
+        id: 1,
+        name: "m0-fixture-schema",
+        sql: MIGRATION_0001,
+    },
+    Migration {
+        id: 2,
+        name: "m0b-identity-and-routes",
+        sql: MIGRATION_0002,
+    },
+];
 
 fn checksum(sql: &str) -> String {
     let digest = Sha256::digest(sql.as_bytes());

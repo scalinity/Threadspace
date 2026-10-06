@@ -9,6 +9,7 @@ use crate::diagnostics::{
     ProcessIdentity,
 };
 use crate::projection::{FleetSnapshot, NativeIntent, ProjectionPatch};
+use crate::route::{DiscoverySummary, RouteRequest, RouteResult};
 use crate::ui::CommandReceipt;
 
 pub const CONTROL_PROTOCOL_VERSION: u32 = 1;
@@ -63,6 +64,13 @@ pub enum ControlRequestBody {
     },
     RequestNotificationAuthorization,
     RequestTerminalAutomation,
+    /// Return-to-Agent (SPEC §13.2): the companion revalidates the target
+    /// against fresh native evidence, focuses it and reads it back.
+    ReturnToSession {
+        route: RouteRequest,
+    },
+    /// Run one discovery pass now (SPEC §4.4, §4.14) and report it.
+    RefreshEvidence,
     /// Qualification only: commit a synthetic fixture turn plus a completed-turn
     /// attention item and its notification intent.
     #[cfg(feature = "qualification")]
@@ -102,6 +110,12 @@ pub enum ControlResponseBody {
     TerminalAutomation {
         automation: AutomationPermission,
         status_code: i32,
+    },
+    Routed {
+        result: Box<RouteResult>,
+    },
+    EvidenceRefreshed {
+        summary: DiscoverySummary,
     },
     #[cfg(feature = "qualification")]
     AttentionRaised {

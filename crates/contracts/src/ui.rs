@@ -11,6 +11,7 @@ use crate::diagnostics::{
 };
 use crate::limits;
 use crate::projection::{NativeIntent, ProjectionPatch};
+use crate::route::{DiscoverySummary, RouteResult};
 
 pub const UI_PROTOCOL_VERSION: u32 = 1;
 
@@ -248,15 +249,22 @@ pub enum UiAction {
         report_kind: String,
         report: serde_json::Value,
     },
+    /// Return-to-Agent (SPEC §13.2). `chosen_binding_id` answers a
+    /// multiple-attachments chooser; `expected_binding_revision` refuses the
+    /// route if the binding changed since the owner looked at it.
+    ReturnToSession {
+        session_id: String,
+        chosen_binding_id: Option<String>,
+        expected_binding_revision: Option<String>,
+    },
+    RefreshEvidence {},
     // Defined by SPEC §18.3 and §19; implemented in later milestones.
-    ReturnToSession {},
     ResolveAttention {},
     SnoozeAttention {},
     UpdateLayout {},
     UpdatePreferences {},
     SetProjectHome {},
     LinkSurface {},
-    RefreshEvidence {},
     EnableObservation {},
     StopObservation {},
 }
@@ -309,6 +317,12 @@ pub enum UiActionResult {
     },
     QualificationReportRecorded {
         file_name: String,
+    },
+    Routed {
+        result: Box<RouteResult>,
+    },
+    EvidenceRefreshed {
+        summary: DiscoverySummary,
     },
 }
 
@@ -436,8 +450,22 @@ mod tests {
             UiErrorCode::InvalidRequest
         );
 
-        let later: UiAction = parse_request(json!({ "kind": "ReturnToSession" })).expect("parses");
-        assert_eq!(later, UiAction::ReturnToSession {});
+        let later: UiAction = parse_request(json!({ "kind": "ResolveAttention" })).expect("parses");
+        assert_eq!(later, UiAction::ResolveAttention {});
+    }
+
+    #[test]
+    fn return_to_session_requires_its_session() {
+        let missing: Result<UiAction, _> = parse_request(json!({ "kind": "ReturnToSession" }));
+        assert!(missing.is_err());
+        let ok: UiAction = parse_request(json!({
+            "kind": "ReturnToSession",
+            "sessionId": "6f1b3c2e-4a5d-4e6f-8a9b-0c1d2e3f4a5b",
+            "chosenBindingId": null,
+            "expectedBindingRevision": null,
+        }))
+        .expect("parses");
+        assert!(matches!(ok, UiAction::ReturnToSession { .. }));
     }
 
     // Serde ignores extra fields on internally tagged *unit* variants even with
@@ -445,7 +473,7 @@ mod tests {
     #[test]
     fn payloadless_actions_reject_unexpected_payloads() {
         let result: Result<UiAction, _> =
-            parse_request(json!({ "kind": "ReturnToSession", "sessionId": "x" }));
+            parse_request(json!({ "kind": "ResolveAttention", "attentionId": "x" }));
         assert!(result.is_err(), "later actions carry no M0A payload");
         let query: Result<UiQuery, _> = parse_request(json!({ "kind": "Diagnostics", "sql": "x" }));
         assert!(query.is_err(), "queries accept no extra fields");

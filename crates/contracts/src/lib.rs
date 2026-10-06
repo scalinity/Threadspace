@@ -11,4 +11,5 @@ pub mod cursor;
 pub mod diagnostics;
 pub mod limits;
 pub mod projection;
+pub mod route;
 pub mod ui;

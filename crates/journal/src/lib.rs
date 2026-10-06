@@ -5,6 +5,7 @@
 //! the linked engine is exactly SQLite 3.53.4 (docs/decisions/D-0001). A
 //! receipt is produced only after `COMMIT` returns.
 
+mod identity;
 mod lock;
 mod projection;
 mod schema;
@@ -20,6 +21,10 @@ use threadspace_contracts::projection::{FleetSnapshot, NotificationState, Projec
 use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
 use uuid::Uuid;
 
+pub use identity::{
+    ActivationChange, ApplyOutcome, BindingRow, DiscoveryApplication, LiveExecutionRow,
+    ObservedSessionRecord, ProcessRecord, RouteTargetRow, SurfaceRecord,
+};
 pub use lock::{LockError, WriterLock};
 pub use schema::SCHEMA_VERSION;
 

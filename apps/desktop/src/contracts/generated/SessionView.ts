@@ -3,9 +3,23 @@ import type { BindingView } from "./BindingView";
 import type { ExecutionPresence } from "./ExecutionPresence";
 import type { ObservationState } from "./ObservationState";
 import type { ProcessView } from "./ProcessView";
+import type { RouteSummary } from "./RouteSummary";
 import type { TurnState } from "./TurnState";
 
 export type SessionView = { sessionId: string, provider: string, nativeSessionId: string, displayName: string, activation: string | null, turnState: TurnState, executionPresence: ExecutionPresence, observation: ObservationState, process: ProcessView | null, binding: BindingView | null, 
+/**
+ * Valid bindings across live attachments; more than one requires a chooser.
+ */
+liveBindings: number, 
+/**
+ * Why the most recent binding stopped being valid, if it did.
+ */
+lastInvalidation: string | null, 
+/**
+ * Provider-reported activity from native inventory (`busy`, `idle`,
+ * `waiting`), shown as reported, not as a turn outcome.
+ */
+providerStatus: string | null, providerWaitingFor: string | null, lastRoute: RouteSummary | null, 
 /**
  * True for M0 fixture records; never true for provider-observed sessions.
  */
