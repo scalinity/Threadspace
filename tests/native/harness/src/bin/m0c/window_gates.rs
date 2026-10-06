@@ -7,6 +7,7 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 use threadspace_harness::evidence::Run;
+use threadspace_harness::idle::wait_for_idle;
 use threadspace_harness::native::Native;
 use threadspace_harness::run::run;
 
@@ -129,12 +130,16 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     let tree = ctx.native.ax_tree(pid, 40);
     let nodes = tree["nodes"].as_array().cloned().unwrap_or_default();
     let buttons: Vec<&Value> = nodes.iter().filter(|n| n["role"] == "AXButton").collect();
-    let unlabelled: Vec<&&Value> = buttons.iter().filter(|n| n["label"].as_str().is_none_or(str::is_empty)).collect();
+    // macOS names the window's own buttons from their subroles ("close
+    // button"), so they carry no title or description of their own.
+    let system_named = |n: &Value| matches!(n["subrole"].as_str(), Some("AXCloseButton" | "AXMinimizeButton" | "AXZoomButton" | "AXFullScreenButton"));
+    let system_buttons = buttons.iter().filter(|n| system_named(n)).count();
+    let unlabelled: Vec<&&Value> = buttons.iter().filter(|n| !system_named(n) && n["label"].as_str().is_none_or(str::is_empty)).collect();
     let regions: Vec<String> = nodes.iter().filter(|n| n["role"] == "AXGroup" || n["role"] == "AXLandmarkRegion").filter_map(|n| n["label"].as_str().map(str::to_owned)).collect();
     let headings = nodes.iter().filter(|n| n["role"] == "AXHeading").count();
     let _ = run_dir.write_json("ax-tree.json", &tree);
     check("accessibility-tree", !buttons.is_empty() && unlabelled.is_empty() && headings >= 3,
-        json!({ "buttons": buttons.len(), "unlabelledButtons": unlabelled.len(), "regionLabels": regions, "headings": headings }));
+        json!({ "buttons": buttons.len(), "systemWindowButtons": system_buttons, "unlabelledButtons": unlabelled.len(), "regionLabels": regions, "headings": headings }));
 
     // Restored bounds across a relaunch.
     set_frame(ctx, pid, 150.0, 120.0, 1000.0, 650.0);
@@ -207,19 +212,98 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     }
     let _ = run_dir.write_json("reduce-motion.json", &motion);
 
-    // Display scale: the only display is the built-in Retina panel, whose
-    // modes are all 2x; no external display is attached.
-    let displays = ctx.native.json(&["displays"]);
-    check("dpr-change", false, json!({ "status": "NOT_RUN", "reason": "built-in Retina panel only (every mode is 2x) and no external display is attached, so a device-pixel-ratio change cannot be produced on this Mac", "displays": displays }));
+    // Device pixel ratio: the main display switches to its nearest 1x mode
+    // for the helper process only (macOS restores the mode when the helper
+    // exits, however it exits); the drawing buffer must follow 2x -> 1x -> 2x
+    // with the scene live. Gated on owner idle: the whole screen changes.
+    let idle = wait_for_idle(&ctx.native, 10.0, Duration::from_secs(1800));
+    let displays_before = ctx.native.json(&["displays"]);
+    let report = |label: &str| {
+        app.view_command("renderer:report-state", json!({ "label": label }), Duration::from_secs(30))
+            .map(|r| r["result"].clone())
+            .unwrap_or_default()
+    };
+    let ratio = |state: &Value| {
+        let canvas = &state["surface"]["canvas"];
+        match (canvas["width"].as_f64(), canvas["clientWidth"].as_f64()) {
+            (Some(width), Some(client)) if client > 0.0 => Some(width / client),
+            _ => None,
+        }
+    };
+    let follows = |state: &Value, dpr: f64| {
+        state["state"] == "live"
+            && state["surface"]["devicePixelRatio"].as_f64() == Some(dpr)
+            && ratio(state).is_some_and(|r| near(r, dpr.min(1.5), 0.02))
+    };
+    let before = report("dpr-before");
+    let mut hold = ctx.native.spawn(&["display-mode-hold", "90"]).map_err(|e| e.to_string())?;
+    let mut line = String::new();
+    if let Some(out) = hold.stdout.as_mut() {
+        let _ = std::io::BufRead::read_line(&mut std::io::BufReader::new(out), &mut line);
+    }
+    let applied: Value = serde_json::from_str(line.trim()).unwrap_or(json!({ "applied": false, "raw": line.trim() }));
+    let mut at_1x = Value::Null;
+    for _ in 0..15 {
+        threadspace_harness::pause_ms(1000);
+        at_1x = report("dpr-1x");
+        if follows(&at_1x, 1.0) {
+            break;
+        }
+    }
+    let live_at_1x = window_id.map(|id| {
+        let a = run_dir.path("dpr-1x-0.png");
+        let b = run_dir.path("dpr-1x-1.png");
+        let _ = Native::capture_window(id, &a);
+        threadspace_harness::pause_ms(1000);
+        let _ = Native::capture_window(id, &b);
+        ctx.native.json(&["pixels-diff", &a.display().to_string(), &b.display().to_string()])
+    });
+    let _ = hold.kill();
+    let _ = hold.wait();
+    let mut after = Value::Null;
+    for _ in 0..15 {
+        threadspace_harness::pause_ms(1000);
+        after = report("dpr-restored");
+        if follows(&after, 2.0) {
+            break;
+        }
+    }
+    let displays_after = ctx.native.json(&["displays"]);
+    let projection_after_dpr = compare_projection(ctx, "after-dpr-change");
+    let scene_changing = live_at_1x.as_ref().is_some_and(|d| d["changedFraction"].as_f64().is_some_and(|f| f > 0.0));
+    check(
+        "dpr-change",
+        applied["applied"] == true
+            && follows(&before, 2.0)
+            && follows(&at_1x, 1.0)
+            && scene_changing
+            && follows(&after, 2.0)
+            && displays_after == displays_before
+            && projection_after_dpr["equal"] == true,
+        json!({
+            "idleGate": idle,
+            "mode": applied,
+            "before": { "surface": before["surface"], "appliedRatio": ratio(&before) },
+            "at1x": { "surface": at_1x["surface"], "appliedRatio": ratio(&at_1x), "state": at_1x["state"], "pixelsChanging": live_at_1x },
+            "restored": { "surface": after["surface"], "appliedRatio": ratio(&after), "state": after["state"] },
+            "displaysRestored": displays_after == displays_before,
+            "projectionEqual": projection_after_dpr["equal"],
+        }),
+    );
+    check(
+        "display-disconnect",
+        false,
+        json!({ "status": "MANUAL_EXTERNAL_REQUIRED", "reason": "the only display is the built-in panel, which cannot be disconnected; the case needs an external display physically attached and then removed", "displays": displays_after }),
+    );
 
     drop(gui);
     app.stop_all();
-    let required: Vec<&Value> = checks.iter().filter(|c| c["check"] != "dpr-change").collect();
+    let required: Vec<&Value> = checks.iter().filter(|c| c["check"] != "display-disconnect").collect();
     let summary = json!({
         "gate": "G16",
         "pass": required.iter().all(|c| c["pass"] == true),
         "checks": checks.iter().map(|c| json!({ "check": c["check"], "pass": c["pass"] })).collect::<Vec<_>>(),
-        "notRun": ["dpr-change (no non-2x or external display available)"],
+        "manualExternalRequired": ["display-disconnect (needs an external display physically attached and removed)"],
     });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(json!({ "summary": summary, "dir": run_dir.dir }))

@@ -19,6 +19,7 @@
 //   ts-native ax-focused <pid>                         (the focused element's role and label)
 //   ts-native idle
 //   ts-native displays
+//   ts-native display-mode-hold <seconds>             (main display at its nearest 1x mode, this process only)
 import AppKit
 import ApplicationServices
 import CoreGraphics
@@ -461,6 +462,36 @@ case "displays":
         ]
     }
     emit(["screens": screens])
+
+case "display-mode-hold":
+    // A device-pixel-ratio change on a Retina-only Mac: the usable 1x mode
+    // nearest the current point size, applied for this process only, so
+    // macOS restores the previous mode when the process exits, however it
+    // exits. Prints one JSON line, then holds the mode for <seconds>.
+    guard args.count >= 2, let seconds = Double(args[1]) else { usage() }
+    let display = CGMainDisplayID()
+    guard let current = CGDisplayCopyDisplayMode(display) else { emit(["applied": false, "reason": "no current mode"], ok: false) }
+    let options = [kCGDisplayShowDuplicateLowResolutionModes: kCFBooleanTrue] as CFDictionary
+    let oneX = ((CGDisplayCopyAllDisplayModes(display, options) as? [CGDisplayMode]) ?? [])
+        .filter { $0.isUsableForDesktopGUI() && $0.pixelWidth == $0.width }
+    let distance = { (mode: CGDisplayMode) -> (Int, Double) in
+        (abs(mode.width - current.width) + abs(mode.height - current.height), abs(mode.refreshRate - current.refreshRate))
+    }
+    guard let target = oneX.min(by: { distance($0) < distance($1) }) else { emit(["applied": false, "reason": "no usable 1x mode"], ok: false) }
+    let describe = { (mode: CGDisplayMode) -> [String: Any] in
+        ["width": mode.width, "height": mode.height, "pixelWidth": mode.pixelWidth, "pixelHeight": mode.pixelHeight, "refreshRate": mode.refreshRate]
+    }
+    var config: CGDisplayConfigRef?
+    CGBeginDisplayConfiguration(&config)
+    CGConfigureDisplayWithDisplayMode(config, display, target, nil)
+    let status = CGCompleteDisplayConfiguration(config, .forAppOnly)
+    let report: [String: Any] = ["applied": status == .success, "status": Int(status.rawValue), "from": describe(current), "to": describe(target), "holdSeconds": seconds]
+    let line = (try? JSONSerialization.data(withJSONObject: report, options: [.sortedKeys])) ?? Data("{}".utf8)
+    print(String(decoding: line, as: UTF8.self))
+    fflush(stdout)
+    guard status == .success else { exit(1) }
+    pause(seconds)
+    exit(0)
 
 default:
     usage()

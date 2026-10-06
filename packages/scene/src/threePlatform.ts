@@ -17,6 +17,23 @@ export interface ThreePlatformOptions {
   onSelect: (workerId: string | null) => void;
 }
 
+// The drawing buffer follows the display's device pixel ratio (capped at
+// 1.5). A display-mode change or a move to another display fires the media
+// query for the current ratio, which then re-arms for the new one.
+const pixelRatioTracking = new WeakMap<WebGPURenderer, () => void>();
+
+function trackPixelRatio(renderer: WebGPURenderer): () => void {
+  let query: MediaQueryList | null = null;
+  const apply = () => {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    query?.removeEventListener("change", apply);
+    query = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    query.addEventListener("change", apply);
+  };
+  apply();
+  return () => query?.removeEventListener("change", apply);
+}
+
 export function createThreeRendererPlatform(options: ThreePlatformOptions): RendererPlatform<WebGPURenderer, FloorTexture> {
   return {
     createRenderer(host) {
@@ -25,7 +42,7 @@ export function createThreeRendererPlatform(options: ThreePlatformOptions): Rend
       canvas.setAttribute("aria-label", options.canvasLabel);
       host.append(canvas);
       const renderer = new WebGPURenderer({ canvas, antialias: true, forceWebGL: options.forceWebGL });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      pixelRatioTracking.set(renderer, trackPixelRatio(renderer));
       return renderer;
     },
     attest(renderer, initDurationMs) {
@@ -35,6 +52,8 @@ export function createThreeRendererPlatform(options: ThreePlatformOptions): Rend
       return new OfficeScene(renderer, { reducedMotion, onSelect: options.onSelect });
     },
     destroySurface(renderer) {
+      pixelRatioTracking.get(renderer)?.();
+      pixelRatioTracking.delete(renderer);
       renderer.domElement.remove();
     },
     async loadAsset(signal) {

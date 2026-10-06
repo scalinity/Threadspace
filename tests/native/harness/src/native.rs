@@ -62,6 +62,16 @@ impl Native {
         )
     }
 
+    /// Starts a long-running subcommand (such as `display-mode-hold`) whose
+    /// first stdout line is its JSON report.
+    pub fn spawn(&self, args: &[&str]) -> std::io::Result<std::process::Child> {
+        std::process::Command::new(&self.binary)
+            .args(args)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+    }
+
     pub fn idle_seconds(&self) -> f64 {
         self.json(&["idle"])["idleSeconds"].as_f64().unwrap_or(0.0)
     }
