@@ -16,7 +16,11 @@ use threadspace_contracts::diagnostics::SqliteDiagnostics;
 use threadspace_contracts::projection::{
     IntentAction, IntentSource, NativeIntent, NotificationState,
 };
-use threadspace_journal::{Change, Journal, JournalError, NotificationIntent};
+use threadspace_contracts::route::RouteResult;
+use threadspace_journal::{
+    ApplyOutcome, Change, DiscoveryApplication, Journal, JournalError, LiveExecutionRow,
+    NotificationIntent, RouteTargetRow,
+};
 use uuid::Uuid;
 
 use crate::bridge::{self, BridgeRequest};
@@ -69,6 +73,32 @@ pub enum WriterCommand {
     NotificationResponse {
         notification_request_id: String,
         attention_id: String,
+    },
+    LiveExecutions {
+        provider: &'static str,
+        reply: Sender<Result<Vec<LiveExecutionRow>, String>>,
+    },
+    ApplyDiscovery {
+        application: Box<DiscoveryApplication>,
+        reply: Sender<Result<ApplyOutcome, String>>,
+    },
+    RouteTarget {
+        session_id: String,
+        reply: Sender<Result<RouteTargetRow, String>>,
+    },
+    BindingRevision {
+        binding_id: String,
+        reply: Sender<Option<i64>>,
+    },
+    RecordRoute {
+        result: Box<RouteResult>,
+        reply: Sender<Result<i64, String>>,
+    },
+    #[cfg(feature = "qualification")]
+    ExportObservations {
+        after_cursor: i64,
+        limit: u32,
+        reply: Sender<Result<Vec<threadspace_journal::ObservationExport>, String>>,
     },
     #[cfg(feature = "qualification")]
     RaiseAttention {
@@ -364,6 +394,68 @@ impl Writer {
                 attention_id,
             } => {
                 self.notification_response(&notification_request_id, &attention_id);
+            }
+            WriterCommand::LiveExecutions { provider, reply } => {
+                let _ = reply.send(
+                    self.journal
+                        .live_executions(provider)
+                        .map_err(|error| error.to_string()),
+                );
+            }
+            WriterCommand::ApplyDiscovery { application, reply } => {
+                match self.journal.apply_discovery(&application, log::now_ms()) {
+                    Ok(outcome) => {
+                        if let Some(change) = &outcome.change {
+                            self.broadcast(change);
+                        }
+                        let _ = reply.send(Ok(outcome));
+                    }
+                    Err(error) => {
+                        log::error(
+                            "DISCOVERY_APPLY_FAILED",
+                            json!({ "error": error.to_string() }),
+                        );
+                        let _ = reply.send(Err(error.to_string()));
+                    }
+                }
+            }
+            WriterCommand::RouteTarget { session_id, reply } => {
+                let _ = reply.send(
+                    self.journal
+                        .route_target(&session_id)
+                        .map_err(|error| error.to_string()),
+                );
+            }
+            WriterCommand::BindingRevision { binding_id, reply } => {
+                let _ = reply.send(self.journal.binding_revision(&binding_id).ok().flatten());
+            }
+            WriterCommand::RecordRoute { result, reply } => {
+                match self.journal.record_route(&result, log::now_ms()) {
+                    Ok(change) => {
+                        let cursor = change.cursor;
+                        self.broadcast(&change);
+                        let _ = reply.send(Ok(cursor));
+                    }
+                    Err(error) => {
+                        log::error(
+                            "ROUTE_RECORD_FAILED",
+                            json!({ "requestId": result.request_id, "error": error.to_string() }),
+                        );
+                        let _ = reply.send(Err(error.to_string()));
+                    }
+                }
+            }
+            #[cfg(feature = "qualification")]
+            WriterCommand::ExportObservations {
+                after_cursor,
+                limit,
+                reply,
+            } => {
+                let _ = reply.send(
+                    self.journal
+                        .export_observations(after_cursor, limit)
+                        .map_err(|error| error.to_string()),
+                );
             }
             #[cfg(feature = "qualification")]
             WriterCommand::RaiseAttention {

@@ -1,0 +1,250 @@
+//! Return-to-Agent in the companion (SPEC §13): the native implementation of
+//! the route model's evidence and effects, run on a native-op worker. Routes
+//! are serialized so competing focus requests never interleave; every result
+//! is journaled with its evidence before it is returned.
+
+use std::sync::Mutex;
+use std::sync::mpsc::{self, Sender, SyncSender};
+use std::time::{Duration, Instant};
+
+use serde_json::json;
+use threadspace_contracts::control::{ControlError, ControlErrorCode};
+use threadspace_contracts::route::{
+    AppGeneration, FrontmostApplication, ProcessKey, RouteRequest, RouteResult,
+};
+use threadspace_journal::RouteTargetRow;
+use threadspace_provider_claude::inventory::{
+    ClaudeInstall, Inventory, InventoryError, InventorySnapshot,
+};
+use threadspace_surfaces::{BoundTarget, RouteNative, SessionTarget, TERMINAL_BUNDLE_ID, route};
+use threadspace_surfaces_macos::process::{self, Incarnation, ProcessError};
+use threadspace_surfaces_macos::terminal::{self, FocusOutcome, TerminalTabs};
+use threadspace_surfaces_macos::tty::{self, TtyError};
+use uuid::Uuid;
+
+use crate::bridge;
+use crate::discovery::{self, DiscoveryContext, Trigger};
+use crate::log;
+use crate::writer::WriterCommand;
+
+/// One provider lookup inside a route: shorter than discovery's, because the
+/// whole attempt has a two-second budget.
+const LOOKUP_TIMEOUT: Duration = Duration::from_millis(1500);
+/// Frontmost-application readback: NSWorkspace learns of an activation
+/// asynchronously, so the reading is retried briefly before it is reported.
+const FRONTMOST_SETTLE: Duration = Duration::from_millis(250);
+
+static ROUTES: Mutex<()> = Mutex::new(());
+
+struct Native<'a> {
+    context: &'a DiscoveryContext,
+    install: ClaudeInstall,
+}
+
+fn writer_call<T>(
+    writer: &SyncSender<WriterCommand>,
+    build: impl FnOnce(Sender<T>) -> WriterCommand,
+) -> Option<T> {
+    let (reply, answer) = mpsc::channel();
+    writer.send(build(reply)).ok()?;
+    answer.recv_timeout(Duration::from_secs(5)).ok()
+}
+
+impl RouteNative for Native<'_> {
+    fn now_ms(&self) -> i64 {
+        log::now_ms()
+    }
+
+    fn sample(&self, pid: i32) -> Result<Incarnation, ProcessError> {
+        process::sample_incarnation(pid)
+    }
+
+    fn inventory(&self) -> Result<InventorySnapshot, InventoryError> {
+        self.context.cli(&self.install, LOOKUP_TIMEOUT).fetch()
+    }
+
+    fn terminal_generation(&self) -> Result<Option<AppGeneration>, String> {
+        discovery::terminal_generation()
+    }
+
+    fn automation_authorized(&self) -> Result<bool, String> {
+        discovery::automation_authorized()
+    }
+
+    fn enumerate(&self) -> Result<TerminalTabs, String> {
+        terminal::enumerate(
+            &self
+                .context
+                .resources_dir
+                .join("terminal-inventory.applescript"),
+        )
+        .map_err(|error| error.to_string())
+    }
+
+    fn device_of(&self, path: &str) -> Result<u32, TtyError> {
+        tty::character_device(path)
+    }
+
+    fn focus(&self, tty: &str) -> Result<(FocusOutcome, u32, u32), String> {
+        terminal::focus(
+            &self
+                .context
+                .resources_dir
+                .join("terminal-focus.applescript"),
+            tty,
+        )
+        .map_err(|error| error.to_string())
+    }
+
+    fn frontmost(&self) -> Option<FrontmostApplication> {
+        let deadline = Instant::now() + FRONTMOST_SETTLE;
+        loop {
+            let front = bridge::frontmost_application(Duration::from_millis(500));
+            let is_terminal = front
+                .as_ref()
+                .and_then(|app| app.bundle_identifier.as_deref())
+                == Some(TERMINAL_BUNDLE_ID);
+            if is_terminal || Instant::now() >= deadline {
+                return front;
+            }
+            std::thread::sleep(Duration::from_millis(25));
+        }
+    }
+
+    fn binding_revision(&self, binding_id: &str) -> Option<i64> {
+        writer_call(&self.context.writer, |reply| {
+            WriterCommand::BindingRevision {
+                binding_id: binding_id.to_owned(),
+                reply,
+            }
+        })
+        .flatten()
+    }
+}
+
+fn session_target(row: RouteTargetRow) -> SessionTarget {
+    match row {
+        RouteTargetRow::NotFound => SessionTarget::NotFound,
+        RouteTargetRow::Fixture => SessionTarget::Fixture,
+        RouteTargetRow::Unbound {
+            native_session_id,
+            reason,
+        } => SessionTarget::Unbound {
+            native_session_id,
+            reason,
+        },
+        RouteTargetRow::Bound {
+            native_session_id,
+            bindings,
+        } => SessionTarget::Bound {
+            native_session_id: native_session_id.clone(),
+            bindings: bindings
+                .into_iter()
+                .map(|binding| BoundTarget {
+                    binding_id: binding.binding_id,
+                    revision: binding.revision,
+                    execution_id: binding.execution_id,
+                    native_session_id: native_session_id.clone(),
+                    process_key: ProcessKey {
+                        endpoint_id: binding.endpoint_id,
+                        boot_id: binding.boot_id,
+                        pid: binding.pid,
+                        start_seconds: binding.start_seconds.to_string(),
+                        start_microseconds: binding.start_microseconds,
+                    },
+                    executable: binding.executable,
+                    device: binding.device,
+                    tty_hint: binding.tty,
+                    terminal_generation: binding.terminal_generation,
+                })
+                .collect(),
+        },
+    }
+}
+
+fn canonical_uuid(value: &str) -> bool {
+    Uuid::parse_str(value).is_ok_and(|parsed| parsed.hyphenated().to_string() == value)
+}
+
+fn bad_request(detail: &str) -> ControlError {
+    ControlError::new(ControlErrorCode::BadRequest, detail)
+}
+
+/// Runs one Return-to-Agent request. `received_ms` is when the request
+/// reached the companion; work queued past its budget never moves focus.
+pub fn return_to_session(
+    request: RouteRequest,
+    context: &DiscoveryContext,
+    discovery: &SyncSender<Trigger>,
+    received_ms: i64,
+) -> Result<RouteResult, ControlError> {
+    if !canonical_uuid(&request.request_id) || !canonical_uuid(&request.session_id) {
+        return Err(bad_request("request and session IDs must be UUIDs"));
+    }
+    if request
+        .chosen_binding_id
+        .as_deref()
+        .is_some_and(|id| !canonical_uuid(id))
+    {
+        return Err(bad_request("chosen binding ID must be a UUID"));
+    }
+    if request
+        .expected_binding_revision
+        .as_deref()
+        .is_some_and(|revision| revision.parse::<i64>().is_err())
+    {
+        return Err(bad_request("expected binding revision must be a cursor"));
+    }
+    let _serialized = ROUTES
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    let Some(Ok(row)) = writer_call(&context.writer, |reply| WriterCommand::RouteTarget {
+        session_id: request.session_id.clone(),
+        reply,
+    }) else {
+        return Err(ControlError::new(
+            ControlErrorCode::Unavailable,
+            "writer unavailable",
+        ));
+    };
+    let Some(install) = ClaudeInstall::resolve(&context.launcher()) else {
+        return Err(ControlError::new(
+            ControlErrorCode::Unavailable,
+            "Claude CLI not installed",
+        ));
+    };
+    let native = Native { context, install };
+    let result = route(&native, &request, &session_target(row), received_ms);
+    match writer_call(&context.writer, |reply| WriterCommand::RecordRoute {
+        result: Box::new(result.clone()),
+        reply,
+    }) {
+        Some(Ok(_)) => {}
+        _ => log::warn(
+            "ROUTE_UNRECORDED",
+            json!({ "requestId": result.request_id }),
+        ),
+    }
+    log::info(
+        "ROUTE_RESULT",
+        json!({
+            "requestId": result.request_id,
+            "sessionId": result.session_id,
+            "surfaceResult": result.surface_result,
+            "sessionVerification": result.session_verification,
+            "inputReadiness": result.input_readiness,
+            "reasonCode": result.reason_code,
+            "focusPerformed": result.focus_performed,
+            "latencyMs": result.latency_ms,
+            "focusSenderPid": result.evidence.focus.as_ref().and_then(|focus| focus.sender_pid),
+        }),
+    );
+    if result.reason_code != "OK" {
+        // A route conflict is a reconciliation trigger (SPEC §4.14).
+        let _ = discovery.try_send(Trigger::Refresh {
+            force_surface: false,
+            reply: None,
+        });
+    }
+    Ok(result)
+}

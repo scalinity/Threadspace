@@ -65,8 +65,27 @@ enum AgentBridge {
         case "RunningApplication":
             let target = request["bundleIdentifier"] as? String ?? ""
             DispatchQueue.main.async {
-                let running = !NSRunningApplication.runningApplications(withBundleIdentifier: target).isEmpty
-                deliverToCore(["kind": "RunningApplication", "correlationId": correlationId, "running": running])
+                let instances = NSRunningApplication.runningApplications(withBundleIdentifier: target)
+                var event: [String: Any] = [
+                    "kind": "RunningApplication",
+                    "correlationId": correlationId,
+                    "running": !instances.isEmpty,
+                    "instances": instances.count,
+                ]
+                // The PID lets the core sample the application's kernel
+                // incarnation; several instances are reported, not chosen.
+                event["pid"] = instances.count == 1 ? Int(instances[0].processIdentifier) : NSNull()
+                deliverToCore(event)
+            }
+        case "FrontmostApplication":
+            DispatchQueue.main.async {
+                let front = NSWorkspace.shared.frontmostApplication
+                deliverToCore([
+                    "kind": "FrontmostApplication",
+                    "correlationId": correlationId,
+                    "bundleIdentifier": front?.bundleIdentifier ?? NSNull(),
+                    "pid": Int(front?.processIdentifier ?? -1),
+                ])
             }
         case "AccessibilityPreferences":
             DispatchQueue.main.async {

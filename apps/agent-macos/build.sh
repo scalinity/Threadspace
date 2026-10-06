@@ -49,7 +49,7 @@ echo "==> Bundle"
 sed -e "s/@AGENT_IDENTIFIER@/$AGENT_IDENTIFIER/" -e "s/@AGENT_NAME@/$AGENT_NAME/" -e "s/@VERSION@/$VERSION/" \
   "$HERE/Info.plist.in" > "$APP/Contents/Info.plist"
 plutil -lint "$APP/Contents/Info.plist" >/dev/null
-cp "$HERE/Resources/terminal-inventory.applescript" "$APP/Contents/Resources/"
+cp "$HERE/Resources/terminal-inventory.applescript" "$HERE/Resources/terminal-focus.applescript" "$APP/Contents/Resources/"
 cp "$ROOT/apps/desktop/src-tauri/icons/icon.icns" "$APP/Contents/Resources/icon.icns"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 

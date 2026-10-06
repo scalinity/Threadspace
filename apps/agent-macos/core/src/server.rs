@@ -25,6 +25,7 @@ use threadspace_relay::frame::{read_frame, write_frame};
 use threadspace_relay::peer::{current_euid, peer_credentials};
 use threadspace_surfaces_macos::process;
 
+use crate::discovery::{DiscoveryContext, Trigger};
 use crate::log;
 use crate::native_ops;
 use crate::writer::{Outbound, WriterCommand, respond};
@@ -40,6 +41,8 @@ pub struct CoreContext {
     pub started_at_ms: i64,
     pub resources_dir: PathBuf,
     pub writer: SyncSender<WriterCommand>,
+    pub claude: DiscoveryContext,
+    pub discovery: SyncSender<Trigger>,
 }
 
 static NEXT_CONNECTION: AtomicU64 = AtomicU64::new(1);
@@ -334,10 +337,68 @@ fn dispatch(
                 },
             );
         }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyExportObservations { .. }
+            if role != ClientRole::Qualification =>
+        {
+            respond(
+                outbound,
+                request_id,
+                Err(ControlError::new(
+                    ControlErrorCode::RoleNotPermitted,
+                    "qualification role required",
+                )),
+            );
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyExportObservations {
+            after_cursor,
+            limit,
+        } => {
+            let Some(after_cursor) = threadspace_contracts::cursor::parse_cursor(&after_cursor)
+            else {
+                respond(
+                    outbound,
+                    request_id,
+                    Err(ControlError::new(
+                        ControlErrorCode::BadRequest,
+                        "afterCursor must be a cursor",
+                    )),
+                );
+                return;
+            };
+            let (reply, answer) = mpsc::channel();
+            to_writer(
+                context,
+                outbound,
+                request_id,
+                WriterCommand::ExportObservations {
+                    after_cursor,
+                    limit,
+                    reply,
+                },
+            );
+            let outcome = match answer.recv_timeout(Duration::from_secs(10)) {
+                Ok(Ok(rows)) => Ok(ControlResponseBody::ObservationsExported {
+                    observations: rows
+                        .into_iter()
+                        .filter_map(|row| serde_json::to_value(row).ok())
+                        .collect(),
+                }),
+                Ok(Err(error)) => Err(ControlError::new(ControlErrorCode::Internal, error)),
+                Err(_) => Err(ControlError::new(
+                    ControlErrorCode::Unavailable,
+                    "writer did not answer",
+                )),
+            };
+            respond(outbound, request_id, outcome);
+        }
         body @ (ControlRequestBody::Diagnostics
         | ControlRequestBody::IntegrationStatus
         | ControlRequestBody::RequestNotificationAuthorization
-        | ControlRequestBody::RequestTerminalAutomation) => {
+        | ControlRequestBody::RequestTerminalAutomation
+        | ControlRequestBody::ReturnToSession { .. }
+        | ControlRequestBody::RefreshEvidence) => {
             if slow.fetch_add(1, Ordering::AcqRel) >= MAX_SLOW_IN_FLIGHT {
                 slow.fetch_sub(1, Ordering::AcqRel);
                 respond(

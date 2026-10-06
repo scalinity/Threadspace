@@ -777,3 +777,63 @@ impl Journal {
             .optional()?)
     }
 }
+
+/// One journaled identity/route observation, exported for qualification
+/// evidence. Payloads are the sanitized records the companion wrote.
+#[cfg(feature = "qualification")]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ObservationExport {
+    pub cursor: i64,
+    pub observation_id: String,
+    pub source_id: String,
+    pub native_event: String,
+    pub captured_wall_ms: i64,
+    pub received_wall_ms: i64,
+    pub payload: Value,
+    /// For a route result, its full evidence chain.
+    pub route_evidence: Option<Value>,
+}
+
+#[cfg(feature = "qualification")]
+impl Journal {
+    /// Identity and route observations after `after_cursor`, oldest first.
+    pub fn export_observations(
+        &self,
+        after_cursor: i64,
+        limit: u32,
+    ) -> Result<Vec<ObservationExport>, JournalError> {
+        let mut statement = self.conn.prepare(
+            "SELECT o.ingest_seq, o.observation_id, o.source_id, o.native_event, o.captured_wall_ms,
+                    o.received_wall_ms, o.payload_json, r.evidence_json
+               FROM observations o LEFT JOIN route_results r ON r.observation_id = o.observation_id
+              WHERE o.ingest_seq > ?1 AND o.source_id IN (?2, ?3)
+              ORDER BY o.ingest_seq LIMIT ?4",
+        )?;
+        let rows = statement
+            .query_map(
+                params![
+                    after_cursor,
+                    SOURCE_CLAUDE_INVENTORY,
+                    SOURCE_ROUTE,
+                    limit.min(200)
+                ],
+                |row| {
+                    let payload: String = row.get(6)?;
+                    let evidence: Option<String> = row.get(7)?;
+                    Ok(ObservationExport {
+                        cursor: row.get(0)?,
+                        observation_id: row.get(1)?,
+                        source_id: row.get(2)?,
+                        native_event: row.get(3)?,
+                        captured_wall_ms: row.get(4)?,
+                        received_wall_ms: row.get(5)?,
+                        payload: serde_json::from_str(&payload).unwrap_or(Value::Null),
+                        route_evidence: evidence.and_then(|text| serde_json::from_str(&text).ok()),
+                    })
+                },
+            )?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(rows)
+    }
+}

@@ -77,6 +77,13 @@ pub enum ControlRequestBody {
     QualifyRaiseAttention {
         label: String,
     },
+    /// Qualification only: journaled identity and route observations after a
+    /// cursor, for the evidence ledger.
+    #[cfg(feature = "qualification")]
+    QualifyExportObservations {
+        after_cursor: String,
+        limit: u32,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -116,6 +123,10 @@ pub enum ControlResponseBody {
     },
     EvidenceRefreshed {
         summary: DiscoverySummary,
+    },
+    #[cfg(feature = "qualification")]
+    ObservationsExported {
+        observations: Vec<serde_json::Value>,
     },
     #[cfg(feature = "qualification")]
     AttentionRaised {

@@ -12,6 +12,7 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use threadspace_contracts::diagnostics::{AccessibilityPreferences, NotificationSettings};
+use threadspace_contracts::route::FrontmostApplication;
 
 pub type BridgeCallback = extern "C" fn(*const c_char);
 
@@ -45,6 +46,10 @@ pub enum BridgeRequest {
     AccessibilityPreferences {
         correlation_id: u64,
     },
+    /// The native frontmost application (NSWorkspace), for route readback.
+    FrontmostApplication {
+        correlation_id: u64,
+    },
     /// Open (or activate) the containing Threadspace application.
     OpenContainingApp,
 }
@@ -74,10 +79,20 @@ pub enum BridgeEvent {
     RunningApplication {
         correlation_id: u64,
         running: bool,
+        #[serde(default)]
+        instances: u32,
+        /// Present only when exactly one instance runs.
+        #[serde(default)]
+        pid: Option<i32>,
     },
     AccessibilityPreferences {
         correlation_id: u64,
         preferences: AccessibilityPreferences,
+    },
+    FrontmostApplication {
+        correlation_id: u64,
+        bundle_identifier: Option<String>,
+        pid: i32,
     },
     /// The user interacted with a delivered notification. Only internal IDs.
     NotificationResponse {
@@ -97,7 +112,8 @@ impl BridgeEvent {
             | Self::NotificationPosted { correlation_id, .. }
             | Self::AutomationPermission { correlation_id, .. }
             | Self::RunningApplication { correlation_id, .. }
-            | Self::AccessibilityPreferences { correlation_id, .. } => Some(*correlation_id),
+            | Self::AccessibilityPreferences { correlation_id, .. }
+            | Self::FrontmostApplication { correlation_id, .. } => Some(*correlation_id),
             Self::NotificationResponse { .. } => None,
         }
     }
@@ -215,6 +231,41 @@ pub fn application_running(
     )? {
         BridgeEvent::RunningApplication { running, .. } => Ok(running),
         _ => Err(BridgeError::Unexpected),
+    }
+}
+
+/// The PID of the single running instance of an application, `None` when it
+/// is not running or more than one instance runs.
+pub fn running_application_pid(
+    bundle_identifier: &str,
+    timeout: Duration,
+) -> Result<Option<i32>, BridgeError> {
+    match call(
+        |correlation_id| BridgeRequest::RunningApplication {
+            correlation_id,
+            bundle_identifier: bundle_identifier.to_owned(),
+        },
+        timeout,
+    )? {
+        BridgeEvent::RunningApplication { pid, .. } => Ok(pid),
+        _ => Err(BridgeError::Unexpected),
+    }
+}
+
+pub fn frontmost_application(timeout: Duration) -> Option<FrontmostApplication> {
+    match call(
+        |correlation_id| BridgeRequest::FrontmostApplication { correlation_id },
+        timeout,
+    ) {
+        Ok(BridgeEvent::FrontmostApplication {
+            bundle_identifier,
+            pid,
+            ..
+        }) => Some(FrontmostApplication {
+            bundle_identifier,
+            pid,
+        }),
+        _ => None,
     }
 }
 

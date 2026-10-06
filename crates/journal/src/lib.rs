@@ -21,6 +21,8 @@ use threadspace_contracts::projection::{FleetSnapshot, NotificationState, Projec
 use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
 use uuid::Uuid;
 
+#[cfg(feature = "qualification")]
+pub use identity::ObservationExport;
 pub use identity::{
     ActivationChange, ApplyOutcome, BindingRow, DiscoveryApplication, LiveExecutionRow,
     ObservedSessionRecord, ProcessRecord, RouteTargetRow, SurfaceRecord,

@@ -18,7 +18,9 @@ use threadspace_relay::paths::redact_home;
 use threadspace_surfaces_macos::terminal::{self, TERMINAL_APP_PATH, TERMINAL_BUNDLE_ID};
 
 use crate::bridge::{self, BridgeEvent, BridgeRequest};
+use crate::discovery::{DiscoveryContext, Trigger};
 use crate::log;
+use crate::route;
 use crate::server::CoreContext;
 use crate::writer::WriterCommand;
 
@@ -40,6 +42,10 @@ pub struct OpsContext {
     identity: ProcessIdentity,
     started_at_ms: i64,
     resources_dir: PathBuf,
+    claude: DiscoveryContext,
+    discovery: SyncSender<Trigger>,
+    /// When the request reached the companion.
+    received_ms: i64,
 }
 
 impl From<&CoreContext> for OpsContext {
@@ -51,8 +57,27 @@ impl From<&CoreContext> for OpsContext {
             identity: context.identity.clone(),
             started_at_ms: context.started_at_ms,
             resources_dir: context.resources_dir.clone(),
+            claude: context.claude.clone(),
+            discovery: context.discovery.clone(),
+            received_ms: log::now_ms(),
         }
     }
+}
+
+/// Runs one discovery pass now, retrying final surface answers, and reports it.
+fn refresh_evidence(context: &OpsContext) -> Result<ControlResponseBody, ControlError> {
+    let (reply, answer) = mpsc::channel();
+    context
+        .discovery
+        .send(Trigger::Refresh {
+            force_surface: true,
+            reply: Some(reply),
+        })
+        .map_err(|_| internal("discovery unavailable"))?;
+    let summary = answer
+        .recv_timeout(Duration::from_secs(30))
+        .map_err(|_| internal("discovery did not answer"))?;
+    Ok(ControlResponseBody::EvidenceRefreshed { summary })
 }
 
 fn internal(detail: impl Into<String>) -> ControlError {
@@ -219,6 +244,16 @@ pub fn run(
             request_notification_authorization()
         }
         ControlRequestBody::RequestTerminalAutomation => request_terminal_automation(),
+        ControlRequestBody::ReturnToSession { route } => route::return_to_session(
+            route,
+            &context.claude,
+            &context.discovery,
+            context.received_ms,
+        )
+        .map(|result| ControlResponseBody::Routed {
+            result: Box::new(result),
+        }),
+        ControlRequestBody::RefreshEvidence => refresh_evidence(context),
         _ => Err(ControlError::new(
             ControlErrorCode::BadRequest,
             "not a native operation",

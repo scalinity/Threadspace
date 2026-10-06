@@ -12,9 +12,11 @@
 //!   responses into the core.
 
 mod bridge;
+mod discovery;
 mod log;
 mod native_ops;
 mod notify;
+mod route;
 mod server;
 mod writer;
 
@@ -229,18 +231,33 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
 
     let (writer_tx, writer_rx) = mpsc::sync_channel(256);
     let (notify_tx, notify_rx) = mpsc::sync_channel(64);
-    let context = Arc::new(server::CoreContext {
-        bundle_identifier: config.bundle_identifier.clone(),
-        core_generation: core_generation.clone(),
-        store_generation: store_generation.clone(),
-        identity: identity.clone(),
-        started_at_ms,
-        resources_dir: PathBuf::from(&config.resources_path),
+    let Some(home) = threadspace_relay::paths::home_dir() else {
+        log::error("HOME_UNAVAILABLE", json!({}));
+        return EXIT_FATAL;
+    };
+    let claude = discovery::DiscoveryContext {
         writer: writer_tx.clone(),
-    });
+        boot_id: identity.boot_id.clone(),
+        home,
+        resources_dir: PathBuf::from(&config.resources_path),
+    };
     let spawned = writer::spawn(journal, writer_rx, notify_tx)
         .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
-        .and_then(|_| server::spawn(listener, Arc::clone(&context)));
+        .and_then(|_| discovery::spawn(claude.clone()))
+        .and_then(|discovery| {
+            let context = Arc::new(server::CoreContext {
+                bundle_identifier: config.bundle_identifier.clone(),
+                core_generation: core_generation.clone(),
+                store_generation: store_generation.clone(),
+                identity: identity.clone(),
+                started_at_ms,
+                resources_dir: PathBuf::from(&config.resources_path),
+                writer: writer_tx.clone(),
+                claude,
+                discovery,
+            });
+            server::spawn(listener, context)
+        });
     if let Err(error) = spawned {
         log::error("THREAD_SPAWN_FAILED", json!({ "error": error.to_string() }));
         return EXIT_FATAL;
