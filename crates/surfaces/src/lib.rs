@@ -707,9 +707,13 @@ pub fn route<N: RouteNative>(
         .map(|r| r.to_string());
     run.phase("post-focus revalidation");
 
+    // Every readback signal must agree: the selected tab's device, the tab's
+    // selection, the target as AppleScript's front window, and Terminal's own
+    // view that the target is its frontmost window.
     let readback_ok = readback_rdev == Some(target.device)
         && readback.target_tab_selected
-        && readback.front_window_id == readback.window_id;
+        && readback.front_window_id == readback.window_id
+        && readback.target_window_frontmost;
     if !readback_ok {
         return run.finish(
             request,

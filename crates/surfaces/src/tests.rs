@@ -493,6 +493,30 @@ fn readback_must_name_the_target_device() {
 }
 
 #[test]
+fn a_target_window_terminal_does_not_call_frontmost_is_not_exact() {
+    // Observed natively: the target was AppleScript's front window and its
+    // tab was selected, but Terminal reported it was not the frontmost
+    // window while the owner clicked elsewhere.
+    let mut mock = Mock::healthy();
+    mock.focus_result = Some(Ok((
+        FocusOutcome::Focused(FocusReadback {
+            window_id: 77,
+            tab_index: 2,
+            front_window_id: 77,
+            front_selected_tty: TTY.into(),
+            target_window_frontmost: false,
+            target_tab_selected: true,
+        }),
+        9002,
+        40,
+    )));
+    let result = go(&mock, &target(vec![bound(PID, "b1")]));
+    assert_eq!(result.reason_code, "READBACK_FAILED");
+    assert!(result.focus_performed);
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
+
+#[test]
 fn terminal_not_frontmost_after_activation_is_not_exact() {
     let mut mock = Mock::healthy();
     mock.frontmost = Some(FrontmostApplication {
