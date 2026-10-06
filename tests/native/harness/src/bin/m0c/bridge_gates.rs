@@ -532,7 +532,15 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             Duration::from_secs(60),
             &mut lines,
         );
-        let hydrated = app.wait_hydrated(&mut companion, Duration::from_secs(30));
+        // The recreated view's own hydration: a subscription attached before
+        // the recovery (a deliberately stalled one) never hydrates.
+        let recovered_ms = recovered.as_ref().and_then(|r| r["ms"].as_i64()).unwrap_or(i64::MAX);
+        let hydrated = companion.wait_for(
+            "VIEW_HYDRATED",
+            |line| line["ts"].as_i64().is_some_and(|ts| ts >= recovered_ms),
+            Duration::from_secs(30),
+            &mut Vec::new(),
+        );
         threadspace_harness::pause_ms(2000);
         lines.extend(desktop.read_new());
         let stale_refusals: Vec<Value> = lines
@@ -556,6 +564,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             "trigger": triggered,
             "recovered": recovered,
             "newViewHydrated": hydrated.is_some(),
+            "hydratedSubscription": hydrated.as_ref().map(|h| h["subscriptionId"].clone()),
             "officeViewsCreated": created,
             "staleViewRefusals": stale_refusals,
             "projectionEqual": projection["equal"],
