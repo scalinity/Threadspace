@@ -163,7 +163,11 @@ pub fn create_office<R: Runtime>(
                     },
                 );
             }
+            if matches!(event, WindowEvent::Resized(_)) {
+                keep_web_focus(&event_window);
+            }
         }
+        WindowEvent::Focused(true) => keep_web_focus(&event_window),
         _ => {}
     });
     prefs::log(
@@ -299,4 +303,15 @@ pub fn recover<R: Runtime>(
                 }),
             );
         });
+}
+
+/// Fullscreen and zoom transitions leave the window itself as first
+/// responder, so Tab no longer reaches the office. While the window is key,
+/// keyboard focus goes back to its web view (first responder only; the
+/// window is not raised or activated).
+fn keep_web_focus<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
+    if window.is_focused().unwrap_or(false) {
+        let webview: &tauri::Webview<R> = window.as_ref();
+        let _ = webview.set_focus();
+    }
 }

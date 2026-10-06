@@ -108,27 +108,26 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     check("fullscreen-enter-exit", full["after"]["fullScreen"] == true && exit["after"]["fullScreen"] == false && state_full == "live" && projection_after_fullscreen["equal"] == true,
         json!({ "enter": full["after"]["fullScreen"], "rendererInFullscreen": state_full, "exit": exit["after"]["fullScreen"], "projectionEqual": projection_after_fullscreen["equal"] }));
 
-    // Keyboard navigation: Option-Tab moves focus through labelled controls.
-    // With macOS Keyboard navigation off (AppleKeyboardUIMode 0, the
-    // default), plain Tab reaches only text fields and lists in WebKit, as in
-    // native apps; Option-Tab reaches every control. The focused web element
-    // is reported only once WebKit has built its accessibility tree.
+    // Keyboard navigation: Tab moves focus through labelled controls, after
+    // the fullscreen and zoom transitions above (which once left the window
+    // itself as first responder). The focused web element is reported only
+    // once WebKit has built its accessibility tree.
     let keyboard_ui_mode = run("/usr/bin/defaults", &["read", "-g", "AppleKeyboardUIMode"], Duration::from_secs(5)).stdout.trim().to_owned();
     ctx.native.ax_tree(pid, 40);
     ctx.native.ax_action(pid, "raise", Some(TITLE));
     let mut focus_path = Vec::new();
     for _ in 0..10 {
-        ctx.native.json(&["key", "48", "option"]);
+        ctx.native.json(&["key", "48"]);
         threadspace_harness::pause_ms(250);
         focus_path.push(ctx.native.json(&["ax-focused", &pid.to_string()]));
     }
-    ctx.native.json(&["key", "48", "option", "shift"]);
+    ctx.native.json(&["key", "48", "shift"]);
     threadspace_harness::pause_ms(250);
     let back = ctx.native.json(&["ax-focused", &pid.to_string()]);
     let labelled: Vec<&Value> = focus_path.iter().filter(|f| f["found"] == true && f["label"].as_str().is_some_and(|l| !l.is_empty())).collect();
     let distinct: std::collections::BTreeSet<String> = labelled.iter().map(|f| format!("{}:{}", f["role"], f["label"])).collect();
     let reverse_ok = focus_path.len() >= 2 && back["label"] == focus_path[focus_path.len() - 2]["label"];
-    check("keyboard-navigation", distinct.len() >= 5 && reverse_ok, json!({ "keys": "Option-Tab x10, then Option-Shift-Tab", "appleKeyboardUIMode": keyboard_ui_mode, "path": focus_path, "shiftTabLandsOn": back, "distinctLabelled": distinct.len() }));
+    check("keyboard-navigation", distinct.len() >= 5 && reverse_ok, json!({ "keys": "Tab x10, then Shift-Tab", "appleKeyboardUIMode": keyboard_ui_mode, "path": focus_path, "shiftTabLandsOn": back, "distinctLabelled": distinct.len() }));
 
     // Accessibility tree: every button labelled, regions and headings present.
     let tree = ctx.native.ax_tree(pid, 40);
