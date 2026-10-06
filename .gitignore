@@ -1,1 +1,16 @@
 .DS_Store
+
+# Agent runtime state
+.claude/
+.codex/
+
+# Rust
+/target/
+
+# Node / Vite
+node_modules/
+/apps/desktop/dist/
+
+# Tauri generated schemas and native build products
+/apps/desktop/src-tauri/gen/
+/apps/agent-macos/build/

@@ -1,0 +1,23 @@
+[package]
+name = "threadspace-journal"
+description = "Single-writer SQLite journal, minimal M0 fixture schema and projections."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[features]
+qualification = ["threadspace-contracts/qualification"]
+
+[dependencies]
+threadspace-contracts.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+libc.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

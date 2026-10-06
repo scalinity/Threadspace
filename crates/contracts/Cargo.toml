@@ -1,0 +1,21 @@
+[package]
+name = "threadspace-contracts"
+description = "Authoritative IPC and view-model contracts; TypeScript definitions are generated from these types."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[features]
+# Qualification-only control operations (synthetic attention). Absent from release builds.
+qualification = []
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+ts-rs.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,9 @@
+[build]
+target = "aarch64-apple-darwin"
+
+[env]
+# TypeScript definitions generated from crates/contracts (`cargo test -p threadspace-contracts`).
+TS_RS_EXPORT_DIR = { value = "apps/desktop/src/contracts/generated", relative = true }
+# Contract integers that exceed 32 bits are millisecond timestamps (< 2^53).
+# Journal cursors and revisions are decimal strings, never integers.
+TS_RS_LARGE_INT = "number"
