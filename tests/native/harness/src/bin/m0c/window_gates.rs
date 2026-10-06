@@ -108,23 +108,27 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     check("fullscreen-enter-exit", full["after"]["fullScreen"] == true && exit["after"]["fullScreen"] == false && state_full == "live" && projection_after_fullscreen["equal"] == true,
         json!({ "enter": full["after"]["fullScreen"], "rendererInFullscreen": state_full, "exit": exit["after"]["fullScreen"], "projectionEqual": projection_after_fullscreen["equal"] }));
 
-    // Keyboard navigation: Tab moves focus through labelled controls. The
-    // focused web element is reported only once WebKit has built its tree.
+    // Keyboard navigation: Option-Tab moves focus through labelled controls.
+    // With macOS Keyboard navigation off (AppleKeyboardUIMode 0, the
+    // default), plain Tab reaches only text fields and lists in WebKit, as in
+    // native apps; Option-Tab reaches every control. The focused web element
+    // is reported only once WebKit has built its accessibility tree.
+    let keyboard_ui_mode = run("/usr/bin/defaults", &["read", "-g", "AppleKeyboardUIMode"], Duration::from_secs(5)).stdout.trim().to_owned();
     ctx.native.ax_tree(pid, 40);
     ctx.native.ax_action(pid, "raise", Some(TITLE));
     let mut focus_path = Vec::new();
     for _ in 0..10 {
-        ctx.native.json(&["key", "48"]);
+        ctx.native.json(&["key", "48", "option"]);
         threadspace_harness::pause_ms(250);
         focus_path.push(ctx.native.json(&["ax-focused", &pid.to_string()]));
     }
-    ctx.native.json(&["key", "48", "shift"]);
+    ctx.native.json(&["key", "48", "option", "shift"]);
     threadspace_harness::pause_ms(250);
     let back = ctx.native.json(&["ax-focused", &pid.to_string()]);
     let labelled: Vec<&Value> = focus_path.iter().filter(|f| f["found"] == true && f["label"].as_str().is_some_and(|l| !l.is_empty())).collect();
     let distinct: std::collections::BTreeSet<String> = labelled.iter().map(|f| format!("{}:{}", f["role"], f["label"])).collect();
     let reverse_ok = focus_path.len() >= 2 && back["label"] == focus_path[focus_path.len() - 2]["label"];
-    check("keyboard-navigation", distinct.len() >= 5 && reverse_ok, json!({ "path": focus_path, "shiftTabLandsOn": back, "distinctLabelled": distinct.len() }));
+    check("keyboard-navigation", distinct.len() >= 5 && reverse_ok, json!({ "keys": "Option-Tab x10, then Option-Shift-Tab", "appleKeyboardUIMode": keyboard_ui_mode, "path": focus_path, "shiftTabLandsOn": back, "distinctLabelled": distinct.len() }));
 
     // Accessibility tree: every button labelled, regions and headings present.
     let tree = ctx.native.ax_tree(pid, 40);
@@ -176,37 +180,64 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     let original = reduce_motion(ctx);
     let mut motion = json!({ "original": original });
     if original == Some(false) {
+        // The office moves only while an on-camera worker needs attention, so
+        // the run first shows the canvas moving, then still under Reduce Motion.
+        let mut fixture = Vec::new();
+        let centre = crate::graphics::keep_centre_animated(ctx, &mut fixture);
+        ctx.native.ax_action(pid, "raise", Some(TITLE));
+        threadspace_harness::pause_ms(1500);
+        let canvas_pair = |label: &str| -> Value {
+            let Some(id) = window_id else { return json!(null) };
+            let a = run_dir.path(&format!("{label}-0.png"));
+            let b = run_dir.path(&format!("{label}-1.png"));
+            let _ = Native::capture_window(id, &a);
+            threadspace_harness::pause_ms(3000);
+            let _ = Native::capture_window(id, &b);
+            let surface = app.view_command("renderer:report-state", json!({}), Duration::from_secs(30)).map(|r| r["result"].clone()).unwrap_or_default();
+            let stats = ctx.native.json(&["pixels-stats", &a.display().to_string()]);
+            let crop = stats["width"].as_f64().zip(stats["height"].as_f64()).and_then(|(w, h)| crate::graphics::canvas_crop(&surface, w, h));
+            let (a, b) = (a.display().to_string(), b.display().to_string());
+            let mut args = vec!["pixels-diff", a.as_str(), b.as_str()];
+            if let Some(crop) = &crop {
+                args.extend(crop.iter().map(String::as_str));
+            }
+            json!({ "canvasCrop": crop, "diff": ctx.native.json(&args) })
+        };
+        let moving = canvas_pair("motion-before");
         open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Motion");
         threadspace_harness::pause_ms(2500);
         let on = ctx.native.json(&["ax-switch", "com.apple.systempreferences", "Reduce motion", "press"]);
         threadspace_harness::pause_ms(3000);
         let companion_sees = reduce_motion(ctx);
-        let renderer = app.view_command("renderer:report-state", json!({}), Duration::from_secs(30)).map(|r| r["result"]["reducedMotion"].clone()).unwrap_or_default();
+        // The renderer follows the view's prefers-reduced-motion media query;
+        // poll it rather than read once.
+        let renderer_poll = std::time::Instant::now();
+        let mut renderer = Value::Null;
+        while renderer_poll.elapsed() < Duration::from_secs(10) {
+            renderer = app.view_command("renderer:report-state", json!({}), Duration::from_secs(30)).map(|r| r["result"]["reducedMotion"].clone()).unwrap_or_default();
+            if renderer == true {
+                break;
+            }
+            threadspace_harness::pause_ms(500);
+        }
+        let renderer_saw_ms = renderer_poll.elapsed().as_millis() as u64;
         ctx.native.ax_action(pid, "raise", Some(TITLE));
         threadspace_harness::pause_ms(1500);
-        let shots: Vec<Value> = window_id
-            .map(|id| {
-                (0..2).map(|i| {
-                    let path = run_dir.path(&format!("reduce-motion-{i}.png"));
-                    let _ = Native::capture_window(id, &path);
-                    threadspace_harness::pause_ms(3000);
-                    json!(path.display().to_string())
-                }).collect()
-            })
-            .unwrap_or_default();
-        let still = if shots.len() == 2 {
-            ctx.native.json(&["pixels-diff", shots[0].as_str().unwrap_or(""), shots[1].as_str().unwrap_or("")])
-        } else {
-            json!(null)
-        };
+        let still = canvas_pair("reduce-motion");
         open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Motion");
         threadspace_harness::pause_ms(2500);
         let off = ctx.native.json(&["ax-switch", "com.apple.systempreferences", "Reduce motion", "press"]);
         threadspace_harness::pause_ms(3000);
         quit_settings();
         let restored = reduce_motion(ctx);
-        motion = json!({ "original": original, "toggleOn": on, "companionReadsReduceMotion": companion_sees, "rendererReducedMotion": renderer, "idleFrameDiff": still, "toggleOff": off, "restoredTo": restored });
-        check("reduce-motion", companion_sees == Some(true) && renderer == true && still["changedFraction"].as_f64().is_some_and(|f| f < 0.0005) && restored == Some(false), motion.clone());
+        let fixture_cleanup = json!({
+            "resolved": crate::cleanup::resolve_qualification(ctx, "g16 reduce-motion fixture").unwrap_or_else(|e| json!({ "error": e })),
+            "notificationsCleared": crate::cleanup::clear_notifications(ctx).unwrap_or_else(|e| json!({ "error": e })),
+        });
+        motion = json!({ "original": original, "fixture": { "centre": centre, "raised": fixture, "cleanup": fixture_cleanup }, "canvasMovingBefore": moving, "toggleOn": on, "companionReadsReduceMotion": companion_sees, "rendererReducedMotion": renderer, "rendererPolledMs": renderer_saw_ms, "canvasUnderReduceMotion": still, "toggleOff": off, "restoredTo": restored });
+        let moved = moving["diff"]["changedFraction"].as_f64().is_some_and(|f| f > 0.0005);
+        let held = still["diff"]["changedFraction"].as_f64().is_some_and(|f| f < 0.0005);
+        check("reduce-motion", moved && companion_sees == Some(true) && renderer == true && held && restored == Some(false), motion.clone());
     } else {
         check("reduce-motion", false, json!({ "reason": "Reduce Motion was already on; the run does not change an owner setting it cannot restore", "original": original }));
     }

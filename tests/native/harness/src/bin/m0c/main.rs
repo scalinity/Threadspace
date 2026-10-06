@@ -23,6 +23,7 @@
 //!   threadspace-m0c g16-window prod
 //!   threadspace-m0c g12-sleep-wake prod [cycles]
 //!   threadspace-m0c wake-schedule prod
+//!   threadspace-m0c motion-fixture prod
 //!   threadspace-m0c clear-notifications <prod|dev>
 //!   threadspace-m0c resolve-qualification <prod|dev> [reason]
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
@@ -79,6 +80,11 @@ fn main() -> ExitCode {
         "g16-window" => window_gates::matrix(&ctx),
         "g12-sleep-wake" => power::cycles(&ctx, number(&args, 2, 5)),
         "wake-schedule" => Ok(json!({ "futureWakes": power::scheduled_wakes() })),
+        "motion-fixture" => {
+            let mut raised = Vec::new();
+            let centre = graphics::keep_centre_animated(&ctx, &mut raised);
+            Ok(json!({ "centre": centre, "raised": raised }))
+        }
         "clear-notifications" => cleanup::clear_notifications(&ctx),
         "resolve-qualification" => cleanup::resolve_qualification(
             &ctx,

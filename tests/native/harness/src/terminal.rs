@@ -230,8 +230,10 @@ impl Tab {
             }
         }
         crate::pause_ms(800);
-        let closed = osascript(CLOSE, &[&self.window_id.to_string()], timeout());
-        json!({ "closed": closed.ok, "endedPids": ended, "ownership": ownership })
+        // Terminal may already have closed the window when its shell ended.
+        let close = osascript(CLOSE, &[&self.window_id.to_string()], timeout());
+        let remains = osascript(WINDOW_TTYS, &[&self.window_id.to_string()], timeout()).ok;
+        json!({ "closed": !remains, "closedByHarness": close.ok, "endedPids": ended, "ownership": ownership })
     }
 }
 

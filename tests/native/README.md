@@ -62,7 +62,9 @@ $M g12-sleep-wake prod 5     # needs five root-scheduled wakes (see below)
 ```
 
 Utilities: `env`, `view-command <ch> <command> [json]`, `synthetic <ch> <count> <ms>`,
-`clear-notifications <ch>`, `resolve-qualification <ch> [reason]`, `wake-schedule <ch>`.
+`clear-notifications <ch>`, `resolve-qualification <ch> [reason]`, `wake-schedule <ch>`,
+`motion-fixture <ch>` (puts the on-camera office workers in the attention state, so the
+scene visibly animates; resolve afterwards with `resolve-qualification`).
 
 ## Rules the harness keeps
 

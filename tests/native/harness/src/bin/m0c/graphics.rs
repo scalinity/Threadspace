@@ -142,7 +142,7 @@ impl Captures<'_> {
 /// The canvas's rectangle in a window capture's pixels, from the view's
 /// surface facts: the scale comes from the widths, and any extra capture
 /// height above the viewport is titlebar.
-fn canvas_crop(state: &Value, capture_width: f64, capture_height: f64) -> Option<[String; 4]> {
+pub fn canvas_crop(state: &Value, capture_width: f64, capture_height: f64) -> Option<[String; 4]> {
     let canvas = &state["surface"]["canvas"];
     let viewport = &state["surface"]["viewport"];
     let scale = capture_width / viewport["width"].as_f64()?;
@@ -160,8 +160,10 @@ fn canvas_crop(state: &Value, capture_width: f64, capture_height: f64) -> Option
 /// attention state pulses (its marker also spins). The office lays workers
 /// out in view order centred on the camera, so the two nearest the centre
 /// are on screen; each one not already in attention gets a labelled
-/// qualification attention item, resolved when the run ends.
-fn keep_centre_animated(ctx: &Ctx, raised: &mut Vec<Value>) -> Value {
+/// qualification attention item, resolved when the run ends. A view that
+/// re-subscribes (after minimize, loss or reload) can receive its sessions
+/// in a different order, so every live phase re-checks the centre first.
+pub fn keep_centre_animated(ctx: &Ctx, raised: &mut Vec<Value>) -> Value {
     let workers = ctx
         .app()
         .view_command("scene-workers", json!({}), Duration::from_secs(30))
@@ -281,6 +283,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         && returned["lastAttestation"]["backend"] == "WEBGPU";
     log("returned-visible", returned.clone());
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(30, "after-unminimize", &mut captures, &mut log, &mut sample);
 
     // 3. 2D mode: disposed, the DOM view operational; back to 3D.
@@ -294,6 +297,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     log("exit-2d", command(ctx, "exit-2d"));
     threadspace_harness::pause_ms(5000);
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(20, "after-2d", &mut captures, &mut log, &mut sample);
 
     // 4. Hide during renderer initialization: start a rebuild, minimize at once.
@@ -312,6 +316,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     let after_race = state(ctx);
     log("after-init-race", after_race.clone());
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(20, "after-init-race", &mut captures, &mut log, &mut sample);
 
     // 5. Injected visible device loss: one bounded rebuild.
@@ -325,6 +330,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         && after_loss["counts"]["recoveryRebuilds"].as_u64() > before_loss["counts"]["recoveryRebuilds"].as_u64()
         && after_loss["deviceLosses"].as_array().is_some_and(|l| l.last().is_some_and(|x| x["injected"] == true));
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(20, "after-visible-loss", &mut captures, &mut log, &mut sample);
 
     // 6. Repeated loss: the recovery renderer is lost too — fall back to the
@@ -343,6 +349,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     let recovered = state(ctx);
     log("after-fallback-recovery", recovered.clone());
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(20, "after-fallback-recovery", &mut captures, &mut log, &mut sample);
 
     // 7. Loss while hidden: no live device exists once hidden; an injection
@@ -371,6 +378,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     log("after-repeated-hide-show", toggled.clone());
     let toggle_ok = toggled["state"] == "live" && toggled["generation"].as_u64().unwrap_or(0) >= generation_before + 5;
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
     wait_live(20, "after-toggles", &mut captures, &mut log, &mut sample);
 
     // 9. Document reload with the scene's asset request in flight.
@@ -384,6 +392,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     let reload_ok = recovered_view.is_some() && after_reload["state"] == "live";
     ctx.native.ax_action(pid, "raise", Some("Threadspace"));
     captures.previous = None;
+    log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
 
     // 10. The rest of the run: steady animation with periodic state changes
     //     (synthetic sessions appear as workers) and DOM/journal agreement.
