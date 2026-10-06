@@ -3,6 +3,7 @@
 //! unauthorized ACL probe view. Release builds contain none of this.
 
 use std::fs;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde_json::{Value, json};
@@ -15,6 +16,8 @@ use crate::window::navigation_allowed;
 const REPORT_MAX_BYTES: usize = 64 * 1024;
 pub const PROBE_LABEL: &str = "acl-probe";
 const PROBE_TITLE_PREFIX: &str = "ACL-PROBE:";
+/// Keeps two reports of one kind in the same millisecond from colliding.
+static REPORT_SEQUENCE: AtomicU64 = AtomicU64::new(1);
 
 fn now_ms() -> u128 {
     SystemTime::now()
@@ -59,7 +62,8 @@ pub fn record<R: Runtime>(
         .join("qualification");
     fs::create_dir_all(&directory)
         .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
-    let file_name = format!("{kind}-{recorded_at_ms}.json");
+    let sequence = REPORT_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let file_name = format!("{kind}-{recorded_at_ms}-{sequence:06}.json");
     fs::write(directory.join(&file_name), body)
         .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
     Ok(file_name)

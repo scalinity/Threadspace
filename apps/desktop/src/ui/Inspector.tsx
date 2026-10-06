@@ -63,6 +63,8 @@ export function Inspector({ state, client }: { state: ViewState; client: BridgeC
       {inspector.source === "NOTIFICATION_RESPONSE" ? (
         <p className="callout" role="status">
           Opened from a native notification{inspector.outstandingAtOpen === false ? " — this item was already handled." : "."}
+          {inspector.observationEnabled === false ? " Observation is stopped or under maintenance, so nothing was routed." : ""}
+          {inspector.route ? ` Return: ${inspector.route.surfaceResult} · ${inspector.route.sessionVerification} · ${inspector.route.reasonCode}.` : ""}
         </p>
       ) : null}
       <dl className="fields">
@@ -113,6 +115,11 @@ export function Inspector({ state, client }: { state: ViewState; client: BridgeC
         {item && item.acknowledgedAtMs === null ? (
           <button type="button" className="button" onClick={() => void client.acknowledge(item.attentionId)} disabled={state.phase !== "live"}>
             Acknowledge
+          </button>
+        ) : null}
+        {item && item.resolvedAtMs === null ? (
+          <button type="button" className="button button--quiet" onClick={() => void client.resolve(item.attentionId, "Marked handled in the inspector")} disabled={state.phase !== "live"}>
+            Mark handled
           </button>
         ) : null}
         <button type="button" className="button button--quiet" onClick={() => client.select(null)}>

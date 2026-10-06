@@ -9,6 +9,7 @@ import {
 } from "@threadspace/scene";
 
 import type { BridgeClient, ViewState } from "../bridge/client";
+import { ipc } from "../bridge/ipc";
 import { launch } from "../launch";
 import { registerRendererLifecycle } from "../qualification/rendererQualification";
 
@@ -32,6 +33,23 @@ export function sceneModel(state: ViewState): SceneModel {
 const lifecycles = new WeakMap<BridgeClient, RendererLifecycle>();
 
 /**
+ * Native confirmation (SPEC §15.6): the renderer acts only on the office
+ * window's AppKit state, read through the bootstrap-scoped WindowState query.
+ * If the native query is unavailable, document visibility is the fallback.
+ */
+async function nativeVisibility(): Promise<{ visible: boolean; minimized: boolean }> {
+  try {
+    const result = await ipc.query({ query: { kind: "WindowState" }, context: null });
+    if (result.kind === "WindowState") {
+      return { visible: result.visible && !result.minimized, minimized: result.minimized };
+    }
+  } catch {
+    // fall through to the document's own signal
+  }
+  return documentVisibilityConfirmation();
+}
+
+/**
  * The one renderer lifecycle for a bridge client. Construction has no side
  * effects; the lifecycle starts work only when SceneView attaches it.
  * `confirmVisibility` is the single injection point for a native-confirmed
@@ -46,7 +64,7 @@ export function rendererLifecycleFor(client: BridgeClient): RendererLifecycle {
         canvasLabel: "Office scene: one desk and worker per session",
         onSelect: (sessionId) => client.select(sessionId),
       }),
-      confirmVisibility: documentVisibilityConfirmation,
+      confirmVisibility: nativeVisibility,
       qualification: launch.qualificationBuild,
       frameTarget: launch.qualificationBuild ? window : null,
       matchMedia: (query) => window.matchMedia(query),

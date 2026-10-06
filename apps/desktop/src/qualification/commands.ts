@@ -6,6 +6,7 @@
 
 import type { BridgeClient } from "../bridge/client";
 import { BridgeError, ipc, normalizeFailure } from "../bridge/ipc";
+import { runRendererQualificationCommand } from "./rendererQualification";
 
 interface Outcome {
   ok: boolean;
@@ -238,6 +239,9 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
         setTimeout(() => location.reload(), 20);
         return { reloading: true };
       default:
+        if (command.startsWith("renderer:")) {
+          return runRendererQualificationCommand(command.slice("renderer:".length), input);
+        }
         for (const handler of extra) {
           const result = handler(command, args);
           if (result !== undefined) return result;

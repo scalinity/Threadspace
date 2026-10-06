@@ -25,6 +25,9 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
         <button type="button" className="button button--quiet" onClick={() => void client.requestSetup("RequestNotificationAuthorization")} disabled={state.phase !== "live"}>
           Allow notifications
         </button>
+        <button type="button" className="button button--quiet" onClick={() => void client.setObservation(!(companion?.observationEnabled ?? false))}>
+          {companion?.observationEnabled === false || companion === undefined || companion === null ? "Enable observation" : "Stop observation"}
+        </button>
         <button type="button" className="button button--quiet" onClick={() => void client.requestSetup("RequestTerminalAutomation")} disabled={state.phase !== "live"}>
           Allow Terminal access
         </button>
@@ -56,6 +59,9 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
         <Row label="SQLite" value={companion ? `${companion.sqlite.version} · ${companion.sqlite.journalMode} · sync ${companion.sqlite.synchronous}` : null} />
         <Row label="Notifications" value={notifications ? `${notifications.authorizationStatus} · alert ${notifications.alertSetting}` : null} />
         <Row label="Reduce motion" value={companion?.accessibilityPreferences?.reduceMotion} />
+        <Row label="Observation" value={companion ? (companion.observationEnabled ? "enabled" : "stopped") : null} />
+        <Row label="Maintenance" value={companion?.maintenancePhase} />
+        <Row label="Sleep / wake" value={companion ? `${companion.power.sleeps} / ${companion.power.wakes}` : null} />
         <Row label="Login item" value={state.integration?.service.status} />
         <Row label="Terminal" value={terminal ? `${terminal.applicationVersion ?? "?"} · ${terminal.automation} · ${terminal.inventory ? `${terminal.inventory.tabCount} tabs` : "no inventory"}` : null} />
       </dl>
