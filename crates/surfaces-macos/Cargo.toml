@@ -1,0 +1,16 @@
+[package]
+name = "threadspace-surfaces-macos"
+description = "macOS process incarnation sampling, bounded argv execution and Terminal.app dictionary/inventory support."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-contracts.workspace = true
+libc.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true
