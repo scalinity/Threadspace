@@ -1,6 +1,6 @@
 # D-0002 — Grant the two core window permissions that titlebar drag regions use
 
-**Status:** Accepted for M0A qualification; open for owner/reviewer confirmation.
+**Status:** Accepted; ratified during the independent M0C review on 2026-10-06 using inherited ACL evidence and native G16 drag/zoom qualification. This does not accept M0C as a whole.
 **Affects:** SPEC §18.6 (the `office-local` capability example lists only the five app-command permissions), §15.5 and §18.8 (overlay titlebar with explicit drag regions), MILESTONES G16.
 
 ## Context
@@ -22,4 +22,4 @@ The capability stays scoped to the `office` webview, local origin only and macOS
 
 - Drag regions and native double-click zoom work through the framework's public mechanism, with no private API or native overlay view.
 - The renderer can start a window drag or toggle zoom. It cannot close, move programmatically, resize, or open windows, because those permissions are absent. The M0A IPC self-test verifies that `plugin:window|close` is refused.
-- The ACL example in SPEC §18.6 differs from the shipped capability by these two lines. The owner should either accept this record or choose another drag strategy before M0C's full G16 matrix.
+- SPEC §18.6 now includes these exact two titlebar permissions; the application-command and local-view boundaries remain unchanged.

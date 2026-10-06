@@ -1,6 +1,6 @@
 # D-0003 — Apple-event consent is attributed to the containing application
 
-**Status:** Accepted for M0A qualification. Natively confirmed in M0B under real focus and readback (see "M0B confirmation" below). Still open for owner/reviewer confirmation of the SPEC §13.5/§18.9 wording.
+**Status:** Accepted; ratified during the independent M0C review on 2026-10-06. M0B confirmed real focus/readback attribution (below); SPEC §13.5/§18.9 now reflect it. This does not accept M0C as a whole.
 **Affects:** SPEC §13.5 ("Put [the usage description and automation entitlement] on the native companion and test the resulting identity"), §18.9 ("The outer app and companion have separate minimal entitlements. Automation belongs on the actual event-sending companion"); MILESTONES G07/G08 and M0B step 6 (native readback "through the packaged companion's actual authorization identity").
 
 ## Runtime evidence (macOS 27.2, build 26B5091g)
@@ -24,7 +24,7 @@ After `NSAppleEventsUsageDescription` and `com.apple.security.automation.apple-e
 
 - The consent prompt names "Threadspace", and System Settings › Privacy & Security › Automation lists Terminal access under the outer application.
 - M0B's "actual authorization identity" for Terminal readback is the outer application's TCC identity exercised by the companion process. M0B/M0C should confirm the same attribution for focus and readback, and after the outer application is replaced.
-- SPEC §13.5/§18.9 describe the entitlement as belonging only to the companion. The owner should either accept this record and update those sections, or decide on another arrangement.
+- SPEC §13.5/§18.9 require the entitlement/usage description on both bundles for this profile and distinguish the outer consent identity from the companion sender.
 
 ## M0B confirmation (2026-10-06, macOS 27.2 26B5091g; attribution captured on packaged build `46a2a04`, continued operation without prompt on `8980d34` and `fc65641`)
 

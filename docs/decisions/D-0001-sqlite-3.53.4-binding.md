@@ -1,6 +1,6 @@
 # D-0001 — Link SQLite 3.53.4 through a patched `libsqlite3-sys`
 
-**Status:** Accepted for M0A qualification; open for owner/reviewer confirmation.
+**Status:** Accepted; ratified during the independent M0C review on 2026-10-06 using inherited M0A/M0B and M0C engine/durability evidence. This does not accept M0C as a whole.
 **Affects:** SPEC §9.1, §18.1 (SQLite engine row; "M0 pins the Rust binding/build inputs so this exact native engine is used"); MILESTONES M0A implementation requirements (SQLite `3.53.4` row) and G10.
 
 ## Context

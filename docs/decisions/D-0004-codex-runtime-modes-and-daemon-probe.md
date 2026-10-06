@@ -1,6 +1,6 @@
 # D-0004 — Codex 0.160.x runtime modes and the daemon version probe
 
-**Status:** Accepted for M0C qualification; open for owner/reviewer confirmation. No Codex product code exists before M6, so nothing is corrected in code here.
+**Status:** ACCEPTED by independent review on 2026-10-06 of candidate `6f903c273eedc135123e3a7968d3c00887e8cc70`. This resolves the milestone-contract contradiction; it does not pass unexecuted native facets or accept M0C as a whole. Codex product integration remains M6.
 **Affects:** SPEC §12.1 (runtime modes), §12.2 (SessionStart sources), §12.3 (`canAcceptDirectInput`), §12.4 (read-only daemon probe, `historyMode`), §12.6 (exact 0.160.1 adapter); MILESTONES G07 (Codex detached-hook ancestry) and M6.
 
 ## Evidence (M0C probe, macOS 27.2 26B5091g)
@@ -20,12 +20,12 @@
 
 - **Default mode.** A plain `codex` launch is classified CODEX_SHARED_DAEMON; CODEX_EMBEDDED is the exclusion case. The default routing ceiling for Codex is therefore SPEC §12.8's shared-daemon row (no originating terminal) until a client→thread→TTY mapping qualifies.
 - **Version probe.** The companion learns the daemon version from its own observer handshake (`initialize` reports it), not by running the CLI periodically, so observation never writes the owner's `~/.codex`. Any CLI invocation for setup diagnostics is explicit and owner-initiated.
-- **Daemon version is its own profile axis.** The answering daemon's version is qualified separately from the CLI and desktop builds; an unqualified daemon version runs at LIMITED coverage. 0.160.0 is accepted as the 0.160.1 profile for the cited source; 0.159.3 is unqualified.
+- **Daemon version is its own profile axis.** The answering daemon's version is qualified separately from the CLI and desktop builds; an unqualified daemon version runs at LIMITED coverage. Installed macOS 0.160.0 has proved 0.160.1 cited-source equivalence, not blanket runtime certification; 0.159.3 is unqualified. No daemon answered the M0C probe, so a live observer handshake remains NOT_RUN until M6.
 - **Passive capability set.** `canAcceptDirectInput` is treated as unavailable to the passive observer (it sends no experimental capability). `historyMode` is read from responses only. SessionStart `fork` is accepted as a source value.
-- **Detached-hook ancestry for Codex** stays NOT_RUN in M0C, because M0C forbids creating provider work. M6 performs it in an owner-authorized disposable thread, once with `--no-daemon` (embedded: the nearest provider ancestor is the TUI) and once attached to the daemon (the nearest provider ancestor is the daemon, with no TTY), using a Codex executable-identity rule analogous to M0B's Claude rule.
+- **Detached-hook ancestry for Codex** stays NOT_RUN in M0C, because M0C forbids creating provider work. M0C records configuration/trust/install surfaces without claiming an installed-hook execution test. M6 qualifies safe installation and ancestry in an owner-authorized disposable thread, once with `--no-daemon` (embedded: the nearest provider ancestor is the TUI) and once attached to the daemon (the nearest provider ancestor is the daemon, with no TTY), using a Codex executable-identity rule analogous to M0B's Claude rule.
 - **Desktop runtime.** CODEX_DESKTOP_LOCAL observation is limited to hooks/notify; no passive app-server attach.
 
 ## Consequences
 
-- SPEC §12.1/§12.2/§12.3/§12.4/§12.6 need the wording above once this record is accepted; M6 implements against it.
-- G07's Codex portion is reported in M0C as not available under M0C's no-provider-work rule, with this record as the disposition, rather than as a pass.
+- SPEC §12.1/§12.2/§12.3/§12.4/§12.6 and MILESTONES G07/M0C/M6 now carry this contract; M6 implements against it.
+- G07 may pass the revised M0C mechanism/probe scope. Codex detached-hook ancestry and the absent live-daemon handshake remain explicitly NOT_RUN, assigned to M6. The two required live ancestry runs cannot be inferred from source inspection or the Claude proof.

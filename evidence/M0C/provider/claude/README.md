@@ -13,7 +13,7 @@ Provider-semantics qualification of the pinned observer mod (`packages/provider-
 | — sha256 / lines / first line | `03815831f5ceaffc9557ebcd75fe8c3bf36369a404a3153865a3e920cb818d61` / 20,755 / `// Written by Claude Code 2.1.291.` |
 | Declarations the engine lays beside a loaded mod | `<mod>/.claude-plugin/types/claude-code/index.d.ts` (API only; tools are in `claude-code-tools/`) |
 | — sha256 / lines / first line | `c05419d753bc81d991ddec4b66af17a9172f498e59d28fad07a8e676635c07ce` / 15,507 / `// Written by Claude Code 2.1.291.` (identical in all three native runs: `native/run*-generated-types.json`) |
-| Mod under test | `packages/provider-mod` at `160641b`; `hooks/register.ts` sha256 `f9a42b2522fd088ff2b7ba535adad75e1bbd523a04e8729532efb652c295b009`, `hooks/delivery.ts` sha256 `109251fcefe5f74914f9c598e9b63de2820a429b5c9b896aa2df821fe33300ca` |
+| Mod under test | `packages/provider-mod`: recorded test label `160641b` is unresolvable in the published history; published source `9b8d604c269ccc79ca8a728c5fd2b01dcd781a34` has the exact qualified file hashes (not an asserted commit-rewrite mapping). `hooks/register.ts` sha256 `f9a42b2522fd088ff2b7ba535adad75e1bbd523a04e8729532efb652c295b009`, `hooks/delivery.ts` sha256 `109251fcefe5f74914f9c598e9b63de2820a429b5c9b896aa2df821fe33300ca` |
 
 Neither declaration file is committed (licensing); the hashes and the excerpts below identify them. Line numbers in this file refer to the bundled 20,755-line file.
 

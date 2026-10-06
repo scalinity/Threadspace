@@ -1,7 +1,8 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** Implementation baseline after independent readiness audit; native qualification proceeds through mandatory M0A → M0B → M0C. No native gate is represented as passed.  
+**Status:** M0A/M0B accepted on `8558854`; independent review of M0C `6f903c2` requires remediation before merge or M1. Accepted qualification decisions are normative below; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
+
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.
 
@@ -13,10 +14,10 @@ The research used current official provider documentation, public release-pinned
 
 Two provider reference points materially inform the design:
 
-- Claude Code **2.1.290**, released October 5, is the initial qualification candidate. Its release-pinned public mod declaration snapshot still identifies itself as **2.1.277**, while its current reference discusses later builds. The mod API is early access. Generated declarations from the exact installed build and recorded runtime fixtures control implementation compatibility. A larger version number is not automatic certification. [Claude release][C9] [Mod reference][C7] [Release-pinned declarations][C8_PIN] [Public declarations][C8]
+- Claude Code **2.1.290**, released October 5, was the researched candidate; M0C qualifies the installed **2.1.291** observer profile under [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md). The researched release-pinned public declaration snapshot identifies **2.1.277**. Generated declarations from the exact installed build and recorded runtime fixtures control compatibility; a larger version number is not automatic certification. [Claude release][C9] [Mod reference][C7] [Release-pinned declarations][C8_PIN] [Public declarations][C8]
 - Codex **0.160.1**, release commit **d27764b82f7118f674371e6d6e76271d9d606edb**, is the researched release. Some generic documentation lagged that release. Where they conflict, this document cites the released schema and implementation, with actual installed CLI and desktop runtimes qualified separately. [Codex release][O1] [Released hook schema][O2]
 
-No native macOS behavior, provider integration, or performance result was executed or certified in this research workspace. M0A proves the native substrate, M0B is the decisive real Claude/Terminal identity-and-return spike, and M0C closes platform/recovery qualification on the target Mac. A failed native prerequisite produces a BLOCKED gate, not an invented implementation success.
+The original research was not native certification. Committed M0A/M0B evidence now establishes the accepted substrate and real Claude/Terminal identity-and-return path. M0C reviews reliability on the target Mac; its successful native runs do not override a code defect or missing required evidence. M1 remains gated by G17.
 
 ### 0.1 Frozen decisions
 
@@ -588,7 +589,7 @@ interface CanonicalFact {
 | NOTIFICATION_DELIVERY_RECORDED | Submission/known OS result, not proof the user saw a banner |
 | LAYOUT_UPDATED / SETTINGS_CHANGED | Relevant persisted owner preferences and world layout changes |
 
-Every fact has a payload schema and adapter/source preconditions. Facts do not carry executable commands, arbitrary scripts or provider decision outputs. Mod dispatch provenance is part of those preconditions: plugins can raise lifecycle-shaped events, so a plausible payload/native ID alone cannot earn PROVIDER_EVENT authority. Capture host-stamped dispatch origin at callback entry and require qualified native semantics or independent native corroboration for the particular fact. Unqualified dispatches remain bounded observation diagnostics, not native outcomes. [Mod dispatch declarations][C8]
+Every fact has a payload schema and adapter/source preconditions. Facts do not carry executable commands, arbitrary scripts or provider decision outputs. Mod dispatch provenance is part of those preconditions: a plausible payload/native ID alone cannot earn PROVIDER_EVENT authority. Qualified Claude 2.1.291 does not expose direct lifecycle raises through the plugin-facing `$`; nonengine lifecycle-shaped inputs remain a synthetic defence for other profiles. Capture host-stamped dispatch origin at callback entry and require qualified native semantics or independent native corroboration for the particular fact. Unqualified dispatches remain bounded observation diagnostics, not native outcomes. [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md)
 
 ### 5.3 Idempotency
 
@@ -769,7 +770,7 @@ The UI has “Needs attention” for unacknowledged unsnoozed items and “Await
 
 ### 7.3 Human-follow-up auto-resolution
 
-Auto-resolution is deliberately narrow and is enabled only when `automaticHumanFollowupResolution=true` for a positively qualified original-order witness. `acceptedInputProvenance` is separate. The researched public `prompt.submit` contract exposes original origin and the active-at-submission turn, but no universal original-submission sequence/timestamp. Callback arrival, a missing `turnId`, or an assumed first/prepend seat cannot alone supply positive ordering. The default for an unproven build/observation is explicit Mark handled, preserving the action. This limited convenience does not block the primary native observer/MVP; exact current-session Return and native outcomes remain required. [Prompt and middleware declarations][C8_PIN]
+Auto-resolution is deliberately narrow and is enabled only when `automaticHumanFollowupResolution=true` for a positively qualified original-order witness. Qualified Claude 2.1.291 has `acceptedInputProvenance=true` but `automaticHumanFollowupResolution=false` / NOT_SUPPORTED: its installed `prompt.submit` contract exposes original origin and the active-at-submission turn, but no positive original-submission order witness. Callback arrival, a missing `turnId`, or an assumed first/prepend seat cannot supply that ordering. Explicit Mark handled preserves the owner's resolution path; M1 implements the durable command and M2 qualifies the native control. This unavailable convenience does not block the native observer/MVP; exact current-session Return and qualified native outcomes remain required. [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md)
 
 When enabled, all of these conditions apply:
 
@@ -1092,7 +1093,9 @@ At startup and after gaps, enumerate all relevant profiles without cwd filtering
 
 The public mod runs in a restricted host environment. It does not have Node globals, `process.pid`, unrestricted filesystem/network globals, or ordinary timer globals. Use qualified host APIs and generated declarations. [Mod API][C6] [Reference][C7]
 
-Apply provenance checks before interpreting the following events. Public `EventCalls` permits plugins to raise `$.turn.start/step/complete` and `$.session.start/end` on the same middleware chain. Snapshot `next.origin` at callback entry; native lifecycle authority requires the host-stamped engine/core origin plus the qualified event semantics, or independent native corroboration. A plugin-raised `turn.complete` naming a real turn does not by itself complete it or create owner output attention. Preserve legitimate plugin-origin tool/spawn activity only when actual execution/relation is independently established. An engine-origin request also needs actual core execution/result evidence: dispatch origin alone does not prove that a downstream middleware performed a requested spawn. Host methods including `$.agent.list()` and `$.session.id()` are middleware-interceptable; the profile must identify the core-backed read contract or retain their values at a lower tier. [EventCalls, Next.origin and trace declarations][C8]
+Apply provenance checks before interpreting the following events. In qualified 2.1.291, `EventCalls` is engine/test-kit functionality; the plugin-facing `$` cannot directly raise turn start/step/complete or session start/end. Snapshot `next.origin` at callback entry; native lifecycle authority requires host-stamped engine/core origin plus qualified semantics and core settlement, or independent native corroboration. Preserve legitimate plugin-origin tool/spawn activity only when actual execution/relation is established; engine dispatch alone does not prove a downstream middleware performed a requested spawn. Host methods including `$.agent.list()` and `$.session.id()` are middleware-interceptable and need core-backed proof or a lower evidence tier. [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md)
+
+Load the pinned mod from a Threadspace-owned copy: loading writes generated declarations and `tsconfig.json` into its folder. After reload, identity learned through `$.session.id()` remains lower-tier until separate qualified native proof restores authority. The M0C observer does not promote an unchanged ID merely because another event arrives; M2 must qualify that restoration. Immutable callback-entry ownership never changes with reload or later identity proof.
 
 | Mod event/API | Qualified contract |
 | --- | --- |
@@ -1114,7 +1117,7 @@ Mod `turn.complete` reason maps answer→COMPLETED, aborted→INTERRUPTED, error
 
 Observer middleware always calls `next(e)` once with the original event, returns its exact result unchanged and propagates provider exceptions. Catch observer failures separately. Never catch a provider exception and call next again. Streaming observation must forward every chunk with the correct native generator contract.
 
-Require engine dispatch origin and settled core trace for accepted-human input. A lower middleware returning a plausible object without calling core cannot create INPUT_ACCEPTED. If an earlier middleware hides events or a build lacks proof fields, lower the affected capability and retain explicit owner controls. M0C records the actual positive original-order witness before enabling automaticHumanFollowupResolution; passing origin/core acceptance is not that witness. If none exists, keep this facet unavailable and use Mark handled while retaining native outcomes/identity/actors that do qualify.
+Require engine dispatch origin, protected original prompt origin and settled core trace for accepted-human input. A lower middleware returning a plausible object without calling core cannot create INPUT_ACCEPTED. If an earlier middleware hides events or a build lacks proof fields, lower the affected capability and retain explicit owner controls. M0C's 2.1.291 native sessions exercise SDK/task-notification origins and successful main/child outcomes; composer/bridge provenance is declaration/test-kit evidence. No positive original-order witness qualifies, so automaticHumanFollowupResolution stays disabled. M2 qualifies interactive human input, the native Mark handled control and its additional outcome cases.
 
 ### 11.5 Approval, input and notification nuance
 
@@ -1136,11 +1139,11 @@ Commands such as `claude attach` or `claude --desktop --resume` alter attachment
 
 ### 12.1 Supported runtime modes
 
-**CODEX_SHARED_DAEMON** observes an already-running native daemon with read-only protocol operations plus native hooks. It provides strong thread/turn/wait evidence but no guaranteed originating TUI identity.
+**CODEX_SHARED_DAEMON** is the ordinary 0.160.x TUI default when daemon auto-start is enabled, without embedded fallback. Threadspace observes an already-running daemon with read-only protocol operations plus native hooks; it never starts the daemon for observation. The mode provides thread/turn/wait evidence when qualified, but no guaranteed originating TUI identity. [D-0004](decisions/D-0004-codex-runtime-modes-and-daemon-probe.md)
 
-**CODEX_EMBEDDED** observes ordinary embedded/`--no-daemon` CLI execution through native hooks, optional legacy notify and process ancestry. It supports native bound surfaces but does not manufacture missing terminal-outcome or current-thread lookup capabilities.
+**CODEX_EMBEDDED** applies to `--no-daemon` or the release's other explicit daemon exclusions. It observes execution through native hooks, optional legacy notify and process ancestry. It supports native bound surfaces but does not manufacture missing terminal-outcome or current-thread lookup capabilities.
 
-**CODEX_DESKTOP_LOCAL** is qualified separately for the desktop-bundled runtime. Its executable/schema can differ from the standalone CLI. App activation and a verified current conversation route are separate capabilities.
+**CODEX_DESKTOP_LOCAL** is qualified separately for the desktop-bundled runtime. The M0C-observed app-servers use stdio and expose no passive endpoint; this profile is limited to supported hooks/notify. Its executable/schema can differ from the standalone CLI. App activation and a verified current conversation route are separate capabilities.
 
 Threadspace never launches a provider-owned execution merely to observe it and never calls `thread/resume` to acquire prettier telemetry.
 
@@ -1150,7 +1153,7 @@ The researched release supplies common `session_id`, nullable `transcript_path`,
 
 | Hook | Important additional fields | Canonical meaning |
 | --- | --- | --- |
-| SessionStart | model, permission_mode, source | Session context registration; source may be startup/resume/clear/compact |
+| SessionStart | model, permission_mode, source | Session context registration; source may be startup/resume/clear/compact/fork |
 | SessionEnd | reason, currently other | Runtime/session closure; not persistent thread deletion |
 | UserPromptSubmit | turn_id, prompt, actor metadata | Submission attempt; other hooks can block |
 | PreToolUse | turn_id, tool_use_id, name/input | Proposed activity |
@@ -1168,17 +1171,17 @@ Do not invent Codex counterparts for Claude's StopFailure, Notification, Permiss
 
 Map `Thread.id` to persistent Session identity. Treat `Thread.sessionId` and hook `session_id` as live-tree membership, not a substitute for concrete child identity. Map hook `agent_id` to the subordinate thread ID. Recover immediate `parentThreadId` through native thread metadata; a tree-root relation is not an immediate-parent relation. [Thread identity][O3] [Thread model][O4]
 
-`ephemeral` threads can disappear without persistent history. Record their identities/runs while observed but do not claim later recovery if the provider no longer retains them. `canAcceptDirectInput`, when present, controls whether the UI offers direct-surface interaction versus opening a proven owning parent context. In the researched multi-agent V2 profile, parent-owned ThreadSpawn children reject ordinary direct input/resume; do not promote one to root because a user selected it. An explicit parent-context action targets the proven parent Session and is labeled accordingly. Exact-current-parent focus cannot be reported as exact-current-child or auto-acknowledge a child item unless native evidence establishes that parent surface as the item's actual interaction surface. Otherwise retain the child inspector and explicit acknowledgement. [Child input ownership][O_CHILD_INPUT]
+`ephemeral` threads can disappear without persistent history. Record their identities/runs while observed but do not claim later recovery if the provider no longer retains them. `canAcceptDirectInput` is experimental-only and unavailable to the selected nonexperimental passive observer; do not infer direct-input permission from its absence. In the researched multi-agent V2 profile, parent-owned ThreadSpawn children reject ordinary direct input/resume; do not promote one to root because a user selected it. An explicit parent-context action targets the proven parent Session and is labeled accordingly. Exact-current-parent focus cannot be reported as exact-current-child or auto-acknowledge a child item unless native evidence establishes that parent surface as the item's actual interaction surface. Otherwise retain the child inspector and explicit acknowledgement. [Child input ownership][O_CHILD_INPUT] [D-0004](decisions/D-0004-codex-runtime-modes-and-daemon-probe.md)
 
 ### 12.4 Passive app-server observer
 
-The current source supports an existing local shared daemon/control socket. Probe it with the supported read-only `codex app-server daemon version` command, which reports an answering daemon's `socketPath`/`appServerVersion` and does not start an absent daemon. Connect only to that configured/discovered authorized endpoint. The exact local wire is a WebSocket upgrade over AF_UNIX, followed by JSON-RPC; writing raw newline-delimited JSON directly to the Unix socket is incorrect. Record the running daemon version independently of the invoking CLI and desktop build. Initialization is a connection, not a task-start/resume request. [Daemon contract][O7] [Released client handshake][O_DAEMON_CLIENT] [Read-only version probe][O_DAEMON_IMPL]
+Connect only to a configured/discovered authorized existing local daemon socket. Learn its version from the observer's `initialize` response, independently of the CLI and desktop builds. Do not periodically invoke the CLI against the owner's `CODEX_HOME`: even `--version` creates temporary helper directories and runs a janitor. Explicit setup diagnostics may invoke it with the documented scope; the M0C probe used a disposable home. The local wire is a WebSocket upgrade over AF_UNIX followed by JSON-RPC, not raw newline-delimited JSON. Initialization is a connection, not a task-start/resume request. M0C found no answering daemon; a live handshake and runtime/store qualification remain M6 work. [Daemon contract][O7] [Released client handshake][O_DAEMON_CLIENT] [D-0004](decisions/D-0004-codex-runtime-modes-and-daemon-probe.md)
 
 Observer sequence:
 
-1. Start a bounded buffering receive loop, connect the Unix socket, complete its WebSocket upgrade, send `initialize` with a distinct observer client identity, await the response, then send `initialized`. Do not advertise interactive UI/auth/attestation/MCP capabilities this passive observer does not implement.
+1. Start a bounded buffering receive loop, connect the Unix socket, complete its WebSocket upgrade, send `initialize` with a distinct observer client identity, await the response, then send `initialized`. Do not advertise experimental API or interactive UI/auth/attestation/MCP capabilities this passive observer does not implement.
 2. Register status handling before enumeration and qualify the answering daemon/runtime/store profile.
-3. Enumerate `thread/loaded/list` with an explicit bounded `limit` and its cursor until complete; its default is unbounded. Then use metadata-only `thread/read`, including the supported `historyMode` field.
+3. Enumerate `thread/loaded/list` with an explicit bounded `limit` and its cursor until complete; its default is unbounded. Then use metadata-only `thread/read` with request `includeTurns: false`; `Thread.historyMode` is a response field, not a request argument.
 4. Consume globally broadcast `thread/status/changed`.
 5. On changes/gaps, read bounded native turn pages and relevant metadata.
 6. Reconnect and reconcile without changing provider runtime lifetime.
@@ -1212,7 +1215,7 @@ Native pagination is a capability of a qualified reachable app-server/store, not
 
 **Recorded outcomes versus reconstructed history.** The released legacy history builder can create synthetic turn shells defaulting to Completed from message history without a native terminal event. Both history modes can also normalize InProgress to Interrupted when the effective thread status is not active, without recording an interruption. The public wire exposes `Thread.historyMode` and optional start/completion markers, but no universal outcome-provenance discriminator. Do not infer native identity from a UUID-shaped string. [Legacy builder][O_HISTORY_BUILDER] [Response normalization][O12]
 
-Isolate these predicates in the exact 0.160.1 compatibility adapter and qualify the actual runtime/store implementation:
+Isolate these predicates in the exact 0.160.1 compatibility adapter and qualify the actual runtime/store implementation. D-0004 accepts installed macOS CLI 0.160.0's byte-identical cited source, not blanket runtime certification; the separately selected daemon package 0.159.3 remains unqualified. An answering unqualified daemon has LIMITED coverage until M6 qualification:
 
 | Evidence | Permitted recovery |
 | --- | --- |
@@ -1337,7 +1340,7 @@ Scripts are fixed resources; values are passed as data arguments to `osascript`,
 
 A backgrounded/stopped provider can still have the correct controlling TTY while a shell or another process group is foreground. Report `FOREGROUND_COMPATIBLE` only when current foreground-process-group and process-state evidence is compatible with the provider accepting input; a stopped/backgrounded provider or an unproven foreground job yields `BACKGROUND_JOB` or `UNKNOWN`. These lower readiness results cannot auto-acknowledge attention. Never send terminal input to “repair” foreground state.
 
-M0B proves the packaged companion's identity/TTY/tab join, automation/readback and stale-binding rejection first; M0C completes Spaces/fullscreen, minimized restoration, Terminal restart and selection/readback race qualification.
+M0B proves the packaged companion's identity/TTY/tab join, automation/readback and stale-binding rejection first; M0C completes Spaces/fullscreen, minimized restoration and selection/readback race qualification. Full Terminal.app restart remains unexecuted/BLOCKED on the owner environment and is assigned to isolated M15 native qualification by [D-0006](decisions/D-0006-m0c-environment-limits-and-window-shells.md). A Terminal process-generation change still invalidates every affected binding.
 
 ### 13.4 iTerm2, Ghostty and multiplexers
 
@@ -1357,7 +1360,7 @@ tmux pane IDs are meaningful inside their server generation. `pane_pid` names th
 
 ### 13.5 Native permissions
 
-Apple-event automation requires the usage description and, for a hardened build, the automation entitlement on the identity that sends events. Put them on the native companion and test the resulting identity; a successful Terminal-launched script is insufficient. Use public AppKit/AppleEvents before Accessibility. [Usage description][A11] [Automation entitlement][A12]
+Apple-event automation requires the usage description and automation entitlement on both the event-sending companion and its containing application for the qualified profile. TCC attributes Terminal consent to the outer application, while the companion remains the only sender; test that actual arrangement after identity changes. A successful Terminal-launched script is insufficient. Use public AppKit/AppleEvents before Accessibility. [D-0003](decisions/D-0003-apple-event-consent-attribution.md) [Usage description][A11] [Automation entitlement][A12]
 
 Accessibility is requested only for a separately enabled AX adapter or a specific native readback that needs it. Denial is a supported degraded state. Do not request screen recording, Full Disk Access, root privileges or input monitoring for the selected MVP. macOS may restrict foreground activation across Spaces; acceptance records the actual result instead of simulating success with input injection.
 
@@ -1677,7 +1680,7 @@ Use a two-second bridge heartbeat while visible, a five-second initial hydration
 
 Native page load/close handlers retire old subscriptions and renderer epochs even if JavaScript did not unsubscribe; retired renderer epochs cannot reconnect. Native construction identity and renderer document/subscription epoch remain separate. Per-builder page/close callbacks capture their original native marker and ignore retired generations; alpha.4 can resolve a late callback's supplied WebView by label, so reading only that supplied handle is insufficient. For this compatibility profile, every main-document replacement/reload after initial load retires the native incarnation and recreates the actual office view before further connects or mutating bootstrap operations are admitted. This also rejects an old document's first-ever delayed `ui_connect`, whose epoch was not previously registered. Ordinary Vite HMR without document replacement is unaffected. A new webview under label `office` is a new incarnation. Old commands/frames cannot mutate the new view's state; already accepted durable commands retain their documented commit semantics. No callback handle becomes a durable identity.
 
-The following cache-reclamation rule is an alpha.4 compatibility policy isolated in the desktop adapter, not a stable Tauri-wide API guarantee. A failed large Channel fetch can leave framework data in a per-webview cache. Dropping a Channel or reloading the page does not purge it; actual native webview/window removal does. Account for potentially unconsumed query/command callback replies as well as stream frames. If retiring a subscription with potentially unconsumed sent data, destroy and recreate the actual office view before admitting another full subscription. Preserve bounds, visibility and pending native intents, suppress last-window exit only during this controlled recovery, and wait for old registration removal before reusing its label. Do not call private cache APIs. User-requested Quit still wins. M0C proves this path and repeated recovery remains bounded. [Channel cache lifetime][T9] [Native removal cleanup][T_MANAGER]
+The following cache-reclamation rule is an alpha.4 compatibility policy isolated in the desktop adapter, not a stable Tauri-wide API guarantee. A failed large Channel fetch can leave framework data in a per-webview cache. Dropping a Channel or reloading the page does not purge it; actual native webview/window removal does. Account for potentially unconsumed query/command callback replies as well as stream frames. If retiring a subscription with potentially unconsumed sent data, destroy and recreate the actual office view before admitting another full subscription. Preserve bounds, visibility and pending native intents, suppress last-window exit only during this controlled recovery, and wait for old registration removal before reusing its label. Do not call private cache APIs. User-requested Quit still wins. M0C proves content/cache release on this path, but each recovery retains an empty native window shell. This rate-limited, linearly accumulating C-04 defect is accepted only with mandatory M1 closure under [D-0006](decisions/D-0006-m0c-environment-limits-and-window-shells.md); lifetime resource growth is not claimed bounded. [Channel cache lifetime][T9] [Native removal cleanup][T_MANAGER]
 
 On hidden→visible, sleep→wake or core reconnection, validate status explicitly; browser timers may have been suspended. Mark the displayed data synchronizing until current hydration is applied. A renderer outage changes observation presentation only; it cannot end provider sessions, clear attention or lose hook endpoints.
 
@@ -1709,7 +1712,9 @@ Use the one local `office` webview and explicitly select `office-local` through 
   "webviews": ["office"],
   "permissions": [
     "allow-ui-connect", "allow-ui-ack", "allow-ui-disconnect",
-    "allow-ui-query", "allow-ui-action"
+    "allow-ui-query", "allow-ui-action",
+    "core:window:allow-start-dragging",
+    "core:window:allow-internal-toggle-maximize"
   ],
   "platforms": ["macOS"]
 }
@@ -1717,7 +1722,7 @@ Use the one local `office` webview and explicitly select `office-local` through 
 
 Omit remote origins and the `windows` matcher. Window and webview matches are OR, so adding a broad window matcher would widen the grant. Do not add a blanket local deny capability for other windows: the current deny path is origin-wide and can deny the office too. Missing allow rules deny unlisted views. [Capability schema][T_ACL_CAP] [Runtime authority][T_ACL_AUTH]
 
-No generic shell, filesystem, SQL, notification or broad core default permission is needed for these five app commands. The framework's internal Channel transport has its own ownership handling; do not claim the five app permissions replace it or add invented internal Channel permission strings.
+No generic shell, filesystem, SQL, notification or broad core default permission is needed for these five app commands. The two scoped core permissions implement titlebar drag/double-click zoom only ([D-0002](decisions/D-0002-titlebar-drag-permissions.md)). The framework's internal Channel transport has its own ownership handling; do not claim the five app permissions replace it or add invented internal Channel permission strings.
 
 Serve only bundled local frontend assets in production. Cancel external document navigation/new windows in native handlers. Permit only the exact configured dev origin during development; do not authorize arbitrary localhost pages. Open explicit validated external links through native `NSWorkspace`. Apply a restrictive CSP validated with the selected runtime/Three build; use no remote script/CDN assets or renderer secrets.
 
@@ -1769,7 +1774,7 @@ Use `bundle.macOS.files` to copy the complete helper app relative to `Contents`.
 
 Tauri 3 development restarts terminate the application's descendant process tree. Register the development companion from a stable development host bundle with distinct bundle IDs, stores, sockets and service identity; ServiceManagement starts it independently. A Tauri-spawned sidecar or direct shell child does not replace supervision. [CLI lifetime][T5]
 
-The outer app and companion have separate minimal entitlements. Automation belongs on the actual event-sending companion; standard WebKit graphics do not justify blanket unsigned-memory/library-validation exceptions. Direct distribution has no App Sandbox or privileged-helper prerequisite. A stable local signing identity must qualify on Daniel's Mac; Developer ID/notarization belongs to the later public-distribution gate.
+The outer app and companion have separate minimal entitlements. Both carry the qualified Automation entitlement/usage description: the outer app is the TCC consent subject and the companion is the only Apple-event sender ([D-0003](decisions/D-0003-apple-event-consent-attribution.md)). Standard WebKit graphics do not justify blanket unsigned-memory/library-validation exceptions. Direct distribution has no App Sandbox or privileged-helper prerequisite. A stable local signing identity must qualify on Daniel's Mac; Developer ID/notarization belongs to the later public-distribution gate.
 
 Enforce minimum macOS `26.0` in dev preflight and native startup as well as bundle configuration. Dev resources may resolve to source paths while production uses bundle paths, so package acceptance runs with the checkout/dev server unavailable. [Configuration][T7] [Resources][T3]
 
@@ -1792,7 +1797,7 @@ Known reports guide concrete tests. They are not claimed reproductions on alpha.
 
 [Scheme race][T11] [Presented-frame report][T11_FRAMES] [Asset report][T11_ASSETS] [Teardown report][T11_CLOSE] [Transparency report][T11_POWER] [Icon report][T11_ICON]
 
-**M0 is three executable phases, not one prerequisite wall.** M0A proves the pinned shell, independent companion, basic native IPC/storage/notifications and actual WebGPU. M0B immediately proves the real manually launched Claude → session → process incarnation → TTY → exact Terminal tab → Return path, before extended recovery/stress work. M0C then closes every remaining platform obligation. Each phase has its own evidence and exit review; M1 requires the final M0C gate. Bounded spike code is reused, while extensive art and unqualified architecture-dependent features wait. [M0 traceability and phase gates](MILESTONES.md)
+**M0 is three executable phases, not one prerequisite wall.** M0A proves the pinned shell, independent companion, basic native IPC/storage/notifications and actual WebGPU. M0B immediately proves the real manually launched Claude → session → process incarnation → TTY → exact Terminal tab → Return path, before extended recovery/stress work. M0C then closes the remaining platform obligations within the explicit accepted D-0004–D-0006 scope. Each phase has its own evidence and exit review; M1 requires the final M0C gate. Bounded spike code is reused, while extensive art and unqualified architecture-dependent features wait. [M0 traceability and phase gates](MILESTONES.md)
 
 Together the phases preserve all seventeen user-required properties: minimal Tauri 3 build; dev and package launch; request/response IPC; sustained native streaming; native notifications; notification interaction; required macOS execution mechanisms; Terminal inspection/routing; renderer-independent endpoints; SQLite persistence; restart restoration; sleep/wake integrity; WebGPURenderer initialization in the real webview; actual WebGPU backend; sustained packaged animation; native titlebar/window behavior; and no unresolved alpha issue invalidating the core architecture.
 
@@ -1991,7 +1996,7 @@ Required fixture families include:
 - PID reuse, same-PID executable replacement, TTY reuse, terminal restart, moved tabs, changed foreground job and copied stale environment tokens.
 - Duplicate observation/ACK loss, duplicate native occurrence, reordered native steps, incomparable conflicting outcomes and missing observations with/without available history.
 - Five recorded offline Codex outcomes spanning multiple pages; first import versus enrolled-gap recovery; legacy markerless Completed shells, unmatched terminal B attached to legacy start A despite both markers, and normalized Interrupted without terminal markers; repeated/expired cursors; a nonterminal turn ending after its original page was passed.
-- Lower mod middleware returning without core acceptance/spawn, a plugin raising turn.complete with a real turn ID, unqualified host-list results, non-engine lifecycle dispatch, autonomous/upstream-delayed prompt origins, input queued before completion, accepted human follow-up delivered before its earlier completion, and partial mod-batch receipts/retries.
+- Lower mod middleware returning without core acceptance/spawn, synthetic nonengine turn.complete with a real turn ID (direct plugin raises are unavailable on 2.1.291), unqualified host-list results, non-engine lifecycle dispatch, autonomous/upstream-delayed prompt origins, input queued before completion, accepted human follow-up delivered before its earlier completion, and partial mod-batch receipts/retries.
 - Parent-owned child completion, child owner wait, parent completion while child continues and an actually promoted former child whose delayed old completion remains parent-owned.
 - Relay failure, capture timeout, disk full, atomic spool interruption, crash before/after durable commit, migration failure and checkpoint corruption.
 - Channel frame loss/stall, repeated native view recreation/cache cleanup, old-epoch queued actions and query replies, oversized initial snapshots, stale paged rows, renderer reload during a burst and companion restart with UI open.
@@ -2015,7 +2020,7 @@ Graphics evidence comes from the packaged app: actual WebGPU backend, a sustaine
 
 Each milestone stores a manifest with commit, dependency lock hashes, schema/reducer versions, hardware/OS/provider profiles, commands, fixture seeds, expected/actual outcomes, relevant sanitized logs, screenshots/video and timing/memory summaries.
 
-Gate results are `PASS`, `FAIL`, `BLOCKED` or `NOT_SUPPORTED` for an explicitly optional capability. A required gate cannot be passed by relabeling failure as optional. A documented unsupported ChatGPT capability does not fail the Claude MVP; a failed Tauri 3 WebGPU requirement on the intended target does.
+Gate results are `PASS`, `FAIL`, `BLOCKED` or `NOT_SUPPORTED` for an explicitly optional capability. A required gate cannot be passed by relabeling failure as optional. Accepted decisions D-0004–D-0006 define specific profile/facet limits, their preserved native NOT_RUN/BLOCKED/MANUAL_EXTERNAL_REQUIRED status and later closure; they do not certify execution or waive unrelated requirements. Gate PASS applies only to the resulting explicit scope. A documented unsupported ChatGPT capability does not fail the Claude MVP; a failed Tauri 3 WebGPU requirement on the intended target does.
 
 Tests target meaningful invariants and native risks, not every trivial layout detail. Broader repeats occur for changed dependencies, a concrete unresolved risk or a release gate. Once a gate has the required evidence, continue to the next milestone.
 
@@ -2052,7 +2057,7 @@ The following decisions control implementation at the failure boundaries:
 
 ### 22.2 External boundaries that remain explicit
 
-- **Native qualification:** this research has not run macOS builds, AppleEvents, ServiceManagement, notifications or WKWebView WebGPU. M0A/M0B/M0C are the executable gates for the exact candidate on Daniel's Mac.
+- **Native qualification:** M0A/M0B are accepted; M0C remains under a remediation hold recorded in its checklist. Built-in-display qualification does not certify physical external-monitor disconnect/reconnect, deferred to M15 by D-0006. No M1 work begins before G17 passes.
 - **Tauri prerelease drift:** current source supports the architecture, but later alphas may change APIs. Exact locks and the native boundary contain that risk; changes require deliberate regression.
 - **Claude mod compatibility:** the public snapshot and exact installed runtime may differ. Generate/pin installed declarations and qualify callback semantics. Original human-input acceptance and positive original causal order are different capabilities; absent a sufficient order witness, automatic follow-up resolution stays disabled and explicit Mark handled remains available without blocking otherwise qualified native observation.
 - **Codex shared-daemon routing:** the researched public interface lacks a live TUI-client→thread→TTY registry. Preserve lifecycle visibility and explicit pairing/last-known routes; do not claim current-session verification.
