@@ -28,7 +28,7 @@ export THREADSPACE_SIGNING_IDENTITY="$IDENTITY"
 
 echo "==> Threadspace ($CHANNEL) Tauri bundle"
 cd "$ROOT/apps/desktop"
-APPLE_SIGNING_IDENTITY="$IDENTITY" npx --no-install tauri build "${CONFIG[@]}" \
+APPLE_SIGNING_IDENTITY="$IDENTITY" npx --no-install tauri build ${CONFIG[@]+"${CONFIG[@]}"} \
   --target aarch64-apple-darwin --bundles app --features qualification
 
 APP="$ROOT/target/aarch64-apple-darwin/release/bundle/macos/$PRODUCT.app"

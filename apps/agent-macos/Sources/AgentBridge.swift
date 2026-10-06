@@ -113,11 +113,14 @@ enum AgentBridge {
         }
     }
 
-    /// `AEDeterminePermissionToAutomateTarget` under this app's own identity.
+    /// `AEDeterminePermissionToAutomateTarget` under this app's own identity,
+    /// for the exact event the read-only inventory sends: Core Suite "get
+    /// data". A wildcard class/ID only reports status; it is refused at once
+    /// (errAEEventNotPermitted) instead of prompting when consent is needed.
     private static func automationPermission(bundleIdentifier: String, askUser: Bool) -> OSStatus {
         let target = NSAppleEventDescriptor(bundleIdentifier: bundleIdentifier)
         guard let address = target.aeDesc else { return OSStatus(paramErr) }
-        return AEDeterminePermissionToAutomateTarget(address, typeWildCard, typeWildCard, askUser)
+        return AEDeterminePermissionToAutomateTarget(address, AEEventClass(kAECoreSuite), AEEventID(kAEGetData), askUser)
     }
 
     /// The containing application is four levels up:
