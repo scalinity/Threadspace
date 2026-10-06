@@ -23,7 +23,7 @@ Neither declaration file is committed (licensing); the hashes and the excerpts b
 - **native session** — `claude -p --model haiku --plugin-dir <disposable copy of the mod>` with a trivial prompt. Three runs (of the five allowed), each from a disposable directory under `/private/tmp/claude-501/`, removed afterwards. The capture argv reached the copy as its manifest default; no Claude settings file was read or written for it (the debug log states "no pluginConfigs[…] in user, --settings or managed settings … every option is its default").
 - **declaration** — a quoted line of the 2.1.291 declarations.
 
-A stand-in replaces the capture helper in both classes, because `threadspace-hook mod-batch` does not exist before M1/M2: a test `process.run` hook in the kit, and `scratchpad/native/helper.py` (Python, `/usr/bin/python3 -I`) natively.
+A stand-in replaces the capture helper in both classes, because `threadspace-hook mod-batch` does not exist before M1/M2: a test `process.run` hook in the kit, and `harness/helper.py` (Python, `/usr/bin/python3 -I`) natively.
 
 ## Commands
 
@@ -44,6 +44,15 @@ run 3  claude -p … --tools Agent --output-format json "Call the Agent tool exa
 ```
 
 The only edit to saved output is the repository's absolute path, written `<repo>`, and the home directory, written `~`.
+
+### Re-running
+
+The harness that produced this evidence is in `harness/` (qualification-only; it is not part of the mod). Each script takes absolute paths; run with `python3 -I`.
+
+- `run_qual.py <repo> <out-dir>` — the three commands above, raw output to `<out-dir>`.
+- `mutate.py <mod> <scratch-dir>` — applies each listed defect to a scratch copy and runs `claude plugin test` on it (`mutation-check.txt`).
+- `native.py setup <mod> /private/tmp/claude-501/ts-m0c-claude-native-<run>` → `native.py run1|run2|run3 <run-dir>` → `native.py collect <run-dir> <out-dir> <label>` → `native.py cleanup <run-dir>`. `setup` copies the mod without its tests and sets the copy's `captureArgv` default to `helper.py`; it never writes Claude settings. Each `run*` is one `claude -p --model haiku` process. `analyze_run2.py <run-dir> <out.json>` derives the reload figures; `summarize.py <batches.jsonl>` prints a run's records.
+- Afterwards remove the `~/.claude/projects/-private-tmp-claude-501-ts-m0c-claude-native-<run>-work` folder each run leaves (see Native session runs).
 
 ## Results
 
