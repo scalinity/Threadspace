@@ -30,7 +30,7 @@ fn command(ctx: &Ctx, name: &str) -> Value {
 }
 
 fn ax_texts(ctx: &Ctx, pid: u32) -> Vec<String> {
-    ctx.native.json(&["ax-tree", &pid.to_string(), "40"])["nodes"]
+    ctx.native.ax_tree(pid, 40)["nodes"]
         .as_array()
         .map(|nodes| {
             nodes

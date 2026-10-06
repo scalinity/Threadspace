@@ -107,7 +107,9 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     check("fullscreen-enter-exit", full["after"]["fullScreen"] == true && exit["after"]["fullScreen"] == false && state_full == "live" && projection_after_fullscreen["equal"] == true,
         json!({ "enter": full["after"]["fullScreen"], "rendererInFullscreen": state_full, "exit": exit["after"]["fullScreen"], "projectionEqual": projection_after_fullscreen["equal"] }));
 
-    // Keyboard navigation: Tab moves focus through labelled controls.
+    // Keyboard navigation: Tab moves focus through labelled controls. The
+    // focused web element is reported only once WebKit has built its tree.
+    ctx.native.ax_tree(pid, 40);
     ctx.native.ax_action(pid, "raise", Some(TITLE));
     let mut focus_path = Vec::new();
     for _ in 0..10 {
@@ -124,7 +126,7 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     check("keyboard-navigation", distinct.len() >= 5 && reverse_ok, json!({ "path": focus_path, "shiftTabLandsOn": back, "distinctLabelled": distinct.len() }));
 
     // Accessibility tree: every button labelled, regions and headings present.
-    let tree = ctx.native.json(&["ax-tree", &pid.to_string(), "40"]);
+    let tree = ctx.native.ax_tree(pid, 40);
     let nodes = tree["nodes"].as_array().cloned().unwrap_or_default();
     let buttons: Vec<&Value> = nodes.iter().filter(|n| n["role"] == "AXButton").collect();
     let unlabelled: Vec<&&Value> = buttons.iter().filter(|n| n["label"].as_str().is_none_or(str::is_empty)).collect();

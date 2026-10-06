@@ -63,7 +63,9 @@ pub fn spawn_claude(ctx: &Ctx, dir: PathBuf) -> Result<ClaudeTab, String> {
         let _gui = ctx.gui("g08 spawn Claude window")?;
         let tab = Tab::open(dir.clone(), &command)?;
         threadspace_harness::pause_ms(4000);
-        tab.type_line("");
+        // The folder-trust dialog preselects "No, exit" (Claude Code
+        // 2.1.291): Down selects "Yes, I trust this folder", Return confirms.
+        tab.type_line("\u{1b}[B");
         tab
     };
     let cli = cli().ok_or("claude not installed")?;

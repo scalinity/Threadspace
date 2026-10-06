@@ -66,6 +66,25 @@ impl Native {
         self.json(&["idle"])["idleSeconds"].as_f64().unwrap_or(0.0)
     }
 
+    /// The accessibility tree of `pid`. WebKit builds a web view's tree in its
+    /// web process on the first request, which therefore lists only the
+    /// native chrome; this asks again until the web area appears.
+    pub fn ax_tree(&self, pid: u32, depth: u32) -> Value {
+        let (pid, depth) = (pid.to_string(), depth.to_string());
+        let mut tree = Value::Null;
+        for _ in 0..5 {
+            tree = self.json(&["ax-tree", &pid, &depth]);
+            if tree["nodes"]
+                .as_array()
+                .is_some_and(|nodes| nodes.iter().any(|n| n["role"] == "AXWebArea"))
+            {
+                break;
+            }
+            crate::pause_ms(1000);
+        }
+        tree
+    }
+
     pub fn ax_window(&self, pid: u32, title: Option<&str>) -> Value {
         let pid = pid.to_string();
         let mut args = vec!["ax-window", pid.as_str()];
