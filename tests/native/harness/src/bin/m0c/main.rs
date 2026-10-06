@@ -6,9 +6,16 @@
 //!
 //!   threadspace-m0c env <prod|dev>
 //!   threadspace-m0c install <prod|dev> <built-bundle>
+//!   threadspace-m0c g02-packaged <prod|dev> [count]
+//!   threadspace-m0c g02-dev dev [count]
+//!   threadspace-m0c g03-ipc <prod|dev> [rounds]
+//!   threadspace-m0c g04-stream <prod|dev> [count] [duration-ms]
+//!   threadspace-m0c view-recovery <prod|dev> [repeats]
 
+mod bridge_gates;
 mod ctx;
 mod install;
+mod launches;
 
 use std::process::ExitCode;
 
@@ -31,6 +38,13 @@ fn main() -> ExitCode {
     };
     let outcome = match command {
         "env" => Ok(ctx.environment()),
+        "g02-packaged" => launches::packaged(&ctx, number(&args, 2, 10)),
+        "g02-dev" => launches::dev(&ctx, number(&args, 2, 10)),
+        "g03-ipc" => bridge_gates::ipc(&ctx, number(&args, 2, 1000)),
+        "g04-stream" => {
+            bridge_gates::stream(&ctx, number(&args, 2, 10_000), number(&args, 3, 60_000))
+        }
+        "view-recovery" => bridge_gates::recovery(&ctx, number(&args, 2, 10)),
         "install" => match args.get(2) {
             Some(built) => install::install(&ctx, std::path::Path::new(built), &rollback_root()),
             None => Err("install needs the built bundle path".into()),
@@ -54,6 +68,12 @@ fn main() -> ExitCode {
             ExitCode::from(1)
         }
     }
+}
+
+fn number(args: &[String], index: usize, default: u32) -> u32 {
+    args.get(index)
+        .and_then(|value| value.parse().ok())
+        .unwrap_or(default)
 }
 
 /// UTC stamp for directory names.

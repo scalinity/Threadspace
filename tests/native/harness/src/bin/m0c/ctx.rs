@@ -33,6 +33,13 @@ impl Ctx {
         self.repo.join("evidence/M0C")
     }
 
+    pub fn channel_name(&self) -> &'static str {
+        match self.id.channel {
+            threadspace_harness::identity::Channel::Prod => "prod",
+            threadspace_harness::identity::Channel::Dev => "dev",
+        }
+    }
+
     pub fn app(&self) -> App<'_> {
         App::new(&self.id)
     }

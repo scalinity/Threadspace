@@ -24,6 +24,9 @@ pub struct LaunchOptions {
     /// Qualification builds only: open an unauthorized second view to prove
     /// the capability refuses it.
     pub qualify_acl_probe: bool,
+    /// Qualification builds only: open a view on this loopback HTTP URL to
+    /// prove a remote origin cannot reach the bridge commands.
+    pub qualify_origin_probe: Option<String>,
 }
 
 impl LaunchOptions {
@@ -41,6 +44,16 @@ impl LaunchOptions {
                 "--qualify-ipc" if cfg!(feature = "qualification") => options.qualify_ipc = true,
                 "--qualify-acl-probe" if cfg!(feature = "qualification") => {
                     options.qualify_acl_probe = true
+                }
+                probe
+                    if cfg!(feature = "qualification")
+                        && probe.starts_with("--qualify-origin-probe=") =>
+                {
+                    let url = &probe["--qualify-origin-probe=".len()..];
+                    // Loopback only: the probe never loads anything off-machine.
+                    if url.starts_with("http://127.0.0.1:") {
+                        options.qualify_origin_probe = Some(url.to_owned());
+                    }
                 }
                 // Unknown arguments (for example Finder's legacy -psn_*) are ignored.
                 _ => {}

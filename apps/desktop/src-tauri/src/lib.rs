@@ -94,6 +94,10 @@ pub fn main_entry() -> i32 {
             if setup_launch.qualify_acl_probe {
                 qualification::open_acl_probe(app.handle(), &setup_launch)?;
             }
+            #[cfg(feature = "qualification")]
+            if let Some(url) = &setup_launch.qualify_origin_probe {
+                qualification::open_origin_probe(app.handle(), url)?;
+            }
             let heartbeat = Arc::downgrade(&setup_bridge);
             let heartbeat_app = app.handle().clone();
             thread::Builder::new()

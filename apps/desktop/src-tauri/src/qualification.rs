@@ -16,6 +16,8 @@ use crate::window::navigation_allowed;
 const REPORT_MAX_BYTES: usize = 64 * 1024;
 pub const PROBE_LABEL: &str = "acl-probe";
 const PROBE_TITLE_PREFIX: &str = "ACL-PROBE:";
+pub const ORIGIN_PROBE_LABEL: &str = "origin-probe";
+const ORIGIN_TITLE_PREFIX: &str = "ORIGIN-PROBE:";
 /// Keeps two reports of one kind in the same millisecond from colliding.
 static REPORT_SEQUENCE: AtomicU64 = AtomicU64::new(1);
 
@@ -85,6 +87,32 @@ pub fn open_acl_probe<R: Runtime>(app: &AppHandle<R>, launch: &LaunchOptions) ->
                 let value = serde_json::from_str(payload)
                     .unwrap_or_else(|_| Value::String(payload.to_owned()));
                 let _ = record(&handle, "acl-probe", &value);
+                let _ = window.destroy();
+            }
+        })
+        .build()?;
+    Ok(())
+}
+
+/// Opens a hidden view on a loopback HTTP page the harness serves. That page
+/// tries the bridge commands from a non-local origin and reports the outcome
+/// through its title. The view's own navigation is limited to that origin.
+pub fn open_origin_probe<R: Runtime>(app: &AppHandle<R>, url: &str) -> tauri::Result<()> {
+    let handle = app.clone();
+    let parsed: tauri::Url = url
+        .parse()
+        .map_err(|_| tauri::Error::InvalidWebviewUrl("origin probe URL"))?;
+    let origin = parsed.origin().ascii_serialization();
+    WebviewWindowBuilder::new(app, ORIGIN_PROBE_LABEL, WebviewUrl::External(parsed))
+        .title("Threadspace origin probe")
+        .inner_size(480.0, 320.0)
+        .visible(false)
+        .on_navigation(move |target| target.origin().ascii_serialization() == origin)
+        .on_document_title_changed(move |window, title| {
+            if let Some(payload) = title.strip_prefix(ORIGIN_TITLE_PREFIX) {
+                let value = serde_json::from_str(payload)
+                    .unwrap_or_else(|_| Value::String(payload.to_owned()));
+                let _ = record(&handle, "origin-probe", &value);
                 let _ = window.destroy();
             }
         })

@@ -188,7 +188,7 @@ export class BridgeClient {
    * Qualification-only stream faults (inert unless `launch.qualificationBuild`):
    * drop frames as though lost in transit, withhold or delay ACKs.
    */
-  readonly faults = { dropFrames: "none" as "none" | "next" | "all", withholdAcks: false, ackDelayMs: 0, dropped: 0 };
+  readonly faults = { dropFrames: "none" as "none" | "next" | "all", withholdAcks: false, ackDelayMs: 0, stallNext: false, dropped: 0 };
   private qualificationHandler: QualificationHandler | null = null;
   private pagingEpoch: string | null = null;
 
@@ -218,6 +218,11 @@ export class BridgeClient {
       if (document.visibilityState === "visible") void this.revalidate("view became visible");
     });
     void this.connect("initial connection");
+  }
+
+  /** Qualification builds only: resubscribe as after a detected stream fault. */
+  qualificationReconnect(reason: string): void {
+    if (launch.qualificationBuild) this.reconnect(reason);
   }
 
   /** Qualification builds only: receives QualificationCommand intents. */
@@ -262,6 +267,11 @@ export class BridgeClient {
     }
     this.teardown();
     this.ackedThrough = 0;
+    // An injected stream fault belongs to the stream it broke; a new Channel
+    // is a new stream. `stallNext` withholds ACKs on exactly one new stream.
+    this.faults.dropFrames = "none";
+    this.faults.withholdAcks = this.faults.stallNext;
+    this.faults.stallNext = false;
     const attempt = ++this.attempts;
     const viewEpoch = crypto.randomUUID();
     const channel = new Channel<unknown>();

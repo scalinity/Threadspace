@@ -229,7 +229,12 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
       case "ack-mode":
         client.faults.withholdAcks = input.withhold === true;
         client.faults.ackDelayMs = typeof input.delayMs === "number" ? input.delayMs : 0;
+        client.faults.stallNext = input.stallNext === true;
         return { ...client.faults };
+      case "reconnect":
+        // A renderer-initiated resubscription, as after a detected gap.
+        client.qualificationReconnect(typeof input.reason === "string" ? input.reason : "qualification reconnect");
+        return { reconnecting: true };
       case "reload":
         setTimeout(() => location.reload(), 50);
         return { reloading: true };
