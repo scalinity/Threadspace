@@ -1,12 +1,17 @@
 //! Kernel process incarnation evidence (SPEC §4.2, §4.5). A ProcessKey is
-//! endpoint + boot + PID + kernel birth; PID alone is never identity.
+//! endpoint + boot + PID + kernel birth; PID alone is never identity, and the
+//! executable is a separate axis because `exec` keeps both PID and birth.
 
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::mem::{MaybeUninit, size_of};
 use std::path::PathBuf;
 
 /// `e_tdev` value meaning "no controlling terminal".
 const NODEV: u32 = u32::MAX;
+/// `pbi_status` for a stopped (suspended or traced) process.
+pub const SSTOP: u32 = 4;
+/// `pbi_status` for a zombie awaiting collection.
+pub const SZOMB: u32 = 5;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessSample {
@@ -18,7 +23,10 @@ pub struct ProcessSample {
     /// Controlling-device number (`e_tdev`); `None` for no controlling terminal.
     pub controlling_device: Option<u32>,
     pub pgid: u32,
+    /// Foreground process group of the controlling terminal (`e_tpgid`).
     pub tpgid: u32,
+    /// Kernel process state (`pbi_status`: SIDL/SRUN/SSLEEP/SSTOP/SZOMB).
+    pub status: u32,
     pub comm: String,
 }
 
@@ -29,11 +37,68 @@ impl ProcessSample {
             && self.start_seconds == other.start_seconds
             && self.start_microseconds == other.start_microseconds
     }
+
+    /// The process group owns its controlling terminal's foreground.
+    pub fn is_terminal_foreground(&self) -> bool {
+        self.controlling_device.is_some() && self.tpgid != 0 && self.tpgid == self.pgid
+    }
+
+    pub fn is_stopped(&self) -> bool {
+        self.status == SSTOP
+    }
+
+    /// Kernel birth as microseconds since the epoch, for ordering checks.
+    pub fn birth_micros(&self) -> u128 {
+        u128::from(self.start_seconds) * 1_000_000 + u128::from(self.start_microseconds)
+    }
 }
 
-#[derive(Debug)]
+/// The running image: the kernel's executable path plus the file identity
+/// found at that path. A changed path, name or file is a replaced executable.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExecutableIdentity {
+    pub path: String,
+    /// `dev:ino` of the file at `path` when sampled; `None` if it was unlinked.
+    pub file_id: Option<String>,
+}
+
+impl ExecutableIdentity {
+    /// Canonical single-string form stored with a process incarnation.
+    pub fn canonical(&self) -> String {
+        match &self.file_id {
+            Some(file_id) => format!("{}#{file_id}", self.path),
+            None => format!("{}#unlinked", self.path),
+        }
+    }
+}
+
+/// One incarnation sample: kernel BSD info and the executable read inside a
+/// birth-checked bracket, so both belong to the same process.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Incarnation {
+    pub sample: ProcessSample,
+    pub executable: ExecutableIdentity,
+}
+
+impl Incarnation {
+    /// Same process incarnation running the same executable.
+    pub fn same_process_and_image(&self, other: &Incarnation) -> bool {
+        self.sample.same_incarnation(&other.sample) && self.executable == other.executable
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProcessError {
-    /// The process does not exist or the kernel refused the read.
+    /// No such process (`ESRCH`): it exited or never existed.
+    Vanished {
+        pid: i32,
+    },
+    /// The kernel refused the read (`EPERM`).
+    Denied {
+        pid: i32,
+        errno: i32,
+    },
+    /// Any other failed read.
     Unavailable {
         pid: i32,
         errno: i32,
@@ -43,20 +108,43 @@ pub enum ProcessError {
         pid: i32,
         bytes: i32,
     },
+    /// The PID's incarnation changed between the reads of one sample.
+    ChangedDuringCapture {
+        pid: i32,
+    },
     Sysctl {
         name: &'static str,
         errno: i32,
     },
 }
 
+impl ProcessError {
+    /// Stable code for evidence records.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::Vanished { .. } => "PROCESS_VANISHED",
+            Self::Denied { .. } => "PROCESS_READ_DENIED",
+            Self::Unavailable { .. } => "PROCESS_UNAVAILABLE",
+            Self::ShortRead { .. } => "PROCESS_SHORT_READ",
+            Self::ChangedDuringCapture { .. } => "PROCESS_CHANGED_DURING_CAPTURE",
+            Self::Sysctl { .. } => "SYSCTL_FAILED",
+        }
+    }
+}
+
 impl std::fmt::Display for ProcessError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Vanished { pid } => write!(f, "process {pid} vanished"),
+            Self::Denied { pid, errno } => write!(f, "process {pid} read denied (errno {errno})"),
             Self::Unavailable { pid, errno } => {
                 write!(f, "process {pid} unavailable (errno {errno})")
             }
             Self::ShortRead { pid, bytes } => {
                 write!(f, "process {pid}: short proc_pidinfo read ({bytes} bytes)")
+            }
+            Self::ChangedDuringCapture { pid } => {
+                write!(f, "process {pid} changed incarnation during capture")
             }
             Self::Sysctl { name, errno } => write!(f, "sysctl {name} failed (errno {errno})"),
         }
@@ -69,9 +157,20 @@ fn errno() -> i32 {
     std::io::Error::last_os_error().raw_os_error().unwrap_or(0)
 }
 
+fn read_error(pid: i32, errno: i32) -> ProcessError {
+    match errno {
+        libc::ESRCH => ProcessError::Vanished { pid },
+        libc::EPERM => ProcessError::Denied { pid, errno },
+        _ => ProcessError::Unavailable { pid, errno },
+    }
+}
+
 /// Samples `proc_pidinfo(PROC_PIDTBSDINFO)`, requiring the exact structure
 /// length; denied or short reads leave the evidence unavailable.
 pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
+    if pid <= 0 {
+        return Err(ProcessError::Vanished { pid });
+    }
     let mut info = MaybeUninit::<libc::proc_bsdinfo>::zeroed();
     let expected = size_of::<libc::proc_bsdinfo>() as i32;
     // SAFETY: the buffer is a properly aligned, zeroed `proc_bsdinfo` of the
@@ -86,10 +185,7 @@ pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
         )
     };
     if bytes <= 0 {
-        return Err(ProcessError::Unavailable {
-            pid,
-            errno: errno(),
-        });
+        return Err(read_error(pid, errno()));
     }
     if bytes != expected {
         return Err(ProcessError::ShortRead { pid, bytes });
@@ -109,6 +205,7 @@ pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
         controlling_device: (info.e_tdev != NODEV).then_some(info.e_tdev),
         pgid: info.pbi_pgid,
         tpgid: info.e_tpgid,
+        status: info.pbi_status,
         comm,
     })
 }
@@ -120,13 +217,45 @@ pub fn executable_path(pid: i32) -> Result<PathBuf, ProcessError> {
     let length =
         unsafe { libc::proc_pidpath(pid, buffer.as_mut_ptr().cast(), buffer.len() as u32) };
     if length <= 0 {
-        return Err(ProcessError::Unavailable {
-            pid,
-            errno: errno(),
-        });
+        return Err(read_error(pid, errno()));
     }
     buffer.truncate(length as usize);
     Ok(PathBuf::from(String::from_utf8_lossy(&buffer).into_owned()))
+}
+
+/// `dev:ino` of the file currently at `path`, or `None` if it cannot be stat'ed.
+fn file_id(path: &str) -> Option<String> {
+    let text = CString::new(path).ok()?;
+    let mut status = MaybeUninit::<libc::stat>::zeroed();
+    // SAFETY: `text` is NUL-terminated and `status` is writable.
+    let rc = unsafe { libc::stat(text.as_ptr(), status.as_mut_ptr()) };
+    if rc != 0 {
+        return None;
+    }
+    // SAFETY: `stat` succeeded and filled the structure.
+    let status = unsafe { status.assume_init() };
+    Some(format!("{}:{}", status.st_dev as u32, status.st_ino))
+}
+
+pub fn executable_identity(pid: i32) -> Result<ExecutableIdentity, ProcessError> {
+    let path = executable_path(pid)?.display().to_string();
+    let file_id = file_id(&path);
+    Ok(ExecutableIdentity { path, file_id })
+}
+
+/// Samples one incarnation: BSD info, executable, BSD info again. A changed
+/// birth between the two reads means the PID was reused mid-capture.
+pub fn sample_incarnation(pid: i32) -> Result<Incarnation, ProcessError> {
+    let first = sample(pid)?;
+    let executable = executable_identity(pid)?;
+    let second = sample(pid)?;
+    if !first.same_incarnation(&second) {
+        return Err(ProcessError::ChangedDuringCapture { pid });
+    }
+    Ok(Incarnation {
+        sample: second,
+        executable,
+    })
 }
 
 /// The kernel boot-session UUID (`kern.bootsessionuuid`); ProcessKeys from
@@ -228,6 +357,8 @@ pub fn meets_minimum_macos() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::process::{Command, Stdio};
+    use std::time::{Duration, Instant};
 
     #[test]
     fn samples_this_process() {
@@ -238,14 +369,64 @@ mod tests {
         assert!(first.same_incarnation(&second));
         assert!(first.start_seconds > 0);
         assert!(executable_path(pid).expect("path").is_absolute());
+        let incarnation = sample_incarnation(pid).expect("incarnation");
+        assert!(incarnation.executable.file_id.is_some());
+        assert!(incarnation.executable.canonical().contains('#'));
     }
 
     #[test]
-    fn missing_process_is_unavailable() {
-        assert!(matches!(
+    fn missing_process_is_vanished() {
+        assert_eq!(
             sample(i32::MAX - 1),
-            Err(ProcessError::Unavailable { .. })
-        ));
+            Err(ProcessError::Vanished { pid: i32::MAX - 1 })
+        );
+        assert!(matches!(sample(0), Err(ProcessError::Vanished { .. })));
+    }
+
+    #[test]
+    fn launchd_has_no_controlling_terminal() {
+        // PID 1 may be unreadable for an unprivileged caller; if readable it
+        // must report NODEV as no controlling device rather than a number.
+        if let Ok(launchd) = sample(1) {
+            assert_eq!(launchd.controlling_device, None);
+            assert!(!launchd.is_terminal_foreground());
+        }
+    }
+
+    /// Native kernel evidence for SPEC §4.2: `exec` keeps the PID and kernel
+    /// birth but changes the executable, so the image must be revalidated.
+    #[test]
+    fn exec_keeps_pid_and_birth_but_changes_the_executable() {
+        let mut child = Command::new("/bin/sh")
+            .arg("-c")
+            .arg("read line; exec /bin/sleep 5")
+            .stdin(Stdio::piped())
+            .spawn()
+            .expect("spawn");
+        let pid = child.id() as i32;
+        let before = sample_incarnation(pid).expect("before exec");
+        assert!(before.executable.path.ends_with("/sh"), "{before:?}");
+        {
+            use std::io::Write;
+            let mut stdin = child.stdin.take().expect("stdin");
+            stdin.write_all(b"go\n").expect("release");
+        }
+        let deadline = Instant::now() + Duration::from_secs(3);
+        let after = loop {
+            let now = sample_incarnation(pid).expect("after exec");
+            if now.executable.path.ends_with("/sleep") || Instant::now() > deadline {
+                break now;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        let _ = child.kill();
+        let _ = child.wait();
+        assert!(
+            before.sample.same_incarnation(&after.sample),
+            "same PID and birth"
+        );
+        assert_ne!(before.executable, after.executable, "image replaced");
+        assert!(!before.same_process_and_image(&after));
     }
 
     #[test]

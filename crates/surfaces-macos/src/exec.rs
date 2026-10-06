@@ -1,6 +1,7 @@
 //! Bounded argv subprocess execution (SPEC §13.3, §19.3): an absolute program
 //! path, argument vector without a shell, bounded stdin/stdout/stderr, a hard
-//! timeout and a recorded exit status. Values are always data arguments.
+//! timeout and a recorded exit status. Values are always data arguments, and
+//! the environment is cleared except for an explicit allowlist.
 
 use std::ffi::OsString;
 use std::io::{Read, Write};
@@ -13,6 +14,8 @@ use std::time::{Duration, Instant};
 pub struct BoundedCommand {
     pub program: PathBuf,
     pub args: Vec<OsString>,
+    /// Explicit environment; everything else is cleared.
+    pub env: Vec<(OsString, OsString)>,
     pub stdin: Option<Vec<u8>>,
     pub timeout: Duration,
     pub max_output_bytes: usize,
@@ -23,6 +26,7 @@ impl BoundedCommand {
         Self {
             program: program.into(),
             args: Vec::new(),
+            env: Vec::new(),
             stdin: None,
             timeout,
             max_output_bytes,
@@ -33,10 +37,17 @@ impl BoundedCommand {
         self.args.push(value.into());
         self
     }
+
+    pub fn env(mut self, key: impl Into<OsString>, value: impl Into<OsString>) -> Self {
+        self.env.push((key.into(), value.into()));
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BoundedOutput {
+    /// PID of the spawned child (evidence of which process did the work).
+    pub pid: u32,
     /// Exit code; `None` when killed by a signal (including timeout).
     pub status: Option<i32>,
     pub stdout: Vec<u8>,
@@ -110,6 +121,7 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
         .args(&command.args)
         .env_clear()
         .env("LANG", "en_US.UTF-8")
+        .envs(command.env.iter().map(|(key, value)| (key, value)))
         .stdin(if command.stdin.is_some() {
             Stdio::piped()
         } else {
@@ -119,6 +131,7 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
         .stderr(Stdio::piped())
         .spawn()
         .map_err(ExecError::Spawn)?;
+    let pid = child.id();
 
     if let (Some(input), Some(mut pipe)) = (command.stdin.clone(), child.stdin.take()) {
         thread::spawn(move || {
@@ -155,6 +168,7 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
     let (stdout, stdout_truncated) = join(stdout);
     let (stderr, stderr_truncated) = join(stderr);
     Ok(BoundedOutput {
+        pid,
         status: status.code(),
         stdout,
         stderr,
@@ -176,8 +190,25 @@ mod tests {
         )
         .expect("run");
         assert!(output.succeeded());
+        assert!(output.pid > 0);
         // The argument is data: shell metacharacters reach the program verbatim.
         assert_eq!(output.stdout, b"hello; rm -rf /\n");
+    }
+
+    #[test]
+    fn environment_is_cleared_except_the_allowlist() {
+        let output = run_bounded(
+            &BoundedCommand::new("/usr/bin/env", Duration::from_secs(2), 4096)
+                .env("HOME", "/nowhere"),
+        )
+        .expect("run");
+        let text = String::from_utf8_lossy(&output.stdout);
+        let mut keys: Vec<&str> = text
+            .lines()
+            .filter_map(|line| line.split('=').next())
+            .collect();
+        keys.sort_unstable();
+        assert_eq!(keys, vec!["HOME", "LANG"], "{text}");
     }
 
     #[test]

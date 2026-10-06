@@ -127,8 +127,8 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
     let automation = classify_automation(status);
     let inventory = if running && automation == AutomationPermission::Authorized {
         let script = context.resources_dir.join("terminal-inventory.applescript");
-        match terminal::inventory(&script) {
-            Ok(summary) => Some(summary),
+        match terminal::enumerate(&script) {
+            Ok(tabs) => Some(tabs.summary()),
             Err(error) => {
                 log::warn(
                     "TERMINAL_INVENTORY_FAILED",
