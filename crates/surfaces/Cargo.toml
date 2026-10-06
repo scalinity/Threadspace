@@ -1,0 +1,16 @@
+[package]
+name = "threadspace-surfaces"
+description = "Return-to-Agent route model: the exact-surface, current-session and readiness decision over native evidence (SPEC §13)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-contracts.workspace = true
+threadspace-surfaces-macos.workspace = true
+threadspace-provider-claude.workspace = true
+
+[lints]
+workspace = true

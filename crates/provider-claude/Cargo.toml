@@ -1,0 +1,17 @@
+[package]
+name = "threadspace-provider-claude"
+description = "Claude CLI native inventory, bracketed session-to-process joins and reconciliation planning (SPEC §4.4, §11.3)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-contracts.workspace = true
+threadspace-surfaces-macos.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

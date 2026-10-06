@@ -4,6 +4,8 @@ members = [
   "crates/contracts",
   "crates/journal",
   "crates/surfaces-macos",
+  "crates/surfaces",
+  "crates/provider-claude",
   "crates/relay",
   "apps/agent-macos/core",
   "apps/desktop/src-tauri",
@@ -43,6 +45,8 @@ threadspace-contracts = { path = "crates/contracts" }
 threadspace-journal = { path = "crates/journal" }
 threadspace-relay = { path = "crates/relay" }
 threadspace-surfaces-macos = { path = "crates/surfaces-macos" }
+threadspace-surfaces = { path = "crates/surfaces" }
+threadspace-provider-claude = { path = "crates/provider-claude" }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"

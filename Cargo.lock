@@ -3484,6 +3484,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "threadspace-provider-claude"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "threadspace-contracts",
+ "threadspace-surfaces-macos",
+]
+
+[[package]]
 name = "threadspace-qualify"
 version = "0.1.0"
 dependencies = [
@@ -3503,6 +3513,15 @@ dependencies = [
  "threadspace-contracts",
  "threadspace-surfaces-macos",
  "uuid",
+]
+
+[[package]]
+name = "threadspace-surfaces"
+version = "0.1.0"
+dependencies = [
+ "threadspace-contracts",
+ "threadspace-provider-claude",
+ "threadspace-surfaces-macos",
 ]
 
 [[package]]
