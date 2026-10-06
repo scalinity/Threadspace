@@ -9,6 +9,8 @@ mod commands;
 mod diagnostics;
 mod incarnation;
 mod launch;
+#[cfg(test)]
+mod mock_ipc_tests;
 #[cfg(feature = "qualification")]
 mod qualification;
 mod window;
@@ -61,13 +63,15 @@ pub fn main_entry() -> i32 {
                 qualification::open_acl_probe(app.handle(), &setup_launch)?;
             }
             let heartbeat = Arc::downgrade(&setup_bridge);
-            thread::Builder::new().name("bridge-heartbeat".into()).spawn(move || {
-                while let Some(bridge) = heartbeat.upgrade() {
-                    bridge.heartbeat_tick();
-                    drop(bridge);
-                    thread::sleep(Duration::from_millis(u64::from(HEARTBEAT_INTERVAL_MS)));
-                }
-            })?;
+            thread::Builder::new()
+                .name("bridge-heartbeat".into())
+                .spawn(move || {
+                    while let Some(bridge) = heartbeat.upgrade() {
+                        bridge.heartbeat_tick();
+                        drop(bridge);
+                        thread::sleep(Duration::from_millis(u64::from(HEARTBEAT_INTERVAL_MS)));
+                    }
+                })?;
             Ok(())
         })
         .build(context)
@@ -75,7 +79,11 @@ pub fn main_entry() -> i32 {
 
     let reopen_bridge = Arc::clone(&bridge);
     app.run(move |handle, event| {
-        if let RunEvent::Reopen { has_visible_windows: false, .. } = event {
+        if let RunEvent::Reopen {
+            has_visible_windows: false,
+            ..
+        } = event
+        {
             match handle.get_webview_window(window::OFFICE_LABEL) {
                 Some(office) => {
                     let _ = office.unminimize();

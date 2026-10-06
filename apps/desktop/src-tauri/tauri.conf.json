@@ -13,22 +13,33 @@
     "windows": [],
     "withGlobalTauri": false,
     "security": {
-      "capabilities": ["office-local"],
+      "capabilities": [
+        "office-local"
+      ],
       "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'",
       "devCsp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost ws://localhost:1420; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'"
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["app"],
+    "targets": [
+      "app"
+    ],
     "category": "public.app-category.developer-tools",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns"
+    ],
     "macOS": {
       "minimumSystemVersion": "26.0",
       "hardenedRuntime": true,
       "files": {
         "Library/LoginItems/ThreadspaceAgent.app": "../../agent-macos/build/prod/ThreadspaceAgent.app"
-      }
+      },
+      "infoPlist": "Info.plist",
+      "entitlements": "Threadspace.entitlements"
     }
   }
 }
