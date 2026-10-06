@@ -1,0 +1,16 @@
+## before dev restart 2026-10-06T06:04:50Z
+94156     1 Tue Oct  6 02:04:06 2026     ai.scalinity.threadspace.dev.agent
+94240     1 Tue Oct  6 02:04:11 2026     ai.scalinity.threadspace.agent
+94616 94453 Tue Oct  6 02:04:32 2026     ~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop
+## after tauri dev rebuild-restart (ui 94616 -> 95051) 2026-10-06T06:05:02Z
+94156     1 Tue Oct  6 02:04:06 2026     ai.scalinity.threadspace.dev.agent
+94240     1 Tue Oct  6 02:04:11 2026     ai.scalinity.threadspace.agent
+95051 94453 Tue Oct  6 02:04:51 2026     ~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop
+companion log after restart:
+{"connectionId":2,"event":"CLIENT_CONNECTED","level":"info","peerExecutable":"~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop","peerPid":95051,"peerStart
+{"event":"VIEW_HYDRATED","level":"info","pendingIntents":0,"pid":94156,"subscriptionId":"fe222d5a-9ee6-44f1-8bfe-51b2ff5e275b","ts":1791266693402}
+## after stopping tauri dev, vite and the dev UI 2026-10-06T06:05:06Z
+94156     1 Tue Oct  6 02:04:06 2026     ai.scalinity.threadspace.dev.agent
+94240     1 Tue Oct  6 02:04:11 2026     ai.scalinity.threadspace.agent
+port 1420 listeners: 0
+companion answers with no UI: ok True pid 94156 cursor 7

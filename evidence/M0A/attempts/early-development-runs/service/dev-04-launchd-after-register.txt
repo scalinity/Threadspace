@@ -1,0 +1,64 @@
+# captured 2026-10-06T05:10:20Z
+## ps (pid ppid lstart comm)
+25797     1 Tue Oct  6 01:09:53 2026     ai.scalinity.threadspace.dev.agent
+## launchctl print gui/<uid>/ai.scalinity.threadspace.dev.agent
+gui/501/ai.scalinity.threadspace.dev.agent = {
+	active count = 3
+	path = (submitted by smd.44293)
+	type = Submitted
+	managed_by = com.apple.xpc.ServiceManagement
+	state = running
+	program identifier = ai.scalinity.threadspace.dev.agent (mode: 1)
+	parent bundle identifier = ai.scalinity.threadspace.dev
+	parent bundle version = 0.1.0
+	BTM uuid = 2A08E406-305E-4406-B265-5EFECB9DAE87
+	inherited environment = {
+		SSH_AUTH_SOCK => /var/run/com.apple.launchd.heGHuMqlqk/Listeners
+	}
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+	environment = {
+		OSLogRateLimit => 64
+		XPC_SERVICE_NAME => ai.scalinity.threadspace.dev.agent
+	}
+	LWCR = {
+		"reqs" => {
+			"signing-identifier" => "ai.scalinity.threadspace.dev.agent"
+			"validation-category" => 3
+			"team-identifier" => "25H5DDPKAC"
+		}
+		"vers" => 1
+		"comp" => 1
+		"ccat" => 0
+	}
+	domain = gui/501 [100020]
+	asid = 100020
+	minimum runtime = 10
+	exit timeout = 5
+	runs = 1
+	pid = 25797
+	immediate reason = semaphore
+	forks = 0
+	execs = 1
+	initialized = 1
+	trampolined = 1
+	started suspended = 0
+	proxy started suspended = 0
+	checked allocations = 0 (queried = 1)
+	checked allocations reason = no host
+	checked allocations flags = 0x0
+	last exit code = (never exited)
+	semaphores = {
+		successful exit => 0
+	}
+	endpoints = {
+		"ai.scalinity.threadspace.dev.agent" = {
+			port = 0x11b357
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 0
+		}
+	}

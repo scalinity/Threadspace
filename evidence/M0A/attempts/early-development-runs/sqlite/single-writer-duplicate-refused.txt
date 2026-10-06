@@ -1,0 +1,8 @@
+# duplicate companion while the system-started writer runs 2026-10-06T05:18:59Z
+system-started writer: 30420 Tue Oct  6 01:16:53 2026     ai.scalinity.threadspace.agent
+manual duplicate pid 31479 exit status: 75
+## companion log lines from the duplicate
+{"bundleIdentifier":"ai.scalinity.threadspace.agent","bundlePath":"~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app","event":"CORE_START","level":"info","pid":31479,"qualificationBuild":true,"ts":1791263939533}
+{"event":"WRITER_LOCK_HELD","level":"warn","pid":31479,"ts":1791263939533}
+## system-started writer still serving
+ok True pid 30420 cursor 3

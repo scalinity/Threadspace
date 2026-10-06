@@ -1,0 +1,24 @@
+## before dev restart 2026-10-06T05:15:31Z
+25797     1 Tue Oct  6 01:09:53 2026     ai.scalinity.threadspace.dev.agent
+26565 26455 Tue Oct  6 01:10:50 2026     ~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop
+## after dev restart (ui 26565 -> 29292) 2026-10-06T05:15:41Z
+25797     1 Tue Oct  6 01:09:53 2026     ai.scalinity.threadspace.dev.agent
+29292 26455 Tue Oct  6 01:15:33 2026     ~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop
+## companion log tail
+{"cursor":2,"event":"VIEW_ATTACHED","level":"info","pid":25797,"subscriptionId":"556102f7-b907-4a83-abbc-4339ffc6eb4b","ts":1791263735752}
+{"event":"VIEW_HYDRATED","level":"info","pendingIntents":0,"pid":25797,"subscriptionId":"556102f7-b907-4a83-abbc-4339ffc6eb4b","ts":1791263735770}
+{"automation":"REQUIRES_CONSENT","automationStatus":-1744,"dictionarySha256":"cd4dad3e8717922a6e8712638e7bdd0d607054b391f9e7e6993de2700fa233f4","event":"INTEGRATION_STATUS","inventoryTabs":null,"level":"info","pid":25797,"terminalRunning":true,"ts":1791263735831}
+{"commandId":"04f409c5-1be1-4082-83bd-d67cdd6fecf8","cursor":"3","event":"OWNER_COMMAND_RECEIPT","level":"info","pid":25797,"status":"COMMITTED","ts":1791263735847}
+{"cursor":"3","event":"PATCH_BROADCAST","level":"info","pid":25797,"ts":1791263735847,"views":1}
+{"commandId":"04f409c5-1be1-4082-83bd-d67cdd6fecf8","cursor":"3","event":"OWNER_COMMAND_RECEIPT","level":"info","pid":25797,"status":"ALREADY_COMMITTED","ts":1791263735848}
+## after stopping tauri dev entirely 2026-10-06T05:15:54Z
+25797     1 Tue Oct  6 01:09:53 2026     ai.scalinity.threadspace.dev.agent
+29292     1 Tue Oct  6 01:15:33 2026     ~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop
+companion answers with no UI: ok True pid 25797 cursor 3
+## after terminating the dev UI process 29292 2026-10-06T05:16:06Z
+25797     1 Tue Oct  6 01:09:53 2026     ai.scalinity.threadspace.dev.agent
+companion answers with no UI process: ok True pid 25797 cursor 3
+## companion log tail
+{"connectionId":5,"event":"CLIENT_CONNECTED","level":"info","peerExecutable":"~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/release/threadspace-qualify","peerPid":29645,"peerSta
+{"cursor":3,"event":"VIEW_ATTACHED","level":"info","pid":25797,"subscriptionId":"d41a0793-d04e-40dd-89d4-7da818101860","ts":1791263766379}
+{"connectionId":5,"event":"CLIENT_DISCONNECTED","level":"info","pid":25797,"ts":1791263766379}

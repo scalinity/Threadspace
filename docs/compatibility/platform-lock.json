@@ -1,0 +1,266 @@
+{
+  "schema": 1,
+  "milestone": "M0A",
+  "status": "Qualification candidate exercised on the target Mac; see evidence/M0A/manifest.json for gate results.",
+  "applicationCommit": "73283ef6fae2ea388da2e707809a24dda54b960c",
+  "machine": {
+    "os": "macOS",
+    "productVersion": "27.2",
+    "buildVersion": "26B5091g",
+    "architecture": "arm64",
+    "hardwareModel": "Mac17,8",
+    "chip": "Apple M5 Pro",
+    "memoryGiB": 48,
+    "deploymentFloor": "26.0"
+  },
+  "toolchain": {
+    "xcode": "Xcode 27.0 Build version 27A5218g",
+    "sdk": "macosx 27.0 (26A5378i)",
+    "swift": "swift-driver version: 1.168.4 Apple Swift version 6.4 (swiftlang-6.4.0.25.4 clang-2100.3.25.1)",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "rustTarget": "aarch64-apple-darwin",
+    "rustEdition": "2024",
+    "rustToolchainFile": "rust-toolchain.toml (1.99.0)",
+    "node": "v26.10.0",
+    "npm": "12.2.0",
+    "macosxDeploymentTarget": "26.0"
+  },
+  "tauri": {
+    "sourceRef": "a8703ee487c659efbebb27c799752d523a6d09a1",
+    "crates": {
+      "tauri": "3.0.0-alpha.4",
+      "tauri-runtime-wry": "3.0.0-alpha.4",
+      "tauri-build": "3.0.0-alpha.3",
+      "tauri-runtime": "3.0.0-alpha.3",
+      "tauri-utils": "3.0.0-alpha.3",
+      "tauri-macros": "3.0.0-alpha.3",
+      "tauri-codegen": "3.0.0-alpha.3",
+      "wry": "0.57.0",
+      "tao": "0.37.0"
+    },
+    "tauriFeatures": "default-features = false, features = [compression] (static ACL, no dynamic-acl)",
+    "runtimeSelection": ".runtime(tauri_runtime_wry::Wry::default())",
+    "cli": {
+      "npm": "@tauri-apps/cli 3.0.0-alpha.4",
+      "nativeBinary": "@tauri-apps/cli-darwin-arm64 3.0.0-alpha.4",
+      "resolvedBundler": "tauri-bundler =3.0.0-alpha.3 (tauri-cli 3.0.0-alpha.4 manifest)",
+      "resolvedMacosSign": "tauri-macos-sign =3.0.0-alpha.2 (tauri-cli 3.0.0-alpha.4 manifest)",
+      "globalCli": "none; builds use the project-local CLI via npx --no-install"
+    },
+    "jsApi": "@tauri-apps/api 3.0.0-alpha.2",
+    "pluginsSelected": [],
+    "tauri2Dependencies": 0,
+    "cefOrChromiumDependencies": 0
+  },
+  "webview": {
+    "engine": "WKWebView through Wry 0.57.0",
+    "webkitBundleVersion": "22625.2.5.11.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+  },
+  "graphics": {
+    "three": "0.186.1",
+    "threeSourceCommit": "9b4a2ac29c63ccb43fd51c5661f2f873ac2c39b8",
+    "typesThree": "0.186.0",
+    "rendererProof": {
+      "devWkWebView": {
+        "rendererClass": "WebGPURenderer",
+        "backend": "WEBGPU",
+        "webgpuGate": "PASS",
+        "forcedCompatibility": false,
+        "threeRevision": "186",
+        "navigatorGpu": true,
+        "secureContext": true,
+        "origin": "http://localhost:1420",
+        "adapter": {
+          "architecture": "apple",
+          "description": "apple",
+          "device": "apple",
+          "vendor": "apple"
+        }
+      },
+      "packagedWkWebView": {
+        "rendererClass": "WebGPURenderer",
+        "backend": "WEBGPU",
+        "webgpuGate": "PASS",
+        "forcedCompatibility": false,
+        "threeRevision": "186",
+        "navigatorGpu": true,
+        "secureContext": true,
+        "origin": "tauri://localhost",
+        "adapter": {
+          "architecture": "apple",
+          "description": "apple",
+          "device": "apple",
+          "vendor": "apple"
+        }
+      },
+      "forcedWebgl2Compatibility": {
+        "rendererClass": "WebGPURenderer",
+        "backend": "WEBGL2_COMPATIBILITY",
+        "webgpuGate": "FAIL",
+        "forcedCompatibility": true,
+        "threeRevision": "186",
+        "navigatorGpu": true,
+        "secureContext": true,
+        "origin": "tauri://localhost",
+        "adapter": null
+      }
+    }
+  },
+  "sqlite": {
+    "version": "3.53.4",
+    "sourceId": "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+    "binding": "rusqlite 0.40.2 (bundled) with libsqlite3-sys 0.38.2 patched from third_party/libsqlite3-sys (docs/decisions/D-0001)",
+    "amalgamation": {
+      "url": "https://sqlite.org/2026/sqlite-amalgamation-3530400.zip",
+      "zipSha3_256": "628a44cfe82c66aed1ccbbe85a562d2e33ebe64b3288981ed76285612227934e",
+      "sqlite3cSha3_256": "67f423e9ebbbdc473cbc4772c872ee6b89f31fde4ed0279a5c25d5f65c043a16",
+      "sqlite3cSha256": "b1dd5d74ec7f29055a6684fa06fb3c2f6821c87dd38f9a458dfd2e8a1db28189"
+    },
+    "pragmas": {
+      "journal_mode": "wal",
+      "synchronous": 2,
+      "foreign_keys": true,
+      "fullfsync": false
+    },
+    "compileOptions": [
+      "ATOMIC_INTRINSICS=1",
+      "COMPILER=clang-21.0.0",
+      "DEFAULT_AUTOVACUUM",
+      "DEFAULT_CACHE_SIZE=-2000",
+      "DEFAULT_FILE_FORMAT=4",
+      "DEFAULT_FOREIGN_KEYS",
+      "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+      "DEFAULT_MMAP_SIZE=0",
+      "DEFAULT_PAGE_SIZE=4096",
+      "DEFAULT_PCACHE_INITSZ=20",
+      "DEFAULT_RECURSIVE_TRIGGERS",
+      "DEFAULT_SECTOR_SIZE=4096",
+      "DEFAULT_SYNCHRONOUS=2",
+      "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+      "DEFAULT_WAL_SYNCHRONOUS=2",
+      "DEFAULT_WORKER_THREADS=0",
+      "DIRECT_OVERFLOW_READ",
+      "ENABLE_API_ARMOR",
+      "ENABLE_COLUMN_METADATA",
+      "ENABLE_DBSTAT_VTAB",
+      "ENABLE_FTS3",
+      "ENABLE_FTS3_PARENTHESIS",
+      "ENABLE_FTS5",
+      "ENABLE_LOAD_EXTENSION",
+      "ENABLE_MEMORY_MANAGEMENT",
+      "ENABLE_RTREE",
+      "ENABLE_STAT4",
+      "HAVE_ISNAN",
+      "MALLOC_SOFT_LIMIT=1024",
+      "MAX_ATTACHED=10",
+      "MAX_COLUMN=2000",
+      "MAX_COMPOUND_SELECT=500",
+      "MAX_DEFAULT_PAGE_SIZE=8192",
+      "MAX_EXPR_DEPTH=1000",
+      "MAX_FUNCTION_ARG=1000",
+      "MAX_LENGTH=1000000000",
+      "MAX_LIKE_PATTERN_LENGTH=50000",
+      "MAX_MMAP_SIZE=0x7fff0000",
+      "MAX_PAGE_COUNT=0xfffffffe",
+      "MAX_PAGE_SIZE=65536",
+      "MAX_SQL_LENGTH=1000000000",
+      "MAX_TRIGGER_DEPTH=1000",
+      "MAX_VARIABLE_NUMBER=32766",
+      "MAX_VDBE_OP=250000000",
+      "MAX_WORKER_THREADS=8",
+      "MUTEX_PTHREADS",
+      "SOUNDEX",
+      "SYSTEM_MALLOC",
+      "TEMP_STORE=1",
+      "THREADSAFE=1",
+      "USE_URI"
+    ],
+    "schemaVersion": 1
+  },
+  "frontend": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "vitest": "5.0.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0"
+  },
+  "rustLibraries": {
+    "serde": "1.0.229",
+    "serde_json": "1.0.151",
+    "uuid": "1.27.0",
+    "libc": "0.2.190",
+    "sha2": "0.11.0",
+    "ts-rs": "12.0.1",
+    "tokio": "1.53.2",
+    "objc2": "0.6.5",
+    "objc2-foundation": "0.3.2",
+    "objc2-service-management": "0.3.2",
+    "objc2-web-kit": "0.3.2"
+  },
+  "bundles": {
+    "production": {
+      "app": "Threadspace.app",
+      "identifier": "ai.scalinity.threadspace",
+      "companion": "Contents/Library/LoginItems/ThreadspaceAgent.app",
+      "companionIdentifier": "ai.scalinity.threadspace.agent",
+      "store": "~/Library/Application Support/ai.scalinity.threadspace.agent/",
+      "logs": "~/Library/Logs/ai.scalinity.threadspace.agent/"
+    },
+    "development": {
+      "app": "Threadspace Dev.app (stable development host at ~/Applications)",
+      "identifier": "ai.scalinity.threadspace.dev",
+      "companionIdentifier": "ai.scalinity.threadspace.dev.agent",
+      "store": "~/Library/Application Support/ai.scalinity.threadspace.dev.agent/",
+      "logs": "~/Library/Logs/ai.scalinity.threadspace.dev.agent/"
+    },
+    "socketDirectory": "/tmp/ts.<uid>.<random>/ (0700), control.sock (0600), located through each store's runtime-locator.json (0600)",
+    "supervision": "single SMAppService.loginItem(identifier:) per channel, registered by the outer app's native bootstrap (--service register); no LaunchAgent"
+  },
+  "signing": {
+    "certificateType": "Apple Development",
+    "holder": "redacted",
+    "teamIdentifier": "25H5DDPKAC",
+    "certificateSha1": "BF0C3BD87875380E053876EA170575E50AACE8DD",
+    "hardenedRuntime": true,
+    "notarized": false,
+    "order": "companion signed with its own entitlements, copied into Contents/Library/LoginItems, then the outer app signed (no --deep)",
+    "outerEntitlements": {
+      "com.apple.security.automation.apple-events": true,
+      "rationale": "docs/decisions/D-0003"
+    },
+    "companionEntitlements": {
+      "com.apple.security.automation.apple-events": true
+    }
+  },
+  "terminal": {
+    "application": "/System/Applications/Utilities/Terminal.app",
+    "version": "2.15",
+    "dictionarySha256": "cd4dad3e8717922a6e8712638e7bdd0d607054b391f9e7e6993de2700fa233f4",
+    "dictionaryBytes": 24840,
+    "requiredTerms": {
+      "hasTabClass": true,
+      "hasTtyProperty": true,
+      "hasSelectedTabProperty": true,
+      "hasFrontmostProperty": true
+    }
+  },
+  "providers": {
+    "claude": "2.1.290 qualification candidate (not exercised in M0A)",
+    "codex": "0.160.1 qualification candidate (not exercised in M0A)"
+  },
+  "lockfiles": {
+    "Cargo.lock": "b1b8ba94038750c5d69f4fc52023bcd0fcc0d23a38e6af43655e81709780d13f",
+    "package-lock.json": "ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025",
+    "rust-toolchain.toml": "3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd"
+  },
+  "decisions": [
+    "docs/decisions/D-0001-sqlite-3.53.4-binding.md",
+    "docs/decisions/D-0002-titlebar-drag-permissions.md",
+    "docs/decisions/D-0003-apple-event-consent-attribution.md"
+  ]
+}

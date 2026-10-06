@@ -1,0 +1,82 @@
+{
+  "ok": true,
+  "peer": {
+    "companion": {
+      "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+      "executablePath": "~/Applications/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent",
+      "pid": 25797,
+      "startMicroseconds": 492982,
+      "startSeconds": "1791263393"
+    },
+    "coreGeneration": "28c784e0-6d9f-4ec1-af60-9f4a89491020",
+    "pid": 25797,
+    "storeGeneration": "2ba05a43-269d-418e-b513-3407bafc0e45"
+  },
+  "response": {
+    "cursor": "5",
+    "kind": "ViewAttached",
+    "snapshot": {
+      "attention": [
+        {
+          "acknowledgedAtMs": 1791263459900,
+          "attentionId": "c5116ca6-15d6-46eb-a1ee-96e94f9fc548",
+          "category": "TURN_COMPLETE",
+          "createdAtMs": 1791263393566,
+          "notificationState": "NOT_REQUESTED",
+          "priority": 40,
+          "resolvedAtMs": null,
+          "revision": "3",
+          "sessionId": "9de8903a-993f-4da5-b5da-2e27055f3799",
+          "summary": "Fixture turn completed",
+          "turnId": "75536ab6-3460-4b89-8c73-7bab278a85d1"
+        },
+        {
+          "acknowledgedAtMs": null,
+          "attentionId": "746837e0-50ce-4549-98a3-69cf9add1743",
+          "category": "TURN_COMPLETE",
+          "createdAtMs": 1791265156386,
+          "notificationState": "FAILED",
+          "priority": 40,
+          "resolvedAtMs": null,
+          "revision": "5",
+          "sessionId": "9de8903a-993f-4da5-b5da-2e27055f3799",
+          "summary": "Fixture turn completed — denied-path send",
+          "turnId": "48496f39-9d64-48d3-a25b-f0968dea017b"
+        }
+      ],
+      "counts": {
+        "awaitingAction": 1,
+        "needsAttention": 1
+      },
+      "sessions": [
+        {
+          "activation": "1",
+          "binding": {
+            "bindingId": "b439077d-e906-46a0-8e95-929e12e86ad8",
+            "proof": "FIXTURE",
+            "revision": "1",
+            "surfaceKind": "fixture"
+          },
+          "displayName": "Fixture worker",
+          "executionPresence": "LIVE",
+          "fixture": true,
+          "nativeSessionId": "m0a-fixture-session-1",
+          "observation": "UNKNOWN",
+          "process": {
+            "bootId": "fixture-boot",
+            "executableIdentity": "fixture:synthetic-process",
+            "pid": 4242,
+            "startMicroseconds": 0,
+            "startSeconds": "1759000000"
+          },
+          "provider": "synthetic",
+          "revision": "4",
+          "sessionId": "9de8903a-993f-4da5-b5da-2e27055f3799",
+          "turnState": "COMPLETED"
+        }
+      ],
+      "viewRevision": "5"
+    },
+    "subscriptionId": "9334d2ff-1bd5-489f-b310-4e11951bccb1"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "appIdentifier": "ai.scalinity.threadspace",
+  "executable": "~/Applications/Threadspace.app/Contents/MacOS/Threadspace",
+  "kind": "ipc-selftest",
+  "recordedAtMs": 1791263874606,
+  "report": {
+    "elapsedMs": 70,
+    "passed": 14,
+    "results": [
+      {
+        "expectation": "ConnectionStatus returns a typed result",
+        "name": "typed success",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "Diagnostics returns a typed result",
+        "name": "typed success with context",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "FleetPage is NOT_IMPLEMENTED_FOR_MILESTONE",
+        "name": "typed error",
+        "outcome": "NOT_IMPLEMENTED_FOR_MILESTONE (FleetPage is not implemented in milestone M0A)",
+        "pass": true
+      },
+      {
+        "expectation": "ReturnToSession is NOT_IMPLEMENTED_FOR_MILESTONE",
+        "name": "typed error (action)",
+        "outcome": "NOT_IMPLEMENTED_FOR_MILESTONE (ReturnToSession is not implemented in milestone M0A)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: extra field",
+        "outcome": "INVALID_REQUEST (unknown field `sql`, there are no fields)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: unknown action",
+        "outcome": "INVALID_REQUEST (unknown variant `RunShell`, expected one of `AcknowledgeAttention`, `RequestNotificationAuthorization`, `RequestTerminalAutomation`, `RecordQualificationReport`)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: non-UUID requestId",
+        "outcome": "INVALID_REQUEST (requestId must be a canonical lowercase UUID)",
+        "pass": true
+      },
+      {
+        "expectation": "UNSUPPORTED_PROTOCOL",
+        "name": "unsupported protocol",
+        "outcome": "UNSUPPORTED_PROTOCOL (unsupported UI protocol version)",
+        "pass": true
+      },
+      {
+        "expectation": "STALE_CONTEXT for a wrong view epoch",
+        "name": "stale context",
+        "outcome": "STALE_CONTEXT (subscription belongs to another view)",
+        "pass": true
+      },
+      {
+        "expectation": "ACK_REJECTED",
+        "name": "future ACK",
+        "outcome": "ACK_REJECTED (FutureSequence { last_sent: 3 })",
+        "pass": true
+      },
+      {
+        "expectation": "plugin:window|close refused by the capability",
+        "name": "disallowed core command",
+        "outcome": "IPC_REFUSED (Command plugin:window|close not allowed by ACL)",
+        "pass": true
+      },
+      {
+        "expectation": "ui_shell refused",
+        "name": "unknown command",
+        "outcome": "IPC_REFUSED (Command ui_shell not allowed by ACL)",
+        "pass": true
+      },
+      {
+        "expectation": "AcknowledgeAttention COMMITTED",
+        "name": "owner command",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "same requestId returns ALREADY_COMMITTED",
+        "name": "idempotent retry",
+        "outcome": "OK",
+        "pass": true
+      }
+    ],
+    "total": 14
+  }
+}
