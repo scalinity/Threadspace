@@ -10,12 +10,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, Weak};
 use std::time::Duration;
 
-use threadspace_contracts::control::{ControlErrorCode, ControlMessage, ControlRequestBody, ControlResponseBody};
+use threadspace_contracts::control::{
+    ControlErrorCode, ControlMessage, ControlRequestBody, ControlResponseBody,
+};
 use threadspace_contracts::cursor::parse_cursor;
 use threadspace_contracts::limits::QUERY_MAX_IN_FLIGHT;
 use threadspace_contracts::ui::{
-    StreamLimits, UI_PROTOCOL_VERSION, UiAckReply, UiAckRequest, UiCallContext, UiConnectReply, UiConnectRequest,
-    UiDisconnectRequest, UiError, UiErrorCode, UiFrame, parse_uuid,
+    StreamLimits, UI_PROTOCOL_VERSION, UiAckReply, UiAckRequest, UiCallContext, UiConnectReply,
+    UiConnectRequest, UiDisconnectRequest, UiError, UiErrorCode, UiFrame, parse_uuid,
 };
 use threadspace_relay::paths::AgentPaths;
 use uuid::Uuid;
@@ -50,12 +52,20 @@ pub struct Bridge {
 
 pub fn link_error(error: LinkError) -> UiError {
     match error {
-        LinkError::Closed => UiError::new(UiErrorCode::CompanionUnavailable, "companion connection closed"),
-        LinkError::Timeout => UiError::new(UiErrorCode::CompanionUnavailable, "companion did not answer in time"),
+        LinkError::Closed => UiError::new(
+            UiErrorCode::CompanionUnavailable,
+            "companion connection closed",
+        ),
+        LinkError::Timeout => UiError::new(
+            UiErrorCode::CompanionUnavailable,
+            "companion did not answer in time",
+        ),
         LinkError::Rejected(error) => {
             let code = match error.code {
                 ControlErrorCode::Conflict => UiErrorCode::Conflict,
-                ControlErrorCode::NotFound | ControlErrorCode::BadRequest => UiErrorCode::InvalidRequest,
+                ControlErrorCode::NotFound | ControlErrorCode::BadRequest => {
+                    UiErrorCode::InvalidRequest
+                }
                 ControlErrorCode::Busy => UiErrorCode::TooManyInFlight,
                 ControlErrorCode::UnknownSubscription => UiErrorCode::UnknownSubscription,
                 _ => UiErrorCode::CompanionRejected,
@@ -104,7 +114,10 @@ impl Bridge {
 
     /// The current companion link, connecting on demand.
     pub fn link(self: &Arc<Self>) -> Result<Arc<CompanionLink>, UiError> {
-        let mut slot = self.link.lock().map_err(|_| UiError::new(UiErrorCode::Internal, "link lock"))?;
+        let mut slot = self
+            .link
+            .lock()
+            .map_err(|_| UiError::new(UiErrorCode::Internal, "link lock"))?;
         if let Some(link) = slot.as_ref().filter(|link| link.is_alive()) {
             return Ok(Arc::clone(link));
         }
@@ -133,7 +146,10 @@ impl Bridge {
     }
 
     pub fn current_link(&self) -> Option<Arc<CompanionLink>> {
-        self.link.lock().ok().and_then(|slot| slot.as_ref().filter(|link| link.is_alive()).cloned())
+        self.link
+            .lock()
+            .ok()
+            .and_then(|slot| slot.as_ref().filter(|link| link.is_alive()).cloned())
     }
 
     pub fn subscription_count(&self) -> usize {
@@ -141,7 +157,9 @@ impl Bridge {
     }
 
     fn remember_epoch(&self, epoch: &str) -> bool {
-        let Ok(mut guard) = self.used_epochs.lock() else { return false };
+        let Ok(mut guard) = self.used_epochs.lock() else {
+            return false;
+        };
         let (set, order) = &mut *guard;
         if !set.insert(epoch.to_owned()) {
             return false;
@@ -158,7 +176,10 @@ impl Bridge {
     pub fn acquire_query_slot(&self) -> Result<QuerySlot<'_>, UiError> {
         if self.queries_in_flight.fetch_add(1, Ordering::AcqRel) >= QUERY_MAX_IN_FLIGHT {
             self.queries_in_flight.fetch_sub(1, Ordering::AcqRel);
-            return Err(UiError::new(UiErrorCode::TooManyInFlight, "four queries already in flight"));
+            return Err(UiError::new(
+                UiErrorCode::TooManyInFlight,
+                "four queries already in flight",
+            ));
         }
         Ok(QuerySlot(&self.queries_in_flight))
     }
@@ -173,11 +194,17 @@ impl Bridge {
         channel: tauri::ipc::Channel<UiFrame>,
     ) -> Result<UiConnectReply, UiError> {
         if request.protocol_version != UI_PROTOCOL_VERSION {
-            return Err(UiError::new(UiErrorCode::UnsupportedProtocol, "unsupported UI protocol version"));
+            return Err(UiError::new(
+                UiErrorCode::UnsupportedProtocol,
+                "unsupported UI protocol version",
+            ));
         }
         parse_uuid(&request.view_epoch, "viewEpoch")?;
         if !self.remember_epoch(&request.view_epoch) {
-            return Err(UiError::new(UiErrorCode::StaleContext, "view epoch was already used"));
+            return Err(UiError::new(
+                UiErrorCode::StaleContext,
+                "view epoch was already used",
+            ));
         }
         let link = self.link()?;
         let subscription_id = Uuid::new_v4().to_string();
@@ -200,15 +227,29 @@ impl Bridge {
             map.insert(subscription_id.clone(), Arc::clone(&subscription));
         }
         let attached = link
-            .request(ControlRequestBody::AttachView { subscription_id: subscription_id.clone() }, REQUEST_TIMEOUT)
+            .request(
+                ControlRequestBody::AttachView {
+                    subscription_id: subscription_id.clone(),
+                },
+                REQUEST_TIMEOUT,
+            )
             .await;
         let result = match attached {
-            Ok(ControlResponseBody::ViewAttached { cursor, snapshot, .. }) => subscription
+            Ok(ControlResponseBody::ViewAttached {
+                cursor, snapshot, ..
+            }) => subscription
                 .stream
                 .lock()
                 .map_err(|_| UiError::new(UiErrorCode::Internal, "stream lock"))
-                .and_then(|mut stream| stream.emit_snapshot(&cursor, &snapshot).map_err(|error| stream_error(&error))),
-            Ok(_) => Err(UiError::new(UiErrorCode::Internal, "unexpected attach reply")),
+                .and_then(|mut stream| {
+                    stream
+                        .emit_snapshot(&cursor, &snapshot)
+                        .map_err(|error| stream_error(&error))
+                }),
+            Ok(_) => Err(UiError::new(
+                UiErrorCode::Internal,
+                "unexpected attach reply",
+            )),
             Err(error) => Err(link_error(error)),
         };
         if let Err(error) = result {
@@ -224,52 +265,93 @@ impl Bridge {
         })
     }
 
-    fn subscription_for(&self, incarnation: Uuid, subscription_id: &str, view_epoch: &str) -> Result<Arc<Subscription>, UiError> {
+    fn subscription_for(
+        &self,
+        incarnation: Uuid,
+        subscription_id: &str,
+        view_epoch: &str,
+    ) -> Result<Arc<Subscription>, UiError> {
         let subscription = self
             .subscriptions
             .lock()
             .ok()
             .and_then(|map| map.get(subscription_id).cloned())
-            .ok_or_else(|| UiError::new(UiErrorCode::UnknownSubscription, "unknown or retired subscription"))?;
+            .ok_or_else(|| {
+                UiError::new(
+                    UiErrorCode::UnknownSubscription,
+                    "unknown or retired subscription",
+                )
+            })?;
         if subscription.incarnation != incarnation || subscription.view_epoch != view_epoch {
-            return Err(UiError::new(UiErrorCode::StaleContext, "subscription belongs to another view"));
+            return Err(UiError::new(
+                UiErrorCode::StaleContext,
+                "subscription belongs to another view",
+            ));
         }
         Ok(subscription)
     }
 
     /// Validates a subscribed call context against the current registration.
-    pub fn validate_context(&self, incarnation: Uuid, context: &UiCallContext) -> Result<Arc<Subscription>, UiError> {
-        let subscription = self.subscription_for(incarnation, &context.subscription_id, &context.view_epoch)?;
+    pub fn validate_context(
+        &self,
+        incarnation: Uuid,
+        context: &UiCallContext,
+    ) -> Result<Arc<Subscription>, UiError> {
+        let subscription =
+            self.subscription_for(incarnation, &context.subscription_id, &context.view_epoch)?;
         if subscription.core_generation != context.core_generation
             || subscription.store_generation != context.store_generation
         {
-            return Err(UiError::new(UiErrorCode::StaleContext, "companion generation changed"));
+            return Err(UiError::new(
+                UiErrorCode::StaleContext,
+                "companion generation changed",
+            ));
         }
         Ok(subscription)
     }
 
-    pub fn ack(self: &Arc<Self>, incarnation: Uuid, request: &UiAckRequest) -> Result<UiAckReply, UiError> {
+    pub fn ack(
+        self: &Arc<Self>,
+        incarnation: Uuid,
+        request: &UiAckRequest,
+    ) -> Result<UiAckReply, UiError> {
         if parse_cursor(&request.applied_journal_cursor).is_none() {
-            return Err(UiError::invalid("appliedJournalCursor must be a canonical cursor"));
+            return Err(UiError::invalid(
+                "appliedJournalCursor must be a canonical cursor",
+            ));
         }
-        let subscription = self.subscription_for(incarnation, &request.subscription_id, &request.view_epoch)?;
+        let subscription =
+            self.subscription_for(incarnation, &request.subscription_id, &request.view_epoch)?;
         let outcome = subscription
             .stream
             .lock()
             .map_err(|_| UiError::new(UiErrorCode::Internal, "stream lock"))?
-            .ack(request.highest_applied_stream_seq, &request.applied_journal_cursor)
+            .ack(
+                request.highest_applied_stream_seq,
+                &request.applied_journal_cursor,
+            )
             .map_err(|error| match error {
-                AckError::Retired => UiError::new(UiErrorCode::UnknownSubscription, "subscription retired"),
+                AckError::Retired => {
+                    UiError::new(UiErrorCode::UnknownSubscription, "subscription retired")
+                }
                 other => UiError::new(UiErrorCode::AckRejected, format!("{other:?}")),
             })?;
         let notify: Vec<ControlRequestBody> = outcome
             .newly_hydrated
-            .then(|| ControlRequestBody::ViewHydrated { subscription_id: subscription.id.clone() })
+            .then(|| ControlRequestBody::ViewHydrated {
+                subscription_id: subscription.id.clone(),
+            })
             .into_iter()
-            .chain(outcome.consumed_intents.iter().map(|intent_id| ControlRequestBody::IntentConsumed { intent_id: intent_id.clone() }))
+            .chain(outcome.consumed_intents.iter().map(|intent_id| {
+                ControlRequestBody::IntentConsumed {
+                    intent_id: intent_id.clone(),
+                }
+            }))
             .collect();
         if !notify.is_empty()
-            && let Some(link) = self.current_link().filter(|link| link.id == subscription.link_id)
+            && let Some(link) = self
+                .current_link()
+                .filter(|link| link.id == subscription.link_id)
         {
             tauri::async_runtime::spawn(async move {
                 for body in notify {
@@ -277,26 +359,46 @@ impl Bridge {
                 }
             });
         }
-        Ok(UiAckReply { acknowledged_through: outcome.acknowledged_through, hydrated: outcome.hydrated })
+        Ok(UiAckReply {
+            acknowledged_through: outcome.acknowledged_through,
+            hydrated: outcome.hydrated,
+        })
     }
 
-    pub fn disconnect(self: &Arc<Self>, incarnation: Uuid, request: &UiDisconnectRequest) -> Result<(), UiError> {
-        let subscription = self.subscription_for(incarnation, &request.subscription_id, &request.view_epoch)?;
+    pub fn disconnect(
+        self: &Arc<Self>,
+        incarnation: Uuid,
+        request: &UiDisconnectRequest,
+    ) -> Result<(), UiError> {
+        let subscription =
+            self.subscription_for(incarnation, &request.subscription_id, &request.view_epoch)?;
         self.retire(&subscription.id);
         Ok(())
     }
 
     /// Retires one subscription and best-effort detaches it from the companion.
     pub fn retire(&self, subscription_id: &str) {
-        let removed = self.subscriptions.lock().ok().and_then(|mut map| map.remove(subscription_id));
+        let removed = self
+            .subscriptions
+            .lock()
+            .ok()
+            .and_then(|mut map| map.remove(subscription_id));
         let Some(subscription) = removed else { return };
         if let Ok(mut stream) = subscription.stream.lock() {
             stream.retire();
         }
-        if let Some(link) = self.current_link().filter(|link| link.id == subscription.link_id) {
+        if let Some(link) = self
+            .current_link()
+            .filter(|link| link.id == subscription.link_id)
+        {
             let subscription_id = subscription.id.clone();
             tauri::async_runtime::spawn(async move {
-                let _ = link.request(ControlRequestBody::DetachView { subscription_id }, REQUEST_TIMEOUT).await;
+                let _ = link
+                    .request(
+                        ControlRequestBody::DetachView { subscription_id },
+                        REQUEST_TIMEOUT,
+                    )
+                    .await;
             });
         }
     }
@@ -307,7 +409,12 @@ impl Bridge {
         let ids: Vec<String> = self
             .subscriptions
             .lock()
-            .map(|map| map.values().filter(|sub| sub.incarnation == incarnation).map(|sub| sub.id.clone()).collect())
+            .map(|map| {
+                map.values()
+                    .filter(|sub| sub.incarnation == incarnation)
+                    .map(|sub| sub.id.clone())
+                    .collect()
+            })
             .unwrap_or_default();
         for id in ids {
             self.retire(&id);
@@ -316,18 +423,44 @@ impl Bridge {
 
     fn on_push(&self, link_id: u64, message: ControlMessage) {
         let (subscription_id, outcome) = match message {
-            ControlMessage::ViewPatch { subscription_id, cursor, patch } => {
-                let subscription = self.subscriptions.lock().ok().and_then(|map| map.get(&subscription_id).cloned());
+            ControlMessage::ViewPatch {
+                subscription_id,
+                cursor,
+                patch,
+            } => {
+                let subscription = self
+                    .subscriptions
+                    .lock()
+                    .ok()
+                    .and_then(|map| map.get(&subscription_id).cloned());
                 let outcome = subscription
                     .filter(|sub| sub.link_id == link_id)
-                    .map(|sub| sub.stream.lock().map_err(|_| StreamError::Retired).and_then(|mut stream| stream.push_patch(&cursor, patch)));
+                    .map(|sub| {
+                        sub.stream
+                            .lock()
+                            .map_err(|_| StreamError::Retired)
+                            .and_then(|mut stream| stream.push_patch(&cursor, patch))
+                    });
                 (subscription_id, outcome)
             }
-            ControlMessage::Intent { subscription_id, cursor, intent } => {
-                let subscription = self.subscriptions.lock().ok().and_then(|map| map.get(&subscription_id).cloned());
+            ControlMessage::Intent {
+                subscription_id,
+                cursor,
+                intent,
+            } => {
+                let subscription = self
+                    .subscriptions
+                    .lock()
+                    .ok()
+                    .and_then(|map| map.get(&subscription_id).cloned());
                 let outcome = subscription
                     .filter(|sub| sub.link_id == link_id)
-                    .map(|sub| sub.stream.lock().map_err(|_| StreamError::Retired).and_then(|mut stream| stream.push_intent(&cursor, intent)));
+                    .map(|sub| {
+                        sub.stream
+                            .lock()
+                            .map_err(|_| StreamError::Retired)
+                            .and_then(|mut stream| stream.push_intent(&cursor, intent))
+                    });
                 (subscription_id, outcome)
             }
             ControlMessage::Response { .. } => return,
@@ -342,7 +475,12 @@ impl Bridge {
         let ids: Vec<String> = self
             .subscriptions
             .lock()
-            .map(|map| map.values().filter(|sub| sub.link_id == link_id).map(|sub| sub.id.clone()).collect())
+            .map(|map| {
+                map.values()
+                    .filter(|sub| sub.link_id == link_id)
+                    .map(|sub| sub.id.clone())
+                    .collect()
+            })
             .unwrap_or_default();
         for id in ids {
             self.retire(&id);
@@ -357,10 +495,17 @@ impl Bridge {
     /// Sends a heartbeat on every hydrated subscription; a renderer that stops
     /// acknowledging exhausts its window and is retired.
     pub fn heartbeat_tick(&self) {
-        let subscriptions: Vec<Arc<Subscription>> =
-            self.subscriptions.lock().map(|map| map.values().cloned().collect()).unwrap_or_default();
+        let subscriptions: Vec<Arc<Subscription>> = self
+            .subscriptions
+            .lock()
+            .map(|map| map.values().cloned().collect())
+            .unwrap_or_default();
         for subscription in subscriptions {
-            let failed = subscription.stream.lock().map(|mut stream| stream.heartbeat().is_err()).unwrap_or(true);
+            let failed = subscription
+                .stream
+                .lock()
+                .map(|mut stream| stream.heartbeat().is_err())
+                .unwrap_or(true);
             if failed {
                 self.retire(&subscription.id);
             }

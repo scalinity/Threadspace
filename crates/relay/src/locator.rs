@@ -52,12 +52,18 @@ impl std::error::Error for LocatorError {}
 /// Writes the locator to a same-directory temporary file, syncs it, and
 /// renames it into place.
 pub fn write_atomic(path: &Path, locator: &RuntimeLocator) -> io::Result<()> {
-    let directory = path.parent().ok_or_else(|| io::Error::other("locator has no parent"))?;
+    let directory = path
+        .parent()
+        .ok_or_else(|| io::Error::other("locator has no parent"))?;
     let temporary = directory.join(format!(".runtime-locator.{}.tmp", std::process::id()));
     let _ = fs::remove_file(&temporary);
     let body = serde_json::to_vec_pretty(locator).map_err(io::Error::other)?;
     {
-        let mut file = OpenOptions::new().write(true).create_new(true).mode(0o600).open(&temporary)?;
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&temporary)?;
         file.write_all(&body)?;
         file.sync_all()?;
     }
@@ -76,17 +82,27 @@ pub fn read(path: &Path) -> Result<RuntimeLocator, LocatorError> {
         return Err(LocatorError::NotPrivate("not a regular file".into()));
     }
     if metadata.uid() != current_euid() || metadata.mode() & 0o077 != 0 {
-        return Err(LocatorError::NotPrivate(format!("uid {} mode {:o}", metadata.uid(), metadata.mode() & 0o777)));
+        return Err(LocatorError::NotPrivate(format!(
+            "uid {} mode {:o}",
+            metadata.uid(),
+            metadata.mode() & 0o777
+        )));
     }
     if metadata.len() > LOCATOR_MAX_BYTES {
         return Err(LocatorError::Malformed("too large".into()));
     }
     let mut body = Vec::new();
-    fs::File::open(path).map_err(LocatorError::Io)?.read_to_end(&mut body).map_err(LocatorError::Io)?;
-    let locator: RuntimeLocator =
-        serde_json::from_slice(&body).map_err(|error| LocatorError::Malformed(error.to_string()))?;
+    fs::File::open(path)
+        .map_err(LocatorError::Io)?
+        .read_to_end(&mut body)
+        .map_err(LocatorError::Io)?;
+    let locator: RuntimeLocator = serde_json::from_slice(&body)
+        .map_err(|error| LocatorError::Malformed(error.to_string()))?;
     if locator.schema != LOCATOR_SCHEMA {
-        return Err(LocatorError::Malformed(format!("schema {}", locator.schema)));
+        return Err(LocatorError::Malformed(format!(
+            "schema {}",
+            locator.schema
+        )));
     }
     Ok(locator)
 }
@@ -126,7 +142,10 @@ mod tests {
 
         fs::set_permissions(&path, fs::Permissions::from_mode(0o644)).expect("chmod");
         assert!(matches!(read(&path), Err(LocatorError::NotPrivate(_))));
-        assert!(matches!(read(&dir.join("absent.json")), Err(LocatorError::Missing)));
+        assert!(matches!(
+            read(&dir.join("absent.json")),
+            Err(LocatorError::Missing)
+        ));
         let _ = fs::remove_dir_all(dir);
     }
 }

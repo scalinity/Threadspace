@@ -34,17 +34,30 @@ impl ProcessSample {
 #[derive(Debug)]
 pub enum ProcessError {
     /// The process does not exist or the kernel refused the read.
-    Unavailable { pid: i32, errno: i32 },
+    Unavailable {
+        pid: i32,
+        errno: i32,
+    },
     /// A short read: the structure was not returned at its exact length.
-    ShortRead { pid: i32, bytes: i32 },
-    Sysctl { name: &'static str, errno: i32 },
+    ShortRead {
+        pid: i32,
+        bytes: i32,
+    },
+    Sysctl {
+        name: &'static str,
+        errno: i32,
+    },
 }
 
 impl std::fmt::Display for ProcessError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Unavailable { pid, errno } => write!(f, "process {pid} unavailable (errno {errno})"),
-            Self::ShortRead { pid, bytes } => write!(f, "process {pid}: short proc_pidinfo read ({bytes} bytes)"),
+            Self::Unavailable { pid, errno } => {
+                write!(f, "process {pid} unavailable (errno {errno})")
+            }
+            Self::ShortRead { pid, bytes } => {
+                write!(f, "process {pid}: short proc_pidinfo read ({bytes} bytes)")
+            }
             Self::Sysctl { name, errno } => write!(f, "sysctl {name} failed (errno {errno})"),
         }
     }
@@ -64,10 +77,19 @@ pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
     // SAFETY: the buffer is a properly aligned, zeroed `proc_bsdinfo` of the
     // size passed to the kernel.
     let bytes = unsafe {
-        libc::proc_pidinfo(pid, libc::PROC_PIDTBSDINFO, 0, info.as_mut_ptr().cast(), expected)
+        libc::proc_pidinfo(
+            pid,
+            libc::PROC_PIDTBSDINFO,
+            0,
+            info.as_mut_ptr().cast(),
+            expected,
+        )
     };
     if bytes <= 0 {
-        return Err(ProcessError::Unavailable { pid, errno: errno() });
+        return Err(ProcessError::Unavailable {
+            pid,
+            errno: errno(),
+        });
     }
     if bytes != expected {
         return Err(ProcessError::ShortRead { pid, bytes });
@@ -75,7 +97,9 @@ pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
     // SAFETY: the kernel filled exactly `expected` bytes.
     let info = unsafe { info.assume_init() };
     // SAFETY: `pbi_comm` is a NUL-terminated (or zero-padded) fixed array.
-    let comm = unsafe { CStr::from_ptr(info.pbi_comm.as_ptr()) }.to_string_lossy().into_owned();
+    let comm = unsafe { CStr::from_ptr(info.pbi_comm.as_ptr()) }
+        .to_string_lossy()
+        .into_owned();
     Ok(ProcessSample {
         pid: info.pbi_pid as i32,
         ppid: info.pbi_ppid as i32,
@@ -93,9 +117,13 @@ pub fn sample(pid: i32) -> Result<ProcessSample, ProcessError> {
 pub fn executable_path(pid: i32) -> Result<PathBuf, ProcessError> {
     let mut buffer = vec![0u8; libc::PROC_PIDPATHINFO_MAXSIZE as usize];
     // SAFETY: the buffer is writable for the size passed.
-    let length = unsafe { libc::proc_pidpath(pid, buffer.as_mut_ptr().cast(), buffer.len() as u32) };
+    let length =
+        unsafe { libc::proc_pidpath(pid, buffer.as_mut_ptr().cast(), buffer.len() as u32) };
     if length <= 0 {
-        return Err(ProcessError::Unavailable { pid, errno: errno() });
+        return Err(ProcessError::Unavailable {
+            pid,
+            errno: errno(),
+        });
     }
     buffer.truncate(length as usize);
     Ok(PathBuf::from(String::from_utf8_lossy(&buffer).into_owned()))
@@ -109,10 +137,19 @@ pub fn boot_session_id() -> Result<String, ProcessError> {
     let mut length = buffer.len();
     // SAFETY: `buffer`/`length` describe a writable region; no new value is set.
     let rc = unsafe {
-        libc::sysctlbyname(NAME.as_ptr(), buffer.as_mut_ptr().cast(), &mut length, std::ptr::null_mut(), 0)
+        libc::sysctlbyname(
+            NAME.as_ptr(),
+            buffer.as_mut_ptr().cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        )
     };
     if rc != 0 {
-        return Err(ProcessError::Sysctl { name: "kern.bootsessionuuid", errno: errno() });
+        return Err(ProcessError::Sysctl {
+            name: "kern.bootsessionuuid",
+            errno: errno(),
+        });
     }
     let text = CStr::from_bytes_until_nul(&buffer[..length.min(buffer.len())])
         .map(|value| value.to_string_lossy().into_owned())
@@ -127,16 +164,29 @@ pub fn os_product_version() -> Result<(u32, u32, u32), ProcessError> {
     let mut length = buffer.len();
     // SAFETY: as in `boot_session_id`.
     let rc = unsafe {
-        libc::sysctlbyname(NAME.as_ptr(), buffer.as_mut_ptr().cast(), &mut length, std::ptr::null_mut(), 0)
+        libc::sysctlbyname(
+            NAME.as_ptr(),
+            buffer.as_mut_ptr().cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        )
     };
     if rc != 0 {
-        return Err(ProcessError::Sysctl { name: "kern.osproductversion", errno: errno() });
+        return Err(ProcessError::Sysctl {
+            name: "kern.osproductversion",
+            errno: errno(),
+        });
     }
     let text = CStr::from_bytes_until_nul(&buffer[..length.min(buffer.len())])
         .map(|value| value.to_string_lossy().into_owned())
         .unwrap_or_default();
     let mut parts = text.split('.').map(|part| part.parse::<u32>().unwrap_or(0));
-    Ok((parts.next().unwrap_or(0), parts.next().unwrap_or(0), parts.next().unwrap_or(0)))
+    Ok((
+        parts.next().unwrap_or(0),
+        parts.next().unwrap_or(0),
+        parts.next().unwrap_or(0),
+    ))
 }
 
 /// The macOS build identifier from `kern.osversion` (for example `26B5091g`).
@@ -146,20 +196,33 @@ pub fn os_build_version() -> Result<String, ProcessError> {
     let mut length = buffer.len();
     // SAFETY: as in `boot_session_id`.
     let rc = unsafe {
-        libc::sysctlbyname(NAME.as_ptr(), buffer.as_mut_ptr().cast(), &mut length, std::ptr::null_mut(), 0)
+        libc::sysctlbyname(
+            NAME.as_ptr(),
+            buffer.as_mut_ptr().cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        )
     };
     if rc != 0 {
-        return Err(ProcessError::Sysctl { name: "kern.osversion", errno: errno() });
+        return Err(ProcessError::Sysctl {
+            name: "kern.osversion",
+            errno: errno(),
+        });
     }
-    Ok(CStr::from_bytes_until_nul(&buffer[..length.min(buffer.len())])
-        .map(|value| value.to_string_lossy().into_owned())
-        .unwrap_or_default())
+    Ok(
+        CStr::from_bytes_until_nul(&buffer[..length.min(buffer.len())])
+            .map(|value| value.to_string_lossy().into_owned())
+            .unwrap_or_default(),
+    )
 }
 
 /// The selected deployment floor (SPEC §18.9): macOS 26.0, enforced at runtime
 /// as well as in bundle configuration.
 pub fn meets_minimum_macos() -> bool {
-    os_product_version().map(|(major, _, _)| major >= 26).unwrap_or(false)
+    os_product_version()
+        .map(|(major, _, _)| major >= 26)
+        .unwrap_or(false)
 }
 
 #[cfg(test)]
@@ -179,7 +242,10 @@ mod tests {
 
     #[test]
     fn missing_process_is_unavailable() {
-        assert!(matches!(sample(i32::MAX - 1), Err(ProcessError::Unavailable { .. })));
+        assert!(matches!(
+            sample(i32::MAX - 1),
+            Err(ProcessError::Unavailable { .. })
+        ));
     }
 
     #[test]

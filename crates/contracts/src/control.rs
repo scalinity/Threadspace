@@ -41,11 +41,19 @@ pub enum ControlRequestBody {
     },
     /// Serialized on the single writer: capture the projection at committed
     /// cursor S, register the subscription, and reply before any change after S.
-    AttachView { subscription_id: String },
-    DetachView { subscription_id: String },
+    AttachView {
+        subscription_id: String,
+    },
+    DetachView {
+        subscription_id: String,
+    },
     /// The renderer applied the snapshot; pending native intents may now flow.
-    ViewHydrated { subscription_id: String },
-    IntentConsumed { intent_id: String },
+    ViewHydrated {
+        subscription_id: String,
+    },
+    IntentConsumed {
+        intent_id: String,
+    },
     Diagnostics,
     IntegrationStatus,
     AcknowledgeAttention {
@@ -58,7 +66,9 @@ pub enum ControlRequestBody {
     /// Qualification only: commit a synthetic fixture turn plus a completed-turn
     /// attention item and its notification intent.
     #[cfg(feature = "qualification")]
-    QualifyRaiseAttention { label: String },
+    QualifyRaiseAttention {
+        label: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -130,7 +140,10 @@ impl ControlError {
         let detail: String = detail.into();
         Self {
             code,
-            detail: detail.chars().take(crate::limits::ERROR_DETAIL_MAX_CHARS).collect(),
+            detail: detail
+                .chars()
+                .take(crate::limits::ERROR_DETAIL_MAX_CHARS)
+                .collect(),
         }
     }
 }

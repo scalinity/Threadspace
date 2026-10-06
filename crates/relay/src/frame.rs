@@ -10,7 +10,10 @@ use serde::de::DeserializeOwned;
 pub enum FrameError {
     /// Clean end of stream at a frame boundary.
     Closed,
-    TooLarge { length: usize, max: usize },
+    TooLarge {
+        length: usize,
+        max: usize,
+    },
     Malformed(serde_json::Error),
     Io(io::Error),
 }
@@ -37,7 +40,10 @@ impl From<io::Error> for FrameError {
 pub fn encode<T: Serialize>(message: &T, max: usize) -> Result<Vec<u8>, FrameError> {
     let body = serde_json::to_vec(message).map_err(FrameError::Malformed)?;
     if body.len() > max {
-        return Err(FrameError::TooLarge { length: body.len(), max });
+        return Err(FrameError::TooLarge {
+            length: body.len(),
+            max,
+        });
     }
     let mut frame = Vec::with_capacity(4 + body.len());
     frame.extend_from_slice(&(body.len() as u32).to_be_bytes());
@@ -45,18 +51,27 @@ pub fn encode<T: Serialize>(message: &T, max: usize) -> Result<Vec<u8>, FrameErr
     Ok(frame)
 }
 
-pub fn write_frame<W: Write, T: Serialize>(writer: &mut W, message: &T, max: usize) -> Result<(), FrameError> {
+pub fn write_frame<W: Write, T: Serialize>(
+    writer: &mut W,
+    message: &T,
+    max: usize,
+) -> Result<(), FrameError> {
     let frame = encode(message, max)?;
     writer.write_all(&frame)?;
     writer.flush()?;
     Ok(())
 }
 
-pub fn read_frame<R: Read, T: DeserializeOwned>(reader: &mut R, max: usize) -> Result<T, FrameError> {
+pub fn read_frame<R: Read, T: DeserializeOwned>(
+    reader: &mut R,
+    max: usize,
+) -> Result<T, FrameError> {
     let mut prefix = [0u8; 4];
     match reader.read_exact(&mut prefix) {
         Ok(()) => {}
-        Err(error) if error.kind() == io::ErrorKind::UnexpectedEof => return Err(FrameError::Closed),
+        Err(error) if error.kind() == io::ErrorKind::UnexpectedEof => {
+            return Err(FrameError::Closed);
+        }
         Err(error) => return Err(FrameError::Io(error)),
     }
     let length = u32::from_be_bytes(prefix) as usize;

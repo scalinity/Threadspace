@@ -17,14 +17,23 @@ pub const PROBE_LABEL: &str = "acl-probe";
 const PROBE_TITLE_PREFIX: &str = "ACL-PROBE:";
 
 fn now_ms() -> u128 {
-    SystemTime::now().duration_since(UNIX_EPOCH).map(|elapsed| elapsed.as_millis()).unwrap_or(0)
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_millis())
+        .unwrap_or(0)
 }
 
 /// Writes `~/Library/Logs/<identifier>/qualification/<kind>-<ms>.json`.
-pub fn record<R: Runtime>(app: &AppHandle<R>, kind: &str, report: &Value) -> Result<String, UiError> {
+pub fn record<R: Runtime>(
+    app: &AppHandle<R>,
+    kind: &str,
+    report: &Value,
+) -> Result<String, UiError> {
     let valid_kind = !kind.is_empty()
         && kind.len() <= 48
-        && kind.bytes().all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-');
+        && kind
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-');
     if !valid_kind {
         return Err(UiError::invalid("reportKind must be 1-48 of [a-z0-9-]"));
     }
@@ -38,16 +47,21 @@ pub fn record<R: Runtime>(app: &AppHandle<R>, kind: &str, report: &Value) -> Res
     }))
     .map_err(|error| UiError::invalid(error.to_string()))?;
     if body.len() > REPORT_MAX_BYTES {
-        return Err(UiError::new(UiErrorCode::ReplyTooLarge, "report exceeds 64 KiB"));
+        return Err(UiError::new(
+            UiErrorCode::ReplyTooLarge,
+            "report exceeds 64 KiB",
+        ));
     }
     let directory = app
         .path()
         .app_log_dir()
         .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?
         .join("qualification");
-    fs::create_dir_all(&directory).map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
+    fs::create_dir_all(&directory)
+        .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
     let file_name = format!("{kind}-{recorded_at_ms}.json");
-    fs::write(directory.join(&file_name), body).map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
+    fs::write(directory.join(&file_name), body)
+        .map_err(|error| UiError::new(UiErrorCode::Internal, error.to_string()))?;
     Ok(file_name)
 }
 
@@ -64,7 +78,8 @@ pub fn open_acl_probe<R: Runtime>(app: &AppHandle<R>, launch: &LaunchOptions) ->
         .on_navigation(navigation_allowed)
         .on_document_title_changed(move |window, title| {
             if let Some(payload) = title.strip_prefix(PROBE_TITLE_PREFIX) {
-                let value = serde_json::from_str(payload).unwrap_or_else(|_| Value::String(payload.to_owned()));
+                let value = serde_json::from_str(payload)
+                    .unwrap_or_else(|_| Value::String(payload.to_owned()));
                 let _ = record(&handle, "acl-probe", &value);
                 let _ = window.destroy();
             }

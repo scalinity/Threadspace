@@ -44,9 +44,22 @@ impl ViewRegistry {
 
     /// Returns the caller's incarnation only if it is the active office view.
     pub fn verify<R: Runtime>(&self, webview: &Webview<R>) -> Result<Uuid, UiError> {
-        let stale = || UiError::new(UiErrorCode::StaleView, "calling view is not the active office incarnation");
-        let active = self.active.lock().ok().and_then(|active| *active).ok_or_else(stale)?;
-        let marker = webview.resources_table().get::<OfficeIncarnation>(active.rid).map_err(|_| stale())?;
+        let stale = || {
+            UiError::new(
+                UiErrorCode::StaleView,
+                "calling view is not the active office incarnation",
+            )
+        };
+        let active = self
+            .active
+            .lock()
+            .ok()
+            .and_then(|active| *active)
+            .ok_or_else(stale)?;
+        let marker = webview
+            .resources_table()
+            .get::<OfficeIncarnation>(active.rid)
+            .map_err(|_| stale())?;
         if marker.id != active.id {
             return Err(stale());
         }

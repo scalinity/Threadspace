@@ -89,12 +89,21 @@ pub enum UiFrameBody {
         total_bytes: u32,
     },
     /// A UTF-8 slice of the serialized `FleetSnapshot`; staged until `SnapshotEnd`.
-    SnapshotChunk { index: u32, data: String },
+    SnapshotChunk {
+        index: u32,
+        data: String,
+    },
     /// Replace the renderer projection atomically, then ACK this frame.
-    SnapshotEnd { view_revision: String },
-    ProjectionPatch { patch: ProjectionPatch },
+    SnapshotEnd {
+        view_revision: String,
+    },
+    ProjectionPatch {
+        patch: ProjectionPatch,
+    },
     BridgeHeartbeat,
-    NativeIntent { intent: NativeIntent },
+    NativeIntent {
+        intent: NativeIntent,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -178,7 +187,9 @@ pub enum CompanionLink {
         store_generation: String,
         companion_pid: u32,
     },
-    Unavailable { reason: String },
+    Unavailable {
+        reason: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
@@ -344,7 +355,10 @@ impl UiError {
                 | UiErrorCode::UnknownSubscription
         );
         let detail: String = detail.into();
-        let detail = detail.chars().take(limits::ERROR_DETAIL_MAX_CHARS).collect();
+        let detail = detail
+            .chars()
+            .take(limits::ERROR_DETAIL_MAX_CHARS)
+            .collect();
         Self {
             code,
             retryable,
@@ -375,7 +389,9 @@ impl std::error::Error for UiError {}
 /// Deserializes a raw command argument into a strict contract type, mapping
 /// every shape error to a typed `INVALID_REQUEST` (a TypeScript generic on
 /// `invoke<T>` is not wire validation).
-pub fn parse_request<T: serde::de::DeserializeOwned>(value: serde_json::Value) -> Result<T, UiError> {
+pub fn parse_request<T: serde::de::DeserializeOwned>(
+    value: serde_json::Value,
+) -> Result<T, UiError> {
     serde_json::from_value(value).map_err(|error| UiError::invalid(error.to_string()))
 }
 
@@ -405,13 +421,20 @@ mod tests {
             "viewEpoch": "6f1b3c2e-4a5d-4e6f-8a9b-0c1d2e3f4a5b",
             "extra": true
         }));
-        assert_eq!(result.expect_err("must reject").code, UiErrorCode::InvalidRequest);
+        assert_eq!(
+            result.expect_err("must reject").code,
+            UiErrorCode::InvalidRequest
+        );
     }
 
     #[test]
     fn unknown_action_kind_is_malformed_but_later_actions_parse() {
-        let unknown: Result<UiAction, _> = parse_request(json!({ "kind": "RunShell", "cmd": "ls" }));
-        assert_eq!(unknown.expect_err("must reject").code, UiErrorCode::InvalidRequest);
+        let unknown: Result<UiAction, _> =
+            parse_request(json!({ "kind": "RunShell", "cmd": "ls" }));
+        assert_eq!(
+            unknown.expect_err("must reject").code,
+            UiErrorCode::InvalidRequest
+        );
 
         let later: UiAction = parse_request(json!({ "kind": "ReturnToSession" })).expect("parses");
         assert_eq!(later, UiAction::ReturnToSession {});

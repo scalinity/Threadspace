@@ -34,7 +34,16 @@ mod tests {
 
     #[test]
     fn rejects_noncanonical_and_out_of_range_values() {
-        for bad in ["", "-1", "+1", "01", "1.0", " 1", "9223372036854775808", "abc"] {
+        for bad in [
+            "",
+            "-1",
+            "+1",
+            "01",
+            "1.0",
+            " 1",
+            "9223372036854775808",
+            "abc",
+        ] {
             assert_eq!(parse_cursor(bad), None, "{bad:?} must be rejected");
         }
     }

@@ -12,9 +12,10 @@ use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody};
 use threadspace_contracts::cursor::parse_cursor;
 use threadspace_contracts::limits::QUERY_REPLY_MAX_BYTES;
 use threadspace_contracts::ui::{
-    CompanionLink, ConnectionStatus, DiagnosticsReport, IntegrationReport, UI_PROTOCOL_VERSION, UiAckReply,
-    UiAckRequest, UiAction, UiActionRequest, UiActionResult, UiConnectReply, UiConnectRequest, UiDisconnectRequest,
-    UiError, UiErrorCode, UiFrame, UiQuery, UiQueryRequest, UiQueryResult, parse_request, parse_uuid,
+    CompanionLink, ConnectionStatus, DiagnosticsReport, IntegrationReport, UI_PROTOCOL_VERSION,
+    UiAckReply, UiAckRequest, UiAction, UiActionRequest, UiActionResult, UiConnectReply,
+    UiConnectRequest, UiDisconnectRequest, UiError, UiErrorCode, UiFrame, UiQuery, UiQueryRequest,
+    UiQueryResult, parse_request, parse_uuid,
 };
 
 use crate::bootstrap;
@@ -34,7 +35,10 @@ pub async fn ui_connect<R: Runtime>(
 ) -> Result<UiConnectReply, UiError> {
     let incarnation = bridge.views.verify(&webview)?;
     let request: UiConnectRequest = parse_request(request)?;
-    bridge.inner().connect_view(incarnation, request, events).await
+    bridge
+        .inner()
+        .connect_view(incarnation, request, events)
+        .await
 }
 
 #[tauri::command]
@@ -60,9 +64,14 @@ pub async fn ui_disconnect<R: Runtime>(
 }
 
 fn bounded<T: serde::Serialize>(value: T) -> Result<T, UiError> {
-    let size = serde_json::to_vec(&value).map(|bytes| bytes.len()).unwrap_or(usize::MAX);
+    let size = serde_json::to_vec(&value)
+        .map(|bytes| bytes.len())
+        .unwrap_or(usize::MAX);
     if size > QUERY_REPLY_MAX_BYTES {
-        return Err(UiError::new(UiErrorCode::ReplyTooLarge, format!("reply of {size} bytes exceeds 64 KiB")));
+        return Err(UiError::new(
+            UiErrorCode::ReplyTooLarge,
+            format!("reply of {size} bytes exceeds 64 KiB"),
+        ));
     }
     Ok(value)
 }
@@ -96,7 +105,9 @@ pub async fn ui_query<R: Runtime>(
                     store_generation: link.hello.store_generation.clone(),
                     companion_pid: link.hello.companion.pid,
                 },
-                Err(error) => CompanionLink::Unavailable { reason: error.detail },
+                Err(error) => CompanionLink::Unavailable {
+                    reason: error.detail,
+                },
             };
             UiQueryResult::ConnectionStatus(ConnectionStatus {
                 ui_protocol_version: UI_PROTOCOL_VERSION,
@@ -108,7 +119,11 @@ pub async fn ui_query<R: Runtime>(
         UiQuery::Diagnostics {} => {
             subscribed(bridge)?;
             let version = webview.app_handle().package_info().version.to_string();
-            let companion = match bridge.link()?.request(ControlRequestBody::Diagnostics, QUICK).await {
+            let companion = match bridge
+                .link()?
+                .request(ControlRequestBody::Diagnostics, QUICK)
+                .await
+            {
                 Ok(ControlResponseBody::Diagnostics { report }) => Some(report),
                 _ => None,
             };
@@ -120,14 +135,23 @@ pub async fn ui_query<R: Runtime>(
         UiQuery::IntegrationStatus {} => {
             subscribed(bridge)?;
             let service = bootstrap::report(&bridge.agent_identifier());
-            let companion = match bridge.link()?.request(ControlRequestBody::IntegrationStatus, QUICK).await {
+            let companion = match bridge
+                .link()?
+                .request(ControlRequestBody::IntegrationStatus, QUICK)
+                .await
+            {
                 Ok(ControlResponseBody::IntegrationStatus { report }) => Some(report),
                 _ => None,
             };
             UiQueryResult::IntegrationStatus(Box::new(IntegrationReport { service, companion }))
         }
-        UiQuery::FleetPage {} | UiQuery::AttentionPage {} | UiQuery::SessionDetail {} | UiQuery::ProjectDetail {} => {
-            return Err(UiError::not_implemented(&format!("{:?}", request.query).replace(" {}", "")));
+        UiQuery::FleetPage {}
+        | UiQuery::AttentionPage {}
+        | UiQuery::SessionDetail {}
+        | UiQuery::ProjectDetail {} => {
+            return Err(UiError::not_implemented(
+                &format!("{:?}", request.query).replace(" {}", ""),
+            ));
         }
     };
     bounded(result)
@@ -146,7 +170,10 @@ pub async fn ui_action<R: Runtime>(
     let subscription = bridge.validate_context(incarnation, &request.context)?;
     let link = bridge.link()?;
     if link.id != subscription.link_id {
-        return Err(UiError::new(UiErrorCode::StaleContext, "companion connection changed"));
+        return Err(UiError::new(
+            UiErrorCode::StaleContext,
+            "companion connection changed",
+        ));
     }
     let result = match request.action {
         UiAction::AcknowledgeAttention { attention_id } => {
@@ -154,7 +181,9 @@ pub async fn ui_action<R: Runtime>(
             if let Some(revision) = &request.expected_revision
                 && parse_cursor(revision).is_none()
             {
-                return Err(UiError::invalid("expectedRevision must be a canonical cursor"));
+                return Err(UiError::invalid(
+                    "expectedRevision must be a canonical cursor",
+                ));
             }
             let body = ControlRequestBody::AcknowledgeAttention {
                 command_id: request.request_id,
@@ -162,29 +191,62 @@ pub async fn ui_action<R: Runtime>(
                 expected_revision: request.expected_revision,
             };
             match link.request(body, QUICK).await.map_err(link_error)? {
-                ControlResponseBody::CommandReceipt { receipt } => UiActionResult::CommandCommitted { receipt },
-                _ => return Err(UiError::new(UiErrorCode::Internal, "unexpected companion reply")),
+                ControlResponseBody::CommandReceipt { receipt } => {
+                    UiActionResult::CommandCommitted { receipt }
+                }
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
             }
         }
         UiAction::RequestNotificationAuthorization {} => {
-            match link.request(ControlRequestBody::RequestNotificationAuthorization, PROMPT).await.map_err(link_error)? {
+            match link
+                .request(ControlRequestBody::RequestNotificationAuthorization, PROMPT)
+                .await
+                .map_err(link_error)?
+            {
                 ControlResponseBody::NotificationAuthorization { granted, settings } => {
                     UiActionResult::NotificationAuthorization { granted, settings }
                 }
-                _ => return Err(UiError::new(UiErrorCode::Internal, "unexpected companion reply")),
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
+                }
             }
         }
         UiAction::RequestTerminalAutomation {} => {
-            match link.request(ControlRequestBody::RequestTerminalAutomation, PROMPT).await.map_err(link_error)? {
-                ControlResponseBody::TerminalAutomation { automation, status_code } => {
-                    UiActionResult::TerminalAutomation { automation, status_code }
+            match link
+                .request(ControlRequestBody::RequestTerminalAutomation, PROMPT)
+                .await
+                .map_err(link_error)?
+            {
+                ControlResponseBody::TerminalAutomation {
+                    automation,
+                    status_code,
+                } => UiActionResult::TerminalAutomation {
+                    automation,
+                    status_code,
+                },
+                _ => {
+                    return Err(UiError::new(
+                        UiErrorCode::Internal,
+                        "unexpected companion reply",
+                    ));
                 }
-                _ => return Err(UiError::new(UiErrorCode::Internal, "unexpected companion reply")),
             }
         }
         #[cfg(feature = "qualification")]
-        UiAction::RecordQualificationReport { report_kind, report } => {
-            let file_name = crate::qualification::record(webview.app_handle(), &report_kind, &report)?;
+        UiAction::RecordQualificationReport {
+            report_kind,
+            report,
+        } => {
+            let file_name =
+                crate::qualification::record(webview.app_handle(), &report_kind, &report)?;
             UiActionResult::QualificationReportRecorded { file_name }
         }
         other => {

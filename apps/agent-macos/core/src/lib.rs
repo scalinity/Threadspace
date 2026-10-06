@@ -32,7 +32,9 @@ use threadspace_contracts::diagnostics::ProcessIdentity;
 use threadspace_journal::{Journal, LockError, WriterLock};
 use threadspace_relay::locator::{self, LOCATOR_SCHEMA, RuntimeLocator};
 use threadspace_relay::paths::AgentPaths;
-use threadspace_relay::runtime::{bind_private_socket, create_runtime_dir, remove_stale_runtime_dir};
+use threadspace_relay::runtime::{
+    bind_private_socket, create_runtime_dir, remove_stale_runtime_dir,
+};
 use threadspace_surfaces_macos::process;
 use uuid::Uuid;
 
@@ -73,7 +75,10 @@ fn own_identity() -> Result<ProcessIdentity, String> {
         boot_id: process::boot_session_id().map_err(|error| error.to_string())?,
         start_seconds: sample.start_seconds.to_string(),
         start_microseconds: sample.start_microseconds,
-        executable_path: process::executable_path(pid).map_err(|error| error.to_string())?.display().to_string(),
+        executable_path: process::executable_path(pid)
+            .map_err(|error| error.to_string())?
+            .display()
+            .to_string(),
     })
 }
 
@@ -85,7 +90,14 @@ fn private_dir(path: &Path) -> std::io::Result<()> {
 /// Validated, ID-only handling of notification responses; queued until the
 /// writer exists (SPEC §7.5).
 fn handle_event(event: BridgeEvent) {
-    let BridgeEvent::NotificationResponse { schema, request_id, action_identifier, attention_id, .. } = event else {
+    let BridgeEvent::NotificationResponse {
+        schema,
+        request_id,
+        action_identifier,
+        attention_id,
+        ..
+    } = event
+    else {
         return;
     };
     if schema != 1 || action_identifier != DEFAULT_ACTION {
@@ -99,10 +111,16 @@ fn handle_event(event: BridgeEvent) {
         Some(running) => {
             if running
                 .writer
-                .try_send(WriterCommand::NotificationResponse { notification_request_id: request_id, attention_id })
+                .try_send(WriterCommand::NotificationResponse {
+                    notification_request_id: request_id,
+                    attention_id,
+                })
                 .is_err()
             {
-                log::warn("NOTIFICATION_RESPONSE_DROPPED", json!({ "reason": "writer queue full" }));
+                log::warn(
+                    "NOTIFICATION_RESPONSE_DROPPED",
+                    json!({ "reason": "writer queue full" }),
+                );
             }
         }
         None => {
@@ -137,7 +155,10 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         }),
     );
     if !process::meets_minimum_macos() {
-        log::error("UNSUPPORTED_OS", json!({ "version": format!("{:?}", process::os_product_version().ok()) }));
+        log::error(
+            "UNSUPPORTED_OS",
+            json!({ "version": format!("{:?}", process::os_product_version().ok()) }),
+        );
         return EXIT_UNSUPPORTED_OS;
     }
     if let Err(error) = private_dir(&paths.store_dir) {
@@ -179,7 +200,10 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
                 "storeGeneration": journal.store_generation(),
             }),
         ),
-        Err(error) => log::warn("JOURNAL_DIAGNOSTICS_FAILED", json!({ "error": error.to_string() })),
+        Err(error) => log::warn(
+            "JOURNAL_DIAGNOSTICS_FAILED",
+            json!({ "error": error.to_string() }),
+        ),
     }
     let store_generation = journal.store_generation().to_owned();
     let identity = match own_identity() {
@@ -193,9 +217,9 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     if let Ok(previous) = locator::read(&paths.locator) {
         remove_stale_runtime_dir(Path::new(&previous.runtime_dir));
     }
-    let (listener, socket_path, runtime_dir) = match create_runtime_dir()
-        .and_then(|dir| bind_private_socket(&dir, "control.sock").map(|(listener, path)| (listener, path, dir)))
-    {
+    let (listener, socket_path, runtime_dir) = match create_runtime_dir().and_then(|dir| {
+        bind_private_socket(&dir, "control.sock").map(|(listener, path)| (listener, path, dir))
+    }) {
         Ok(bound) => bound,
         Err(error) => {
             log::error("SOCKET_BIND_FAILED", json!({ "error": error.to_string() }));
@@ -233,10 +257,19 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         written_at_ms: log::now_ms(),
     };
     if let Err(error) = locator::write_atomic(&paths.locator, &runtime_locator) {
-        log::error("LOCATOR_WRITE_FAILED", json!({ "error": error.to_string() }));
+        log::error(
+            "LOCATOR_WRITE_FAILED",
+            json!({ "error": error.to_string() }),
+        );
         return EXIT_FATAL;
     }
-    if RUNNING.set(Running { writer: writer_tx, _lock: lock }).is_err() {
+    if RUNNING
+        .set(Running {
+            writer: writer_tx,
+            _lock: lock,
+        })
+        .is_err()
+    {
         return EXIT_FATAL;
     }
     log::info(
@@ -251,7 +284,10 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
             "controlSocket": runtime_locator.control_socket,
         }),
     );
-    let queued: Vec<BridgeEvent> = PRESTART.lock().map(|mut queue| queue.drain(..).collect()).unwrap_or_default();
+    let queued: Vec<BridgeEvent> = PRESTART
+        .lock()
+        .map(|mut queue| queue.drain(..).collect())
+        .unwrap_or_default();
     for event in queued {
         handle_event(event);
     }
@@ -265,7 +301,10 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
 /// of the call; `callback` must remain callable for the life of the process
 /// and must copy the string it receives before returning.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_core_start(config_json: *const c_char, callback: Option<BridgeCallback>) -> i32 {
+pub unsafe extern "C" fn ts_core_start(
+    config_json: *const c_char,
+    callback: Option<BridgeCallback>,
+) -> i32 {
     // This core runs inside a Swift executable, so Rust's runtime never set
     // SIGPIPE to ignored; a write to a closed client socket must not kill the
     // companion.
@@ -308,6 +347,9 @@ pub unsafe extern "C" fn ts_core_deliver(event_json: *const c_char) {
                 handle_event(uncorrelated);
             }
         }
-        Err(error) => log::warn("BRIDGE_EVENT_REJECTED", json!({ "reason": error.to_string() })),
+        Err(error) => log::warn(
+            "BRIDGE_EVENT_REJECTED",
+            json!({ "reason": error.to_string() }),
+        ),
     }
 }

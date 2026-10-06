@@ -7,9 +7,12 @@ use std::sync::mpsc::{self, SyncSender};
 use std::time::Duration;
 
 use serde_json::json;
-use threadspace_contracts::control::{ControlError, ControlErrorCode, ControlRequestBody, ControlResponseBody};
+use threadspace_contracts::control::{
+    ControlError, ControlErrorCode, ControlRequestBody, ControlResponseBody,
+};
 use threadspace_contracts::diagnostics::{
-    AutomationPermission, CompanionDiagnostics, CompanionIntegration, ProcessIdentity, TerminalIntegration,
+    AutomationPermission, CompanionDiagnostics, CompanionIntegration, ProcessIdentity,
+    TerminalIntegration,
 };
 use threadspace_relay::paths::redact_home;
 use threadspace_surfaces_macos::terminal::{self, TERMINAL_APP_PATH, TERMINAL_BUNDLE_ID};
@@ -66,12 +69,18 @@ pub fn classify_automation(status: i32) -> AutomationPermission {
     }
 }
 
-fn diagnostics(context: &OpsContext, writer: &SyncSender<WriterCommand>) -> Result<ControlResponseBody, ControlError> {
+fn diagnostics(
+    context: &OpsContext,
+    writer: &SyncSender<WriterCommand>,
+) -> Result<ControlResponseBody, ControlError> {
     let (reply, answer) = mpsc::channel();
     writer
         .send(WriterCommand::SqliteDiagnostics { reply })
         .map_err(|_| internal("writer unavailable"))?;
-    let mut sqlite = answer.recv_timeout(QUICK).map_err(|_| internal("writer did not answer"))?.map_err(internal)?;
+    let mut sqlite = answer
+        .recv_timeout(QUICK)
+        .map_err(|_| internal("writer did not answer"))?
+        .map_err(internal)?;
     sqlite.database_path = redact_home(&sqlite.database_path);
     let mut process = context.identity.clone();
     process.executable_path = redact_home(&process.executable_path);
@@ -94,15 +103,24 @@ fn diagnostics(context: &OpsContext, writer: &SyncSender<WriterCommand>) -> Resu
 fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError> {
     let app = PathBuf::from(TERMINAL_APP_PATH);
     let installed = app.exists();
-    let running = bridge::application_running(TERMINAL_BUNDLE_ID, QUICK).map_err(|error| internal(error.to_string()))?;
+    let running = bridge::application_running(TERMINAL_BUNDLE_ID, QUICK)
+        .map_err(|error| internal(error.to_string()))?;
     let dictionary = if installed {
-        terminal::probe_dictionary(&app).map_err(|error| log::warn("TERMINAL_DICTIONARY_FAILED", json!({ "error": error.to_string() }))).ok()
+        terminal::probe_dictionary(&app)
+            .map_err(|error| {
+                log::warn(
+                    "TERMINAL_DICTIONARY_FAILED",
+                    json!({ "error": error.to_string() }),
+                )
+            })
+            .ok()
     } else {
         None
     };
     // Asking without prompting; an unopened Terminal reports procNotFound.
     let status = if running {
-        bridge::automation_permission(TERMINAL_BUNDLE_ID, false, QUICK).map_err(|error| internal(error.to_string()))?
+        bridge::automation_permission(TERMINAL_BUNDLE_ID, false, QUICK)
+            .map_err(|error| internal(error.to_string()))?
     } else {
         PROC_NOT_FOUND
     };
@@ -112,7 +130,10 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
         match terminal::inventory(&script) {
             Ok(summary) => Some(summary),
             Err(error) => {
-                log::warn("TERMINAL_INVENTORY_FAILED", json!({ "error": error.to_string() }));
+                log::warn(
+                    "TERMINAL_INVENTORY_FAILED",
+                    json!({ "error": error.to_string() }),
+                );
                 None
             }
         }
@@ -134,7 +155,9 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
             notification_settings: bridge::notification_settings(QUICK),
             terminal: TerminalIntegration {
                 application_path: installed.then(|| TERMINAL_APP_PATH.to_owned()),
-                application_version: installed.then(|| terminal::application_version(&app)).flatten(),
+                application_version: installed
+                    .then(|| terminal::application_version(&app))
+                    .flatten(),
                 running,
                 dictionary,
                 automation,
@@ -146,8 +169,13 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
 }
 
 fn request_notification_authorization() -> Result<ControlResponseBody, ControlError> {
-    match bridge::call(|correlation_id| BridgeRequest::RequestNotificationAuthorization { correlation_id }, PROMPT) {
-        Ok(BridgeEvent::NotificationAuthorization { granted, settings, .. }) => {
+    match bridge::call(
+        |correlation_id| BridgeRequest::RequestNotificationAuthorization { correlation_id },
+        PROMPT,
+    ) {
+        Ok(BridgeEvent::NotificationAuthorization {
+            granted, settings, ..
+        }) => {
             log::info(
                 "NOTIFICATION_AUTHORIZATION_RESULT",
                 json!({ "granted": granted, "authorizationStatus": settings.authorization_status, "alertSetting": settings.alert_setting }),
@@ -160,15 +188,23 @@ fn request_notification_authorization() -> Result<ControlResponseBody, ControlEr
 }
 
 fn request_terminal_automation() -> Result<ControlResponseBody, ControlError> {
-    let running = bridge::application_running(TERMINAL_BUNDLE_ID, QUICK).map_err(|error| internal(error.to_string()))?;
+    let running = bridge::application_running(TERMINAL_BUNDLE_ID, QUICK)
+        .map_err(|error| internal(error.to_string()))?;
     let status = if running {
-        bridge::automation_permission(TERMINAL_BUNDLE_ID, true, PROMPT).map_err(|error| internal(error.to_string()))?
+        bridge::automation_permission(TERMINAL_BUNDLE_ID, true, PROMPT)
+            .map_err(|error| internal(error.to_string()))?
     } else {
         PROC_NOT_FOUND
     };
     let automation = classify_automation(status);
-    log::info("TERMINAL_AUTOMATION_RESULT", json!({ "automation": automation, "status": status }));
-    Ok(ControlResponseBody::TerminalAutomation { automation, status_code: status })
+    log::info(
+        "TERMINAL_AUTOMATION_RESULT",
+        json!({ "automation": automation, "status": status }),
+    );
+    Ok(ControlResponseBody::TerminalAutomation {
+        automation,
+        status_code: status,
+    })
 }
 
 pub fn run(
@@ -179,9 +215,14 @@ pub fn run(
     match body {
         ControlRequestBody::Diagnostics => diagnostics(context, writer),
         ControlRequestBody::IntegrationStatus => integration(context),
-        ControlRequestBody::RequestNotificationAuthorization => request_notification_authorization(),
+        ControlRequestBody::RequestNotificationAuthorization => {
+            request_notification_authorization()
+        }
         ControlRequestBody::RequestTerminalAutomation => request_terminal_automation(),
-        _ => Err(ControlError::new(ControlErrorCode::BadRequest, "not a native operation")),
+        _ => Err(ControlError::new(
+            ControlErrorCode::BadRequest,
+            "not a native operation",
+        )),
     }
 }
 
@@ -193,8 +234,14 @@ mod tests {
     fn classifies_apple_event_statuses() {
         assert_eq!(classify_automation(0), AutomationPermission::Authorized);
         assert_eq!(classify_automation(-1743), AutomationPermission::Denied);
-        assert_eq!(classify_automation(-1744), AutomationPermission::RequiresConsent);
-        assert_eq!(classify_automation(-600), AutomationPermission::TargetNotRunning);
+        assert_eq!(
+            classify_automation(-1744),
+            AutomationPermission::RequiresConsent
+        );
+        assert_eq!(
+            classify_automation(-600),
+            AutomationPermission::TargetNotRunning
+        );
         assert_eq!(classify_automation(-50), AutomationPermission::Error);
     }
 }

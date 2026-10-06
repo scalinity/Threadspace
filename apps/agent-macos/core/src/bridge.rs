@@ -19,8 +19,12 @@ pub type BridgeCallback = extern "C" fn(*const c_char);
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "kind", rename_all_fields = "camelCase")]
 pub enum BridgeRequest {
-    NotificationSettings { correlation_id: u64 },
-    RequestNotificationAuthorization { correlation_id: u64 },
+    NotificationSettings {
+        correlation_id: u64,
+    },
+    RequestNotificationAuthorization {
+        correlation_id: u64,
+    },
     PostNotification {
         correlation_id: u64,
         request_id: String,
@@ -29,9 +33,18 @@ pub enum BridgeRequest {
         attention_id: String,
         session_id: String,
     },
-    AutomationPermission { correlation_id: u64, bundle_identifier: String, ask_user: bool },
-    RunningApplication { correlation_id: u64, bundle_identifier: String },
-    AccessibilityPreferences { correlation_id: u64 },
+    AutomationPermission {
+        correlation_id: u64,
+        bundle_identifier: String,
+        ask_user: bool,
+    },
+    RunningApplication {
+        correlation_id: u64,
+        bundle_identifier: String,
+    },
+    AccessibilityPreferences {
+        correlation_id: u64,
+    },
     /// Open (or activate) the containing Threadspace application.
     OpenContainingApp,
 }
@@ -40,12 +53,32 @@ pub enum BridgeRequest {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(tag = "kind", rename_all_fields = "camelCase")]
 pub enum BridgeEvent {
-    NotificationSettings { correlation_id: u64, settings: NotificationSettings },
-    NotificationAuthorization { correlation_id: u64, granted: bool, settings: NotificationSettings },
-    NotificationPosted { correlation_id: u64, request_id: String, error: Option<String> },
-    AutomationPermission { correlation_id: u64, status: i32 },
-    RunningApplication { correlation_id: u64, running: bool },
-    AccessibilityPreferences { correlation_id: u64, preferences: AccessibilityPreferences },
+    NotificationSettings {
+        correlation_id: u64,
+        settings: NotificationSettings,
+    },
+    NotificationAuthorization {
+        correlation_id: u64,
+        granted: bool,
+        settings: NotificationSettings,
+    },
+    NotificationPosted {
+        correlation_id: u64,
+        request_id: String,
+        error: Option<String>,
+    },
+    AutomationPermission {
+        correlation_id: u64,
+        status: i32,
+    },
+    RunningApplication {
+        correlation_id: u64,
+        running: bool,
+    },
+    AccessibilityPreferences {
+        correlation_id: u64,
+        preferences: AccessibilityPreferences,
+    },
     /// The user interacted with a delivered notification. Only internal IDs.
     NotificationResponse {
         schema: u32,
@@ -113,13 +146,20 @@ pub fn notify(request: &BridgeRequest) {
 }
 
 /// Sends a correlated request and waits for its answer.
-pub fn call(build: impl FnOnce(u64) -> BridgeRequest, timeout: Duration) -> Result<BridgeEvent, BridgeError> {
+pub fn call(
+    build: impl FnOnce(u64) -> BridgeRequest,
+    timeout: Duration,
+) -> Result<BridgeEvent, BridgeError> {
     let correlation_id = NEXT_CORRELATION.fetch_add(1, Ordering::Relaxed);
     let (sender, receiver): (Sender<BridgeEvent>, Receiver<BridgeEvent>) = mpsc::channel();
     if let Ok(mut map) = pending().lock() {
         map.insert(correlation_id, sender);
     }
-    let result = send(&build(correlation_id)).and_then(|()| receiver.recv_timeout(timeout).map_err(|_| BridgeError::Timeout));
+    let result = send(&build(correlation_id)).and_then(|()| {
+        receiver
+            .recv_timeout(timeout)
+            .map_err(|_| BridgeError::Timeout)
+    });
     if let Ok(mut map) = pending().lock() {
         map.remove(&correlation_id);
     }
@@ -132,7 +172,10 @@ pub fn route(event: BridgeEvent) -> Option<BridgeEvent> {
     let Some(correlation_id) = event.correlation_id() else {
         return Some(event);
     };
-    let sender = pending().lock().ok().and_then(|mut map| map.remove(&correlation_id));
+    let sender = pending()
+        .lock()
+        .ok()
+        .and_then(|mut map| map.remove(&correlation_id));
     if let Some(sender) = sender {
         let _ = sender.send(event);
     }
@@ -140,20 +183,29 @@ pub fn route(event: BridgeEvent) -> Option<BridgeEvent> {
 }
 
 pub fn notification_settings(timeout: Duration) -> Option<NotificationSettings> {
-    match call(|correlation_id| BridgeRequest::NotificationSettings { correlation_id }, timeout) {
+    match call(
+        |correlation_id| BridgeRequest::NotificationSettings { correlation_id },
+        timeout,
+    ) {
         Ok(BridgeEvent::NotificationSettings { settings, .. }) => Some(settings),
         _ => None,
     }
 }
 
 pub fn accessibility_preferences(timeout: Duration) -> Option<AccessibilityPreferences> {
-    match call(|correlation_id| BridgeRequest::AccessibilityPreferences { correlation_id }, timeout) {
+    match call(
+        |correlation_id| BridgeRequest::AccessibilityPreferences { correlation_id },
+        timeout,
+    ) {
         Ok(BridgeEvent::AccessibilityPreferences { preferences, .. }) => Some(preferences),
         _ => None,
     }
 }
 
-pub fn application_running(bundle_identifier: &str, timeout: Duration) -> Result<bool, BridgeError> {
+pub fn application_running(
+    bundle_identifier: &str,
+    timeout: Duration,
+) -> Result<bool, BridgeError> {
     match call(
         |correlation_id| BridgeRequest::RunningApplication {
             correlation_id,
@@ -166,7 +218,11 @@ pub fn application_running(bundle_identifier: &str, timeout: Duration) -> Result
     }
 }
 
-pub fn automation_permission(bundle_identifier: &str, ask_user: bool, timeout: Duration) -> Result<i32, BridgeError> {
+pub fn automation_permission(
+    bundle_identifier: &str,
+    ask_user: bool,
+    timeout: Duration,
+) -> Result<i32, BridgeError> {
     match call(
         |correlation_id| BridgeRequest::AutomationPermission {
             correlation_id,

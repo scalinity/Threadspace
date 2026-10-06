@@ -22,7 +22,12 @@ const MAX_INVENTORY_BYTES: usize = 64 * 1024;
 #[derive(Debug)]
 pub enum TerminalError {
     Exec(ExecError),
-    Failed { program: &'static str, status: Option<i32>, timed_out: bool, stderr: String },
+    Failed {
+        program: &'static str,
+        status: Option<i32>,
+        timed_out: bool,
+        stderr: String,
+    },
     Parse(String),
 }
 
@@ -30,8 +35,16 @@ impl std::fmt::Display for TerminalError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Exec(error) => write!(f, "{error}"),
-            Self::Failed { program, status, timed_out, stderr } => {
-                write!(f, "{program} failed (status {status:?}, timed out {timed_out}): {stderr}")
+            Self::Failed {
+                program,
+                status,
+                timed_out,
+                stderr,
+            } => {
+                write!(
+                    f,
+                    "{program} failed (status {status:?}, timed out {timed_out}): {stderr}"
+                )
             }
             Self::Parse(detail) => write!(f, "unexpected output: {detail}"),
         }
@@ -57,7 +70,10 @@ fn checked(program: &'static str, command: &BoundedCommand) -> Result<Vec<u8>, T
             program,
             status: output.status,
             timed_out: output.timed_out,
-            stderr: String::from_utf8_lossy(&output.stderr).chars().take(240).collect(),
+            stderr: String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(240)
+                .collect(),
         });
     }
     Ok(output.stdout)
@@ -104,14 +120,20 @@ pub fn application_version(app: &Path) -> Option<String> {
 }
 
 /// Parses the fixed inventory script's output: one `<window id>\t<tty>` line per tab.
-pub fn parse_inventory(output: &str, elapsed_ms: u32) -> Result<TerminalInventorySummary, TerminalError> {
+pub fn parse_inventory(
+    output: &str,
+    elapsed_ms: u32,
+) -> Result<TerminalInventorySummary, TerminalError> {
     let mut windows = std::collections::BTreeSet::new();
     let mut tty_paths = Vec::new();
     for line in output.lines().filter(|line| !line.trim().is_empty()) {
         let (window, tty) = line
             .split_once('\t')
             .ok_or_else(|| TerminalError::Parse("missing tab separator".into()))?;
-        let window: i64 = window.trim().parse().map_err(|_| TerminalError::Parse("window id".into()))?;
+        let window: i64 = window
+            .trim()
+            .parse()
+            .map_err(|_| TerminalError::Parse("window id".into()))?;
         let tty = tty.trim();
         if !tty.starts_with("/dev/") {
             return Err(TerminalError::Parse("tty is not a device path".into()));
@@ -139,10 +161,16 @@ pub fn inventory(script: &Path) -> Result<TerminalInventorySummary, TerminalErro
             program: "osascript",
             status: output.status,
             timed_out: output.timed_out,
-            stderr: String::from_utf8_lossy(&output.stderr).chars().take(240).collect(),
+            stderr: String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(240)
+                .collect(),
         });
     }
-    parse_inventory(&String::from_utf8_lossy(&output.stdout), output.elapsed.as_millis() as u32)
+    parse_inventory(
+        &String::from_utf8_lossy(&output.stdout),
+        output.elapsed.as_millis() as u32,
+    )
 }
 
 #[cfg(test)]
@@ -161,8 +189,11 @@ mod tests {
 
     #[test]
     fn parses_inventory_lines() {
-        let summary = parse_inventory("101\t/dev/ttys001\n101\t/dev/ttys002\n202\t/dev/ttys004\n", 12)
-            .expect("parse");
+        let summary = parse_inventory(
+            "101\t/dev/ttys001\n101\t/dev/ttys002\n202\t/dev/ttys004\n",
+            12,
+        )
+        .expect("parse");
         assert_eq!(summary.window_count, 2);
         assert_eq!(summary.tab_count, 3);
         assert!(parse_inventory("101 /dev/ttys001", 0).is_err());

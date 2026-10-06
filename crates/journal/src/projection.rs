@@ -13,8 +13,11 @@ use threadspace_contracts::projection::{
 use crate::JournalError;
 
 fn parse_enum<T: DeserializeOwned>(text: String) -> Result<T, JournalError> {
-    serde_json::from_value(serde_json::Value::String(text.clone()))
-        .map_err(|_| JournalError::Invalid { detail: format!("unknown stored state {text}") })
+    serde_json::from_value(serde_json::Value::String(text.clone())).map_err(|_| {
+        JournalError::Invalid {
+            detail: format!("unknown stored state {text}"),
+        }
+    })
 }
 
 pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, JournalError> {
@@ -24,11 +27,22 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
                FROM sessions s JOIN provider_namespaces n ON n.id = s.namespace_id
               WHERE s.id = ?1",
             params![session_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
+            |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                ))
+            },
         )
         .optional()?;
     let Some((provider, native_session_id, display_name, fixture, revision)) = row else {
-        return Err(JournalError::NotFound { entity: "session", id: session_id.to_owned() });
+        return Err(JournalError::NotFound {
+            entity: "session",
+            id: session_id.to_owned(),
+        });
     };
 
     let execution: Option<(String, i64, String)> = conn
@@ -118,7 +132,9 @@ pub fn sessions(conn: &Connection) -> Result<Vec<SessionView>, JournalError> {
     ids.iter().map(|id| session(conn, id)).collect()
 }
 
-fn attention_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<(AttentionView, String, String)> {
+fn attention_from_row(
+    row: &rusqlite::Row<'_>,
+) -> rusqlite::Result<(AttentionView, String, String)> {
     Ok((
         AttentionView {
             attention_id: row.get(0)?,
@@ -138,10 +154,13 @@ fn attention_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<(AttentionVie
     ))
 }
 
-const ATTENTION_COLUMNS: &str = "id, session_id, turn_id, category, priority, summary, created_at_ms,
+const ATTENTION_COLUMNS: &str =
+    "id, session_id, turn_id, category, priority, summary, created_at_ms,
     acknowledged_at_ms, resolved_at_ms, notification_state, revision";
 
-fn finish_attention((mut view, category, notification_state): (AttentionView, String, String)) -> Result<AttentionView, JournalError> {
+fn finish_attention(
+    (mut view, category, notification_state): (AttentionView, String, String),
+) -> Result<AttentionView, JournalError> {
     view.category = parse_enum(category)?;
     view.notification_state = parse_enum(notification_state)?;
     Ok(view)
@@ -155,7 +174,10 @@ pub fn attention(conn: &Connection, attention_id: &str) -> Result<AttentionView,
             attention_from_row,
         )
         .optional()?
-        .ok_or_else(|| JournalError::NotFound { entity: "attention", id: attention_id.to_owned() })?;
+        .ok_or_else(|| JournalError::NotFound {
+            entity: "attention",
+            id: attention_id.to_owned(),
+        })?;
     finish_attention(row)
 }
 

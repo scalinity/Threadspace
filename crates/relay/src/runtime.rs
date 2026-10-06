@@ -19,7 +19,10 @@ fn verify_private_dir(path: &Path) -> io::Result<()> {
     if !metadata.file_type().is_dir() || metadata.uid() != current_euid() || mode != 0o700 {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied,
-            format!("{} is not a private directory owned by this user", path.display()),
+            format!(
+                "{} is not a private directory owned by this user",
+                path.display()
+            ),
         ));
     }
     Ok(())
@@ -46,7 +49,10 @@ pub fn create_runtime_dir() -> io::Result<PathBuf> {
             Err(error) => return Err(error),
         }
     }
-    Err(io::Error::new(io::ErrorKind::AlreadyExists, "could not allocate a runtime directory"))
+    Err(io::Error::new(
+        io::ErrorKind::AlreadyExists,
+        "could not allocate a runtime directory",
+    ))
 }
 
 /// Removes an earlier runtime directory of this user, if it is one.
@@ -67,11 +73,17 @@ pub fn bind_private_socket(dir: &Path, name: &str) -> io::Result<(UnixListener, 
     verify_private_dir(dir)?;
     let path = dir.join(name);
     if path.as_os_str().len() >= SUN_PATH_MAX {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "socket path exceeds sun_path"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "socket path exceeds sun_path",
+        ));
     }
     if let Ok(existing) = fs::symlink_metadata(&path) {
         if !existing.file_type().is_socket() {
-            return Err(io::Error::new(io::ErrorKind::AlreadyExists, "non-socket at socket path"));
+            return Err(io::Error::new(
+                io::ErrorKind::AlreadyExists,
+                "non-socket at socket path",
+            ));
         }
         fs::remove_file(&path)?;
     }

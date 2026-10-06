@@ -24,7 +24,13 @@ pub fn peer_credentials(socket: &impl AsRawFd) -> io::Result<PeerCredentials> {
     let mut length = std::mem::size_of::<libc::pid_t>() as libc::socklen_t;
     // SAFETY: as above; `length` matches the `pid` buffer.
     let rc = unsafe {
-        libc::getsockopt(fd, libc::SOL_LOCAL, libc::LOCAL_PEERPID, (&raw mut pid).cast(), &mut length)
+        libc::getsockopt(
+            fd,
+            libc::SOL_LOCAL,
+            libc::LOCAL_PEERPID,
+            (&raw mut pid).cast(),
+            &mut length,
+        )
     };
     if rc != 0 {
         return Err(io::Error::last_os_error());

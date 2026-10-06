@@ -12,13 +12,20 @@ use std::path::{Path, PathBuf};
 pub enum LockError {
     /// Another live writer holds the lock.
     Held { path: PathBuf },
-    Io { path: PathBuf, error: std::io::Error },
+    Io {
+        path: PathBuf,
+        error: std::io::Error,
+    },
 }
 
 impl std::fmt::Display for LockError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Held { path } => write!(f, "writer lock {} is held by another process", path.display()),
+            Self::Held { path } => write!(
+                f,
+                "writer lock {} is held by another process",
+                path.display()
+            ),
             Self::Io { path, error } => write!(f, "writer lock {}: {error}", path.display()),
         }
     }
@@ -37,7 +44,10 @@ impl WriterLock {
     /// holder's PID in it for diagnostics.
     pub fn acquire(store_dir: &Path) -> Result<Self, LockError> {
         let path = store_dir.join("writer.lock");
-        let io = |error| LockError::Io { path: path.clone(), error };
+        let io = |error| LockError::Io {
+            path: path.clone(),
+            error,
+        };
         let mut file = OpenOptions::new()
             .read(true)
             .write(true)

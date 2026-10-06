@@ -20,7 +20,13 @@ pub struct BoundedCommand {
 
 impl BoundedCommand {
     pub fn new(program: impl Into<PathBuf>, timeout: Duration, max_output_bytes: usize) -> Self {
-        Self { program: program.into(), args: Vec::new(), stdin: None, timeout, max_output_bytes }
+        Self {
+            program: program.into(),
+            args: Vec::new(),
+            stdin: None,
+            timeout,
+            max_output_bytes,
+        }
     }
 
     pub fn arg(mut self, value: impl Into<OsString>) -> Self {
@@ -69,7 +75,10 @@ impl std::error::Error for ExecError {}
 
 /// Reads up to `cap` bytes, then drains (and discards) the rest so the child
 /// never blocks on a full pipe.
-fn capped_reader<R: Read + Send + 'static>(mut source: R, cap: usize) -> thread::JoinHandle<(Vec<u8>, bool)> {
+fn capped_reader<R: Read + Send + 'static>(
+    mut source: R,
+    cap: usize,
+) -> thread::JoinHandle<(Vec<u8>, bool)> {
     thread::spawn(move || {
         let mut kept = Vec::new();
         let mut truncated = false;
@@ -101,7 +110,11 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
         .args(&command.args)
         .env_clear()
         .env("LANG", "en_US.UTF-8")
-        .stdin(if command.stdin.is_some() { Stdio::piped() } else { Stdio::null() })
+        .stdin(if command.stdin.is_some() {
+            Stdio::piped()
+        } else {
+            Stdio::null()
+        })
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -112,8 +125,14 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
             let _ = pipe.write_all(&input);
         });
     }
-    let stdout = child.stdout.take().map(|pipe| capped_reader(pipe, command.max_output_bytes));
-    let stderr = child.stderr.take().map(|pipe| capped_reader(pipe, command.max_output_bytes));
+    let stdout = child
+        .stdout
+        .take()
+        .map(|pipe| capped_reader(pipe, command.max_output_bytes));
+    let stderr = child
+        .stderr
+        .take()
+        .map(|pipe| capped_reader(pipe, command.max_output_bytes));
 
     let deadline = started + command.timeout;
     let mut timed_out = false;
@@ -129,7 +148,9 @@ pub fn run_bounded(command: &BoundedCommand) -> Result<BoundedOutput, ExecError>
         }
     };
     let join = |handle: Option<thread::JoinHandle<(Vec<u8>, bool)>>| {
-        handle.and_then(|handle| handle.join().ok()).unwrap_or_default()
+        handle
+            .and_then(|handle| handle.join().ok())
+            .unwrap_or_default()
     };
     let (stdout, stdout_truncated) = join(stdout);
     let (stderr, stderr_truncated) = join(stderr);
@@ -173,8 +194,10 @@ mod tests {
 
     #[test]
     fn enforces_timeout() {
-        let output = run_bounded(&BoundedCommand::new("/bin/sleep", Duration::from_millis(100), 64).arg("5"))
-            .expect("run");
+        let output = run_bounded(
+            &BoundedCommand::new("/bin/sleep", Duration::from_millis(100), 64).arg("5"),
+        )
+        .expect("run");
         assert!(output.timed_out);
         assert!(output.elapsed < Duration::from_secs(2));
     }

@@ -32,10 +32,16 @@ impl LaunchOptions {
         let mut args = args.into_iter();
         while let Some(arg) = args.next() {
             match arg.as_str() {
-                "--service" => options.service = args.next().as_deref().and_then(ServiceCommand::parse),
-                "--renderer=webgl2-compatibility" => options.renderer = RendererMode::Webgl2Compatibility,
+                "--service" => {
+                    options.service = args.next().as_deref().and_then(ServiceCommand::parse)
+                }
+                "--renderer=webgl2-compatibility" => {
+                    options.renderer = RendererMode::Webgl2Compatibility
+                }
                 "--qualify-ipc" if cfg!(feature = "qualification") => options.qualify_ipc = true,
-                "--qualify-acl-probe" if cfg!(feature = "qualification") => options.qualify_acl_probe = true,
+                "--qualify-acl-probe" if cfg!(feature = "qualification") => {
+                    options.qualify_acl_probe = true
+                }
                 // Unknown arguments (for example Finder's legacy -psn_*) are ignored.
                 _ => {}
             }
@@ -65,10 +71,15 @@ mod tests {
 
     #[test]
     fn parses_service_and_renderer_flags() {
-        let options = LaunchOptions::parse(["--service".into(), "status".into(), "-psn_0_1".into()]);
+        let options =
+            LaunchOptions::parse(["--service".into(), "status".into(), "-psn_0_1".into()]);
         assert_eq!(options.service, Some(ServiceCommand::Status));
         let options = LaunchOptions::parse(["--renderer=webgl2-compatibility".into()]);
         assert_eq!(options.renderer, RendererMode::Webgl2Compatibility);
-        assert!(options.initialization_script(None).contains("webgl2-compatibility"));
+        assert!(
+            options
+                .initialization_script(None)
+                .contains("webgl2-compatibility")
+        );
     }
 }

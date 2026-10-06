@@ -55,7 +55,10 @@ impl std::fmt::Display for JournalError {
                 "linked SQLite {version} ({source_id}) is not the required {REQUIRED_SQLITE_VERSION}"
             ),
             Self::SchemaTooNew { found } => {
-                write!(f, "store schema {found} is newer than supported {SCHEMA_VERSION}")
+                write!(
+                    f,
+                    "store schema {found} is newer than supported {SCHEMA_VERSION}"
+                )
             }
             Self::MigrationChecksum { id } => write!(f, "migration {id} checksum differs"),
             Self::PragmaRejected { pragma, value } => write!(f, "PRAGMA {pragma} reported {value}"),
@@ -166,17 +169,26 @@ impl Journal {
         verify_engine(&conn)?;
         let mode: String = conn.query_row("PRAGMA journal_mode=WAL", [], |row| row.get(0))?;
         if mode != "wal" {
-            return Err(JournalError::PragmaRejected { pragma: "journal_mode", value: mode });
+            return Err(JournalError::PragmaRejected {
+                pragma: "journal_mode",
+                value: mode,
+            });
         }
         conn.pragma_update(None, "synchronous", "FULL")?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
         let synchronous: i64 = conn.query_row("PRAGMA synchronous", [], |row| row.get(0))?;
         let foreign_keys: i64 = conn.query_row("PRAGMA foreign_keys", [], |row| row.get(0))?;
         if synchronous != 2 {
-            return Err(JournalError::PragmaRejected { pragma: "synchronous", value: synchronous.to_string() });
+            return Err(JournalError::PragmaRejected {
+                pragma: "synchronous",
+                value: synchronous.to_string(),
+            });
         }
         if foreign_keys != 1 {
-            return Err(JournalError::PragmaRejected { pragma: "foreign_keys", value: foreign_keys.to_string() });
+            return Err(JournalError::PragmaRejected {
+                pragma: "foreign_keys",
+                value: foreign_keys.to_string(),
+            });
         }
         schema::migrate(&mut conn, now_ms)?;
 
@@ -210,17 +222,24 @@ impl Journal {
 
     /// Highest committed journal position.
     pub fn cursor(&self) -> Result<i64, JournalError> {
-        Ok(self
-            .conn
-            .query_row("SELECT COALESCE(MAX(ingest_seq), 0) FROM observations", [], |row| row.get(0))?)
+        Ok(self.conn.query_row(
+            "SELECT COALESCE(MAX(ingest_seq), 0) FROM observations",
+            [],
+            |row| row.get(0),
+        )?)
     }
 
     /// A consistent projection at the committed cursor, read in one short
     /// read transaction on the writer's connection.
     pub fn snapshot(&mut self) -> Result<(i64, FleetSnapshot), JournalError> {
-        let tx = self.conn.transaction_with_behavior(TransactionBehavior::Deferred)?;
-        let cursor: i64 =
-            tx.query_row("SELECT COALESCE(MAX(ingest_seq), 0) FROM observations", [], |row| row.get(0))?;
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Deferred)?;
+        let cursor: i64 = tx.query_row(
+            "SELECT COALESCE(MAX(ingest_seq), 0) FROM observations",
+            [],
+            |row| row.get(0),
+        )?;
         let snapshot = FleetSnapshot {
             view_revision: format_cursor(cursor),
             sessions: projection::sessions(&tx)?,
@@ -232,7 +251,11 @@ impl Journal {
     }
 
     /// Full upserts for every entity a committed change touched.
-    pub fn patch_for(&self, from_cursor: i64, change: &Change) -> Result<ProjectionPatch, JournalError> {
+    pub fn patch_for(
+        &self,
+        from_cursor: i64,
+        change: &Change,
+    ) -> Result<ProjectionPatch, JournalError> {
         let mut session_upserts = Vec::with_capacity(change.session_ids.len());
         for id in &change.session_ids {
             session_upserts.push(projection::session(&self.conn, id)?);
@@ -265,7 +288,14 @@ impl Journal {
             "INSERT INTO observations (observation_id, source_id, source_epoch, native_event,
                captured_wall_ms, received_wall_ms, payload_version, payload_json)
              VALUES (?1, ?2, ?3, ?4, ?5, ?5, 1, ?6)",
-            params![observation_id, source_id, source_epoch, native_event, now_ms, payload.to_string()],
+            params![
+                observation_id,
+                source_id,
+                source_epoch,
+                native_event,
+                now_ms,
+                payload.to_string()
+            ],
         )?;
         Ok((observation_id, tx.last_insert_rowid()))
     }
@@ -274,16 +304,28 @@ impl Journal {
     /// activation, SurfaceBinding, Turn and one AttentionItem, journaled as a
     /// single `FIXTURE_SEEDED` observation.
     fn ensure_fixture(&mut self, now_ms: i64) -> Result<(), JournalError> {
-        let tx = self.conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
         let seeded: Option<String> = tx
-            .query_row("SELECT value FROM store_meta WHERE key = 'fixture_seeded'", [], |row| row.get(0))
+            .query_row(
+                "SELECT value FROM store_meta WHERE key = 'fixture_seeded'",
+                [],
+                |row| row.get(0),
+            )
             .optional()?;
         if seeded.is_some() {
             return Ok(());
         }
         let payload = serde_json::json!({ "fixture": FIXTURE_PROFILE });
-        let (observation_id, cursor) =
-            Self::insert_observation(&tx, SOURCE_FIXTURE, &self.source_epoch, "FIXTURE_SEEDED", &payload, now_ms)?;
+        let (observation_id, cursor) = Self::insert_observation(
+            &tx,
+            SOURCE_FIXTURE,
+            &self.source_epoch,
+            "FIXTURE_SEEDED",
+            &payload,
+            now_ms,
+        )?;
 
         let namespace_id = Uuid::new_v4().to_string();
         let session_id = Uuid::new_v4().to_string();
@@ -356,7 +398,9 @@ impl Journal {
             "expectedRevision": expected_revision.map(format_cursor),
         });
         let print = fingerprint(&payload);
-        let tx = self.conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
 
         let existing: Option<(String, String)> = tx
             .query_row(
@@ -368,13 +412,20 @@ impl Journal {
         if let Some((recorded_print, result_json)) = existing {
             if recorded_print != print {
                 return Err(JournalError::Conflict {
-                    detail: format!("command {command_id} was already used for a different payload"),
+                    detail: format!(
+                        "command {command_id} was already used for a different payload"
+                    ),
                 });
             }
-            let mut receipt: CommandReceipt = serde_json::from_str(&result_json)
-                .map_err(|error| JournalError::Invalid { detail: error.to_string() })?;
+            let mut receipt: CommandReceipt =
+                serde_json::from_str(&result_json).map_err(|error| JournalError::Invalid {
+                    detail: error.to_string(),
+                })?;
             receipt.status = ReceiptStatus::AlreadyCommitted;
-            return Ok(CommandOutcome { receipt, change: None });
+            return Ok(CommandOutcome {
+                receipt,
+                change: None,
+            });
         }
 
         let current: Option<(String, i64)> = tx
@@ -385,18 +436,29 @@ impl Journal {
             )
             .optional()?;
         let Some((session_id, revision)) = current else {
-            return Err(JournalError::NotFound { entity: "attention", id: attention_id.to_owned() });
+            return Err(JournalError::NotFound {
+                entity: "attention",
+                id: attention_id.to_owned(),
+            });
         };
         if let Some(expected) = expected_revision
             && expected != revision
         {
             return Err(JournalError::Conflict {
-                detail: format!("attention {attention_id} is at revision {revision}, not {expected}"),
+                detail: format!(
+                    "attention {attention_id} is at revision {revision}, not {expected}"
+                ),
             });
         }
 
-        let (observation_id, cursor) =
-            Self::insert_observation(&tx, SOURCE_OWNER, &self.source_epoch, "OWNER_COMMAND", &payload, now_ms)?;
+        let (observation_id, cursor) = Self::insert_observation(
+            &tx,
+            SOURCE_OWNER,
+            &self.source_epoch,
+            "OWNER_COMMAND",
+            &payload,
+            now_ms,
+        )?;
         tx.execute(
             "UPDATE attention_items
                SET acknowledged_at_ms = COALESCE(acknowledged_at_ms, ?2), revision = ?3
@@ -409,8 +471,10 @@ impl Journal {
             cursor: format_cursor(cursor),
             target_revision: format_cursor(cursor),
         };
-        let result_json = serde_json::to_string(&receipt)
-            .map_err(|error| JournalError::Invalid { detail: error.to_string() })?;
+        let result_json =
+            serde_json::to_string(&receipt).map_err(|error| JournalError::Invalid {
+                detail: error.to_string(),
+            })?;
         tx.execute(
             "INSERT INTO attention_commands (command_id, attention_id, action, payload_json, payload_fingerprint,
                result_json, observation_id)
@@ -438,7 +502,9 @@ impl Journal {
         detail: &str,
         now_ms: i64,
     ) -> Result<Change, JournalError> {
-        let tx = self.conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
         let target: Option<(String, String)> = tx
             .query_row(
                 "SELECT o.attention_id, a.session_id FROM notification_outbox o
@@ -449,7 +515,10 @@ impl Journal {
             )
             .optional()?;
         let Some((attention_id, session_id)) = target else {
-            return Err(JournalError::NotFound { entity: "notification request", id: request_id.to_owned() });
+            return Err(JournalError::NotFound {
+                entity: "notification request",
+                id: request_id.to_owned(),
+            });
         };
         let state_text = enum_text(state);
         let payload = serde_json::json!({
@@ -475,7 +544,11 @@ impl Journal {
             params![attention_id, state_text, cursor],
         )?;
         tx.commit()?;
-        Ok(Change { cursor, session_ids: vec![session_id], attention_ids: vec![attention_id] })
+        Ok(Change {
+            cursor,
+            session_ids: vec![session_id],
+            attention_ids: vec![attention_id],
+        })
     }
 
     /// Re-reads an attention item for a native notification response. Only
@@ -494,14 +567,23 @@ impl Journal {
                 },
             )
             .optional()?
-            .ok_or_else(|| JournalError::NotFound { entity: "attention", id: attention_id.to_owned() })
+            .ok_or_else(|| JournalError::NotFound {
+                entity: "attention",
+                id: attention_id.to_owned(),
+            })
     }
 
     /// Qualification only: commit a new completed fixture turn, its owner
     /// attention item and a PENDING notification intent in one transaction.
     #[cfg(feature = "qualification")]
-    pub fn raise_qualification_attention(&mut self, label: &str, now_ms: i64) -> Result<RaisedAttention, JournalError> {
-        let tx = self.conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    pub fn raise_qualification_attention(
+        &mut self,
+        label: &str,
+        now_ms: i64,
+    ) -> Result<RaisedAttention, JournalError> {
+        let tx = self
+            .conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
         let (session_id, execution_id): (String, String) = tx.query_row(
             "SELECT s.id, e.id FROM sessions s JOIN executions e ON e.session_id = s.id
               WHERE s.fixture = 1 ORDER BY e.activation DESC LIMIT 1",
@@ -538,10 +620,17 @@ impl Journal {
              VALUES (?1, ?2, 'PENDING', ?3, ?3)",
             params![request_id, attention_id, now_ms],
         )?;
-        tx.execute("UPDATE sessions SET revision = ?2 WHERE id = ?1", params![session_id, cursor])?;
+        tx.execute(
+            "UPDATE sessions SET revision = ?2 WHERE id = ?1",
+            params![session_id, cursor],
+        )?;
         tx.commit()?;
         Ok(RaisedAttention {
-            change: Change { cursor, session_ids: vec![session_id.clone()], attention_ids: vec![attention_id.clone()] },
+            change: Change {
+                cursor,
+                session_ids: vec![session_id.clone()],
+                attention_ids: vec![attention_id.clone()],
+            },
             intent: NotificationIntent {
                 request_id,
                 attention_id,
@@ -558,10 +647,18 @@ impl Journal {
         let compile_options = statement
             .query_map([], |row| row.get::<_, String>(0))?
             .collect::<Result<Vec<_>, _>>()?;
-        let journal_mode: String = self.conn.query_row("PRAGMA journal_mode", [], |row| row.get(0))?;
-        let synchronous: u8 = self.conn.query_row("PRAGMA synchronous", [], |row| row.get(0))?;
-        let foreign_keys: bool = self.conn.query_row("PRAGMA foreign_keys", [], |row| row.get(0))?;
-        let fullfsync: bool = self.conn.query_row("PRAGMA fullfsync", [], |row| row.get(0))?;
+        let journal_mode: String = self
+            .conn
+            .query_row("PRAGMA journal_mode", [], |row| row.get(0))?;
+        let synchronous: u8 = self
+            .conn
+            .query_row("PRAGMA synchronous", [], |row| row.get(0))?;
+        let foreign_keys: bool = self
+            .conn
+            .query_row("PRAGMA foreign_keys", [], |row| row.get(0))?;
+        let fullfsync: bool = self
+            .conn
+            .query_row("PRAGMA fullfsync", [], |row| row.get(0))?;
         Ok(SqliteDiagnostics {
             version,
             source_id,
@@ -579,12 +676,19 @@ impl Journal {
 
 fn meta_get_or_insert(tx: &rusqlite::Transaction<'_>, key: &str) -> Result<String, JournalError> {
     let existing: Option<String> = tx
-        .query_row("SELECT value FROM store_meta WHERE key = ?1", params![key], |row| row.get(0))
+        .query_row(
+            "SELECT value FROM store_meta WHERE key = ?1",
+            params![key],
+            |row| row.get(0),
+        )
         .optional()?;
     if let Some(value) = existing {
         return Ok(value);
     }
     let value = Uuid::new_v4().to_string();
-    tx.execute("INSERT INTO store_meta (key, value) VALUES (?1, ?2)", params![key, value])?;
+    tx.execute(
+        "INSERT INTO store_meta (key, value) VALUES (?1, ?2)",
+        params![key, value],
+    )?;
     Ok(value)
 }

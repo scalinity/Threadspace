@@ -6,14 +6,16 @@ use std::path::PathBuf;
 
 use threadspace_contracts::ui::ReceiptStatus;
 use threadspace_journal::{
-    Journal, JournalError, LockError, REQUIRED_SQLITE_SOURCE_ID, REQUIRED_SQLITE_VERSION, WriterLock,
+    Journal, JournalError, LockError, REQUIRED_SQLITE_SOURCE_ID, REQUIRED_SQLITE_VERSION,
+    WriterLock,
 };
 
 struct TempStore(PathBuf);
 
 impl TempStore {
     fn new() -> Self {
-        let dir = std::env::temp_dir().join(format!("threadspace-journal-{}", uuid::Uuid::new_v4()));
+        let dir =
+            std::env::temp_dir().join(format!("threadspace-journal-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&dir).expect("create temp store");
         Self(dir)
     }
@@ -65,11 +67,22 @@ fn close_and_reopen_recovers_the_same_stored_fixture() {
     let store = TempStore::new();
     let (generation, before) = {
         let mut journal = Journal::open(&store.db(), "epoch-a", NOW).expect("open");
-        (journal.store_generation().to_owned(), journal.snapshot().expect("snapshot"))
+        (
+            journal.store_generation().to_owned(),
+            journal.snapshot().expect("snapshot"),
+        )
     };
     let mut reopened = Journal::open(&store.db(), "epoch-b", NOW + 1).expect("reopen");
-    assert_eq!(reopened.store_generation(), generation, "store generation survives restart");
-    assert_eq!(reopened.snapshot().expect("snapshot"), before, "identical fixture, no reseed");
+    assert_eq!(
+        reopened.store_generation(),
+        generation,
+        "store generation survives restart"
+    );
+    assert_eq!(
+        reopened.snapshot().expect("snapshot"),
+        before,
+        "identical fixture, no reseed"
+    );
 }
 
 #[test]
@@ -91,11 +104,17 @@ fn receipts_are_commit_only_and_idempotent() {
         .acknowledge_attention(&command, &item.attention_id, Some(revision), NOW + 9)
         .expect("retry");
     assert_eq!(retry.receipt.status, ReceiptStatus::AlreadyCommitted);
-    assert_eq!(retry.receipt.cursor, first.receipt.cursor, "original result returned");
+    assert_eq!(
+        retry.receipt.cursor, first.receipt.cursor,
+        "original result returned"
+    );
     assert!(retry.change.is_none(), "no second state change");
 
     let conflicting = journal.acknowledge_attention(&command, &item.attention_id, None, NOW + 10);
-    assert!(matches!(conflicting, Err(JournalError::Conflict { .. })), "payload reuse rejected");
+    assert!(
+        matches!(conflicting, Err(JournalError::Conflict { .. })),
+        "payload reuse rejected"
+    );
 
     let stale = journal.acknowledge_attention(
         &uuid::Uuid::new_v4().to_string(),
@@ -103,11 +122,17 @@ fn receipts_are_commit_only_and_idempotent() {
         Some(revision),
         NOW + 11,
     );
-    assert!(matches!(stale, Err(JournalError::Conflict { .. })), "stale revision rejected");
+    assert!(
+        matches!(stale, Err(JournalError::Conflict { .. })),
+        "stale revision rejected"
+    );
 
     let (_, after) = journal.snapshot().expect("snapshot");
     assert_eq!(after.counts.needs_attention, 0);
-    assert_eq!(after.counts.awaiting_action, 1, "acknowledged is not resolved");
+    assert_eq!(
+        after.counts.awaiting_action, 1,
+        "acknowledged is not resolved"
+    );
     drop(journal);
 
     let mut reopened = Journal::open(&store.db(), "epoch-b", NOW + 20).expect("reopen");
@@ -126,7 +151,12 @@ fn patch_carries_full_upserts_for_changed_entities() {
     let (cursor, snapshot) = journal.snapshot().expect("snapshot");
     let item = &snapshot.attention[0];
     let outcome = journal
-        .acknowledge_attention(&uuid::Uuid::new_v4().to_string(), &item.attention_id, None, NOW + 1)
+        .acknowledge_attention(
+            &uuid::Uuid::new_v4().to_string(),
+            &item.attention_id,
+            None,
+            NOW + 1,
+        )
         .expect("ack");
     let change = outcome.change.expect("change");
     let patch = journal.patch_for(cursor, &change).expect("patch");
@@ -174,15 +204,32 @@ fn qualification_attention_has_outbox_intent_in_the_same_commit() {
 
     let store = TempStore::new();
     let mut journal = Journal::open(&store.db(), "epoch-a", NOW).expect("open");
-    let raised = journal.raise_qualification_attention("smoke", NOW + 1).expect("raise");
-    let target = journal.attention_target(&raised.intent.attention_id).expect("target");
+    let raised = journal
+        .raise_qualification_attention("smoke", NOW + 1)
+        .expect("raise");
+    let target = journal
+        .attention_target(&raised.intent.attention_id)
+        .expect("target");
     assert!(target.outstanding);
     let patch = journal.patch_for(0, &raised.change).expect("patch");
-    assert_eq!(patch.attention_upserts[0].notification_state, NotificationState::Pending);
+    assert_eq!(
+        patch.attention_upserts[0].notification_state,
+        NotificationState::Pending
+    );
 
     let change = journal
-        .record_notification_state(&raised.intent.request_id, &NotificationState::Submitted, "accepted", NOW + 2)
+        .record_notification_state(
+            &raised.intent.request_id,
+            &NotificationState::Submitted,
+            "accepted",
+            NOW + 2,
+        )
         .expect("record");
-    let patch = journal.patch_for(raised.change.cursor, &change).expect("patch");
-    assert_eq!(patch.attention_upserts[0].notification_state, NotificationState::Submitted);
+    let patch = journal
+        .patch_for(raised.change.cursor, &change)
+        .expect("patch");
+    assert_eq!(
+        patch.attention_upserts[0].notification_state,
+        NotificationState::Submitted
+    );
 }

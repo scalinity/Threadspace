@@ -50,7 +50,10 @@ fn status_of(service: &SMAppService) -> ServiceStatus {
 }
 
 pub fn report(agent_identifier: &str) -> ServiceReport {
-    ServiceReport { agent_identifier: agent_identifier.to_owned(), status: status_of(&service(agent_identifier)) }
+    ServiceReport {
+        agent_identifier: agent_identifier.to_owned(),
+        status: status_of(&service(agent_identifier)),
+    }
 }
 
 /// Runs one bootstrap command and prints a JSON result line. Exit 0 on success.
@@ -65,7 +68,12 @@ pub fn run_cli(command: ServiceCommand, app_identifier: &str) -> i32 {
         ServiceCommand::Unregister => unsafe { service.unregisterAndReturnError() },
     };
     let error = outcome.err().map(|error| {
-        format!("{} {} {}", error.domain(), error.code(), error.localizedDescription())
+        format!(
+            "{} {} {}",
+            error.domain(),
+            error.code(),
+            error.localizedDescription()
+        )
     });
     let after = status_of(&service);
     println!(

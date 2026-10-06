@@ -21,12 +21,18 @@ fn authorized(status: &str) -> bool {
 
 fn submit(intent: &NotificationIntent) -> (NotificationState, String) {
     let Some(settings) = bridge::notification_settings(Duration::from_secs(5)) else {
-        return (NotificationState::Uncertain, "notification settings unavailable".into());
+        return (
+            NotificationState::Uncertain,
+            "notification settings unavailable".into(),
+        );
     };
     if !authorized(&settings.authorization_status) {
         return (
             NotificationState::Failed,
-            format!("not authorized ({}); attention retained", settings.authorization_status),
+            format!(
+                "not authorized ({}); attention retained",
+                settings.authorization_status
+            ),
         );
     }
     let posted = bridge::call(
@@ -41,11 +47,20 @@ fn submit(intent: &NotificationIntent) -> (NotificationState, String) {
         Duration::from_secs(10),
     );
     match posted {
-        Ok(BridgeEvent::NotificationPosted { error: None, .. }) => {
-            (NotificationState::Submitted, format!("accepted by UNUserNotificationCenter (alert {})", settings.alert_setting))
-        }
-        Ok(BridgeEvent::NotificationPosted { error: Some(error), .. }) => (NotificationState::Failed, error),
-        Ok(_) => (NotificationState::Uncertain, "unexpected bridge answer".into()),
+        Ok(BridgeEvent::NotificationPosted { error: None, .. }) => (
+            NotificationState::Submitted,
+            format!(
+                "accepted by UNUserNotificationCenter (alert {})",
+                settings.alert_setting
+            ),
+        ),
+        Ok(BridgeEvent::NotificationPosted {
+            error: Some(error), ..
+        }) => (NotificationState::Failed, error),
+        Ok(_) => (
+            NotificationState::Uncertain,
+            "unexpected bridge answer".into(),
+        ),
         // A timeout is uncertainty, never assumed delivery.
         Err(error) => (NotificationState::Uncertain, error.to_string()),
     }

@@ -18,7 +18,9 @@ use threadspace_relay::client::{BlockingClient, connect};
 use threadspace_relay::paths::{AgentPaths, agent_identifier_for};
 
 fn usage() -> ExitCode {
-    eprintln!("usage: threadspace-qualify <dev|prod> <diagnostics|integration|snapshot|raise-attention LABEL|request-notifications|request-terminal>");
+    eprintln!(
+        "usage: threadspace-qualify <dev|prod> <diagnostics|integration|snapshot|raise-attention LABEL|request-notifications|request-terminal>"
+    );
     ExitCode::from(64)
 }
 
@@ -29,13 +31,24 @@ fn main() -> ExitCode {
         Some("prod") => "ai.scalinity.threadspace",
         _ => return usage(),
     };
-    let Some(command) = args.get(1) else { return usage() };
-    let Some(paths) = AgentPaths::for_agent(&agent_identifier_for(app_identifier)) else { return usage() };
+    let Some(command) = args.get(1) else {
+        return usage();
+    };
+    let Some(paths) = AgentPaths::for_agent(&agent_identifier_for(app_identifier)) else {
+        return usage();
+    };
 
-    let connection = match connect(&paths.locator, ClientRole::Qualification, Duration::from_secs(3)) {
+    let connection = match connect(
+        &paths.locator,
+        ClientRole::Qualification,
+        Duration::from_secs(3),
+    ) {
         Ok(connection) => connection,
         Err(error) => {
-            println!("{}", json!({ "ok": false, "stage": "connect", "error": error.to_string() }));
+            println!(
+                "{}",
+                json!({ "ok": false, "stage": "connect", "error": error.to_string() })
+            );
             return ExitCode::from(2);
         }
     };
@@ -50,15 +63,24 @@ fn main() -> ExitCode {
     let request = match command.as_str() {
         "diagnostics" => ControlRequestBody::Diagnostics,
         "integration" => ControlRequestBody::IntegrationStatus,
-        "snapshot" => ControlRequestBody::AttachView { subscription_id: uuid::Uuid::new_v4().to_string() },
+        "snapshot" => ControlRequestBody::AttachView {
+            subscription_id: uuid::Uuid::new_v4().to_string(),
+        },
         "raise-attention" => ControlRequestBody::QualifyRaiseAttention {
-            label: args.get(2).cloned().unwrap_or_else(|| "qualification".into()),
+            label: args
+                .get(2)
+                .cloned()
+                .unwrap_or_else(|| "qualification".into()),
         },
         "request-notifications" => ControlRequestBody::RequestNotificationAuthorization,
         "request-terminal" => ControlRequestBody::RequestTerminalAutomation,
         _ => return usage(),
     };
-    if matches!(request, ControlRequestBody::RequestNotificationAuthorization | ControlRequestBody::RequestTerminalAutomation) {
+    if matches!(
+        request,
+        ControlRequestBody::RequestNotificationAuthorization
+            | ControlRequestBody::RequestTerminalAutomation
+    ) {
         // Waits for the owner to answer a native prompt.
         let _ = client.set_read_timeout(Duration::from_secs(200));
     }
@@ -72,11 +94,20 @@ fn main() -> ExitCode {
     }
     match outcome {
         Ok(body) => {
-            println!("{}", serde_json::to_string_pretty(&json!({ "ok": true, "peer": peer, "response": body })).unwrap_or_default());
+            println!(
+                "{}",
+                serde_json::to_string_pretty(
+                    &json!({ "ok": true, "peer": peer, "response": body })
+                )
+                .unwrap_or_default()
+            );
             ExitCode::SUCCESS
         }
         Err(error) => {
-            println!("{}", json!({ "ok": false, "peer": peer, "error": error.to_string() }));
+            println!(
+                "{}",
+                json!({ "ok": false, "peer": peer, "error": error.to_string() })
+            );
             ExitCode::from(1)
         }
     }

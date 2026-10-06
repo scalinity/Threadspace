@@ -6,7 +6,8 @@ use threadspace_contracts::diagnostics::DesktopDiagnostics;
 use threadspace_relay::paths::redact_home;
 use threadspace_surfaces_macos::{process, terminal::plist_string};
 
-const WEBKIT_INFO: &str = "/System/Library/Frameworks/WebKit.framework/Versions/A/Resources/Info.plist";
+const WEBKIT_INFO: &str =
+    "/System/Library/Frameworks/WebKit.framework/Versions/A/Resources/Info.plist";
 
 pub fn desktop(app_identifier: &str, app_version: &str) -> DesktopDiagnostics {
     let (major, minor, patch) = process::os_product_version().unwrap_or((0, 0, 0));

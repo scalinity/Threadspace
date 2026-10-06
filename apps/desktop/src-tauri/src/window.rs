@@ -25,7 +25,11 @@ pub fn navigation_allowed(url: &Url) -> bool {
     url.scheme() == "tauri" && url.host_str() == Some("localhost")
 }
 
-pub fn create_office<R: Runtime>(app: &AppHandle<R>, bridge: &Arc<Bridge>, launch: &LaunchOptions) -> tauri::Result<()> {
+pub fn create_office<R: Runtime>(
+    app: &AppHandle<R>,
+    bridge: &Arc<Bridge>,
+    launch: &LaunchOptions,
+) -> tauri::Result<()> {
     let incarnation = Uuid::new_v4();
     let page_bridge = Arc::clone(bridge);
     let window = WebviewWindowBuilder::new(app, OFFICE_LABEL, WebviewUrl::App("index.html".into()))
@@ -46,7 +50,9 @@ pub fn create_office<R: Runtime>(app: &AppHandle<R>, bridge: &Arc<Bridge>, launc
             }
         })
         .build()?;
-    let rid = window.resources_table().add(OfficeIncarnation { id: incarnation });
+    let rid = window
+        .resources_table()
+        .add(OfficeIncarnation { id: incarnation });
     bridge.views.activate(incarnation, rid);
     Ok(())
 }

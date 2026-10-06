@@ -12,7 +12,8 @@ use std::thread;
 use std::time::Duration;
 
 use threadspace_contracts::control::{
-    ClientRole, ControlError, ControlMessage, ControlOutcome, ControlRequest, ControlRequestBody, ControlResponseBody,
+    ClientRole, ControlError, ControlMessage, ControlOutcome, ControlRequest, ControlRequestBody,
+    ControlResponseBody,
 };
 use threadspace_contracts::limits::CONTROL_FRAME_MAX_BYTES;
 use threadspace_relay::client::{self, ClientError, HelloInfo};
@@ -44,8 +45,13 @@ impl CompanionLink {
         on_closed: impl FnOnce(u64) + Send + 'static,
     ) -> Result<Arc<Self>, ClientError> {
         let connection = client::connect(locator, ClientRole::Ui, Duration::from_secs(2))?;
-        let reader = connection.stream.try_clone().map_err(ClientError::Connect)?;
-        reader.set_read_timeout(None).map_err(ClientError::Connect)?;
+        let reader = connection
+            .stream
+            .try_clone()
+            .map_err(ClientError::Connect)?;
+        reader
+            .set_read_timeout(None)
+            .map_err(ClientError::Connect)?;
         let link = Arc::new(Self {
             id: NEXT_LINK.fetch_add(1, Ordering::Relaxed),
             hello: connection.hello,
@@ -59,10 +65,19 @@ impl CompanionLink {
             .name("companion-link".into())
             .spawn(move || {
                 let mut reader = reader;
-                while let Ok(message) = read_frame::<_, ControlMessage>(&mut reader, CONTROL_FRAME_MAX_BYTES) {
+                while let Ok(message) =
+                    read_frame::<_, ControlMessage>(&mut reader, CONTROL_FRAME_MAX_BYTES)
+                {
                     match message {
-                        ControlMessage::Response { request_id, outcome } => {
-                            let waiter = reader_link.pending.lock().ok().and_then(|mut map| map.remove(&request_id));
+                        ControlMessage::Response {
+                            request_id,
+                            outcome,
+                        } => {
+                            let waiter = reader_link
+                                .pending
+                                .lock()
+                                .ok()
+                                .and_then(|mut map| map.remove(&request_id));
                             if let Some(waiter) = waiter {
                                 let _ = waiter.send(outcome);
                             }
@@ -84,20 +99,31 @@ impl CompanionLink {
         self.alive.load(Ordering::Acquire)
     }
 
-    pub async fn request(&self, body: ControlRequestBody, timeout: Duration) -> Result<ControlResponseBody, LinkError> {
+    pub async fn request(
+        &self,
+        body: ControlRequestBody,
+        timeout: Duration,
+    ) -> Result<ControlResponseBody, LinkError> {
         if !self.is_alive() {
             return Err(LinkError::Closed);
         }
         let request_id = self.next_request.fetch_add(1, Ordering::Relaxed);
         let (sender, receiver) = oneshot::channel();
-        self.pending.lock().map_err(|_| LinkError::Closed)?.insert(request_id, sender);
+        self.pending
+            .lock()
+            .map_err(|_| LinkError::Closed)?
+            .insert(request_id, sender);
         let written = self
             .writer
             .lock()
             .map_err(|_| LinkError::Closed)
             .and_then(|mut stream| {
-                write_frame(&mut *stream, &ControlRequest { request_id, body }, CONTROL_FRAME_MAX_BYTES)
-                    .map_err(|_| LinkError::Closed)
+                write_frame(
+                    &mut *stream,
+                    &ControlRequest { request_id, body },
+                    CONTROL_FRAME_MAX_BYTES,
+                )
+                .map_err(|_| LinkError::Closed)
             });
         if let Err(error) = written {
             if let Ok(mut map) = self.pending.lock() {

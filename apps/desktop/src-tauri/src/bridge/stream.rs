@@ -70,8 +70,14 @@ struct Sent {
 }
 
 enum Pending {
-    Patch { cursor: String, patch: Box<ProjectionPatch> },
-    Intent { cursor: String, intent: NativeIntent },
+    Patch {
+        cursor: String,
+        patch: Box<ProjectionPatch>,
+    },
+    Intent {
+        cursor: String,
+        intent: NativeIntent,
+    },
 }
 
 enum State {
@@ -171,11 +177,14 @@ impl<S: FrameSink> StreamSender<S> {
             },
             body,
         };
-        let bytes = serde_json::to_vec(&frame).map(|encoded| encoded.len()).unwrap_or(usize::MAX);
+        let bytes = serde_json::to_vec(&frame)
+            .map(|encoded| encoded.len())
+            .unwrap_or(usize::MAX);
         if bytes > FRAME_MAX_BYTES {
             return Err(StreamError::FrameTooLarge(bytes));
         }
-        if self.unacked.len() >= WINDOW_MAX_FRAMES || self.unacked_bytes + bytes > WINDOW_MAX_BYTES {
+        if self.unacked.len() >= WINDOW_MAX_FRAMES || self.unacked_bytes + bytes > WINDOW_MAX_BYTES
+        {
             self.retire();
             return Err(StreamError::WindowExhausted);
         }
@@ -183,7 +192,11 @@ impl<S: FrameSink> StreamSender<S> {
             self.retire();
             return Err(StreamError::ChannelClosed(error));
         }
-        self.unacked.push_back(Sent { seq, bytes, cursor: cursor.to_owned() });
+        self.unacked.push_back(Sent {
+            seq,
+            bytes,
+            cursor: cursor.to_owned(),
+        });
         self.unacked_bytes += bytes;
         self.next_seq += 1;
         self.last_cursor = cursor.to_owned();
@@ -192,12 +205,20 @@ impl<S: FrameSink> StreamSender<S> {
 
     /// Enforces the snapshot bounds before `SnapshotBegin`, emits the complete
     /// snapshot, then any changes that arrived while it was being attached.
-    pub fn emit_snapshot(&mut self, cursor: &str, snapshot: &FleetSnapshot) -> Result<(), StreamError> {
-        let json = serde_json::to_string(snapshot).map_err(|error| StreamError::ChannelClosed(error.to_string()))?;
+    pub fn emit_snapshot(
+        &mut self,
+        cursor: &str,
+        snapshot: &FleetSnapshot,
+    ) -> Result<(), StreamError> {
+        let json = serde_json::to_string(snapshot)
+            .map_err(|error| StreamError::ChannelClosed(error.to_string()))?;
         let chunks = chunk_for_frames(&json, FRAME_MAX_BYTES - ENVELOPE_RESERVE);
         let frames = chunks.len() + 2;
         if json.len() > SNAPSHOT_MAX_BYTES || frames > SNAPSHOT_MAX_FRAMES {
-            return Err(StreamError::SnapshotExceedsBound { bytes: json.len(), frames });
+            return Err(StreamError::SnapshotExceedsBound {
+                bytes: json.len(),
+                frames,
+            });
         }
         self.send(
             UiFrameBody::SnapshotBegin {
@@ -208,9 +229,20 @@ impl<S: FrameSink> StreamSender<S> {
             cursor,
         )?;
         for (index, data) in chunks.iter().enumerate() {
-            self.send(UiFrameBody::SnapshotChunk { index: index as u32, data: (*data).to_owned() }, cursor)?;
+            self.send(
+                UiFrameBody::SnapshotChunk {
+                    index: index as u32,
+                    data: (*data).to_owned(),
+                },
+                cursor,
+            )?;
         }
-        let end = self.send(UiFrameBody::SnapshotEnd { view_revision: snapshot.view_revision.clone() }, cursor)?;
+        let end = self.send(
+            UiFrameBody::SnapshotEnd {
+                view_revision: snapshot.view_revision.clone(),
+            },
+            cursor,
+        )?;
         self.snapshot_end_seq = Some(end);
         let buffered = match std::mem::replace(&mut self.state, State::Live) {
             State::AwaitingSnapshot(buffered) => buffered,
@@ -240,15 +272,26 @@ impl<S: FrameSink> StreamSender<S> {
         Ok(false)
     }
 
-    pub fn push_patch(&mut self, cursor: &str, patch: Box<ProjectionPatch>) -> Result<(), StreamError> {
-        if self.buffer(Pending::Patch { cursor: cursor.to_owned(), patch: patch.clone() })? {
+    pub fn push_patch(
+        &mut self,
+        cursor: &str,
+        patch: Box<ProjectionPatch>,
+    ) -> Result<(), StreamError> {
+        if self.buffer(Pending::Patch {
+            cursor: cursor.to_owned(),
+            patch: patch.clone(),
+        })? {
             return Ok(());
         }
-        self.send(UiFrameBody::ProjectionPatch { patch: *patch }, cursor).map(|_| ())
+        self.send(UiFrameBody::ProjectionPatch { patch: *patch }, cursor)
+            .map(|_| ())
     }
 
     pub fn push_intent(&mut self, cursor: &str, intent: NativeIntent) -> Result<(), StreamError> {
-        if self.buffer(Pending::Intent { cursor: cursor.to_owned(), intent: intent.clone() })? {
+        if self.buffer(Pending::Intent {
+            cursor: cursor.to_owned(),
+            intent: intent.clone(),
+        })? {
             return Ok(());
         }
         let intent_id = intent.intent_id.clone();
@@ -274,10 +317,14 @@ impl<S: FrameSink> StreamSender<S> {
             return Err(AckError::Retired);
         }
         if seq <= self.acked_through {
-            return Err(AckError::NotMonotonic { acked_through: self.acked_through });
+            return Err(AckError::NotMonotonic {
+                acked_through: self.acked_through,
+            });
         }
         if seq >= self.next_seq {
-            return Err(AckError::FutureSequence { last_sent: self.next_seq - 1 });
+            return Err(AckError::FutureSequence {
+                last_sent: self.next_seq - 1,
+            });
         }
         let expected = self
             .unacked
@@ -298,9 +345,21 @@ impl<S: FrameSink> StreamSender<S> {
         if newly_hydrated {
             self.hydrated = true;
         }
-        let consumed: Vec<u32> = self.intents_by_seq.range(..=seq).map(|(seq, _)| *seq).collect();
-        let consumed_intents = consumed.iter().filter_map(|seq| self.intents_by_seq.remove(seq)).collect();
-        Ok(AckOutcome { acknowledged_through: seq, hydrated: self.hydrated, newly_hydrated, consumed_intents })
+        let consumed: Vec<u32> = self
+            .intents_by_seq
+            .range(..=seq)
+            .map(|(seq, _)| *seq)
+            .collect();
+        let consumed_intents = consumed
+            .iter()
+            .filter_map(|seq| self.intents_by_seq.remove(seq))
+            .collect();
+        Ok(AckOutcome {
+            acknowledged_through: seq,
+            hydrated: self.hydrated,
+            newly_hydrated,
+            consumed_intents,
+        })
     }
 }
 
@@ -315,7 +374,10 @@ mod tests {
 
     impl FrameSink for Sink {
         fn deliver(&self, frame: UiFrame) -> Result<(), String> {
-            self.0.lock().map_err(|_| "poisoned".to_string())?.push(frame);
+            self.0
+                .lock()
+                .map_err(|_| "poisoned".to_string())?
+                .push(frame);
             Ok(())
         }
     }
@@ -336,7 +398,10 @@ mod tests {
             view_revision: "7".into(),
             sessions: Vec::new(),
             attention: vec![],
-            counts: AttentionCounts { needs_attention: padding as u32, awaiting_action: 0 },
+            counts: AttentionCounts {
+                needs_attention: padding as u32,
+                awaiting_action: 0,
+            },
         }
     }
 
@@ -348,7 +413,10 @@ mod tests {
             session_upserts: vec![],
             attention_upserts: vec![],
             tombstones: vec![],
-            counts: AttentionCounts { needs_attention: 0, awaiting_action: 1 },
+            counts: AttentionCounts {
+                needs_attention: 0,
+                awaiting_action: 1,
+            },
         })
     }
 
@@ -378,11 +446,20 @@ mod tests {
     fn ack_rules() {
         let (mut stream, _) = sender();
         stream.emit_snapshot("7", &snapshot(1)).expect("snapshot");
-        assert!(matches!(stream.ack(9, "7"), Err(AckError::FutureSequence { .. })));
-        assert!(matches!(stream.ack(3, "8"), Err(AckError::CursorMismatch { .. })));
+        assert!(matches!(
+            stream.ack(9, "7"),
+            Err(AckError::FutureSequence { .. })
+        ));
+        assert!(matches!(
+            stream.ack(3, "8"),
+            Err(AckError::CursorMismatch { .. })
+        ));
         let outcome = stream.ack(3, "7").expect("ack end");
         assert!(outcome.newly_hydrated && outcome.hydrated);
-        assert!(matches!(stream.ack(3, "7"), Err(AckError::NotMonotonic { .. })));
+        assert!(matches!(
+            stream.ack(3, "7"),
+            Err(AckError::NotMonotonic { .. })
+        ));
     }
 
     #[test]
@@ -432,13 +509,18 @@ mod tests {
         let (mut stream, sink) = sender();
         let mut big = snapshot(1);
         big.view_revision = "x".repeat(SNAPSHOT_MAX_BYTES);
-        assert!(matches!(stream.emit_snapshot("7", &big), Err(StreamError::SnapshotExceedsBound { .. })));
+        assert!(matches!(
+            stream.emit_snapshot("7", &big),
+            Err(StreamError::SnapshotExceedsBound { .. })
+        ));
         assert!(sink.0.lock().expect("lock").is_empty(), "nothing sent");
     }
 
     #[test]
     fn escape_heavy_snapshots_still_fit_frames() {
-        use threadspace_contracts::projection::{ExecutionPresence, ObservationState, SessionView, TurnState};
+        use threadspace_contracts::projection::{
+            ExecutionPresence, ObservationState, SessionView, TurnState,
+        };
 
         let (mut stream, sink) = sender();
         let mut heavy = snapshot(1);
@@ -457,7 +539,9 @@ mod tests {
             fixture: true,
             revision: "1".into(),
         });
-        stream.emit_snapshot("7", &heavy).expect("fits within bounds");
+        stream
+            .emit_snapshot("7", &heavy)
+            .expect("fits within bounds");
         for frame in sink.0.lock().expect("lock").iter() {
             assert!(serde_json::to_vec(frame).expect("json").len() <= FRAME_MAX_BYTES);
         }
@@ -468,6 +552,10 @@ mod tests {
         let text = "aé\"\\\u{1}b".repeat(1000);
         let chunks = chunk_for_frames(&text, 100);
         assert_eq!(chunks.concat(), text);
-        assert!(chunks.iter().all(|chunk| chunk.chars().map(escaped_len).sum::<usize>() <= 100));
+        assert!(
+            chunks
+                .iter()
+                .all(|chunk| chunk.chars().map(escaped_len).sum::<usize>() <= 100)
+        );
     }
 }
