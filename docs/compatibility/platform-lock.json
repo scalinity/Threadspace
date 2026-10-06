@@ -177,7 +177,7 @@
       "THREADSAFE=1",
       "USE_URI"
     ],
-    "schemaVersion": 1
+    "schemaVersion": 2
   },
   "frontend": {
     "react": "19.3.0",
@@ -250,7 +250,7 @@
     }
   },
   "providers": {
-    "claude": "2.1.290 qualification candidate (not exercised in M0A)",
+    "claude": "2.1.290 listed candidate; M0B qualified the installed 2.1.291 (native installer, ~/.local/share/claude/versions/2.1.291) for the direct interactive CLI identity/current-session-routing subset. See evidence/M0B/manifest.json.",
     "codex": "0.160.1 qualification candidate (not exercised in M0A)"
   },
   "lockfiles": {
@@ -262,5 +262,34 @@
     "docs/decisions/D-0001-sqlite-3.53.4-binding.md",
     "docs/decisions/D-0002-titlebar-drag-permissions.md",
     "docs/decisions/D-0003-apple-event-consent-attribution.md"
-  ]
+  ],
+  "m0b": {
+    "candidateCommit": "fc6564199fcc8fb1c84b8895fa849fb567872c05",
+    "claudeCli": {
+      "version": "2.1.291",
+      "inventoryCommand": [
+        "agents",
+        "--json",
+        "--all"
+      ],
+      "inventoryEnv": [
+        "HOME",
+        "LANG",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1",
+        "DISABLE_AUTOUPDATER=1"
+      ],
+      "qualifiedRuntimeRule": "process executable in the installer's versions directory; kind=interactive row with full sessionId"
+    },
+    "terminal": {
+      "version": "2.15",
+      "dictionarySha256": "cd4dad3e8717922a6e8712638e7bdd0d607054b391f9e7e6993de2700fa233f4",
+      "scripts": [
+        "terminal-inventory.applescript",
+        "terminal-focus.applescript"
+      ],
+      "note": "Terminal tabs are native window tabs: AppleScript models each tab as its own window with one tab"
+    },
+    "journalSchema": 2,
+    "evidence": "evidence/M0B/manifest.json"
+  }
 }

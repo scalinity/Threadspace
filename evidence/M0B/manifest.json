@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "milestone": "M0B",
+  "title": "Decisive Claude Identity + Exact Return Spike",
+  "verdict": "PASS — GO candidate pending independent review",
+  "verdictScope": "Every M0B GO criterion passed natively on the packaged production identity. Only M0B portions of original gates are claimed; M0C portions remain NOT_RUN.",
+  "generatedAt": "2026-10-06T09:15:00Z",
+  "baseCommit": "f94dd7bf410d925dc01571bbecb5d18bf1683c77",
+  "branch": "m0b",
+  "applicationCommit": "fc6564199fcc8fb1c84b8895fa849fb567872c05",
+  "evidenceCommit": "the commit that adds this manifest; its application sources are identical to applicationCommit",
+  "ancestry": "m0b is a strict descendant of baseCommit (git merge-base --is-ancestor f94dd7b HEAD); main/origin/main remain at baseCommit",
+  "commits": [
+    "e048eef Add native identity primitives for the Claude-to-Terminal join",
+    "7d86983 Persist Claude identity, activations, bindings and route results",
+    "cfd3731 Add the Claude inventory adapter and the Return-to-Agent route model",
+    "9e7cf29 Run Claude discovery and Return-to-Agent in the companion",
+    "a43fed0 Expose Return and refreshed evidence in the desktop UI",
+    "46a2a04 Add the M0B route harness and hook ancestry probe",
+    "35d7573 Record M0B late-start discovery and hook ancestry evidence",
+    "8980d34 Take Terminal's incarnation from the kernel, not LaunchServices",
+    "fc65641 Require Terminal's frontmost-window readback for an exact route"
+  ],
+  "platform": {
+    "macOS": "27.2",
+    "build": "26B5091g",
+    "hardware": "Apple M5 Pro (Mac17,8, 48 GiB)",
+    "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "xcode": "Xcode 27.0 Build version 27A5218g (unchanged from M0A)"
+  },
+  "lockHashes": {
+    "Cargo.lock": "9637dfc493eda256b62428767b112726d09b8812be53421e466ade0dbc8427c9",
+    "package-lock.json": "ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025",
+    "rust-toolchain.toml": "3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd",
+    "docs/compatibility/platform-lock.json": "314d9d5b951ea6f061b858a7fe388155a072c94bbad239ba4e2faa7158c0ad19"
+  },
+  "dependencyChange": "Cargo.lock adds only the internal crates threadspace-provider-claude, threadspace-surfaces and threadspace-hook-probe; tauri 3.0.0-alpha.4, tauri-runtime-wry 3.0.0-alpha.4, wry 0.57.0, tao 0.37.0, rusqlite 0.40.2, libsqlite3-sys 0.38.2 (patched, D-0001) unchanged; package-lock.json unchanged",
+  "provider": {
+    "claude": {
+      "launcher": "~/.local/bin/claude",
+      "binary": "~/.local/share/claude/versions/2.1.291",
+      "version": "2.1.291 (Claude Code)",
+      "platformLockCandidate": "2.1.290 (the installed build is one patch newer; M0B qualifies 2.1.291)",
+      "profile": "default config ~/.claude (no CLAUDE_CONFIG_DIR); launch preferences unchanged",
+      "runtimeMode": "direct interactive CLI in Terminal.app (kind=interactive, entry via `claude` in a login zsh)",
+      "inventory": {
+        "argv": [
+          "agents",
+          "--json",
+          "--all"
+        ],
+        "env": [
+          "HOME",
+          "LANG",
+          "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1",
+          "DISABLE_AUTOUPDATER=1"
+        ],
+        "observedFields": [
+          "pid",
+          "cwd",
+          "kind",
+          "startedAt",
+          "sessionId",
+          "name",
+          "status",
+          "waitingFor"
+        ],
+        "typicalLatencyMs": 175,
+        "sideEffects": "none observed: no supervisor/daemon started, no model work",
+        "cpuSecondsPerCall": 0.14
+      },
+      "capabilities": {
+        "liveInventory": true,
+        "currentSessionProcessLookup": true,
+        "currentSessionProcessLookupEvidence": "evidence/M0B/native/G-in-place-switch (inventory follows /clear and /resume in place within seconds); evidence/M0B/native/H-unsupported-no-guess (SIGKILLed process dropped from inventory within 0.16 s)",
+        "simultaneousAttachment": "accepted by the provider (two live processes reported for one sessionId)"
+      }
+    }
+  },
+  "terminal": {
+    "application": "/System/Applications/Utilities/Terminal.app",
+    "version": "2.15",
+    "dictionarySha256": "cd4dad3e8717922a6e8712638e7bdd0d607054b391f9e7e6993de2700fa233f4",
+    "incarnationSource": "single live process with Terminal's executable path (kernel), sampled for birth"
+  },
+  "identities": {
+    "app": "ai.scalinity.threadspace",
+    "companion": "ai.scalinity.threadspace.agent",
+    "signing": "Apple Development, team 25H5DDPKAC (unchanged from M0A)"
+  },
+  "executables": {
+    "installedOuter": {
+      "path": "~/Applications/Threadspace.app/Contents/MacOS/Threadspace",
+      "sha256": "5c544b2493732b9be749d229053d01c06d36f26bb88eb5e7692528cb59af6a4b"
+    },
+    "installedCompanion": {
+      "path": "~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent",
+      "sha256": "46aa6c86b8111083d60622860f893deb014da19faaf2a36c692fc1751afd9ccf",
+      "sourceCommit": "fc6564199fcc8fb1c84b8895fa849fb567872c05",
+      "sourceTreeDirty": false
+    },
+    "harness": {
+      "path": "target/aarch64-apple-darwin/release/threadspace-qualify",
+      "sha256": "91f4cb1105401b268860d702c8a06506541485be6e8eb10965e25cebe29a808c"
+    },
+    "hookProbe": {
+      "path": "~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/threadspace-hook-probe",
+      "sha256": "ef1816e831fb4c3564d44d6d80a6397e14acad15f83864817220f21db3d8abc3"
+    },
+    "earlierInstalledBuilds": {
+      "46a2a04": "tests A, B, D-0003 capture",
+      "8980d34": "tests C (official), D, E, F, G, H"
+    }
+  },
+  "testCommands": {
+    "rust": "cargo test --workspace --features threadspace-desktop/qualification,threadspace-agent/qualification,threadspace-journal/qualification",
+    "lint": "cargo clippy --workspace --all-targets --features …/qualification -- -D warnings; cargo clippy -p threadspace-agent --all-targets -- -D warnings; cargo fmt --all --check",
+    "frontend": "npx vitest run; npx tsc --noEmit -p apps/desktop",
+    "build": "tests/native/build-app.sh prod; cargo build --release -p threadspace-qualify -p threadspace-hook-probe",
+    "install": "<old App>/Contents/MacOS/Threadspace --service unregister; replace ~/Applications/Threadspace.app; <new App>/Contents/MacOS/Threadspace --service register",
+    "routeLoop": "threadspace-qualify prod route-loop 10 OUT.jsonl <3 canonical session ids>",
+    "singleRoute": "threadspace-qualify prod return <session> [binding]",
+    "evidenceExport": "threadspace-qualify prod export <after-cursor> <limit>"
+  },
+  "testLayers": {
+    "rustDomainSynthetic": "evidence/M0B/synthetic (81 tests across surfaces, provider-claude, surfaces-macos, journal); full workspace suite green",
+    "frontend": "6 vitest tests (validate.test.ts) including provider-session and route-axis validation; tsc strict clean",
+    "nativeMechanism": "real kernel tests: process sampling, exec image replacement, ancestry walk stopping at root-owned login, st_rdev vs st_dev",
+    "nativePackaged": "evidence/M0B/native A–H on the installed signed production identity with real Claude 2.1.291, Terminal.app, AppleEvents/TCC"
+  },
+  "nativeTests": [
+    {
+      "id": "A",
+      "name": "Late-start discovery",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/A-late-start/"
+    },
+    {
+      "id": "B",
+      "name": "First exact Return from the packaged UI; D-0003",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/B-first-return-and-D0003/"
+    },
+    {
+      "id": "C",
+      "name": "Three same-cwd sessions × 10 routes",
+      "result": "PASS",
+      "routes": 30,
+      "exact": 30,
+      "wrongTargets": 0,
+      "unrelatedBindingChanges": 0,
+      "evidence": "evidence/M0B/native/C-same-cwd-30-routes/",
+      "finalCandidateRegression": {
+        "sessions": 2,
+        "routes": 30,
+        "exact": 30,
+        "wrongTargets": 0,
+        "evidence": "evidence/M0B/native/C-final-candidate-30-routes/"
+      }
+    },
+    {
+      "id": "D",
+      "name": "Turn completion and follow-up keep the Session",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/D-turn-continuity/"
+    },
+    {
+      "id": "E",
+      "name": "Resume elsewhere; simultaneous attachment",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/E-resume-and-simultaneous-attach/"
+    },
+    {
+      "id": "F",
+      "name": "Tab movement, close/recreate, natural TTY reuse",
+      "result": "PASS",
+      "note": "one disputed exact readback during an owner click led to the stricter readback rule (failure ledger B-07)",
+      "evidence": "evidence/M0B/native/F-tab-movement-and-stale-rejection/"
+    },
+    {
+      "id": "G",
+      "name": "In-place /clear and /resume A→B→A; currentness",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/G-in-place-switch/"
+    },
+    {
+      "id": "H",
+      "name": "Unsupported case without guessed focus; SIGKILL stale-row check",
+      "result": "PASS",
+      "evidence": "evidence/M0B/native/H-unsupported-no-guess/"
+    },
+    {
+      "id": "hook",
+      "name": "Claude command-hook ancestry",
+      "result": "RECORDED",
+      "evidence": "evidence/M0B/native/hook-ancestry/"
+    }
+  ],
+  "sameCwdProof": {
+    "sessions": 3,
+    "routesPerSession": 10,
+    "totalRoutes": 30,
+    "wrongTargets": 0
+  },
+  "latency": "evidence/M0B/latency.json (75 exact native routes: median 874 ms, p95 952 ms, max 964 ms; target p95 ≤750 ms NOT met; 2 s budget never exceeded)",
+  "decisions": {
+    "D-0001": {
+      "disposition": "retained",
+      "evidence": "linked SQLite 3.53.4, source id 2026-07-24 19:02:57 bf7c7f30…, verified at every companion start; journal migrated 1→2 in place on the M0A store generation"
+    },
+    "D-0002": {
+      "disposition": "retained",
+      "evidence": "office-local capability unchanged; no ACL permission added or removed"
+    },
+    "D-0003": {
+      "disposition": "retained — natively confirmed",
+      "evidence": "evidence/M0B/native/B-first-return-and-D0003/; docs/decisions/D-0003 (M0B confirmation section)"
+    }
+  },
+  "gates": "evidence/M0B/gate-checklist.md",
+  "failureLedger": "evidence/M0B/failure-ledger.md",
+  "attempts": [
+    "evidence/M0B/attempts/C-run1-launchservices-terminal-pid/",
+    "evidence/M0B/attempts/C-run2-stale-harness-comparison/",
+    "evidence/M0B/attempts/build/"
+  ],
+  "humanSteps": [
+    "Owner launched three `claude` sessions in ~/Documents/Tools/ts-m0b-samecwd before the companion restart (A).",
+    "Owner clicked Return in the packaged UI (B; registered twice).",
+    "Owner sent two prompts in one test session (D).",
+    "Owner prompted A, ran /clear, prompted B, then /resume back to A in the same session (G).",
+    "Owner ran `claude --resume <id>` in a new tab while the original ran, then /exit in the original (E).",
+    "Owner reordered tabs, moved a tab to a new window, closed a target tab and opened a new window (F).",
+    "Owner ran `script -q /dev/null claude` (H). The SIGKILL of that test Claude was done by the harness with the owner present."
+  ],
+  "testSetup": {
+    "directory": "~/Documents/Tools/ts-m0b-samecwd",
+    "hooks": "project-local .claude/settings.local.json in that directory only (SessionStart, UserPromptSubmit, Stop → threadspace-hook-probe); remove by deleting the directory",
+    "globalClaudeSettingsChanged": false
+  },
+  "limitations": [
+    "Route latency p95 (952 ms across all exact routes) exceeds the 750 ms target; dominated by two osascript launches and two provider lookups (M13).",
+    "Discovery polling (two inventory calls per 5 s) costs ~5–6 % of one core, above the idle-companion target (M13).",
+    "In-place session switches reach the projection within one discovery interval (observed 2.1–2.9 s); routes always perform their own fresh lookup.",
+    "Only the native-installer direct CLI profile is qualified; other Claude surfaces (agent view, background jobs, desktop, IDE) are unsupported for exact routing and return INSPECTOR_ONLY.",
+    "Fullscreen/Spaces, minimized restoration, Terminal restart and readback-race qualification remain M0C (SPEC §13.3)."
+  ],
+  "redaction": "Home paths written as ~; display labels and cwd of the owner's unrelated Claude sessions removed; prompt text and tool payloads are never stored (hook probe keeps only session_id/hook_event_name/source/reason). Full native session IDs of the test sessions are kept for reproducibility. The system-wide tccd stream is trimmed to the relevant windows; the untrimmed capture and the pre-migration journal backup are kept outside the repository."
+}

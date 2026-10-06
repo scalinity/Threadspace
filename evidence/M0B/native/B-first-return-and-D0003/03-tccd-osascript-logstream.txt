@@ -1,0 +1,454 @@
+# Trimmed from a 15-minute `log stream --predicate 'process == "tccd" OR process == "osascript"'` capture:
+# kept only 04:30:29-04:30:40 (UI launch) and 04:31:45-04:32:30 (first Returns), lines mentioning
+# threadspace / Terminal / osascript / AppleEvents / AUTHREQ results. Other apps' TCC activity removed.
+2026-10-06 04:30:30.227 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57814, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:30.236 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57814, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:30.237 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57815, function=<private>, service=kTCCServiceCalendar, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:30.243 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57815, authValue=1, authReason=0, authVersion=2, desired_auth=4, error=(null),
+2026-10-06 04:30:30.243 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57816, function=<private>, service=kTCCServiceReminders, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:30.248 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57816, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.231 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_CTX: msgID=22125.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.232 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=22125.1, attribution={requesting={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, },
+2026-10-06 04:30:35.233 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=22125.1, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.234 Df tccd[409:1ee23c8] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.236 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=22125.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.240 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7882, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.240 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7882, attribution={accessing={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:30:35.240 Df tccd[409:1ee23c8] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:30:35.241 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7882, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.242 Df tccd[409:1ee23c8] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.244 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7882, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.245 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7883, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.245 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7883, attribution={accessing={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:30:35.245 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:30:35.246 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7883, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.246 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.249 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7883, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.286 Df tccd[669:1ee28f7] [com.apple.TCC:managed_settings] #ManagedTCCDefaults showing the prompt for ai.scalinity.threadspace
+2026-10-06 04:30:35.327 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.397 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_CTX: msgID=22125.3, function=<private>, service=kTCCServiceMicrophone, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.397 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=22125.3, attribution={requesting={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, },
+2026-10-06 04:30:35.398 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=22125.3, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.398 Df tccd[669:1ee2042] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x74ad270300 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.401 E  tccd[669:1ee2042] [com.apple.TCC:access] Prompting policy for hardened runtime; service: kTCCServiceMicrophone requires entitlement com.apple.security.device.audio-input but it is missing for requesting={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace},
+2026-10-06 04:30:35.401 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=22125.3, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.401 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_CTX: msgID=22125.4, function=<private>, service=kTCCServiceCamera, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.401 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=22125.4, attribution={requesting={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, },
+2026-10-06 04:30:35.402 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=22125.4, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.403 Df tccd[669:1ee2042] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x74ad270300 at ~/Applications/Threadspace.app
+2026-10-06 04:30:35.405 E  tccd[669:1ee2042] [com.apple.TCC:access] Prompting policy for hardened runtime; service: kTCCServiceCamera requires entitlement com.apple.security.device.camera but it is missing for requesting={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace},
+2026-10-06 04:30:35.405 Df tccd[669:1ee2042] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=22125.4, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.615 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_CTX: msgID=22135.2, function=<private>, service=kTCCServiceMicrophone, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.615 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=22135.2, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, requesting={TCCDProcess: identifier=com.apple.WebKit.GPU, pid=22135, auid=501, euid=501, binary_path=/System/Volumes/Preboot/Cryptexes/OS/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.GPU.xpc/Contents/MacOS/com.apple.WebKit.GPU}, },
+2026-10-06 04:30:35.619 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=22135.2, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.619 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=22135.2, authValue=0, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.621 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_CTX: msgID=522.955, function=<private>, service=kTCCServiceMicrophone, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.621 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=522.955, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, accessing={TCCDProcess: identifier=com.apple.WebKit.GPU, pid=22135, auid=501, euid=501, binary_path=/System/Volumes/Preboot/Cryptexes/OS/System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.GPU.xpc/Contents/MacOS/com.apple.WebKit.GPU}, requesting={TCCDProcess: identifier=com.apple.tccd, pid=409, auid=0, euid=0, binary_path=/System/Library/PrivateFrameworks/TCC.framework/Support/tccd}, },
+2026-10-06 04:30:35.622 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=522.955, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:35.622 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=522.955, authValue=0, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.850 Df tccd[669:1ee2042] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:30:35.856 Df tccd[669:1ee2042] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:30:35.862 A  osascript[22154:1ee2dce] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:30:35.864 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x10571b080] activating connection: mach=true listener=false peer=false name=com.apple.analyticsd
+2026-10-06 04:30:35.865 Df osascript[22154:1ee2dd2] [com.apple.CoreAnalytics:client] Received configuration update from daemon (initial)
+2026-10-06 04:30:35.867 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x105728c60] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:30:35.867 Df osascript[22154:1ee2dd2] [com.apple.xpc:connection] [0x105728e20] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:30:35.869 A  osascript[22154:1ee2dce] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:30:35.870 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4000] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:30:35.872 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4140] activating connection: mach=true listener=false peer=false name=com.apple.security.syspolicy.exec
+2026-10-06 04:30:35.872 E  osascript[22154:1ee2dce] [com.apple.xprotect:xprotect] Rule path is not accessible: /var/protected/xprotect/XProtect.bundle/Contents/Resources/XPScripts.yr
+2026-10-06 04:30:35.872 Df osascript[22154:1ee2dce] [com.apple.xprotect:xprotect] Using XProtect rules location: (null)
+2026-10-06 04:30:35.872 E  osascript[22154:1ee2dce] [com.apple.xprotect:xprotect] Error reading rules: (null)
+2026-10-06 04:30:35.872 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4140] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:30:35.878 A  osascript[22154:1ee2dce] (Security) SecKeyVerifySignature
+2026-10-06 04:30:35.878 A  osascript[22154:1ee2dce] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:30:35.878 Df osascript[22154:1ee2dce] [com.apple.securityd:keychain] Enabling System Keychain Always due to platform
+2026-10-06 04:30:35.878 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4140] activating connection: mach=true listener=false peer=false name=com.apple.trustd.agent
+2026-10-06 04:30:35.885 A  osascript[22154:1ee2dce] (Security) SecKeyVerifySignature
+2026-10-06 04:30:35.886 A  osascript[22154:1ee2dce] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:30:35.891 A  osascript[22154:1ee2dce] (Security) SecKeyVerifySignature
+2026-10-06 04:30:35.891 A  osascript[22154:1ee2dce] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:30:35.895 A  osascript[22154:1ee2dce] (Security) SecKeyVerifySignature
+2026-10-06 04:30:35.895 A  osascript[22154:1ee2dce] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:30:35.899 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4280] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.launchservicesd
+2026-10-06 04:30:35.900 A  osascript[22154:1ee2dce] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:30:35.902 A  osascript[22154:1ee2dce] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:30:35.908 A  osascript[22154:1ee2dce] (TCC) TCCAccessRequest() IPC
+2026-10-06 04:30:35.909 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd43c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:30:35.909 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=22154.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.909 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=22154.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=22154, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:30:35.911 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=22154.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:30:35.911 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:30:35.914 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=22154.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.914 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd43c0] invalidated after the last release of the connection object
+2026-10-06 04:30:35.915 Df osascript[22154:1ee2dce] [com.apple.SkyLight:default] server port 0x00003707, session port 0x00003707
+2026-10-06 04:30:35.916 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7884, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.916 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7884, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=22154, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:30:35.916 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=22154, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:30:35.917 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7884, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:30:35.918 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:30:35.920 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7884, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.921 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7885, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:35.921 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7885, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=22154, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:30:35.921 Df tccd[409:1ee23c8] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=22154, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:30:35.922 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7885, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:30:35.922 Df tccd[409:1ee23c8] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:30:35.925 Df tccd[409:1ee23c8] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7885, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:35.934 Df osascript[22154:1ee2dce] [com.apple.SkyLight:default] New connection 0x135f87 main
+2026-10-06 04:30:35.934 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd43c0] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.appleevents
+2026-10-06 04:30:35.935 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] CHECKIN: pid=22154 coalition=54463
+2026-10-06 04:30:35.938 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] CHECKEDIN: pid=22154 asn=0x0-0xd52d52 foreground=0
+2026-10-06 04:30:35.939 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4500] activating connection: mach=true listener=false peer=false name=com.apple.lsd.modifydb
+2026-10-06 04:30:35.939 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4640] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@Uv3
+2026-10-06 04:30:35.939 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4780] activating connection: mach=false listener=true peer=false name=(anonymous)
+2026-10-06 04:30:35.939 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4780] Connection returned listener port: 0x5603
+2026-10-06 04:30:35.939 Df osascript[22154:1ee2dd1] [com.apple.xpc:connection] [0x7866cd4a00] activating connection: mach=false listener=false peer=true name=com.apple.xpc.anonymous.0x7866cd4780.peer[379].0x7866cd4a00
+2026-10-06 04:30:35.940 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] FRONTLOGGING: version 1
+2026-10-06 04:30:35.940 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] Registered, pid=22154 ASN=0x0,0xd52d52
+2026-10-06 04:30:35.940 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4780] Connection returned listener port: 0x5603
+2026-10-06 04:30:35.940 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] BringForward: pid=22154 asn=0x0-0xd52d52 bringForward=0 foreground=0 uiElement=1 launchedByLS=0 modifiersCount=0 allDisabled=0
+2026-10-06 04:30:35.940 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd4780] Connection returned listener port: 0x5603
+2026-10-06 04:30:35.941 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] SignalReady: pid=22154 asn=0x0-0xd52d52
+2026-10-06 04:30:35.941 Df osascript[22154:1ee2dce] [com.apple.processmanager:front-35286506] SIGNAL: pid=22154 asn=0x0x-0xd52d52
+2026-10-06 04:30:35.942 Df osascript[22154:1ee2dce] [com.apple.xpc:connection] [0x7866cd48c0] activating connection: mach=true listener=false peer=false name=com.apple.pasteboard.1
+2026-10-06 04:30:35.942 A  osascript[22154:1ee2dce] (CoreFoundation) Loading Preferences From User CFPrefsD
+2026-10-06 04:30:35.942 A  osascript[22154:1ee2dce] (CoreFoundation) Loading Preferences From System CFPrefsD
+2026-10-06 04:30:35.943 A  osascript[22154:1ee2dce] (libsystem_info.dylib) Membership API: translate identifier
+2026-10-06 04:30:35.949 Df tccd[669:1ee28f7] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:30:35.953 Df tccd[669:1ee28f7] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:30:36.244 Df osascript[22154:1ee2dce] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-10-06 04:30:36.244 Df osascript[22154:1ee2dce] [com.apple.CoreAnalytics:client] Queueing exit procedure onto XPC queue. Any further messages sent will be discarded. activeSendTransactions=0
+2026-10-06 04:30:36.244 Df osascript[22154:1ee2dd7] [com.apple.CoreAnalytics:client] Cancelling XPC connection. Any further reply handler invocations will not retry messages
+2026-10-06 04:30:36.244 Df osascript[22154:1ee2dd7] [com.apple.xpc:connection] [0x10571b080] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:30:36.244 Df osascript[22154:1ee2dce] [com.apple.CoreAnalytics:client] Exiting exit handler.
+2026-10-06 04:30:38.717 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7886, function=<private>, service=kTCCServiceScreenCapture, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:38.717 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7886, attribution={accessing={TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:30:38.717 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=ai.scalinity.threadspace, pid=22125, auid=501, euid=501, binary_path=~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:30:38.718 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7886, subject=ai.scalinity.threadspace,
+2026-10-06 04:30:38.718 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app
+2026-10-06 04:30:38.721 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7886, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:30:40.988 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57817, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:30:40.998 Df tccd[669:1ee28f7] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57817, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:48.935 Df tccd[669:1ee4c19] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:31:48.939 Df tccd[669:1ee4c19] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:31:48.946 A  osascript[24716:1ee4df9] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:31:48.950 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x104f93080] activating connection: mach=true listener=false peer=false name=com.apple.analyticsd
+2026-10-06 04:31:48.952 Df osascript[24716:1ee4dfe] [com.apple.CoreAnalytics:client] Received configuration update from daemon (initial)
+2026-10-06 04:31:48.956 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x104fa1520] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:31:48.956 Df osascript[24716:1ee4dfd] [com.apple.xpc:connection] [0x104f97ef0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:31:48.960 A  osascript[24716:1ee4df9] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:48.961 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4000] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:31:48.963 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4140] activating connection: mach=true listener=false peer=false name=com.apple.security.syspolicy.exec
+2026-10-06 04:31:48.963 E  osascript[24716:1ee4df9] [com.apple.xprotect:xprotect] Rule path is not accessible: /var/protected/xprotect/XProtect.bundle/Contents/Resources/XPScripts.yr
+2026-10-06 04:31:48.963 Df osascript[24716:1ee4df9] [com.apple.xprotect:xprotect] Using XProtect rules location: (null)
+2026-10-06 04:31:48.963 E  osascript[24716:1ee4df9] [com.apple.xprotect:xprotect] Error reading rules: (null)
+2026-10-06 04:31:48.963 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4140] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:31:48.968 A  osascript[24716:1ee4df9] (Security) SecKeyVerifySignature
+2026-10-06 04:31:48.968 A  osascript[24716:1ee4df9] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:48.968 Df osascript[24716:1ee4df9] [com.apple.securityd:keychain] Enabling System Keychain Always due to platform
+2026-10-06 04:31:48.968 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4140] activating connection: mach=true listener=false peer=false name=com.apple.trustd.agent
+2026-10-06 04:31:48.975 A  osascript[24716:1ee4df9] (Security) SecKeyVerifySignature
+2026-10-06 04:31:48.975 A  osascript[24716:1ee4df9] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:48.980 A  osascript[24716:1ee4df9] (Security) SecKeyVerifySignature
+2026-10-06 04:31:48.980 A  osascript[24716:1ee4df9] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:48.986 A  osascript[24716:1ee4df9] (Security) SecKeyVerifySignature
+2026-10-06 04:31:48.986 A  osascript[24716:1ee4df9] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:48.990 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4280] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.launchservicesd
+2026-10-06 04:31:48.991 A  osascript[24716:1ee4df9] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:48.993 A  osascript[24716:1ee4df9] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:48.999 A  osascript[24716:1ee4df9] (TCC) TCCAccessRequest() IPC
+2026-10-06 04:31:48.999 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd43c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:31:49.000 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=24716.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.000 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=24716.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=24716, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:31:49.001 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=24716.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.002 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.004 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=24716.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.004 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd43c0] invalidated after the last release of the connection object
+2026-10-06 04:31:49.005 Df osascript[24716:1ee4df9] [com.apple.SkyLight:default] server port 0x00003507, session port 0x00003507
+2026-10-06 04:31:49.006 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7887, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.006 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7887, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=24716, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:31:49.006 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=24716, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:31:49.007 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7887, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.008 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.010 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7887, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.011 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7888, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.011 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7888, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=24716, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:31:49.011 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=24716, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:31:49.012 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7888, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.013 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.015 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7888, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.021 Df osascript[24716:1ee4df9] [com.apple.SkyLight:default] New connection 0x10cba7 main
+2026-10-06 04:31:49.021 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd43c0] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.appleevents
+2026-10-06 04:31:49.022 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] CHECKIN: pid=24716 coalition=54463
+2026-10-06 04:31:49.025 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] CHECKEDIN: pid=24716 asn=0x0-0xd53d53 foreground=0
+2026-10-06 04:31:49.025 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4500] activating connection: mach=true listener=false peer=false name=com.apple.lsd.modifydb
+2026-10-06 04:31:49.025 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4640] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@Uv3
+2026-10-06 04:31:49.026 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4780] activating connection: mach=false listener=true peer=false name=(anonymous)
+2026-10-06 04:31:49.026 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4780] Connection returned listener port: 0x5603
+2026-10-06 04:31:49.026 Df osascript[24716:1ee4dfd] [com.apple.xpc:connection] [0x7abccd4a00] activating connection: mach=false listener=false peer=true name=com.apple.xpc.anonymous.0x7abccd4780.peer[379].0x7abccd4a00
+2026-10-06 04:31:49.026 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] FRONTLOGGING: version 1
+2026-10-06 04:31:49.026 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] Registered, pid=24716 ASN=0x0,0xd53d53
+2026-10-06 04:31:49.027 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4780] Connection returned listener port: 0x5603
+2026-10-06 04:31:49.027 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] BringForward: pid=24716 asn=0x0-0xd53d53 bringForward=0 foreground=0 uiElement=1 launchedByLS=0 modifiersCount=0 allDisabled=0
+2026-10-06 04:31:49.027 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd4780] Connection returned listener port: 0x5603
+2026-10-06 04:31:49.027 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] SignalReady: pid=24716 asn=0x0-0xd53d53
+2026-10-06 04:31:49.027 Df osascript[24716:1ee4df9] [com.apple.processmanager:front-35286506] SIGNAL: pid=24716 asn=0x0x-0xd53d53
+2026-10-06 04:31:49.030 Df osascript[24716:1ee4df9] [com.apple.xpc:connection] [0x7abccd48c0] activating connection: mach=true listener=false peer=false name=com.apple.pasteboard.1
+2026-10-06 04:31:49.030 A  osascript[24716:1ee4df9] (CoreFoundation) Loading Preferences From User CFPrefsD
+2026-10-06 04:31:49.030 A  osascript[24716:1ee4df9] (CoreFoundation) Loading Preferences From System CFPrefsD
+2026-10-06 04:31:49.031 A  osascript[24716:1ee4df9] (libsystem_info.dylib) Membership API: translate identifier
+2026-10-06 04:31:49.038 Df tccd[669:1ee4c19] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:31:49.041 Df tccd[669:1ee4c19] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4df9] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4df9] [com.apple.CoreAnalytics:client] Queueing exit procedure onto XPC queue. Any further messages sent will be discarded. activeSendTransactions=0
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4e2b] [com.apple.CoreAnalytics:client] Cancelling XPC connection. Any further reply handler invocations will not retry messages
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4e2b] [com.apple.xpc:connection] [0x104f93080] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4df9] [com.apple.CoreAnalytics:client] Exiting exit handler.
+2026-10-06 04:31:49.335 Df osascript[24716:1ee4e2b] [com.apple.CoreAnalytics:client] XPC connection invalidated (daemon unloaded/disabled)
+2026-10-06 04:31:49.346 A  osascript[24736:1ee4e55] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:31:49.350 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x1011db000] activating connection: mach=true listener=false peer=false name=com.apple.analyticsd
+2026-10-06 04:31:49.351 Df osascript[24736:1ee4e5b] [com.apple.CoreAnalytics:client] Received configuration update from daemon (initial)
+2026-10-06 04:31:49.355 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x1011e4980] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:31:49.355 Df osascript[24736:1ee4e5b] [com.apple.xpc:connection] [0x1011e00e0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:31:49.359 A  osascript[24736:1ee4e55] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:49.360 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4000] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:31:49.361 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4140] activating connection: mach=true listener=false peer=false name=com.apple.security.syspolicy.exec
+2026-10-06 04:31:49.364 E  osascript[24736:1ee4e55] [com.apple.xprotect:xprotect] Rule path is not accessible: /var/protected/xprotect/XProtect.bundle/Contents/Resources/XPScripts.yr
+2026-10-06 04:31:49.364 Df osascript[24736:1ee4e55] [com.apple.xprotect:xprotect] Using XProtect rules location: (null)
+2026-10-06 04:31:49.364 E  osascript[24736:1ee4e55] [com.apple.xprotect:xprotect] Error reading rules: (null)
+2026-10-06 04:31:49.364 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4140] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:31:49.370 A  osascript[24736:1ee4e55] (Security) SecKeyVerifySignature
+2026-10-06 04:31:49.370 A  osascript[24736:1ee4e55] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:49.370 Df osascript[24736:1ee4e55] [com.apple.securityd:keychain] Enabling System Keychain Always due to platform
+2026-10-06 04:31:49.370 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4140] activating connection: mach=true listener=false peer=false name=com.apple.trustd.agent
+2026-10-06 04:31:49.377 A  osascript[24736:1ee4e55] (Security) SecKeyVerifySignature
+2026-10-06 04:31:49.377 A  osascript[24736:1ee4e55] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:49.381 A  osascript[24736:1ee4e55] (Security) SecKeyVerifySignature
+2026-10-06 04:31:49.381 A  osascript[24736:1ee4e55] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:49.385 A  osascript[24736:1ee4e55] (Security) SecKeyVerifySignature
+2026-10-06 04:31:49.385 A  osascript[24736:1ee4e55] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:31:49.388 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4280] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.launchservicesd
+2026-10-06 04:31:49.389 A  osascript[24736:1ee4e55] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:49.390 A  osascript[24736:1ee4e55] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:31:49.395 A  osascript[24736:1ee4e55] (TCC) TCCAccessRequest() IPC
+2026-10-06 04:31:49.395 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb43c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:31:49.396 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=24736.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.396 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=24736.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=24736, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:31:49.397 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=24736.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.397 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.400 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=24736.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.400 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb43c0] invalidated after the last release of the connection object
+2026-10-06 04:31:49.400 Df osascript[24736:1ee4e55] [com.apple.SkyLight:default] server port 0x00003613, session port 0x00003613
+2026-10-06 04:31:49.401 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7889, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.401 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7889, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=24736, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:31:49.401 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=24736, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:31:49.402 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7889, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.402 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.404 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7889, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.405 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7890, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:49.405 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7890, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=24736, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:31:49.405 Df tccd[409:1ee14dc] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=24736, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:31:49.406 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7890, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:31:49.406 Df tccd[409:1ee14dc] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:31:49.409 Df tccd[409:1ee14dc] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7890, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:49.416 Df osascript[24736:1ee4e55] [com.apple.SkyLight:default] New connection 0x1c26f3 main
+2026-10-06 04:31:49.416 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb43c0] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.appleevents
+2026-10-06 04:31:49.418 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] CHECKIN: pid=24736 coalition=54463
+2026-10-06 04:31:49.421 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] CHECKEDIN: pid=24736 asn=0x0-0xd54d54 foreground=0
+2026-10-06 04:31:49.421 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4500] activating connection: mach=true listener=false peer=false name=com.apple.lsd.modifydb
+2026-10-06 04:31:49.422 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4640] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@Uv3
+2026-10-06 04:31:49.422 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4780] activating connection: mach=false listener=true peer=false name=(anonymous)
+2026-10-06 04:31:49.422 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4780] Connection returned listener port: 0x5703
+2026-10-06 04:31:49.422 Df osascript[24736:1ee4e5b] [com.apple.xpc:connection] [0x79cccb4a00] activating connection: mach=false listener=false peer=true name=com.apple.xpc.anonymous.0x79cccb4780.peer[379].0x79cccb4a00
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] FRONTLOGGING: version 1
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] Registered, pid=24736 ASN=0x0,0xd54d54
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4780] Connection returned listener port: 0x5703
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] BringForward: pid=24736 asn=0x0-0xd54d54 bringForward=0 foreground=0 uiElement=1 launchedByLS=0 modifiersCount=0 allDisabled=0
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb4780] Connection returned listener port: 0x5703
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] SignalReady: pid=24736 asn=0x0-0xd54d54
+2026-10-06 04:31:49.423 Df osascript[24736:1ee4e55] [com.apple.processmanager:front-35286506] SIGNAL: pid=24736 asn=0x0x-0xd54d54
+2026-10-06 04:31:49.425 Df osascript[24736:1ee4e55] [com.apple.xpc:connection] [0x79cccb48c0] activating connection: mach=true listener=false peer=false name=com.apple.pasteboard.1
+2026-10-06 04:31:49.425 A  osascript[24736:1ee4e55] (CoreFoundation) Loading Preferences From User CFPrefsD
+2026-10-06 04:31:49.425 A  osascript[24736:1ee4e55] (CoreFoundation) Loading Preferences From System CFPrefsD
+2026-10-06 04:31:49.426 A  osascript[24736:1ee4e55] (libsystem_info.dylib) Membership API: translate identifier
+2026-10-06 04:31:49.434 Df tccd[669:1ee4df3] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:31:49.437 Df tccd[669:1ee4df3] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:31:49.651 Df osascript[24736:1ee4e55] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-10-06 04:31:49.651 Df osascript[24736:1ee4e55] [com.apple.CoreAnalytics:client] Queueing exit procedure onto XPC queue. Any further messages sent will be discarded. activeSendTransactions=0
+2026-10-06 04:31:49.651 Df osascript[24736:1ee4e58] [com.apple.CoreAnalytics:client] Cancelling XPC connection. Any further reply handler invocations will not retry messages
+2026-10-06 04:31:49.651 Df osascript[24736:1ee4e58] [com.apple.xpc:connection] [0x1011db000] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:31:49.651 Df osascript[24736:1ee4e55] [com.apple.CoreAnalytics:client] Exiting exit handler.
+2026-10-06 04:31:54.342 Df tccd[669:1ee4df3] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57838, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:54.351 Df tccd[669:1ee4df3] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57838, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:31:54.352 Df tccd[669:1ee4df3] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57839, function=<private>, service=kTCCServiceCalendar, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:54.360 Df tccd[669:1ee4df3] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57839, authValue=1, authReason=0, authVersion=2, desired_auth=4, error=(null),
+2026-10-06 04:31:54.361 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57840, function=<private>, service=kTCCServiceReminders, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:31:54.367 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57840, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:04.847 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57841, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:04.856 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57841, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:04.857 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57842, function=<private>, service=kTCCServiceCalendar, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:04.864 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57842, authValue=1, authReason=0, authVersion=2, desired_auth=4, error=(null),
+2026-10-06 04:32:04.866 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57843, function=<private>, service=kTCCServiceReminders, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:04.872 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57843, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:15.371 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57844, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:15.379 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57844, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:15.380 Df tccd[669:1ee5851] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57845, function=<private>, service=kTCCServiceCalendar, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:15.387 Df tccd[669:1ee5851] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57845, authValue=1, authReason=0, authVersion=2, desired_auth=4, error=(null),
+2026-10-06 04:32:15.388 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57846, function=<private>, service=kTCCServiceReminders, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:15.396 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57846, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:25.699 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57847, function=<private>, service=kTCCServiceAddressBook, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:25.711 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57847, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:25.712 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57848, function=<private>, service=kTCCServiceCalendar, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:25.721 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57848, authValue=1, authReason=0, authVersion=2, desired_auth=4, error=(null),
+2026-10-06 04:32:25.722 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_CTX: msgID=364.57849, function=<private>, service=kTCCServiceReminders, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:25.729 Df tccd[669:1ee4c19] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=364.57849, authValue=1, authReason=0, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.521 Df tccd[669:1ee5c32] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:32:26.527 Df tccd[669:1ee5c32] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:32:26.537 A  osascript[25871:1ee5c8b] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:32:26.541 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x1016b3080] activating connection: mach=true listener=false peer=false name=com.apple.analyticsd
+2026-10-06 04:32:26.542 Df osascript[25871:1ee5c90] [com.apple.CoreAnalytics:client] Received configuration update from daemon (initial)
+2026-10-06 04:32:26.546 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x1016c1650] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:32:26.546 Df osascript[25871:1ee5c91] [com.apple.xpc:connection] [0x1016b7ee0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:32:26.550 A  osascript[25871:1ee5c8b] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.551 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0000] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:32:26.553 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0140] activating connection: mach=true listener=false peer=false name=com.apple.security.syspolicy.exec
+2026-10-06 04:32:26.554 E  osascript[25871:1ee5c8b] [com.apple.xprotect:xprotect] Rule path is not accessible: /var/protected/xprotect/XProtect.bundle/Contents/Resources/XPScripts.yr
+2026-10-06 04:32:26.554 Df osascript[25871:1ee5c8b] [com.apple.xprotect:xprotect] Using XProtect rules location: (null)
+2026-10-06 04:32:26.554 E  osascript[25871:1ee5c8b] [com.apple.xprotect:xprotect] Error reading rules: (null)
+2026-10-06 04:32:26.554 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0140] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:32:26.560 A  osascript[25871:1ee5c8b] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.561 A  osascript[25871:1ee5c8b] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.561 Df osascript[25871:1ee5c8b] [com.apple.securityd:keychain] Enabling System Keychain Always due to platform
+2026-10-06 04:32:26.561 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0140] activating connection: mach=true listener=false peer=false name=com.apple.trustd.agent
+2026-10-06 04:32:26.569 A  osascript[25871:1ee5c8b] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.569 A  osascript[25871:1ee5c8b] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.575 A  osascript[25871:1ee5c8b] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.575 A  osascript[25871:1ee5c8b] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.579 A  osascript[25871:1ee5c8b] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.580 A  osascript[25871:1ee5c8b] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.584 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0280] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.launchservicesd
+2026-10-06 04:32:26.585 A  osascript[25871:1ee5c8b] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.587 A  osascript[25871:1ee5c8b] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.593 A  osascript[25871:1ee5c8b] (TCC) TCCAccessRequest() IPC
+2026-10-06 04:32:26.594 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d03c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:32:26.594 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_CTX: msgID=25871.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.594 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=25871.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=25871, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:32:26.596 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=25871.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:26.596 Df tccd[409:1ee4e10] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:26.599 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=25871.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.599 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d03c0] invalidated after the last release of the connection object
+2026-10-06 04:32:26.599 Df osascript[25871:1ee5c8b] [com.apple.SkyLight:default] server port 0x0000320f, session port 0x0000320f
+2026-10-06 04:32:26.600 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7891, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.600 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7891, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=25871, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:32:26.600 Df tccd[409:1ee4e10] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=25871, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:32:26.601 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7891, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:26.602 Df tccd[409:1ee4e10] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:26.604 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7891, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.605 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7892, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.605 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7892, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=25871, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:32:26.605 Df tccd[409:1ee4e10] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=25871, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:32:26.606 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7892, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:26.606 Df tccd[409:1ee4e10] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:26.609 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7892, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.613 Df osascript[25871:1ee5c8b] [com.apple.SkyLight:default] New connection 0x157d63 main
+2026-10-06 04:32:26.613 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d03c0] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.appleevents
+2026-10-06 04:32:26.614 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] CHECKIN: pid=25871 coalition=54463
+2026-10-06 04:32:26.617 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] CHECKEDIN: pid=25871 asn=0x0-0xd55d55 foreground=0
+2026-10-06 04:32:26.617 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0500] activating connection: mach=true listener=false peer=false name=com.apple.lsd.modifydb
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0640] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@Uv3
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0780] activating connection: mach=false listener=true peer=false name=(anonymous)
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0780] Connection returned listener port: 0x5803
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c90] [com.apple.xpc:connection] [0x787a8d0a00] activating connection: mach=false listener=false peer=true name=com.apple.xpc.anonymous.0x787a8d0780.peer[379].0x787a8d0a00
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] FRONTLOGGING: version 1
+2026-10-06 04:32:26.618 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] Registered, pid=25871 ASN=0x0,0xd55d55
+2026-10-06 04:32:26.619 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0780] Connection returned listener port: 0x5803
+2026-10-06 04:32:26.619 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] BringForward: pid=25871 asn=0x0-0xd55d55 bringForward=0 foreground=0 uiElement=1 launchedByLS=0 modifiersCount=0 allDisabled=0
+2026-10-06 04:32:26.619 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0780] Connection returned listener port: 0x5803
+2026-10-06 04:32:26.619 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] SignalReady: pid=25871 asn=0x0-0xd55d55
+2026-10-06 04:32:26.619 Df osascript[25871:1ee5c8b] [com.apple.processmanager:front-35286506] SIGNAL: pid=25871 asn=0x0x-0xd55d55
+2026-10-06 04:32:26.621 Df osascript[25871:1ee5c8b] [com.apple.xpc:connection] [0x787a8d0b40] activating connection: mach=true listener=false peer=false name=com.apple.pasteboard.1
+2026-10-06 04:32:26.622 A  osascript[25871:1ee5c8b] (CoreFoundation) Loading Preferences From User CFPrefsD
+2026-10-06 04:32:26.622 A  osascript[25871:1ee5c8b] (CoreFoundation) Loading Preferences From System CFPrefsD
+2026-10-06 04:32:26.622 A  osascript[25871:1ee5c8b] (libsystem_info.dylib) Membership API: translate identifier
+2026-10-06 04:32:26.631 Df tccd[669:1ee5c32] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:32:26.634 Df tccd[669:1ee5c32] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5c8b] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5c8b] [com.apple.CoreAnalytics:client] Queueing exit procedure onto XPC queue. Any further messages sent will be discarded. activeSendTransactions=0
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5cb0] [com.apple.CoreAnalytics:client] Cancelling XPC connection. Any further reply handler invocations will not retry messages
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5cb0] [com.apple.xpc:connection] [0x1016b3080] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5c8b] [com.apple.CoreAnalytics:client] Exiting exit handler.
+2026-10-06 04:32:26.927 Df osascript[25871:1ee5c90] [com.apple.CoreAnalytics:client] XPC connection invalidated (daemon unloaded/disabled)
+2026-10-06 04:32:26.942 A  osascript[25891:1ee5d17] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:32:26.946 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x103483000] activating connection: mach=true listener=false peer=false name=com.apple.analyticsd
+2026-10-06 04:32:26.947 Df osascript[25891:1ee5d1a] [com.apple.CoreAnalytics:client] Received configuration update from daemon (initial)
+2026-10-06 04:32:26.952 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x103487ac0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:32:26.953 Df osascript[25891:1ee5d1a] [com.apple.xpc:connection] [0x103488080] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:32:26.956 A  osascript[25891:1ee5d17] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.957 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc000] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:32:26.959 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc140] activating connection: mach=true listener=false peer=false name=com.apple.security.syspolicy.exec
+2026-10-06 04:32:26.959 E  osascript[25891:1ee5d17] [com.apple.xprotect:xprotect] Rule path is not accessible: /var/protected/xprotect/XProtect.bundle/Contents/Resources/XPScripts.yr
+2026-10-06 04:32:26.959 Df osascript[25891:1ee5d17] [com.apple.xprotect:xprotect] Using XProtect rules location: (null)
+2026-10-06 04:32:26.959 E  osascript[25891:1ee5d17] [com.apple.xprotect:xprotect] Error reading rules: (null)
+2026-10-06 04:32:26.959 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc140] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:32:26.963 A  osascript[25891:1ee5d17] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.963 A  osascript[25891:1ee5d17] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.963 Df osascript[25891:1ee5d17] [com.apple.securityd:keychain] Enabling System Keychain Always due to platform
+2026-10-06 04:32:26.964 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc140] activating connection: mach=true listener=false peer=false name=com.apple.trustd.agent
+2026-10-06 04:32:26.970 A  osascript[25891:1ee5d17] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.970 A  osascript[25891:1ee5d17] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.975 A  osascript[25891:1ee5d17] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.975 A  osascript[25891:1ee5d17] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.979 A  osascript[25891:1ee5d17] (Security) SecKeyVerifySignature
+2026-10-06 04:32:26.979 A  osascript[25891:1ee5d17] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:32:26.983 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc280] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.launchservicesd
+2026-10-06 04:32:26.983 A  osascript[25891:1ee5d17] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.985 A  osascript[25891:1ee5d17] (CoreServicesInternal) CFURLResolveBookmarkData
+2026-10-06 04:32:26.990 A  osascript[25891:1ee5d17] (TCC) TCCAccessRequest() IPC
+2026-10-06 04:32:26.990 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc3c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:32:26.991 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_CTX: msgID=25891.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.991 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=25891.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=25891, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:32:26.992 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=25891.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:26.993 Df tccd[409:1ee4e10] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:26.994 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=25891.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.994 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc3c0] invalidated after the last release of the connection object
+2026-10-06 04:32:26.996 Df osascript[25891:1ee5d17] [com.apple.SkyLight:default] server port 0x00003813, session port 0x00003813
+2026-10-06 04:32:26.996 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7893, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.996 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7893, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=25891, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:32:26.996 Df tccd[409:1ee4e10] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=25891, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:32:26.997 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7893, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:26.997 Df tccd[409:1ee4e10] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:26.999 Df tccd[409:1ee4e10] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7893, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:26.999 Df tccd[409:1ee5c9d] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7894, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:32:26.999 Df tccd[409:1ee5c9d] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7894, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=25891, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:32:26.999 Df tccd[409:1ee5c9d] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=25891, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:32:27.000 Df tccd[409:1ee5c9d] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7894, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:32:27.000 Df tccd[409:1ee5c9d] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:32:27.001 Df tccd[409:1ee5c9d] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7894, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:32:27.007 Df osascript[25891:1ee5d17] [com.apple.SkyLight:default] New connection 0x15493b main
+2026-10-06 04:32:27.007 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc3c0] activating connection: mach=true listener=false peer=false name=com.apple.coreservices.appleevents
+2026-10-06 04:32:27.008 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] CHECKIN: pid=25891 coalition=54463
+2026-10-06 04:32:27.010 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] CHECKEDIN: pid=25891 asn=0x0-0xd56d56 foreground=0
+2026-10-06 04:32:27.011 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc500] activating connection: mach=true listener=false peer=false name=com.apple.lsd.modifydb
+2026-10-06 04:32:27.011 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc640] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@Uv3
+2026-10-06 04:32:27.011 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc780] activating connection: mach=false listener=true peer=false name=(anonymous)
+2026-10-06 04:32:27.011 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc780] Connection returned listener port: 0x5603
+2026-10-06 04:32:27.011 Df osascript[25891:1ee5d1a] [com.apple.xpc:connection] [0x797ecdca00] activating connection: mach=false listener=false peer=true name=com.apple.xpc.anonymous.0x797ecdc780.peer[379].0x797ecdca00
+2026-10-06 04:32:27.012 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] FRONTLOGGING: version 1
+2026-10-06 04:32:27.012 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] Registered, pid=25891 ASN=0x0,0xd56d56
+2026-10-06 04:32:27.013 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc780] Connection returned listener port: 0x5603
+2026-10-06 04:32:27.013 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] BringForward: pid=25891 asn=0x0-0xd56d56 bringForward=0 foreground=0 uiElement=1 launchedByLS=0 modifiersCount=0 allDisabled=0
+2026-10-06 04:32:27.013 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc780] Connection returned listener port: 0x5603
+2026-10-06 04:32:27.013 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] SignalReady: pid=25891 asn=0x0-0xd56d56
+2026-10-06 04:32:27.013 Df osascript[25891:1ee5d17] [com.apple.processmanager:front-35286506] SIGNAL: pid=25891 asn=0x0x-0xd56d56
+2026-10-06 04:32:27.014 Df osascript[25891:1ee5d17] [com.apple.xpc:connection] [0x797ecdc8c0] activating connection: mach=true listener=false peer=false name=com.apple.pasteboard.1
+2026-10-06 04:32:27.014 A  osascript[25891:1ee5d17] (CoreFoundation) Loading Preferences From User CFPrefsD
+2026-10-06 04:32:27.015 A  osascript[25891:1ee5d17] (CoreFoundation) Loading Preferences From System CFPrefsD
+2026-10-06 04:32:27.015 A  osascript[25891:1ee5d17] (libsystem_info.dylib) Membership API: translate identifier
+2026-10-06 04:32:27.028 Df tccd[669:1ee5c32] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:32:27.031 Df tccd[669:1ee5c32] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d17] [com.apple.CoreAnalytics:client] Entering exit handler.
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d17] [com.apple.CoreAnalytics:client] Queueing exit procedure onto XPC queue. Any further messages sent will be discarded. activeSendTransactions=0
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d1b] [com.apple.CoreAnalytics:client] Cancelling XPC connection. Any further reply handler invocations will not retry messages
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d1b] [com.apple.xpc:connection] [0x103483000] invalidated because the current process cancelled the connection by calling xpc_connection_cancel()
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d17] [com.apple.CoreAnalytics:client] Exiting exit handler.
+2026-10-06 04:32:27.193 Df osascript[25891:1ee5d22] [com.apple.CoreAnalytics:client] XPC connection invalidated (daemon unloaded/disabled)

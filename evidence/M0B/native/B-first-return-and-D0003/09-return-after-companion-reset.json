@@ -1,0 +1,245 @@
+{
+  "independent": {
+    "frontmost": "com.apple.Terminal",
+    "nativeSessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+    "provider": {
+      "lookupEndedMs": 1791275654528,
+      "lookupStartedMs": 1791275654350,
+      "processes": [
+        {
+          "controllingDevice": 268435458,
+          "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+          "foreground": true,
+          "pid": 54698,
+          "startMicroseconds": 140544,
+          "startSeconds": "1791273926",
+          "status": 2
+        }
+      ],
+      "rows": 1
+    },
+    "selectedIsExpectedSession": true,
+    "selectedRdev": 268435458,
+    "selectedTty": "/dev/ttys002"
+  },
+  "ok": true,
+  "peer": {
+    "companion": {
+      "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+      "executablePath": "~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent",
+      "pid": 56092,
+      "startMicroseconds": 676158,
+      "startSeconds": "1791274010"
+    },
+    "coreGeneration": "72328ff8-2333-4e31-b65d-af24e0753733",
+    "pid": 56092,
+    "storeGeneration": "f3eefe4f-6d5e-48fb-9dda-354159660588"
+  },
+  "response": {
+    "kind": "Routed",
+    "result": {
+      "bindingId": "32dfa06e-bcaa-4147-8815-f1fde905aef7",
+      "choices": [],
+      "evidence": {
+        "bindingId": "32dfa06e-bcaa-4147-8815-f1fde905aef7",
+        "bindingRevisionAfterFocus": "24",
+        "bindingRevisionBeforeFocus": "24",
+        "bindingRevisionLoaded": "24",
+        "boundDevice": 268435458,
+        "boundExecutable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+        "focus": {
+          "elapsedMs": 290,
+          "error": null,
+          "frontWindowId": 10424,
+          "frontmostApplication": {
+            "bundleIdentifier": "com.apple.Terminal",
+            "pid": 95390
+          },
+          "outcome": "FOCUSED",
+          "readbackRdev": 268435458,
+          "readbackTty": "/dev/ttys002",
+          "senderPid": 29979,
+          "startedMs": 1791275653880,
+          "targetTabIndex": 1,
+          "targetTabSelected": true,
+          "targetWindowFrontmost": true,
+          "targetWindowId": 10424
+        },
+        "lookup": {
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "error": null,
+          "pidRows": [
+            {
+              "kind": "interactive",
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ],
+          "requestEndedMs": 1791275653655,
+          "requestStartedMs": 1791275653485,
+          "rowCount": 7,
+          "sessionRows": [
+            {
+              "kind": "interactive",
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ]
+        },
+        "nativeSessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+        "phases": [
+          {
+            "elapsedMs": 0,
+            "phase": "pre-lookup sample"
+          },
+          {
+            "elapsedMs": 402,
+            "phase": "provider lookup + terminal enumeration"
+          },
+          {
+            "elapsedMs": 0,
+            "phase": "post-lookup sample"
+          },
+          {
+            "elapsedMs": 1,
+            "phase": "surface join"
+          },
+          {
+            "elapsedMs": 290,
+            "phase": "focus + readback"
+          },
+          {
+            "elapsedMs": 1,
+            "phase": "frontmost + readback stat"
+          },
+          {
+            "elapsedMs": 177,
+            "phase": "post-focus revalidation"
+          }
+        ],
+        "postFocusLookup": {
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "error": null,
+          "pidRows": [
+            {
+              "kind": "interactive",
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ],
+          "requestEndedMs": 1791275654348,
+          "requestStartedMs": 1791275654171,
+          "rowCount": 7,
+          "sessionRows": [
+            {
+              "kind": "interactive",
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ]
+        },
+        "postFocusSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435458,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 54698,
+            "pid": 54698,
+            "ppid": 54532,
+            "sampledAtMs": 1791275654171,
+            "startMicroseconds": 140544,
+            "startSeconds": "1791273926",
+            "status": 2,
+            "tpgid": 54698
+          }
+        },
+        "postLookupSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435458,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 54698,
+            "pid": 54698,
+            "ppid": 54532,
+            "sampledAtMs": 1791275653879,
+            "startMicroseconds": 140544,
+            "startSeconds": "1791273926",
+            "status": 2,
+            "tpgid": 54698
+          }
+        },
+        "preLookupSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435458,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 54698,
+            "pid": 54698,
+            "ppid": 54532,
+            "sampledAtMs": 1791275653477,
+            "startMicroseconds": 140544,
+            "startSeconds": "1791273926",
+            "status": 2,
+            "tpgid": 54698
+          }
+        },
+        "processKey": {
+          "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+          "endpointId": "55b51f3b-4134-4260-92d5-c34a77ddb277",
+          "pid": 54698,
+          "startMicroseconds": 140544,
+          "startSeconds": "1791273926"
+        },
+        "terminal": {
+          "endedMs": 1791275653879,
+          "error": null,
+          "generationAfter": {
+            "pid": 95390,
+            "startMicroseconds": 59458,
+            "startSeconds": "1791084253"
+          },
+          "generationBefore": {
+            "pid": 95390,
+            "startMicroseconds": 59458,
+            "startSeconds": "1791084253"
+          },
+          "matches": [
+            {
+              "rdev": 268435458,
+              "selected": true,
+              "tabIndex": 1,
+              "tty": "/dev/ttys002",
+              "windowId": 10424,
+              "windowIndex": 2
+            }
+          ],
+          "senderPid": 29956,
+          "startedMs": 1791275653486,
+          "tabCount": 7,
+          "windowCount": 7
+        }
+      },
+      "focusPerformed": true,
+      "inputReadiness": "FOREGROUND_COMPATIBLE",
+      "latencyMs": 871,
+      "reasonCode": "OK",
+      "requestId": "db1f2183-145a-4a0c-b6b9-12cb7998324a",
+      "sessionId": "a52de5c2-dae4-4730-b66a-3e5c4507663c",
+      "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+      "startedAtMs": 1791275653477,
+      "surfaceResult": "EXACT_NATIVE_SURFACE",
+      "validatedBindingRevision": "24"
+    }
+  }
+}

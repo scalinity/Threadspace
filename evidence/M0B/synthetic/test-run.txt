@@ -1,0 +1,98 @@
+# cargo test (candidate fc65641), 2026-10-06T09:00:02Z
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_journal-69e4098b1f6f65e2)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/identity.rs (target/aarch64-apple-darwin/debug/deps/identity-96d934287de1e3a4)
+test migration_two_keeps_the_frozen_engine_and_m0a_fixture ... ok
+test one_session_with_two_live_attachments_keeps_both_bindings ... ok
+test a_reused_tty_path_does_not_resurrect_an_invalidated_binding ... ok
+test a_delayed_old_end_closes_only_its_own_activation_across_a_to_b_to_a ... ok
+test route_results_are_journaled_with_their_evidence ... ok
+test sessions_leaving_the_inventory_persist_as_stale ... ok
+test same_pid_with_a_new_birth_cannot_inherit_the_old_binding ... ok
+test three_same_cwd_sessions_are_three_sessions_with_independent_bindings ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+     Running tests/journal.rs (target/aarch64-apple-darwin/debug/deps/journal-4caf2d9aacebb430)
+test only_one_writer_can_hold_the_store ... ok
+test linked_engine_is_exactly_the_frozen_candidate ... ok
+test open_applies_wal_full_foreign_keys_and_seeds_one_fixture ... ok
+test patch_carries_full_upserts_for_changed_entities ... ok
+test newer_schema_is_refused ... ok
+test close_and_reopen_recovers_the_same_stored_fixture ... ok
+test qualification_attention_has_outbox_intent_in_the_same_commit ... ok
+test receipts_are_commit_only_and_idempotent ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_provider_claude-d970c2f3efcc9aac)
+test discovery::tests::executable_replacement_within_the_same_pid_and_birth_is_rejected ... ok
+test discovery::tests::a_failed_or_absent_confirmation_never_joins ... ok
+test discovery::tests::background_missing_duplicate_and_new_rows_never_join ... ok
+test discovery::tests::device_change_vanishing_and_denial_are_explicit ... ok
+test discovery::tests::one_session_in_two_processes_is_two_joins ... ok
+test discovery::tests::pid_reused_before_the_first_sample_cannot_inherit_the_old_row ... ok
+test discovery::tests::same_pid_with_a_different_birth_across_the_bracket_is_rejected ... ok
+test discovery::tests::three_same_cwd_sessions_join_independently ... ok
+test discovery::tests::unqualified_executables_and_missing_terminals_stay_provisional ... ok
+test inventory::tests::qualification_is_the_versions_directory_not_a_name ... ok
+test inventory::tests::parses_the_installed_shape_and_tolerates_unknown_fields ... ok
+test inventory::tests::rejects_non_arrays_and_malformed_ids ... ok
+test reconcile::tests::a_still_joined_activation_continues_without_a_new_activation ... ok
+test reconcile::tests::an_in_place_switch_is_proven_only_by_a_bracketed_join ... ok
+test reconcile::tests::executable_replacement_ends_and_requalifies ... ok
+test reconcile::tests::an_unbound_continuing_activation_needs_a_surface ... ok
+test reconcile::tests::missing_rows_and_unreadable_processes_prove_nothing ... ok
+test reconcile::tests::process_exit_and_pid_reuse_end_the_old_activation ... ok
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_surfaces-3c11fb1803dee7c1)
+test tests::a_frontmost_process_other_than_the_terminal_incarnation_is_not_exact ... ok
+test tests::a_missing_or_failed_provider_lookup_never_becomes_current ... ok
+test tests::a_process_replaced_between_bracket_samples_is_refused ... ok
+test tests::a_binding_revised_before_focus_is_refused ... ok
+test tests::a_moved_tab_is_found_by_fresh_enumeration ... ok
+test tests::a_reused_tty_path_cannot_revive_a_binding_whose_process_ended ... ok
+test tests::a_proven_target_is_focused_exactly_once_and_reads_back ... ok
+test tests::a_session_change_seen_after_focus_downgrades_verification ... ok
+test tests::a_provider_session_change_is_a_conflict_not_a_route ... ok
+test tests::a_stale_terminal_generation_is_refused ... ok
+test tests::a_target_window_terminal_does_not_call_frontmost_is_not_exact ... ok
+test tests::an_old_queued_request_never_moves_focus ... ok
+test tests::a_stopped_or_backgrounded_provider_is_not_foreground_compatible ... ok
+test tests::executable_replacement_is_refused ... ok
+test tests::no_matching_tab_is_unavailable ... ok
+test tests::multiple_attachments_require_an_explicit_choice ... ok
+test tests::readback_must_name_the_target_device ... ok
+test tests::automation_denial_and_script_errors_are_explicit ... ok
+test tests::same_pid_with_a_different_birth_cannot_use_the_old_binding ... ok
+test tests::several_eligible_tabs_are_ambiguous ... ok
+test tests::terminal_not_frontmost_after_activation_is_not_exact ... ok
+test tests::unbound_fixture_and_unknown_sessions_open_the_inspector_only ... ok
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_surfaces_macos-a13c918aeec42bf3)
+test ancestry::tests::a_parent_born_after_its_child_is_a_reused_pid ... ok
+test ancestry::tests::a_parent_replaced_mid_edge_is_rejected ... ok
+test ancestry::tests::reparenting_between_reads_stops_the_walk ... ok
+test ancestry::tests::proves_every_edge_to_the_root ... ok
+test ancestry::tests::vanished_cyclic_and_deep_chains_stop_honestly ... ok
+test ancestry::tests::walks_this_test_process_natively ... ok
+test exec::tests::passes_stdin_and_rejects_relative_programs ... ok
+test exec::tests::captures_output_and_status ... ok
+test process::tests::boot_session_is_a_uuid ... ok
+test exec::tests::environment_is_cleared_except_the_allowlist ... ok
+test process::tests::finds_this_process_by_exact_executable_path ... ok
+test process::tests::launchd_has_no_controlling_terminal ... ok
+test process::tests::missing_process_is_vanished ... ok
+test process::tests::samples_this_process ... ok
+test process::tests::target_mac_meets_floor ... ok
+test process::tests::exec_keeps_pid_and_birth_but_changes_the_executable ... ok
+test terminal::tests::parses_focus_outcomes ... ok
+test terminal::tests::parses_window_and_tab_records ... ok
+test terminal::tests::reads_terminal_version ... ok
+test terminal::tests::rejects_incomplete_or_racing_enumerations ... ok
+test tty::tests::dev_null_is_a_character_device_distinct_from_its_filesystem ... ok
+test tty::tests::rejects_non_device_paths_and_non_character_files ... ok
+test terminal::tests::installed_dictionary_exposes_the_required_terms ... ok
+test exec::tests::enforces_timeout ... ok
+test exec::tests::truncates_output_at_the_cap ... ok
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

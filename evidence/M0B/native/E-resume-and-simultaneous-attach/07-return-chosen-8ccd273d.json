@@ -1,0 +1,268 @@
+{
+  "independent": {
+    "frontmost": "com.apple.Terminal",
+    "nativeSessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+    "provider": {
+      "lookupEndedMs": 1791276508535,
+      "lookupStartedMs": 1791276508382,
+      "processes": [
+        {
+          "controllingDevice": 268435461,
+          "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+          "foreground": true,
+          "pid": 55189,
+          "startMicroseconds": 567057,
+          "startSeconds": "1791273933",
+          "status": 2
+        },
+        {
+          "controllingDevice": 268435463,
+          "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+          "foreground": true,
+          "pid": 27964,
+          "startMicroseconds": 606515,
+          "startSeconds": "1791276465",
+          "status": 2
+        }
+      ],
+      "rows": 2
+    },
+    "selectedIsExpectedSession": true,
+    "selectedRdev": 268435461,
+    "selectedTty": "/dev/ttys005"
+  },
+  "ok": true,
+  "peer": {
+    "companion": {
+      "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+      "executablePath": "~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent",
+      "pid": 59327,
+      "startMicroseconds": 914893,
+      "startSeconds": "1791275951"
+    },
+    "coreGeneration": "b999a990-5633-476f-9479-6bb210f24ba7",
+    "pid": 59327,
+    "storeGeneration": "f3eefe4f-6d5e-48fb-9dda-354159660588"
+  },
+  "response": {
+    "kind": "Routed",
+    "result": {
+      "bindingId": "8ccd273d-3cb7-4e03-8f18-d81c50db1499",
+      "choices": [],
+      "evidence": {
+        "bindingId": "8ccd273d-3cb7-4e03-8f18-d81c50db1499",
+        "bindingRevisionAfterFocus": "24",
+        "bindingRevisionBeforeFocus": "24",
+        "bindingRevisionLoaded": "24",
+        "boundDevice": 268435461,
+        "boundExecutable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+        "focus": {
+          "elapsedMs": 297,
+          "error": null,
+          "frontWindowId": 10445,
+          "frontmostApplication": {
+            "bundleIdentifier": "com.apple.Terminal",
+            "pid": 95390
+          },
+          "outcome": "FOCUSED",
+          "readbackRdev": 268435461,
+          "readbackTty": "/dev/ttys005",
+          "senderPid": 39559,
+          "startedMs": 1791276507904,
+          "targetTabIndex": 1,
+          "targetTabSelected": true,
+          "targetWindowFrontmost": true,
+          "targetWindowId": 10445
+        },
+        "lookup": {
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "error": null,
+          "pidRows": [
+            {
+              "kind": "interactive",
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ],
+          "requestEndedMs": 1791276507643,
+          "requestStartedMs": 1791276507471,
+          "rowCount": 8,
+          "sessionRows": [
+            {
+              "kind": "interactive",
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            },
+            {
+              "kind": "interactive",
+              "pid": 27964,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ]
+        },
+        "nativeSessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+        "phases": [
+          {
+            "elapsedMs": 0,
+            "phase": "pre-lookup sample"
+          },
+          {
+            "elapsedMs": 440,
+            "phase": "provider lookup + terminal enumeration"
+          },
+          {
+            "elapsedMs": 0,
+            "phase": "post-lookup sample"
+          },
+          {
+            "elapsedMs": 0,
+            "phase": "surface join"
+          },
+          {
+            "elapsedMs": 297,
+            "phase": "focus + readback"
+          },
+          {
+            "elapsedMs": 1,
+            "phase": "frontmost + readback stat"
+          },
+          {
+            "elapsedMs": 179,
+            "phase": "post-focus revalidation"
+          }
+        ],
+        "postFocusLookup": {
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "error": null,
+          "pidRows": [
+            {
+              "kind": "interactive",
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ],
+          "requestEndedMs": 1791276508381,
+          "requestStartedMs": 1791276508202,
+          "rowCount": 8,
+          "sessionRows": [
+            {
+              "kind": "interactive",
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            },
+            {
+              "kind": "interactive",
+              "pid": 27964,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+              "status": "idle",
+              "waitingFor": null
+            }
+          ]
+        },
+        "postFocusSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435461,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 55189,
+            "pid": 55189,
+            "ppid": 55082,
+            "sampledAtMs": 1791276508202,
+            "startMicroseconds": 567057,
+            "startSeconds": "1791273933",
+            "status": 2,
+            "tpgid": 55189
+          }
+        },
+        "postLookupSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435461,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 55189,
+            "pid": 55189,
+            "ppid": 55082,
+            "sampledAtMs": 1791276507904,
+            "startMicroseconds": 567057,
+            "startSeconds": "1791273933",
+            "status": 2,
+            "tpgid": 55189
+          }
+        },
+        "preLookupSample": {
+          "outcome": "Sampled",
+          "sample": {
+            "comm": "2.1.291",
+            "controllingDevice": 268435461,
+            "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+            "pgid": 55189,
+            "pid": 55189,
+            "ppid": 55082,
+            "sampledAtMs": 1791276507464,
+            "startMicroseconds": 567057,
+            "startSeconds": "1791273933",
+            "status": 2,
+            "tpgid": 55189
+          }
+        },
+        "processKey": {
+          "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+          "endpointId": "55b51f3b-4134-4260-92d5-c34a77ddb277",
+          "pid": 55189,
+          "startMicroseconds": 567057,
+          "startSeconds": "1791273933"
+        },
+        "terminal": {
+          "endedMs": 1791276507900,
+          "error": null,
+          "generationAfter": {
+            "pid": 95390,
+            "startMicroseconds": 59458,
+            "startSeconds": "1791084253"
+          },
+          "generationBefore": {
+            "pid": 95390,
+            "startMicroseconds": 59458,
+            "startSeconds": "1791084253"
+          },
+          "matches": [
+            {
+              "rdev": 268435461,
+              "selected": true,
+              "tabIndex": 1,
+              "tty": "/dev/ttys005",
+              "windowId": 10445,
+              "windowIndex": 8
+            }
+          ],
+          "senderPid": 39532,
+          "startedMs": 1791276507476,
+          "tabCount": 8,
+          "windowCount": 8
+        }
+      },
+      "focusPerformed": true,
+      "inputReadiness": "FOREGROUND_COMPATIBLE",
+      "latencyMs": 917,
+      "reasonCode": "OK",
+      "requestId": "2e49aafd-92d6-4d54-87ce-b53b9cab0703",
+      "sessionId": "ea8e75e4-8ff4-4609-a895-6509abf624a2",
+      "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+      "startedAtMs": 1791276507464,
+      "surfaceResult": "EXACT_NATIVE_SURFACE",
+      "validatedBindingRevision": "24"
+    }
+  }
+}

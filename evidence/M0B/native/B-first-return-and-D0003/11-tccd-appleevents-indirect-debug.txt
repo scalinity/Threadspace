@@ -1,0 +1,187 @@
+Timestamp               Ty Process[PID:TID]
+2026-10-06 04:34:12.429 I  tccd[669:1ee8706] [com.apple.TCC:access] REQUEST_MSG: msgID=29900.1, msg={
+	syncAuth=1 (0x1)
+	service="kTCCServiceAppleEvents"
+	function="TCCAccessResetInternal"
+	noKill=false
+	TCCD_MSG_ID="29900.1"
+	client_type="bundle"
+	client="ai.scalinity.threadspace.agent"
+}
+2026-10-06 04:34:12.435 I  tccd[669:1ee8706] [com.apple.TCC:access] REPLY_MSG: msg={
+	result=true
+}
+2026-10-06 04:34:13.467 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.223
+2026-10-06 04:34:13.467 I  tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST_MSG: msgID=95390.223, msg={
+	target_prompt=0 (0x0)
+	require_purpose=true
+	target_platform_type=1 (0x1)
+	target_team_id="25H5DDPKAC"
+	service="kTCCServiceAppleEvents"
+	indirect_object_token={pid:95390, auid:501, euid:501}
+	target_sdk_version=1769472 (0x1b0000)
+	target_identifier_type=0 (0x0)
+	target_identifier="ai.scalinity.threadspace"
+	function="TCCAccessRequestIndirect"
+	preflight=true
+	timeout=0 (0x0)
+	target_path="file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace"
+	target_csreq={identifier "ai.scalinity.threadspace" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: Daniel Escalante (NLH85S2C4F)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */}
+	target_token={pid:56092, auid:501, euid:501}
+	TCCD_MSG_ID="95390.223"
+	background_session=false
+}
+2026-10-06 04:34:13.467 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: processing incoming request
+2026-10-06 04:34:13.467 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: target information processed
+2026-10-06 04:34:13.467 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: looking up indirect object by audit token
+2026-10-06 04:34:13.467 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: generating designated requirement for pid_indirect 95390
+2026-10-06 04:34:13.474 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: indirect object information processed
+2026-10-06 04:34:13.474 Df tccd[669:1ee8b4d] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.474 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: checking access against database
+2026-10-06 04:34:13.475 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: target Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.475 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: indirect object Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.475 I  tccd[669:1ee8b4d] [com.apple.TCC:access] Handling access request: kTCCServiceAppleEvents:<private>:com.apple.Terminal, default_allow: 0, authValue: 2,
+2026-10-06 04:34:13.475 I  tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY_MSG: msg={
+	result=true
+}
+2026-10-06 04:34:13.475 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.223
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=29956.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.538 I  tccd[409:1ee66d2] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	do_not_cache=true
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.541 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7901, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.541 I  tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.545 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7902, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.545 I  tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.554 I  tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST_MSG: msgID=554.1792, msg={
+	service="kTCCServiceAppleEvents"
+	function="TCCCreateDesignatedRequirementIdentityFromAuditTokenForService"
+	target_token={pid:29956, auid:501, euid:501}
+	TCCD_MSG_ID="554.1792"
+	input_identifier=<xpc_null>
+}
+2026-10-06 04:34:13.571 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.224
+2026-10-06 04:34:13.571 I  tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST_MSG: msgID=95390.224, msg={
+	target_prompt=2 (0x2)
+	require_purpose=true
+	target_platform_type=1 (0x1)
+	target_team_id="25H5DDPKAC"
+	service="kTCCServiceAppleEvents"
+	indirect_object_token={pid:95390, auid:501, euid:501}
+	target_sdk_version=1769472 (0x1b0000)
+	target_identifier_type=0 (0x0)
+	target_identifier="ai.scalinity.threadspace"
+	function="TCCAccessRequestIndirect"
+	preflight=false
+	timeout=120 (0x78)
+	target_path="file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace"
+	target_csreq={identifier "ai.scalinity.threadspace" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: Daniel Escalante (NLH85S2C4F)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */}
+	target_token={pid:29956, auid:501, euid:501}
+	TCCD_MSG_ID="95390.224"
+	background_session=false
+}
+2026-10-06 04:34:13.571 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: processing incoming request
+2026-10-06 04:34:13.571 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: target information processed
+2026-10-06 04:34:13.571 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: looking up indirect object by audit token
+2026-10-06 04:34:13.571 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: generating designated requirement for pid_indirect 95390
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: indirect object information processed
+2026-10-06 04:34:13.577 Df tccd[669:1ee8b4d] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect: checking access against database
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: target Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: indirect object Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] Handling access request: kTCCServiceAppleEvents:<private>:com.apple.Terminal, default_allow: 0, authValue: 2,
+2026-10-06 04:34:13.577 I  tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY_MSG: msg={
+	result=true
+}
+2026-10-06 04:34:13.577 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.224
+2026-10-06 04:34:13.584 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7903, authValue=2, authReason=4, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.584 I  tccd[409:1ee66d2] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	auth_value=2 (0x2)
+	result=true
+	auth_version=1 (0x1)
+	auth_reason=4 (0x4)
+}
+2026-10-06 04:34:13.927 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=29979.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.927 I  tccd[409:1ee66d2] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	do_not_cache=true
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7904, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.934 I  tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.938 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7905, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.938 I  tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY_MSG: msg={
+	prompt_type=1 (0x1)
+	auth_value=1 (0x1)
+	preflight_unknown=true
+	auth_version=1 (0x1)
+	auth_reason=5 (0x5)
+}
+2026-10-06 04:34:13.948 I  tccd[409:1ee66d2] [com.apple.TCC:access] REQUEST_MSG: msgID=554.1793, msg={
+	service="kTCCServiceAppleEvents"
+	function="TCCCreateDesignatedRequirementIdentityFromAuditTokenForService"
+	target_token={pid:29979, auid:501, euid:501}
+	TCCD_MSG_ID="554.1793"
+	input_identifier=<xpc_null>
+}
+2026-10-06 04:34:13.970 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.225
+2026-10-06 04:34:13.970 I  tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST_MSG: msgID=95390.225, msg={
+	target_prompt=2 (0x2)
+	require_purpose=true
+	target_platform_type=1 (0x1)
+	target_team_id="25H5DDPKAC"
+	service="kTCCServiceAppleEvents"
+	indirect_object_token={pid:95390, auid:501, euid:501}
+	target_sdk_version=1769472 (0x1b0000)
+	target_identifier_type=0 (0x0)
+	target_identifier="ai.scalinity.threadspace"
+	function="TCCAccessRequestIndirect"
+	preflight=false
+	timeout=0 (0x0)
+	target_path="file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace"
+	target_csreq={identifier "ai.scalinity.threadspace" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: Daniel Escalante (NLH85S2C4F)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */}
+	target_token={pid:29979, auid:501, euid:501}
+	TCCD_MSG_ID="95390.225"
+	background_session=false
+}
+2026-10-06 04:34:13.970 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: processing incoming request
+2026-10-06 04:34:13.970 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: target information processed
+2026-10-06 04:34:13.970 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: looking up indirect object by audit token
+2026-10-06 04:34:13.970 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: generating designated requirement for pid_indirect 95390
+2026-10-06 04:34:13.975 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: indirect object information processed
+2026-10-06 04:34:13.975 Df tccd[669:1ee8bf6] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.976 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect: checking access against database
+2026-10-06 04:34:13.976 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: target Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.976 I  tccd[669:1ee8bf6] [com.apple.TCC:access] do_TCCAccessRequestIndirect_block_invoke: indirect object Requirements match for <private> : com.apple.Terminal
+2026-10-06 04:34:13.976 I  tccd[669:1ee8bf6] [com.apple.TCC:access] Handling access request: kTCCServiceAppleEvents:<private>:com.apple.Terminal, default_allow: 0, authValue: 2,
+2026-10-06 04:34:13.976 I  tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY_MSG: msg={
+	result=true
+}
+2026-10-06 04:34:13.976 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.225

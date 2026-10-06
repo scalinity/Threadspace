@@ -1,0 +1,313 @@
+Timestamp               Ty Process[PID:TID]
+2026-10-06 04:34:12.350 A  tccutil[29900:1ee8bd4] (libsystem_info.dylib) Retrieve User by ID
+2026-10-06 04:34:12.351 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x103061080] activating connection: mach=true listener=false peer=false name=com.apple.sysextd
+2026-10-06 04:34:12.422 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x103067730] activating connection: mach=true listener=false peer=false name=com.apple.lsd.mapdb
+2026-10-06 04:34:12.425 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x10306ada0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.daemon
+2026-10-06 04:34:12.425 Df tccutil[29900:1ee8bd8] [com.apple.xpc:connection] [0x10306b2e0] activating connection: mach=true listener=false peer=false name=com.apple.cfprefsd.agent
+2026-10-06 04:34:12.429 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x103071ab0] activating connection: mach=true listener=false peer=false name=com.apple.tccd
+2026-10-06 04:34:12.429 A  tccutil[29900:1ee8bd4] (TCC) TCCResetInternal() IPC
+2026-10-06 04:34:12.429 Df tccd[669:1ee8706] [com.apple.xpc:connection] [0x74acc6e080] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[29900].0x74acc6e080
+2026-10-06 04:34:12.429 Df tccd[669:1ee8706] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=29900, sender_uid=501, sender_auid=501, function=TCCAccessResetInternal, msgID=29900.1
+2026-10-06 04:34:12.435 Df tccd[669:1ee8706] [com.apple.TCC:access] REPLY: (501) function=TCCAccessResetInternal, msgID=29900.1
+2026-10-06 04:34:12.435 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x103071ab0] invalidated after the last release of the connection object
+2026-10-06 04:34:12.435 Df tccd[669:1ee8706] [com.apple.xpc:connection] [0x74acc6e080] invalidated because the client process (pid 29900) either cancelled the connection or exited
+2026-10-06 04:34:12.435 Df tccutil[29900:1ee8bd4] [com.apple.xpc:connection] [0x103061080] invalidated after the last release of the connection object
+2026-10-06 04:34:12.436 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e080] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[52406].0x74acc6e080
+2026-10-06 04:34:12.436 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=52406, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=52406.4
+2026-10-06 04:34:12.436 Df tccd[669:1ee8706] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e1c0
+2026-10-06 04:34:12.436 Df tccd[669:1ee8706] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.12
+2026-10-06 04:34:12.436 Df tccd[669:1ee8bf3] [com.apple.xpc:connection] [0x74acc6e6c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e6c0
+2026-10-06 04:34:12.437 Df tccd[669:1ee8bf3] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.13
+2026-10-06 04:34:12.437 Df tccd[669:1ee8bf4] [com.apple.xpc:connection] [0x74acc6f0c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6f0c0
+2026-10-06 04:34:12.437 Df tccd[669:1ee8bf4] [com.apple.xpc:connection] [0x74acc6ee40] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6ee40
+2026-10-06 04:34:12.437 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.16
+2026-10-06 04:34:12.437 Df tccd[669:1ee8bf4] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.15
+2026-10-06 04:34:12.437 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=52406.4
+2026-10-06 04:34:12.438 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e080] invalidated because the client process (pid 52406) either cancelled the connection or exited
+2026-10-06 04:34:12.438 Df tccd[669:1ee8bf7] [com.apple.xpc:connection] [0x74acc6e080] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e080
+2026-10-06 04:34:12.438 Df tccd[669:1ee8bf7] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.17
+2026-10-06 04:34:12.438 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6c140] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6c140
+2026-10-06 04:34:12.438 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.14
+2026-10-06 04:34:12.438 Df tccd[669:1ee8bf3] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.13
+2026-10-06 04:34:12.439 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.16
+2026-10-06 04:34:12.439 Df tccd[669:1ee8706] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.12
+2026-10-06 04:34:12.439 Df tccd[669:1ee8bf4] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.15
+2026-10-06 04:34:12.439 Df tccd[669:1ee8bf7] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.17
+2026-10-06 04:34:12.440 Df tccd[669:1ee8bf4] [com.apple.xpc:connection] [0x74acc6e6c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.440 Df tccd[669:1ee8706] [com.apple.xpc:connection] [0x74acc6ee40] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.440 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6f0c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.440 Df tccd[669:1ee8bf3] [com.apple.xpc:connection] [0x74acc6e080] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.441 Df tccd[669:1ee8bf4] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.441 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.14
+2026-10-06 04:34:12.441 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6c140] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.441 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e1c0
+2026-10-06 04:34:12.441 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.18
+2026-10-06 04:34:12.443 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.18
+2026-10-06 04:34:12.443 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.452 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e1c0
+2026-10-06 04:34:12.452 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.19
+2026-10-06 04:34:12.453 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.19
+2026-10-06 04:34:12.453 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:12.454 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[53536].0x74acc6e1c0
+2026-10-06 04:34:12.454 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=53536, sender_uid=501, sender_auid=501, function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.20
+2026-10-06 04:34:12.455 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessCopyBundleIdentifiersDisabledForService, msgID=53536.20
+2026-10-06 04:34:12.455 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 53536) either cancelled the connection or exited
+2026-10-06 04:34:13.467 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[95390].0x74acc6e1c0
+2026-10-06 04:34:13.467 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.223
+2026-10-06 04:34:13.469 Df tccd[669:1ee8b4d] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:34:13.469 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.469 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.470 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.471 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.472 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.472 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.473 Df tccd[669:1ee8b4d] [com.apple.TCC:access] responsible process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.473 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.473 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.474 Df tccd[669:1ee8b4d] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.475 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.223
+2026-10-06 04:34:13.475 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 95390) either cancelled the connection or exited
+2026-10-06 04:34:13.535 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[29956].0x76b0c74c80
+2026-10-06 04:34:13.535 Df tccd[409:1ee66d2] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=29956, sender_uid=501, sender_auid=501, function=TCCAccessRequest, msgID=29956.1
+2026-10-06 04:34:13.535 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_CTX: msgID=29956.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.535 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=29956.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=29956, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:34:13.535 Df tccd[409:1ee66d2] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.536 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=29956.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.536 Df tccd[409:1ee66d2] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.536 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.536 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=29956.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=29956.1
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 29956) either cancelled the connection or exited
+2026-10-06 04:34:13.538 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[407].0x76b0c74c80
+2026-10-06 04:34:13.538 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=407, sender_uid=88, sender_auid=-1, function=TCCAccessRequest, msgID=407.7901
+2026-10-06 04:34:13.539 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7901, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.539 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7901, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=29956, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:34:13.539 Df tccd[409:1ee8ccb] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=29956, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:34:13.539 Df tccd[409:1ee8ccb] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.540 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7901, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.540 Df tccd[409:1ee8ccb] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.540 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.540 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.541 Df tccd[409:1ee8ccb] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.541 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7901, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.541 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=407.7901
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 407) either cancelled the connection or exited
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[407].0x76b0c74c80
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=407, sender_uid=88, sender_auid=-1, function=TCCAccessRequest, msgID=407.7902
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7902, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7902, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=29956, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=29956, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:34:13.542 Df tccd[409:1ee8ccb] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.543 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7902, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.543 Df tccd[409:1ee8ccb] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.543 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.543 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.544 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.544 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.544 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.544 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.544 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.545 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.545 Df tccd[409:1ee8ccb] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.545 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7902, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.545 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=407.7902
+2026-10-06 04:34:13.545 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 407) either cancelled the connection or exited
+2026-10-06 04:34:13.553 A  appleeventsd[554:1ee7073] New XPC Connection
+2026-10-06 04:34:13.553 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e22440] activating connection: mach=false listener=false peer=true name=com.apple.coreservices.appleevents.peer[29956].0x79b4e22440
+2026-10-06 04:34:13.553 A  appleeventsd[554:1ee7073] Handle XPC Event
+2026-10-06 04:34:13.553 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e230c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:34:13.553 A  appleeventsd[554:1ee7073] (TCC) TCCCreateDesignatedRequirementIdentityFromAuditTokenForService() IPC
+2026-10-06 04:34:13.553 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[554].0x76b0c74c80
+2026-10-06 04:34:13.553 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=554, sender_uid=55, sender_auid=-1, function=TCCCreateDesignatedRequirementIdentityFromAuditTokenForService, msgID=554.1792
+2026-10-06 04:34:13.556 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.557 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.558 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.560 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.560 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.563 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.563 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.563 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.563 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.563 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.565 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.566 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.569 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.570 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.570 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.570 Df tccd[409:1ee8ccb] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.571 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY: (0) function=TCCCreateDesignatedRequirementIdentityFromAuditTokenForService, msgID=554.1792
+2026-10-06 04:34:13.571 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e230c0] invalidated after the last release of the connection object
+2026-10-06 04:34:13.571 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 554) either cancelled the connection or exited
+2026-10-06 04:34:13.571 A  appleeventsd[554:1ee8cce] Handle XPC Event
+2026-10-06 04:34:13.571 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[95390].0x74acc6e1c0
+2026-10-06 04:34:13.571 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.224
+2026-10-06 04:34:13.573 Df tccd[669:1ee8b4d] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:34:13.573 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.573 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.574 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.574 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.575 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.575 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.576 Df tccd[669:1ee8b4d] [com.apple.TCC:access] responsible process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.576 A  tccd[669:1ee8b4d] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.576 A  tccd[669:1ee8b4d] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.577 Df tccd[669:1ee8b4d] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.577 Df tccd[669:1ee8b4d] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.224
+2026-10-06 04:34:13.578 Df tccd[669:1ee8b4d] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 95390) either cancelled the connection or exited
+2026-10-06 04:34:13.578 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[407].0x76b0c74c80
+2026-10-06 04:34:13.578 Df tccd[409:1ee66d2] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=407, sender_uid=88, sender_auid=-1, function=TCCAccessRequest, msgID=407.7903
+2026-10-06 04:34:13.579 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7903, function=<private>, service=kTCCServiceScreenCapture, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.579 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7903, attribution={accessing={TCCDProcess: identifier=com.apple.Terminal, pid=95390, auid=501, euid=501, binary_path=/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:34:13.579 Df tccd[409:1ee66d2] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.Terminal, pid=95390, auid=501, euid=501, binary_path=/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal
+2026-10-06 04:34:13.579 Df tccd[409:1ee66d2] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.579 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.579 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.581 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7903, subject=com.apple.Terminal,
+2026-10-06 04:34:13.581 Df tccd[409:1ee66d2] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x76b0d75b00 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:34:13.581 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.581 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.583 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.583 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.584 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.584 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.584 Df tccd[409:1ee66d2] [com.apple.TCC:access] responsible process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.584 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7903, authValue=2, authReason=4, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.584 Df tccd[409:1ee66d2] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=407.7903
+2026-10-06 04:34:13.584 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 407) either cancelled the connection or exited
+2026-10-06 04:34:13.866 Df appleeventsd[554:1ee8cce] [com.apple.xpc:connection] [0x79b4e22440] invalidated because the client process (pid 29956) either cancelled the connection or exited
+2026-10-06 04:34:13.866 A  appleeventsd[554:1ee8cce] Handle XPC Event
+2026-10-06 04:34:13.922 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[29979].0x76b0c74c80
+2026-10-06 04:34:13.922 Df tccd[409:1ee66d2] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=29979, sender_uid=501, sender_auid=501, function=TCCAccessRequest, msgID=29979.1
+2026-10-06 04:34:13.922 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_CTX: msgID=29979.1, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.922 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=29979.1, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, requesting={TCCDProcess: identifier=com.apple.osascript, pid=29979, auid=501, euid=501, binary_path=/usr/bin/osascript}, },
+2026-10-06 04:34:13.922 Df tccd[409:1ee66d2] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.924 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=29979.1, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.924 Df tccd[409:1ee66d2] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.924 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.924 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.926 Df tccd[409:1ee66d2] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.927 Df tccd[409:1ee66d2] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=29979.1, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.927 Df tccd[409:1ee66d2] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=29979.1
+2026-10-06 04:34:13.927 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 29979) either cancelled the connection or exited
+2026-10-06 04:34:13.929 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[407].0x76b0c74c80
+2026-10-06 04:34:13.929 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=407, sender_uid=88, sender_auid=-1, function=TCCAccessRequest, msgID=407.7904
+2026-10-06 04:34:13.930 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7904, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.930 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7904, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=29979, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:34:13.930 Df tccd[409:1ee8ccb] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=29979, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:34:13.930 Df tccd[409:1ee8ccb] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.931 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7904, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.931 Df tccd[409:1ee8ccb] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.931 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.932 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.933 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7904, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=407.7904
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 407) either cancelled the connection or exited
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[407].0x76b0c74c80
+2026-10-06 04:34:13.934 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=407, sender_uid=88, sender_auid=-1, function=TCCAccessRequest, msgID=407.7905
+2026-10-06 04:34:13.935 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_CTX: msgID=407.7905, function=<private>, service=kTCCServiceListenEvent, preflight=yes, query=1, client_dict=(null), daemon_dict=<private>
+2026-10-06 04:34:13.935 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_ATTRIBUTION: msgID=407.7905, attribution={responsible={TCCDProcess: identifier=ai.scalinity.threadspace.agent, pid=56092, auid=501, euid=501, responsible_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent, binary_path=~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent}, accessing={TCCDProcess: identifier=com.apple.osascript, pid=29979, auid=501, euid=501, binary_path=/usr/bin/osascript}, requesting={TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer}, },
+2026-10-06 04:34:13.935 Df tccd[409:1ee8ccb] [com.apple.TCC:access] requestor: TCCDProcess: identifier=com.apple.WindowServer, pid=407, auid=88, euid=88, binary_path=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer is checking access for accessor TCCDProcess: identifier=com.apple.osascript, pid=29979, auid=501, euid=501, binary_path=/usr/bin/osascript
+2026-10-06 04:34:13.935 Df tccd[409:1ee8ccb] [com.apple.TCC:access] <private> does not support RBS assertion override
+2026-10-06 04:34:13.936 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_SUBJECT: msgID=407.7905, subject=ai.scalinity.threadspace.agent,
+2026-10-06 04:34:13.936 Df tccd[409:1ee8ccb] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier ai.scalinity.threadspace.agent, type: 0: 0x76b0d75b00 at ~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+2026-10-06 04:34:13.936 A  tccd[409:1ee8ccb] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.936 A  tccd[409:1ee8ccb] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 A  tccd[409:1ee8ccb] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.938 Df tccd[409:1ee8ccb] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.938 Df tccd[409:1ee8ccb] [com.apple.TCC:access] AUTHREQ_RESULT: msgID=407.7905, authValue=1, authReason=5, authVersion=1, desired_auth=0, error=(null),
+2026-10-06 04:34:13.938 Df tccd[409:1ee8ccb] [com.apple.TCC:access] REPLY: (0) function=TCCAccessRequest, msgID=407.7905
+2026-10-06 04:34:13.938 Df tccd[409:1ee8ccb] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 407) either cancelled the connection or exited
+2026-10-06 04:34:13.947 A  appleeventsd[554:1ee7073] New XPC Connection
+2026-10-06 04:34:13.947 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e22440] activating connection: mach=false listener=false peer=true name=com.apple.coreservices.appleevents.peer[29979].0x79b4e22440
+2026-10-06 04:34:13.947 A  appleeventsd[554:1ee8cce] Handle XPC Event
+2026-10-06 04:34:13.947 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e230c0] activating connection: mach=true listener=false peer=false name=com.apple.tccd.system
+2026-10-06 04:34:13.947 A  appleeventsd[554:1ee7073] (TCC) TCCCreateDesignatedRequirementIdentityFromAuditTokenForService() IPC
+2026-10-06 04:34:13.947 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] activating connection: mach=false listener=false peer=true name=com.apple.tccd.system.peer[554].0x76b0c74c80
+2026-10-06 04:34:13.947 Df tccd[409:1ee66d2] [com.apple.TCC:access] REQUEST: tccd_uid=0, sender_pid=554, sender_uid=55, sender_auid=-1, function=TCCCreateDesignatedRequirementIdentityFromAuditTokenForService, msgID=554.1793
+2026-10-06 04:34:13.950 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.950 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.955 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.958 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.959 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.961 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.961 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.961 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.961 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.961 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.963 A  appleeventsd[554:1ee8ccd] Handle XPC Event
+2026-10-06 04:34:13.963 A  tccd[409:1ee66d2] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.963 A  tccd[409:1ee66d2] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.967 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.967 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.967 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.967 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.967 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.968 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.968 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.969 A  tccd[409:1ee66d2] (Security) SecTrustCopyAppleTrustAnchors
+2026-10-06 04:34:13.969 Df tccd[409:1ee66d2] [com.apple.TCC:access] accessing process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.969 Df tccd[409:1ee66d2] [com.apple.TCC:access] REPLY: (0) function=TCCCreateDesignatedRequirementIdentityFromAuditTokenForService, msgID=554.1793
+2026-10-06 04:34:13.969 Df appleeventsd[554:1ee7073] [com.apple.xpc:connection] [0x79b4e230c0] invalidated after the last release of the connection object
+2026-10-06 04:34:13.969 Df tccd[409:1ee66d2] [com.apple.xpc:connection] [0x76b0c74c80] invalidated because the client process (pid 554) either cancelled the connection or exited
+2026-10-06 04:34:13.970 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] activating connection: mach=false listener=false peer=true name=com.apple.tccd.peer[95390].0x74acc6e1c0
+2026-10-06 04:34:13.970 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REQUEST: tccd_uid=501, sender_pid=95390, sender_uid=501, sender_auid=501, function=TCCAccessRequestIndirect, msgID=95390.225
+2026-10-06 04:34:13.971 Df tccd[669:1ee8bf6] [com.apple.TCC:access] -[TCCDAccessIdentity staticCode]: static code for: identifier com.apple.Terminal, type: 0: 0x74ad270300 at /System/Applications/Utilities/Terminal.app
+2026-10-06 04:34:13.971 A  tccd[669:1ee8bf6] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.971 A  tccd[669:1ee8bf6] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.973 A  tccd[669:1ee8bf6] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.973 A  tccd[669:1ee8bf6] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.974 A  tccd[669:1ee8bf6] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.974 A  tccd[669:1ee8bf6] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.974 Df tccd[669:1ee8bf6] [com.apple.TCC:access] responsible process has com.apple.private.tcc.allow-prompting entitlement
+2026-10-06 04:34:13.975 A  tccd[669:1ee8bf6] (Security) SecKeyVerifySignature
+2026-10-06 04:34:13.975 A  tccd[669:1ee8bf6] (Security) SecTrustEvaluateIfNecessary
+2026-10-06 04:34:13.975 Df tccd[669:1ee8bf6] [com.apple.TCC:access] target_executable_path_URL: file://~/Applications/Threadspace.app/Contents/MacOS/Threadspace
+2026-10-06 04:34:13.976 Df tccd[669:1ee8bf6] [com.apple.TCC:access] REPLY: (501) function=TCCAccessRequestIndirect, msgID=95390.225
+2026-10-06 04:34:13.976 Df tccd[669:1ee8bf6] [com.apple.xpc:connection] [0x74acc6e1c0] invalidated because the client process (pid 95390) either cancelled the connection or exited

@@ -1,0 +1,3871 @@
+{
+  "independent": null,
+  "ok": true,
+  "peer": {
+    "companion": {
+      "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+      "executablePath": "~/Applications/Threadspace.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/ThreadspaceAgent",
+      "pid": 59327,
+      "startMicroseconds": 914893,
+      "startSeconds": "1791275951"
+    },
+    "coreGeneration": "b999a990-5633-476f-9479-6bb210f24ba7",
+    "pid": 59327,
+    "storeGeneration": "f3eefe4f-6d5e-48fb-9dda-354159660588"
+  },
+  "response": {
+    "kind": "ObservationsExported",
+    "observations": [
+      {
+        "capturedWallMs": 1791276187191,
+        "cursor": 142,
+        "nativeEvent": "ROUTE_RESULT_RECORDED",
+        "observationId": "5e4de2d1-9492-447f-bc6a-d63dc1ac24b1",
+        "payload": {
+          "focusPerformed": true,
+          "inputReadiness": "FOREGROUND_COMPATIBLE",
+          "latencyMs": 870,
+          "reasonCode": "OK",
+          "requestId": "be2463b8-7286-427e-8ffc-16d25d942dbe",
+          "sessionId": "5c4f593b-0978-44b9-8bfa-490a16c89933",
+          "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+          "surfaceResult": "EXACT_NATIVE_SURFACE"
+        },
+        "receivedWallMs": 1791276188061,
+        "routeEvidence": {
+          "bindingId": "080503c9-3314-4d0b-ae6b-f5da817f3916",
+          "bindingRevisionAfterFocus": "24",
+          "bindingRevisionBeforeFocus": "24",
+          "bindingRevisionLoaded": "24",
+          "boundDevice": 268435460,
+          "boundExecutable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+          "focus": {
+            "elapsedMs": 275,
+            "error": null,
+            "frontWindowId": 10443,
+            "frontmostApplication": {
+              "bundleIdentifier": "com.apple.Terminal",
+              "pid": 95390
+            },
+            "outcome": "FOCUSED",
+            "readbackRdev": 268435460,
+            "readbackTty": "/dev/ttys004",
+            "senderPid": 71492,
+            "startedMs": 1791276187612,
+            "targetTabIndex": 1,
+            "targetTabSelected": true,
+            "targetWindowFrontmost": true,
+            "targetWindowId": 10443
+          },
+          "lookup": {
+            "binary": "~/.local/share/claude/versions/2.1.291",
+            "error": null,
+            "pidRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ],
+            "requestEndedMs": 1791276187363,
+            "requestStartedMs": 1791276187197,
+            "rowCount": 7,
+            "sessionRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ]
+          },
+          "nativeSessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+          "phases": [
+            {
+              "elapsedMs": 0,
+              "phase": "pre-lookup sample"
+            },
+            {
+              "elapsedMs": 421,
+              "phase": "provider lookup + terminal enumeration"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "post-lookup sample"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "surface join"
+            },
+            {
+              "elapsedMs": 276,
+              "phase": "focus + readback"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "frontmost + readback stat"
+            },
+            {
+              "elapsedMs": 173,
+              "phase": "post-focus revalidation"
+            }
+          ],
+          "postFocusLookup": {
+            "binary": "~/.local/share/claude/versions/2.1.291",
+            "error": null,
+            "pidRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ],
+            "requestEndedMs": 1791276188060,
+            "requestStartedMs": 1791276187888,
+            "rowCount": 7,
+            "sessionRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ]
+          },
+          "postFocusSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276187888,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "postLookupSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276187612,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "preLookupSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276187191,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "processKey": {
+            "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+            "endpointId": "55b51f3b-4134-4260-92d5-c34a77ddb277",
+            "pid": 55002,
+            "startMicroseconds": 431354,
+            "startSeconds": "1791273931"
+          },
+          "terminal": {
+            "endedMs": 1791276187606,
+            "error": null,
+            "generationAfter": {
+              "pid": 95390,
+              "startMicroseconds": 59458,
+              "startSeconds": "1791084253"
+            },
+            "generationBefore": {
+              "pid": 95390,
+              "startMicroseconds": 59458,
+              "startSeconds": "1791084253"
+            },
+            "matches": [
+              {
+                "rdev": 268435460,
+                "selected": true,
+                "tabIndex": 1,
+                "tty": "/dev/ttys004",
+                "windowId": 10443,
+                "windowIndex": 7
+              }
+            ],
+            "senderPid": 71463,
+            "startedMs": 1791276187201,
+            "tabCount": 7,
+            "windowCount": 7
+          }
+        },
+        "sourceId": "companion.route"
+      },
+      {
+        "capturedWallMs": 1791276197038,
+        "cursor": 143,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "5673c6a8-a6a2-4288-8308-940b40eda44d",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276196885,
+            "requestStartedMs": 1791276196712,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "1d9a4403-a459-4925-832e-af831507a2cf",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276197038,
+            "requestStartedMs": 1791276196885,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276197038,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276256060,
+        "cursor": 144,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "1c976d4e-d93e-4472-b7ff-bdf556a873e8",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [
+            {
+              "executionId": "1d9a4403-a459-4925-832e-af831507a2cf",
+              "reason": "SESSION_SWITCHED"
+            }
+          ],
+          "firstLookup": {
+            "requestEndedMs": 1791276255509,
+            "requestStartedMs": 1791276255349,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "1d9a4403-a459-4925-832e-af831507a2cf",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            }
+          ],
+          "newActivations": 1,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276255663,
+            "requestStartedMs": 1791276255509,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": [
+            {
+              "device": 268435460,
+              "matches": [
+                {
+                  "tabIndex": 1,
+                  "tty": "/dev/ttys004",
+                  "windowId": 10443
+                }
+              ],
+              "outcome": "BOUND",
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ]
+        },
+        "receivedWallMs": 1791276256060,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276261385,
+        "cursor": 145,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "6279bcc9-c8b9-43b5-ae7a-cfdd0cca744b",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276261230,
+            "requestStartedMs": 1791276261065,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276261385,
+            "requestStartedMs": 1791276261230,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276261385,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276266728,
+        "cursor": 146,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "02833233-598f-494b-8988-fcca99ba7ee4",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276266569,
+            "requestStartedMs": 1791276266391,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276266728,
+            "requestStartedMs": 1791276266569,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276266728,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276289962,
+        "cursor": 147,
+        "nativeEvent": "ROUTE_RESULT_RECORDED",
+        "observationId": "e61b5575-255e-4dc5-a9d6-29b678c0f9b3",
+        "payload": {
+          "focusPerformed": false,
+          "inputReadiness": "UNKNOWN",
+          "latencyMs": 0,
+          "reasonCode": "NO_LIVE_MAPPING",
+          "requestId": "b1a47ca3-2af3-4b56-a189-e494daf76b25",
+          "sessionId": "5c4f593b-0978-44b9-8bfa-490a16c89933",
+          "sessionVerification": "UNBOUND",
+          "surfaceResult": "INSPECTOR_ONLY"
+        },
+        "receivedWallMs": 1791276289962,
+        "routeEvidence": {
+          "bindingId": null,
+          "bindingRevisionAfterFocus": null,
+          "bindingRevisionBeforeFocus": null,
+          "bindingRevisionLoaded": null,
+          "boundDevice": null,
+          "boundExecutable": null,
+          "focus": null,
+          "lookup": null,
+          "nativeSessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+          "phases": [],
+          "postFocusLookup": null,
+          "postFocusSample": null,
+          "postLookupSample": null,
+          "preLookupSample": null,
+          "processKey": null,
+          "terminal": null
+        },
+        "sourceId": "companion.route"
+      },
+      {
+        "capturedWallMs": 1791276290636,
+        "cursor": 148,
+        "nativeEvent": "ROUTE_RESULT_RECORDED",
+        "observationId": "dd0c768b-7d7e-4f73-9c86-ebef6d5cd473",
+        "payload": {
+          "focusPerformed": true,
+          "inputReadiness": "FOREGROUND_COMPATIBLE",
+          "latencyMs": 922,
+          "reasonCode": "OK",
+          "requestId": "3c4aa626-34ed-47de-b3e4-cd8079ea2098",
+          "sessionId": "7b46514f-cfda-4f00-8578-78bddc710157",
+          "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+          "surfaceResult": "EXACT_NATIVE_SURFACE"
+        },
+        "receivedWallMs": 1791276291558,
+        "routeEvidence": {
+          "bindingId": "7631e895-476d-4b85-aab2-16dd60e0b826",
+          "bindingRevisionAfterFocus": "144",
+          "bindingRevisionBeforeFocus": "144",
+          "bindingRevisionLoaded": "144",
+          "boundDevice": 268435460,
+          "boundExecutable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+          "focus": {
+            "elapsedMs": 304,
+            "error": null,
+            "frontWindowId": 10443,
+            "frontmostApplication": {
+              "bundleIdentifier": "com.apple.Terminal",
+              "pid": 95390
+            },
+            "outcome": "FOCUSED",
+            "readbackRdev": 268435460,
+            "readbackTty": "/dev/ttys004",
+            "senderPid": 82810,
+            "startedMs": 1791276291072,
+            "targetTabIndex": 1,
+            "targetTabSelected": true,
+            "targetWindowFrontmost": true,
+            "targetWindowId": 10443
+          },
+          "lookup": {
+            "binary": "~/.local/share/claude/versions/2.1.291",
+            "error": null,
+            "pidRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ],
+            "requestEndedMs": 1791276290840,
+            "requestStartedMs": 1791276290644,
+            "rowCount": 7,
+            "sessionRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ]
+          },
+          "nativeSessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+          "phases": [
+            {
+              "elapsedMs": 0,
+              "phase": "pre-lookup sample"
+            },
+            {
+              "elapsedMs": 436,
+              "phase": "provider lookup + terminal enumeration"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "post-lookup sample"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "surface join"
+            },
+            {
+              "elapsedMs": 305,
+              "phase": "focus + readback"
+            },
+            {
+              "elapsedMs": 0,
+              "phase": "frontmost + readback stat"
+            },
+            {
+              "elapsedMs": 181,
+              "phase": "post-focus revalidation"
+            }
+          ],
+          "postFocusLookup": {
+            "binary": "~/.local/share/claude/versions/2.1.291",
+            "error": null,
+            "pidRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ],
+            "requestEndedMs": 1791276291558,
+            "requestStartedMs": 1791276291377,
+            "rowCount": 7,
+            "sessionRows": [
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              }
+            ]
+          },
+          "postFocusSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276291377,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "postLookupSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276291072,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "preLookupSample": {
+            "outcome": "Sampled",
+            "sample": {
+              "comm": "2.1.291",
+              "controllingDevice": 268435460,
+              "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+              "pgid": 55002,
+              "pid": 55002,
+              "ppid": 54945,
+              "sampledAtMs": 1791276290636,
+              "startMicroseconds": 431354,
+              "startSeconds": "1791273931",
+              "status": 2,
+              "tpgid": 55002
+            }
+          },
+          "processKey": {
+            "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+            "endpointId": "55b51f3b-4134-4260-92d5-c34a77ddb277",
+            "pid": 55002,
+            "startMicroseconds": 431354,
+            "startSeconds": "1791273931"
+          },
+          "terminal": {
+            "endedMs": 1791276291068,
+            "error": null,
+            "generationAfter": {
+              "pid": 95390,
+              "startMicroseconds": 59458,
+              "startSeconds": "1791084253"
+            },
+            "generationBefore": {
+              "pid": 95390,
+              "startMicroseconds": 59458,
+              "startSeconds": "1791084253"
+            },
+            "matches": [
+              {
+                "rdev": 268435460,
+                "selected": true,
+                "tabIndex": 1,
+                "tty": "/dev/ttys004",
+                "windowId": 10443,
+                "windowIndex": 2
+              }
+            ],
+            "senderPid": 82652,
+            "startedMs": 1791276290647,
+            "tabCount": 7,
+            "windowCount": 7
+          }
+        },
+        "sourceId": "companion.route"
+      },
+      {
+        "capturedWallMs": 1791276301005,
+        "cursor": 149,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "f5388dd8-b0de-416d-9f23-c0a7e3356d12",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276300857,
+            "requestStartedMs": 1791276300698,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276301005,
+            "requestStartedMs": 1791276300858,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276301005,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276359575,
+        "cursor": 150,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "688b47e9-bece-4c8d-9b88-acf2562feb41",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276359426,
+            "requestStartedMs": 1791276359264,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "waiting",
+                "waitingFor": "dialog open"
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276359575,
+            "requestStartedMs": 1791276359427,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a",
+                "status": "waiting",
+                "waitingFor": "dialog open"
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276359575,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276365301,
+        "cursor": 151,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "d16d1824-2e3c-441e-9cc4-f0ee55b5c238",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "reason": "SESSION_SWITCHED"
+            }
+          ],
+          "firstLookup": {
+            "requestEndedMs": 1791276364754,
+            "requestStartedMs": 1791276364581,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "b8f13e84-341b-404b-ae35-bc8b20221e97",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "670bc29d-238e-4b17-84e0-f9e5f494ac6a"
+            }
+          ],
+          "newActivations": 1,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276364904,
+            "requestStartedMs": 1791276364754,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": [
+            {
+              "device": 268435460,
+              "matches": [
+                {
+                  "tabIndex": 1,
+                  "tty": "/dev/ttys004",
+                  "windowId": 10443
+                }
+              ],
+              "outcome": "BOUND",
+              "pid": 55002,
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            }
+          ]
+        },
+        "receivedWallMs": 1791276365301,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      },
+      {
+        "capturedWallMs": 1791276370627,
+        "cursor": 152,
+        "nativeEvent": "PROVIDER_SNAPSHOT_OBSERVED",
+        "observationId": "d5085153-319f-43f8-a96d-49a71f326eee",
+        "payload": {
+          "adapter": "provider-claude/direct-cli",
+          "argv": [
+            "agents",
+            "--json",
+            "--all"
+          ],
+          "binary": "~/.local/share/claude/versions/2.1.291",
+          "binaryVersion": "2.1.291",
+          "ends": [],
+          "firstLookup": {
+            "requestEndedMs": 1791276370477,
+            "requestStartedMs": 1791276370307,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "forcedSurface": false,
+          "joins": [
+            {
+              "after": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "before": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "device": 268435459,
+              "pid": 23786,
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "before": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "device": 268435456,
+              "pid": 27277,
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "before": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "device": 268435457,
+              "pid": 29794,
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "before": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "device": 268435462,
+              "pid": 33982,
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "before": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "device": 268435458,
+              "pid": 54698,
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "before": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "device": 268435460,
+              "pid": 55002,
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            },
+            {
+              "after": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "before": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "device": 268435461,
+              "pid": 55189,
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            }
+          ],
+          "launcher": "~/.local/bin/claude",
+          "liveExecutions": [
+            {
+              "executionId": "7bcff498-52b1-47b0-ad26-46d89924f8d1",
+              "pid": 23786,
+              "sample": {
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 23786,
+                "pid": 23786,
+                "startMicroseconds": 964105,
+                "startSeconds": "1791270380",
+                "status": 2,
+                "tpgid": 23786
+              },
+              "sessionId": "unrelated-session-3"
+            },
+            {
+              "executionId": "3e970a2b-0e69-49b9-9874-1f50fae0c87f",
+              "pid": 29794,
+              "sample": {
+                "controllingDevice": 268435457,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 29794,
+                "pid": 29794,
+                "startMicroseconds": 979798,
+                "startSeconds": "1791271029",
+                "status": 2,
+                "tpgid": 29794
+              },
+              "sessionId": "unrelated-session-2"
+            },
+            {
+              "executionId": "e720326c-7be7-4399-a6c4-fa64fa4d4d8a",
+              "pid": 33982,
+              "sample": {
+                "controllingDevice": 268435462,
+                "executable": "~/.local/share/claude/versions/2.1.290#16777234:132788755",
+                "pgid": 33982,
+                "pid": 33982,
+                "startMicroseconds": 700702,
+                "startSeconds": "1791257979",
+                "status": 2,
+                "tpgid": 33982
+              },
+              "sessionId": "unrelated-session-4"
+            },
+            {
+              "executionId": "8b852b80-6184-4d9f-968a-048bf0866d41",
+              "pid": 54698,
+              "sample": {
+                "controllingDevice": 268435458,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 54698,
+                "pid": 54698,
+                "startMicroseconds": 140544,
+                "startSeconds": "1791273926",
+                "status": 2,
+                "tpgid": 54698
+              },
+              "sessionId": "efa96221-c946-43b9-89a9-59b85547872c"
+            },
+            {
+              "executionId": "d7c060f9-9fa3-41b1-bdd2-3ff6f8f5eb36",
+              "pid": 55189,
+              "sample": {
+                "controllingDevice": 268435461,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55189,
+                "pid": 55189,
+                "startMicroseconds": 567057,
+                "startSeconds": "1791273933",
+                "status": 2,
+                "tpgid": 55189
+              },
+              "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4"
+            },
+            {
+              "executionId": "93e8cc75-cf2c-43c1-8218-c15797252d89",
+              "pid": 27277,
+              "sample": {
+                "controllingDevice": 268435456,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 27277,
+                "pid": 27277,
+                "startMicroseconds": 966225,
+                "startSeconds": "1791275586",
+                "status": 2,
+                "tpgid": 27277
+              },
+              "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c"
+            },
+            {
+              "executionId": "04223094-75f9-4666-b56f-3b90ae091800",
+              "pid": 55002,
+              "sample": {
+                "controllingDevice": 268435460,
+                "executable": "~/.local/share/claude/versions/2.1.291#16777234:134341485",
+                "pgid": 55002,
+                "pid": 55002,
+                "startMicroseconds": 431354,
+                "startSeconds": "1791273931",
+                "status": 2,
+                "tpgid": 55002
+              },
+              "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c"
+            }
+          ],
+          "newActivations": 0,
+          "provisional": [],
+          "secondLookup": {
+            "requestEndedMs": 1791276370627,
+            "requestStartedMs": 1791276370477,
+            "rows": [
+              {
+                "kind": "interactive",
+                "pid": 33982,
+                "sessionId": "unrelated-session-4",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 23786,
+                "sessionId": "unrelated-session-3",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 29794,
+                "sessionId": "unrelated-session-2",
+                "status": "busy",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 54698,
+                "sessionId": "efa96221-c946-43b9-89a9-59b85547872c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55002,
+                "sessionId": "0d750db7-52a2-4a8c-80e5-534340e6176c",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 55189,
+                "sessionId": "f8cd39d3-dd64-4176-a3b7-634e11ece2f4",
+                "status": "idle",
+                "waitingFor": null
+              },
+              {
+                "kind": "interactive",
+                "pid": 27277,
+                "sessionId": "9d108d89-e052-410a-9ea3-d8b0364c752c",
+                "status": "busy",
+                "waitingFor": null
+              }
+            ]
+          },
+          "secondLookupError": null,
+          "surfaceJoins": []
+        },
+        "receivedWallMs": 1791276370627,
+        "routeEvidence": null,
+        "sourceId": "claude.inventory"
+      }
+    ]
+  }
+}

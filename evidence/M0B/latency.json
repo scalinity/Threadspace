@@ -1,0 +1,44 @@
+{
+  "definition": "companion-measured wall time from route start to result (RouteResult.latencyMs), exact routes only; permissions already granted",
+  "target": {
+    "p95Ms": 750,
+    "hardBudgetMs": 2000
+  },
+  "runs": {
+    "C-same-cwd-30-routes (8980d34)": {
+      "n": 30,
+      "medianMs": 841,
+      "p95Ms": 876,
+      "maxMs": 901
+    },
+    "C-final-candidate-30-routes (fc65641)": {
+      "n": 30,
+      "medianMs": 889,
+      "p95Ms": 941,
+      "maxMs": 943
+    },
+    "single routes B/E/F/G": {
+      "n": 15,
+      "medianMs": 922,
+      "p95Ms": 964,
+      "maxMs": 964
+    }
+  },
+  "allExactRoutes": {
+    "n": 75,
+    "medianMs": 874,
+    "p95Ms": 952,
+    "maxMs": 964
+  },
+  "failuresOverBudget": 0,
+  "phaseMediansFinalRunMs": {
+    "pre-lookup sample": 0,
+    "provider lookup + terminal enumeration": 448,
+    "post-lookup sample": 0,
+    "surface join": 0,
+    "focus + readback": 276,
+    "frontmost + readback stat": 1,
+    "post-focus revalidation": 164
+  },
+  "verdict": "p95 above the 750 ms target; every attempt within the 2 s hard budget. Recorded for M13; correctness not traded for it."
+}
