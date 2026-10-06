@@ -516,13 +516,17 @@ fn dispatch(
             }
         }
         #[cfg(feature = "qualification")]
-        ControlRequestBody::QualifyAdmit { observation_id } => to_writer(
+        ControlRequestBody::QualifyAdmit {
+            observation_id,
+            captured_wall_ms,
+        } => to_writer(
             context,
             outbound,
             request_id,
             WriterCommand::Admit {
                 request_id,
                 observation_id,
+                captured_wall_ms,
                 outbound: outbound_clone,
             },
         ),

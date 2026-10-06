@@ -181,6 +181,7 @@ pub enum WriterCommand {
     Admit {
         request_id: u64,
         observation_id: String,
+        captured_wall_ms: i64,
         outbound: Outbound,
     },
 }
@@ -872,6 +873,7 @@ impl Writer {
             WriterCommand::Admit {
                 request_id,
                 observation_id,
+                captured_wall_ms,
                 outbound,
             } => {
                 if !RUNTIME.writes_open() {
@@ -887,7 +889,7 @@ impl Writer {
                         source_epoch: &epoch,
                         source_sequence: None,
                         native_event: "QUALIFY_DURABILITY_RECORD",
-                        captured_wall_ms: log::now_ms(),
+                        captured_wall_ms,
                         payload: &payload,
                     },
                     log::now_ms(),

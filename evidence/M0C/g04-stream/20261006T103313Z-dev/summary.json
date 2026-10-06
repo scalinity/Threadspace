@@ -1,0 +1,267 @@
+{
+  "faults": [
+    {
+      "connectsAfter": 3,
+      "connectsBefore": 2,
+      "desktopLog": [],
+      "fault": "missing-frame-then-delivery",
+      "pass": true,
+      "projection": {
+        "attention": 4,
+        "companionCursor": "635",
+        "companionDigest": "0a812bc4ab2b0a7cee824120af93ce5e3b1e5a75a99d3c94a9416309ed170fcd",
+        "complete": true,
+        "equal": true,
+        "label": "missing-frame-then-delivery",
+        "sessions": 22,
+        "viewCursor": "635",
+        "viewDigest": "0a812bc4ab2b0a7cee824120af93ce5e3b1e5a75a99d3c94a9416309ed170fcd",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 4,
+          "totalSessions": 22
+        },
+        "viewStream": {
+          "connects": 3,
+          "framesApplied": 696,
+          "hydratedAtMs": 158522,
+          "intentsApplied": 6,
+          "lastFrameAtMs": 175383,
+          "lastSeq": 30,
+          "patchesApplied": 594,
+          "snapshotsApplied": 3
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "drop-frames",
+        "intentId": "26e1562f-75fc-45f2-9440-94904209fea7",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "next",
+          "dropped": 0,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "connectsAfter": 4,
+      "connectsBefore": 3,
+      "desktopLog": [],
+      "fault": "missing-frames-no-further-delivery",
+      "pass": true,
+      "projection": {
+        "attention": 4,
+        "companionCursor": "655",
+        "companionDigest": "bde626695d899248eb4e89e885a386f8793f47c76f1caa3c9525524af8d1eb62",
+        "complete": true,
+        "equal": true,
+        "label": "missing-frames-no-further-delivery",
+        "sessions": 22,
+        "viewCursor": "655",
+        "viewDigest": "bde626695d899248eb4e89e885a386f8793f47c76f1caa3c9525524af8d1eb62",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 4,
+          "totalSessions": 22
+        },
+        "viewStream": {
+          "connects": 4,
+          "framesApplied": 708,
+          "hydratedAtMs": 180957,
+          "intentsApplied": 9,
+          "lastFrameAtMs": 192990,
+          "lastSeq": 10,
+          "patchesApplied": 594,
+          "snapshotsApplied": 4
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "drop-frames",
+        "intentId": "fa75f842-e99e-4ae9-b25b-7dcc13206938",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "all",
+          "dropped": 1,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "connectsAfter": 4,
+      "connectsBefore": 4,
+      "desktopLog": [],
+      "fault": "missing-acks-stalled-window",
+      "pass": false,
+      "projection": {
+        "attention": 4,
+        "companionCursor": "675",
+        "companionDigest": "2d7bc96bf3b4f8eb157c610b45357cc661a4b4b4effb29cdee1e1c9c8bd1edd8",
+        "complete": true,
+        "equal": true,
+        "label": "missing-acks-stalled-window",
+        "sessions": 22,
+        "viewCursor": "675",
+        "viewDigest": "2d7bc96bf3b4f8eb157c610b45357cc661a4b4b4effb29cdee1e1c9c8bd1edd8",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 4,
+          "totalSessions": 22
+        },
+        "viewStream": {
+          "connects": 4,
+          "framesApplied": 740,
+          "hydratedAtMs": 180957,
+          "intentsApplied": 12,
+          "lastFrameAtMs": 210592,
+          "lastSeq": 42,
+          "patchesApplied": 614,
+          "snapshotsApplied": 4
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": false,
+      "setup": {
+        "command": "ack-mode",
+        "intentId": "ef36a172-27bf-433c-b375-0f5a6657ce97",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "none",
+          "dropped": 24,
+          "stallNext": false,
+          "withholdAcks": true
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "connectsAfter": 5,
+      "connectsBefore": 4,
+      "desktopLog": [],
+      "fault": "delayed-acks",
+      "pass": true,
+      "projection": {
+        "attention": 4,
+        "companionCursor": "695",
+        "companionDigest": "718470d8945dc96fd20073fca5a5e3680623b6a81ec0638378f1e2f2e6b366e9",
+        "complete": true,
+        "equal": true,
+        "label": "delayed-acks",
+        "sessions": 22,
+        "viewCursor": "695",
+        "viewDigest": "718470d8945dc96fd20073fca5a5e3680623b6a81ec0638378f1e2f2e6b366e9",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 4,
+          "totalSessions": 22
+        },
+        "viewStream": {
+          "connects": 5,
+          "framesApplied": 778,
+          "hydratedAtMs": 216101,
+          "intentsApplied": 18,
+          "lastFrameAtMs": 233125,
+          "lastSeq": 36,
+          "patchesApplied": 634,
+          "snapshotsApplied": 5
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "ack-mode",
+        "intentId": "a2effd4c-b3ff-400f-a92e-73d14d8f8eb9",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 400,
+          "dropFrames": "none",
+          "dropped": 24,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "connectsAfter": 6,
+      "connectsBefore": 5,
+      "desktopLog": [],
+      "fault": "renderer-reconnect",
+      "pass": true,
+      "projection": {
+        "attention": 4,
+        "companionCursor": "715",
+        "companionDigest": "3096177df2093873c4080b6084b2d6277a2f3f2a68eac74101fee634d9d9d352",
+        "complete": true,
+        "equal": true,
+        "label": "renderer-reconnect",
+        "sessions": 22,
+        "viewCursor": "715",
+        "viewDigest": "3096177df2093873c4080b6084b2d6277a2f3f2a68eac74101fee634d9d9d352",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 4,
+          "totalSessions": 22
+        },
+        "viewStream": {
+          "connects": 6,
+          "framesApplied": 816,
+          "hydratedAtMs": 233766,
+          "intentsApplied": 24,
+          "lastFrameAtMs": 250935,
+          "lastSeq": 33,
+          "patchesApplied": 654,
+          "snapshotsApplied": 6
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "reconnect",
+        "intentId": "8f7b536d-ac0a-41cf-b74c-6d03f0c8b919",
+        "ok": true,
+        "result": {
+          "reconnecting": true
+        }
+      },
+      "viewRecoveries": 0
+    }
+  ],
+  "gate": "G04",
+  "pass": false,
+  "workload": {
+    "committed": 600,
+    "count": 600,
+    "durationMs": 6000,
+    "elapsedMs": 5992,
+    "failed": 0,
+    "finalProjectionEqual": true,
+    "viewRecoveries": 0,
+    "viewRetiredBackpressure": 0
+  }
+}

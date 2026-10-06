@@ -237,7 +237,7 @@ pub fn sqlite_live(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
     let mut rounds_out = Vec::new();
     for round in 1..=rounds {
         let acknowledged =
-            std::sync::Arc::new(std::sync::Mutex::new(Vec::<(String, String)>::new()));
+            std::sync::Arc::new(std::sync::Mutex::new(Vec::<(String, String, i64)>::new()));
         let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
         let worker = {
             let acknowledged = std::sync::Arc::clone(&acknowledged);
@@ -251,14 +251,16 @@ pub fn sqlite_live(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
                     // A durable fixture record per request: no attention item
                     // and no notification. A reply arrives only after COMMIT.
                     let observation_id = uuid::Uuid::new_v4().to_string();
+                    let captured_wall_ms = threadspace_harness::now_ms();
                     if let Ok(ControlResponseBody::Admitted { cursor, .. }) = companion.request(
                         ControlRequestBody::QualifyAdmit {
                             observation_id: observation_id.clone(),
+                            captured_wall_ms,
                         },
                         Duration::from_secs(2),
                     ) && let Ok(mut list) = acknowledged.lock()
                     {
-                        list.push((observation_id, cursor));
+                        list.push((observation_id, cursor, captured_wall_ms));
                     }
                 }
                 let _ = index;
@@ -272,14 +274,15 @@ pub fn sqlite_live(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
             .lock()
             .map(|list| list.clone())
             .unwrap_or_default();
-        // Presence by re-admission: every acknowledged UUID must answer
-        // ALREADY_COMMITTED at the cursor its first receipt named.
+        // Presence by re-admission: every acknowledged UUID, retried with its
+        // original content, must answer ALREADY_COMMITTED at the cursor its
+        // first receipt named.
         let mut client = ctx.companion().client(Duration::from_secs(10))?;
-        let lost: Vec<&(String, String)> = acked
+        let lost: Vec<&(String, String, i64)> = acked
             .iter()
-            .filter(|(id, cursor)| {
+            .filter(|(id, cursor, captured_wall_ms)| {
                 !matches!(
-                    client.request(ControlRequestBody::QualifyAdmit { observation_id: id.clone() }),
+                    client.request(ControlRequestBody::QualifyAdmit { observation_id: id.clone(), captured_wall_ms: *captured_wall_ms }),
                     Ok(ControlResponseBody::Admitted { status: threadspace_contracts::ui::ReceiptStatus::AlreadyCommitted, cursor: again, .. })
                         if &again == cursor
                 )

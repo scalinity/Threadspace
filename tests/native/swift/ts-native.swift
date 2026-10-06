@@ -14,6 +14,7 @@
 //   ts-native key <keycode> [shift|cmd|option|control ...]
 //   ts-native pixels-stats <png> [x y w h]
 //   ts-native pixels-diff <png-a> <png-b> [x y w h]
+//   ts-native ax-switch <bundle-id> <label> [press]   (read, or press, a labelled switch/checkbox)
 //   ts-native idle
 //   ts-native displays
 import AppKit
@@ -129,6 +130,29 @@ func findPressable(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> 
         if (actions as? [String] ?? []).contains(kAXPressAction) { return (child, text(child)) }
         if let deeper = findPressable(child, needle, depth: depth + 1) { return deeper }
     }
+    return nil
+}
+
+// MARK: Labelled controls in another app (System Settings switches)
+
+func findLabelled(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> AXUIElement? {
+    guard depth < 30 else { return nil }
+    let role: String = attribute(element, kAXRoleAttribute) ?? ""
+    if role == "AXCheckBox" || role == "AXSwitch" || role == "AXToggle" {
+        let label = [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"]
+            .compactMap { attribute(element, $0) as String? }
+            .joined(separator: " ")
+        if label.localizedCaseInsensitiveContains(needle) { return element }
+    }
+    let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
+    for child in children {
+        if let hit = findLabelled(child, needle, depth: depth + 1) { return hit }
+    }
+    return nil
+}
+
+func switchValue(_ element: AXUIElement) -> Int? {
+    if let number: NSNumber = attribute(element, kAXValueAttribute) { return number.intValue }
     return nil
 }
 
@@ -340,6 +364,27 @@ case "pixels-diff":
     }
     emit(["comparable": true, "width": pa.width, "height": pa.height, "meanAbsDiff": count > 0 ? total / Double(count) : 0,
           "changedFraction": count > 0 ? Double(changed) / Double(count) : 0])
+
+case "ax-switch":
+    guard args.count >= 3, AXIsProcessTrusted() else { usage() }
+    let bundle = args[1], needle = args[2], doPress = args.count > 3 && args[3] == "press"
+    var element: AXUIElement?
+    let deadline = Date(timeIntervalSinceNow: 15)
+    while element == nil && Date() < deadline {
+        for app in NSRunningApplication.runningApplications(withBundleIdentifier: bundle) {
+            element = findLabelled(AXUIElementCreateApplication(app.processIdentifier), needle)
+            if element != nil { break }
+        }
+        if element == nil { pause(0.5) }
+    }
+    guard let control = element else { emit(["bundle": bundle, "label": needle, "found": false], ok: false) }
+    let before = switchValue(control)
+    var pressed = false
+    if doPress {
+        pressed = AXUIElementPerformAction(control, kAXPressAction as CFString) == .success
+        pause(1.0)
+    }
+    emit(["bundle": bundle, "label": needle, "found": true, "valueBefore": before ?? -1, "pressed": pressed, "valueAfter": switchValue(control) ?? -1])
 
 case "idle":
     var iterator: io_iterator_t = 0

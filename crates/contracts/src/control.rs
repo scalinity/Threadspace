@@ -152,6 +152,8 @@ pub enum ControlRequestBody {
     #[cfg(feature = "qualification")]
     QualifyAdmit {
         observation_id: String,
+        /// The record's capture time; a retry repeats it, as a real capture does.
+        captured_wall_ms: i64,
     },
     /// Qualification only: remove this companion's own delivered and pending
     /// notifications from Notification Center.
