@@ -1,0 +1,57 @@
+$ cargo test -p threadspace-journal
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_journal-fb23b8d3f7d2dd0a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/durability.rs (target/aarch64-apple-darwin/debug/deps/durability-349b0c764016061e)
+
+running 8 tests
+test admission_rejects_reused_ids_and_non_uuids_without_writing ... ok
+test admission_commits_once_and_replays_the_original_cursor ... ok
+test checkpoint_truncate_empties_the_wal ... ok
+test backup_store_into_reads_beside_an_open_writer ... ok
+test restore_refuses_a_lock_for_another_store ... ok
+test backup_into_publishes_a_verified_self_contained_snapshot ... ok
+test restore_installs_the_backup_and_preserves_the_original ... ok
+test restore_rejects_bad_backups_and_leaves_the_original_byte_identical ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/identity.rs (target/aarch64-apple-darwin/debug/deps/identity-18b550936b97144b)
+
+running 8 tests
+test one_session_with_two_live_attachments_keeps_both_bindings ... ok
+test sessions_leaving_the_inventory_persist_as_stale ... ok
+test migration_two_keeps_the_frozen_engine_and_m0a_fixture ... ok
+test a_delayed_old_end_closes_only_its_own_activation_across_a_to_b_to_a ... ok
+test route_results_are_journaled_with_their_evidence ... ok
+test a_reused_tty_path_does_not_resurrect_an_invalidated_binding ... ok
+test same_pid_with_a_new_birth_cannot_inherit_the_old_binding ... ok
+test three_same_cwd_sessions_are_three_sessions_with_independent_bindings ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/journal.rs (target/aarch64-apple-darwin/debug/deps/journal-dc12f849637088b3)
+
+running 7 tests
+test only_one_writer_can_hold_the_store ... ok
+test linked_engine_is_exactly_the_frozen_candidate ... ok
+test close_and_reopen_recovers_the_same_stored_fixture ... ok
+test patch_carries_full_upserts_for_changed_entities ... ok
+test open_applies_wal_full_foreign_keys_and_seeds_one_fixture ... ok
+test receipts_are_commit_only_and_idempotent ... ok
+test newer_schema_is_refused ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests threadspace_journal
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
+

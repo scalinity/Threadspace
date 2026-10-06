@@ -1,0 +1,12 @@
+$ cargo test -p threadspace-journal  --no-run --message-format=json
+0 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/threadspace_journal-fb23b8d3f7d2dd0a
+0 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/journal-dc12f849637088b3
+0 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/identity-18b550936b97144b
+0 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/durability-349b0c764016061e
+
+$ cargo test -p threadspace-journal --features qualification --no-run --message-format=json
+0 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/threadspace_journal-54fb73a69393da3e
+1 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/journal-deeb41b909cabce6
+1 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/identity-2e9875ce8bbb0a10
+2 occurrences of THREADSPACE_QUALIFY_CRASH_POINT in <repo>/target/aarch64-apple-darwin/debug/deps/durability-d3abc7f6a6001ccc
+

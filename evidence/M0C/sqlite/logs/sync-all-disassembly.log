@@ -1,0 +1,16 @@
+<repo>/target/aarch64-apple-darwin/debug/threadspace-journal-crash:
+(__TEXT,__text) section
+__RNvMs2_NtCs1SSuMAdGM58_3std2fsNtB5_4File9sync_data:
+000000010026d198	stp	x22, x21, [sp, #-0x30]!
+000000010026d19c	stp	x20, x19, [sp, #0x10]
+000000010026d1a0	stp	x29, x30, [sp, #0x20]
+000000010026d1a4	add	x29, sp, #0x20
+000000010026d1a8	ldr	w19, [x0]
+000000010026d1ac	adrp	x22, 225 ; 0x10034e000
+000000010026d1b0	add	x22, x22, #0x340
+000000010026d1b4	adrp	x20, 216 ; 0x100345000
+000000010026d1b8	add	x20, x20, #0x558
+000000010026d1bc	mov	x0, x19
+000000010026d1c0	mov	w1, #0x33
+000000010026d1c4	bl	0x1002a9034 ; symbol stub for: _fcntl
+000000010026d1c8	cmn	w0, #0x1

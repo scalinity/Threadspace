@@ -1,0 +1,195 @@
+{
+  "cases": {
+    "after-commit-before-receipt": {
+      "ackedRecords": 343,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 25,
+      "runs": 25,
+      "unackedPresent": 25
+    },
+    "after-receipt": {
+      "ackedRecords": 335,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 25,
+      "runs": 25,
+      "unackedPresent": 0
+    },
+    "backup-concurrent": {
+      "ackedRecords": 17305,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "before-transaction": {
+      "ackedRecords": 423,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 25,
+      "runs": 25,
+      "unackedPresent": 0
+    },
+    "in-transaction": {
+      "ackedRecords": 357,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 25,
+      "runs": 25,
+      "unackedPresent": 0
+    },
+    "in-transaction-spill": {
+      "ackedRecords": 10,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "restore": {
+      "ackedRecords": 175,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "restore-rejected": {
+      "ackedRecords": 150,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "restore-without-lock": {
+      "ackedRecords": 40,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "wal-replay": {
+      "ackedRecords": 200,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    },
+    "writer-lock": {
+      "ackedRecords": 15,
+      "duplicateAdmissions": 0,
+      "duplicateRows": 0,
+      "lostAckedRecords": 0,
+      "passed": 5,
+      "runs": 5,
+      "unackedPresent": 0
+    }
+  },
+  "crashMatrix": {
+    "ackedRecords": 1458,
+    "duplicateAdmissions": 0,
+    "duplicateRows": 0,
+    "lostAckedRecords": 0,
+    "runs": 100,
+    "unackedPresent": 25
+  },
+  "durabilityDomain": "Ordinary process death (SIGKILL, no unwinding) on the local APFS volume with journal_mode=WAL, synchronous=FULL, fullfsync off. Power-loss durability is not qualified here (M13).",
+  "engine": {
+    "engineViolations": 0,
+    "fullfsyncValuesSeen": [
+      false
+    ],
+    "reopenChecks": 210,
+    "sample": {
+      "compileOptions": [
+        "ATOMIC_INTRINSICS=1",
+        "COMPILER=clang-21.0.0",
+        "DEFAULT_AUTOVACUUM",
+        "DEFAULT_CACHE_SIZE=-2000",
+        "DEFAULT_FILE_FORMAT=4",
+        "DEFAULT_FOREIGN_KEYS",
+        "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+        "DEFAULT_MMAP_SIZE=0",
+        "DEFAULT_PAGE_SIZE=4096",
+        "DEFAULT_PCACHE_INITSZ=20",
+        "DEFAULT_RECURSIVE_TRIGGERS",
+        "DEFAULT_SECTOR_SIZE=4096",
+        "DEFAULT_SYNCHRONOUS=2",
+        "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+        "DEFAULT_WAL_SYNCHRONOUS=2",
+        "DEFAULT_WORKER_THREADS=0",
+        "DIRECT_OVERFLOW_READ",
+        "ENABLE_API_ARMOR",
+        "ENABLE_COLUMN_METADATA",
+        "ENABLE_DBSTAT_VTAB",
+        "ENABLE_FTS3",
+        "ENABLE_FTS3_PARENTHESIS",
+        "ENABLE_FTS5",
+        "ENABLE_LOAD_EXTENSION",
+        "ENABLE_MEMORY_MANAGEMENT",
+        "ENABLE_RTREE",
+        "ENABLE_STAT4",
+        "HAVE_ISNAN",
+        "MALLOC_SOFT_LIMIT=1024",
+        "MAX_ATTACHED=10",
+        "MAX_COLUMN=2000",
+        "MAX_COMPOUND_SELECT=500",
+        "MAX_DEFAULT_PAGE_SIZE=8192",
+        "MAX_EXPR_DEPTH=1000",
+        "MAX_FUNCTION_ARG=1000",
+        "MAX_LENGTH=1000000000",
+        "MAX_LIKE_PATTERN_LENGTH=50000",
+        "MAX_MMAP_SIZE=0x7fff0000",
+        "MAX_PAGE_COUNT=0xfffffffe",
+        "MAX_PAGE_SIZE=65536",
+        "MAX_SQL_LENGTH=1000000000",
+        "MAX_TRIGGER_DEPTH=1000",
+        "MAX_VARIABLE_NUMBER=32766",
+        "MAX_VDBE_OP=250000000",
+        "MAX_WORKER_THREADS=8",
+        "MUTEX_PTHREADS",
+        "SOUNDEX",
+        "SYSTEM_MALLOC",
+        "TEMP_STORE=1",
+        "THREADSAFE=1",
+        "USE_URI"
+      ],
+      "foreignKeys": true,
+      "fullfsync": false,
+      "journalMode": "wal",
+      "sourceId": "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+      "sqliteVersion": "3.53.4",
+      "synchronous": 2
+    }
+  },
+  "environment": {
+    "buildVersion": "26B5091g",
+    "kernel": "27.2.0",
+    "machine": "arm64",
+    "productVersion": "27.2",
+    "profile": "debug"
+  },
+  "finishedAtMs": 1791281064511,
+  "fixedRuns": 5,
+  "result": "PASS",
+  "runner": "threadspace-journal-crash",
+  "runsPerCrashPoint": 25,
+  "seed": 1831887632,
+  "startedAtMs": 1791281056757,
+  "violations": []
+}
