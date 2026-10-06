@@ -7,7 +7,9 @@
   "generatedAt": "2026-10-06T09:15:00Z",
   "baseCommit": "f94dd7bf410d925dc01571bbecb5d18bf1683c77",
   "branch": "m0b",
-  "applicationCommit": "fc6564199fcc8fb1c84b8895fa849fb567872c05",
+  "applicationCommit": "0f0d9f1779266e0ccc1e33025b0010378c55139d",
+  "applicationCommitPreRedaction": "fc6564199fcc8fb1c84b8895fa849fb567872c05",
+  "commitMap": "evidence/M0B/COMMIT-MAP.md (history rewritten before first push to pseudonymize unrelated session IDs; application sources identical; evidence text and installed build-info cite pre-redaction SHAs)",
   "evidenceCommit": "the commit that adds this manifest; its application sources are identical to applicationCommit",
   "ancestry": "m0b is a strict descendant of baseCommit (git merge-base --is-ancestor f94dd7b HEAD); main/origin/main remain at baseCommit",
   "commits": [
@@ -17,9 +19,10 @@
     "9e7cf29 Run Claude discovery and Return-to-Agent in the companion",
     "a43fed0 Expose Return and refreshed evidence in the desktop UI",
     "46a2a04 Add the M0B route harness and hook ancestry probe",
-    "35d7573 Record M0B late-start discovery and hook ancestry evidence",
-    "8980d34 Take Terminal's incarnation from the kernel, not LaunchServices",
-    "fc65641 Require Terminal's frontmost-window readback for an exact route"
+    "8c9a7d3 Record M0B late-start discovery and hook ancestry evidence (pre-redaction 35d7573)",
+    "a732f8c Take Terminal's incarnation from the kernel, not LaunchServices (pre-redaction 8980d34)",
+    "0f0d9f1 Require Terminal's frontmost-window readback for an exact route (pre-redaction fc65641)",
+    "1ed401b Record M0B native qualification evidence and the GO candidate (pre-redaction 9dfd176)"
   ],
   "platform": {
     "macOS": "27.2",
