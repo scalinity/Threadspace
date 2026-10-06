@@ -1,0 +1,87 @@
+{
+ "argv": [
+  "~/.local/bin/claude",
+  "-p",
+  "--model",
+  "haiku",
+  "--tools",
+  "",
+  "--no-session-persistence",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--plugin-dir",
+  "/private/tmp/claude-501/ts-m0c-claude-native-run2/mod",
+  "--input-format",
+  "stream-json",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--debug-file",
+  "/private/tmp/claude-501/ts-m0c-claude-native-run2/debug-run2.log"
+ ],
+ "env": {
+  "CLAUDE_CODE_PLUGIN_DIR_WATCH": "1"
+ },
+ "timeline": {
+  "start": 1791280854.1076171,
+  "result1": 1791280855.452866,
+  "edit": 1791280858.457759,
+  "epoch2Seen": 1791280860.17528,
+  "send2": 1791280876.2364821,
+  "result2": 1791280876.974155,
+  "exit": 1791280880.2688031
+ },
+ "returncode": 0,
+ "result1": {
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "result": "one"
+ },
+ "result2": {
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "result": "two"
+ },
+ "streamLines": [
+  {
+   "at": 1791280854.712063,
+   "type": "system",
+   "subtype": "init",
+   "line": "{\"type\":\"system\",\"subtype\":\"init\",\"cwd\":\"/private/tmp/claude-501/ts-m0c-claude-native-run2/work\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\",\"tools\":[],\"mcp_servers\":[],\"model\":\"claude-haiku-4-5-20251001\",\"permissionMode\":\"default\",\"slash_commands\":[\"deep-research\",\"design\",\"design-sync\",\"dataviz\",\"update-config\",\"verify\",\"debug\",\"code-review\",\"simplify\",\"batch\",\"fewer-permission-prompts\",\"doctor\",\"loop\",\"schedule\",\"claude-api\",\"workflow-authoring\",\"run\",\"run-skill-generator\",\"plugin-authoring\",\"advisor\",\"agents\",\"auto-mode-setup\",\"autocompact\",\"clear\",\"color\",\"compact\",\"config\",\"outpu"
+  },
+  {
+   "at": 1791280855.452862,
+   "type": "result",
+   "subtype": "success",
+   "line": "{\"duration_api_ms\":726,\"stop_reason\":\"end_turn\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\",\"total_cost_usd\":0.013510000000000001,\"usage\":{\"input_tokens\":10,\"cache_creation_input_tokens\":6655,\"cache_read_input_tokens\":0,\"output_tokens\":38,\"output_tokens_details\":{\"thinking_tokens\":31},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":6655,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":10,\"output_tokens\":38,\"cache_read_input_tokens\":0,\"cache_creation_inp"
+  },
+  {
+   "at": 1791280859.1511092,
+   "type": "system",
+   "subtype": "ui_invalidate",
+   "line": "{\"type\":\"system\",\"subtype\":\"ui_invalidate\",\"event\":\"ui.render\",\"uuid\":\"e9db134f-054d-462f-a644-e1c4a8c1f709\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\"}"
+  },
+  {
+   "at": 1791280859.173055,
+   "type": "system",
+   "subtype": "ui_log",
+   "line": "{\"type\":\"system\",\"subtype\":\"ui_log\",\"plugin\":\"threadspace-observer\",\"text\":\"reloaded (12 hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call, tool.check, agent.spawn)\",\"uuid\":\"f9d15b33-69a5-4f73-979c-9b5001539066\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\"}"
+  },
+  {
+   "at": 1791280876.245528,
+   "type": "system",
+   "subtype": "init",
+   "line": "{\"type\":\"system\",\"subtype\":\"init\",\"cwd\":\"/private/tmp/claude-501/ts-m0c-claude-native-run2/work\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\",\"tools\":[],\"mcp_servers\":[],\"model\":\"claude-haiku-4-5-20251001\",\"permissionMode\":\"default\",\"slash_commands\":[\"deep-research\",\"design\",\"design-sync\",\"dataviz\",\"update-config\",\"verify\",\"debug\",\"code-review\",\"simplify\",\"batch\",\"fewer-permission-prompts\",\"doctor\",\"loop\",\"schedule\",\"claude-api\",\"workflow-authoring\",\"run\",\"run-skill-generator\",\"plugin-authoring\",\"advisor\",\"agents\",\"auto-mode-setup\",\"autocompact\",\"clear\",\"color\",\"compact\",\"config\",\"outpu"
+  },
+  {
+   "at": 1791280876.974151,
+   "type": "result",
+   "subtype": "success",
+   "line": "{\"duration_api_ms\":1449,\"stop_reason\":\"end_turn\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\",\"total_cost_usd\":0.014543500000000001,\"usage\":{\"input_tokens\":10,\"cache_creation_input_tokens\":84,\"cache_read_input_tokens\":6655,\"output_tokens\":38,\"output_tokens_details\":{\"thinking_tokens\":31},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":84,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":10,\"output_tokens\":38,\"cache_read_input_tokens\":6655,\"cache_creation_"
+  }
+ ],
+ "stderr": ""
+}

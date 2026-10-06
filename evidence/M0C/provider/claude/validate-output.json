@@ -1,0 +1,62 @@
+{
+  "success": true,
+  "strict": false,
+  "target": "<repo>/packages/provider-mod/.claude-plugin/plugin.json",
+  "manifest": {
+    "file": "<repo>/packages/provider-mod/.claude-plugin/plugin.json",
+    "type": "plugin",
+    "errors": [],
+    "warnings": [],
+    "notes": [],
+    "gatingHooks": []
+  },
+  "contents": [
+    {
+      "file": "<repo>/packages/provider-mod/hooks/hooks.json",
+      "type": "hooks",
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        "./register.ts hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, agent.spawn",
+        "./register.ts gating hook without .catch: classic.SessionStart",
+        "./register.ts gating hook without .catch: prompt.submit",
+        "./register.ts gating hook without .catch: tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+        "./register.ts gating hook without .catch: tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+        "./register.ts gating hook without .catch: agent.spawn",
+        "./register.ts calls: $.clock.after, $.process.run, $.session.id, $.session.version"
+      ],
+      "gatingHooks": [
+        {
+          "module": "./register.ts",
+          "pattern": "classic.SessionStart",
+          "hook": "classic.SessionStart",
+          "hasCatch": false
+        },
+        {
+          "module": "./register.ts",
+          "pattern": "prompt.submit",
+          "hook": "prompt.submit",
+          "hasCatch": false
+        },
+        {
+          "module": "./register.ts",
+          "pattern": "tool.call",
+          "hook": "tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+          "hasCatch": false
+        },
+        {
+          "module": "./register.ts",
+          "pattern": "tool.check",
+          "hook": "tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+          "hasCatch": false
+        },
+        {
+          "module": "./register.ts",
+          "pattern": "agent.spawn",
+          "hook": "agent.spawn",
+          "hasCatch": false
+        }
+      ]
+    }
+  ]
+}

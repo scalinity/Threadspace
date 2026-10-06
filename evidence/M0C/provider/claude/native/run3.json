@@ -1,0 +1,33 @@
+{
+ "argv": [
+  "~/.local/bin/claude",
+  "-p",
+  "--model",
+  "haiku",
+  "--tools",
+  "Agent",
+  "--no-session-persistence",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--plugin-dir",
+  "/private/tmp/claude-501/ts-m0c-claude-native-run3/mod",
+  "--output-format",
+  "json",
+  "--debug-file",
+  "/private/tmp/claude-501/ts-m0c-claude-native-run3/debug-run3.log",
+  "Call the Agent tool exactly once with subagent_type general-purpose, description 'say ok' and prompt 'Reply with exactly the word: ok. Use no tools.' Then reply with exactly the word: done"
+ ],
+ "startedAt": 1791281245.140882,
+ "endedAt": 1791281252.184593,
+ "returncode": 0,
+ "result": {
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "duration_ms": 1376,
+  "result": "The agent completed successfully and returned: ok"
+ },
+ "stderr": ""
+}

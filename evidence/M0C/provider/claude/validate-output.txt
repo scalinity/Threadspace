@@ -1,0 +1,18 @@
+# command: ~/.local/bin/claude plugin validate <repo>/packages/provider-mod
+# claude --version: 2.1.291 (Claude Code)
+# started: 2026-10-06T10:06:17+00:00
+# exit code: 0
+
+Validating plugin manifest: <repo>/packages/provider-mod/.claude-plugin/plugin.json
+
+Validating hooks: <repo>/packages/provider-mod/hooks/hooks.json
+
+  ❯ ./register.ts hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}, tool.check{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}, agent.spawn
+  ❯ ./register.ts gating hook without .catch: classic.SessionStart
+  ❯ ./register.ts gating hook without .catch: prompt.submit
+  ❯ ./register.ts gating hook without .catch: tool.call{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}
+  ❯ ./register.ts gating hook without .catch: tool.check{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}
+  ❯ ./register.ts gating hook without .catch: agent.spawn
+  ❯ ./register.ts calls: $.clock.after, $.process.run, $.session.id, $.session.version
+
+✔ Validation passed

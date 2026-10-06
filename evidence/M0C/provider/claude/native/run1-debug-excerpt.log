@@ -1,0 +1,29 @@
+2026-10-06T09:59:53.716Z [DEBUG] clearPluginCache: invalidating loadAllPlugins cache (preAction: --plugin-dir inline plugins)
+2026-10-06T09:59:53.754Z [DEBUG] --plugin-dir <run-dir>/mod is one plugin: .claude-plugin at its top marks it
+2026-10-06T09:59:53.762Z [DEBUG] Read hooks.json for plugin threadspace-observer (enabled=true): <run-dir>/mod/hooks/hooks.json
+2026-10-06T09:59:53.763Z [DEBUG] Loaded inline plugin from path: threadspace-observer
+2026-10-06T09:59:53.764Z [DEBUG] Checking plugin threadspace-observer: skillsPath=none, skillsPaths=0 paths
+2026-10-06T09:59:53.787Z [DEBUG] plugin threadspace-observer: no pluginConfigs["threadspace-observer" or "threadspace-observer@inline"].options in user, --settings or managed settings (project settings are not read); every option is its default
+2026-10-06T09:59:53.879Z [DEBUG] hooks module threadspace-observer@inline loaded (worker, environment 1, tier user); events: session.start,classic.SessionStart,session.end,session.attach,session.detach,prompt.submit,turn.start,turn.step,turn.complete,tool.call,tool.check,agent.spawn
+2026-10-06T09:59:53.882Z [DEBUG] engine.create: no plugin-provided interfaces; $ built for threadspace-observer,cc-plugin-agents-md,cc-plugin-telemetry
+2026-10-06T09:59:53.882Z [DEBUG] plugin.register: threadspace-observer (user, threadspace-observer@inline), judged by core alone: admitted
+2026-10-06T09:59:53.951Z [DEBUG] type root of threadspace-observer at <run-dir>/mod/.claude-plugin/types: entries claude-code, claude-code-tools, claude-code-mcp; wrote .claude-plugin/types/claude-code/index.d.ts, .claude-plugin/types/claude-code-tools/index.d.ts, .claude-plugin/types/claude-code-mcp/index.d.ts, .claude-plugin/types/tsconfig.json, .claude-plugin/types/.gitignore, tsconfig.json
+2026-10-06T09:59:53.955Z [DEBUG] hooks module threadspace-observer@inline classic.SessionStart settled in 2.5ms (worker hop, next() included)
+2026-10-06T09:59:53.956Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 58957)
+2026-10-06T09:59:54.043Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 88ms, 198 + 0 chars
+2026-10-06T09:59:54.199Z [DEBUG] hooks module threadspace-observer@inline session.start settled in 6.8ms (worker hop, next() included)
+2026-10-06T09:59:54.207Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 59091)
+2026-10-06T09:59:54.225Z [DEBUG] hooks module threadspace-observer@inline prompt.submit settled in 10.4ms (worker hop, next() included)
+2026-10-06T09:59:54.225Z [DEBUG] hooks module threadspace-observer@inline turn.start settled in 5.4ms (worker hop, next() included)
+2026-10-06T09:59:54.265Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 58ms, 280 + 0 chars
+2026-10-06T09:59:54.268Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 59131)
+2026-10-06T09:59:54.322Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 55ms, 444 + 0 chars
+2026-10-06T09:59:55.040Z [DEBUG] hooks module threadspace-observer@inline turn.step stream settled in 814.6ms (worker hop, next() included)
+2026-10-06T09:59:55.044Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 59685)
+2026-10-06T09:59:55.044Z [DEBUG] hooks module threadspace-observer@inline turn.complete settled in 1.5ms (worker hop, next() included)
+2026-10-06T09:59:55.097Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 54ms, 198 + 0 chars
+2026-10-06T09:59:55.105Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 59729)
+2026-10-06T09:59:55.160Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 56ms, 198 + 0 chars
+2026-10-06T09:59:55.353Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 with 4 args in <run-dir>/work (pid 59886)
+2026-10-06T09:59:55.411Z [DEBUG] $.process.run (threadspace-observer): /usr/bin/python3 exited 0 in 59ms, 116 + 0 chars
+2026-10-06T09:59:55.412Z [DEBUG] hooks module threadspace-observer@inline session.end settled in 309.4ms (worker hop, next() included)

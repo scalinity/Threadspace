@@ -1,0 +1,114 @@
+{
+ "clock": "seconds after the orchestrator started the claude process",
+ "editAt": 4.35,
+ "reloadUiLogAt": 5.065,
+ "reloadUiLog": "{\"type\":\"system\",\"subtype\":\"ui_log\",\"plugin\":\"threadspace-observer\",\"text\":\"reloaded (12 hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call, tool.check, agent.spawn)\",\"uuid\":\"f9d15b33-69a5-4f73-979c-9b5001539066\",\"session_id\":\"cf327bdd-9aac-4110-a6be-20c1919a246d\"}",
+ "exitAt": 26.161,
+ "epochs": [
+  {
+   "epochIndex": 0,
+   "sourceEpoch": "cfd835e2-b835-46a3-a64c-11a3d01fbfaa",
+   "attempts": [
+    {
+     "at": 0.332,
+     "outcome": "fail",
+     "records": 2
+    },
+    {
+     "at": 0.649,
+     "outcome": "fail",
+     "records": 5
+    },
+    {
+     "at": 1.206,
+     "outcome": "fail",
+     "records": 10
+    },
+    {
+     "at": 2.269,
+     "outcome": "fail",
+     "records": 13
+    },
+    {
+     "at": 4.326,
+     "outcome": "fail",
+     "records": 13
+    }
+   ]
+  },
+  {
+   "epochIndex": 1,
+   "sourceEpoch": "5fc69e08-778e-4389-a4d0-05f0ffdb0804",
+   "attempts": [
+    {
+     "at": 5.122,
+     "outcome": "commit",
+     "records": 3
+    },
+    {
+     "at": 22.194,
+     "outcome": "commit",
+     "records": 5
+    },
+    {
+     "at": 22.92,
+     "outcome": "commit",
+     "records": 2
+    },
+    {
+     "at": 22.977,
+     "outcome": "commit",
+     "records": 1
+    },
+    {
+     "at": 25.931,
+     "outcome": "commit",
+     "records": 2
+    }
+   ]
+  }
+ ],
+ "firstEpochRetryGapsSeconds": [
+  0.317,
+  0.557,
+  1.063,
+  2.057
+ ],
+ "firstEpochPendingRetryDueAt": 8.326,
+ "firstEpochAttemptsAfterReload": [],
+ "firstEpochAttemptsExpectedIfTimerSurvived": [
+  8.326,
+  13.326,
+  18.326,
+  23.326
+ ],
+ "secondEpochFirstRecords": [
+  {
+   "phase": "entry",
+   "nativeEvent": "session.start",
+   "sessionId": null,
+   "sessionIdSource": null
+  },
+  {
+   "phase": "result",
+   "nativeEvent": "session.start",
+   "sessionId": null,
+   "sessionIdSource": null
+  },
+  {
+   "phase": "bootstrap",
+   "nativeEvent": "session.start",
+   "sessionId": null,
+   "sessionIdSource": null
+  }
+ ],
+ "secondEpochEvents": [
+  "prompt.submit",
+  "session.end",
+  "session.start",
+  "turn.complete",
+  "turn.start",
+  "turn.step"
+ ],
+ "firstEpochRecordsNeverAcknowledged": 13
+}

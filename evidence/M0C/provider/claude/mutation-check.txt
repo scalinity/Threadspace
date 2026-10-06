@@ -1,0 +1,33 @@
+# Mutation check of the engine-test-kit suites (packages/provider-mod at 160641b)
+# Each line: one deliberate defect applied to a scratch copy of the mod, then
+# `claude plugin test <copy>` (Claude Code 2.1.291); the indented lines are the
+# tests that caught it. A defect no test catches would show 0 fail.
+
+receipt size cap removed: exit=1 32 pass 1 fail
+    (fail) mod delivery > malformed receipt is not acceptance [17.54ms]
+exit code ignored: exit=1 32 pass 1 fail
+    (fail) mod delivery > malformed receipt is not acceptance [17.22ms]
+no backoff doubling: exit=1 32 pass 1 fail
+    (fail) mod delivery > retry backoff runs 250 ms to 5 s and resets on success [29.85ms]
+next called twice on tool.call: exit=1 28 pass 5 fail
+    (fail) middleware contract > observer calls next(e) exactly once [33.60ms]
+    (fail) provenance and identity > delayed result uses original identity across a logical session change [5002.32ms]
+    (fail) provenance and identity > engine dispatch origin alone does not prove downstream core execution [15.19ms]
+    (fail) provenance and identity > short-circuiting downstream middleware is passed through unchanged [18.30ms]
+    (fail) provenance and identity > no worktree handlers or worktree tool interception [13.34ms]
+session read at result time: exit=1 32 pass 1 fail
+    (fail) provenance and identity > delayed result uses original identity across a logical session change [28.14ms]
+worktree tools not excluded: exit=1 32 pass 1 fail
+    (fail) provenance and identity > no worktree handlers or worktree tool interception [12.57ms]
+queue byte bound raised to 80 MiB: exit=1 32 pass 1 fail
+    (fail) mod delivery > queue byte bound (8 MiB) with long escaped identifiers [155.00ms]
+queue record bound raised to 20480: exit=1 32 pass 1 fail
+    (fail) mod delivery > queue bounds (2,048 records) and batch bounds (128 records, 64 KiB) [194.85ms]
+batch record bound raised to 1280: exit=1 32 pass 1 fail
+    (fail) mod delivery > batch record bound (128) binds for small records [41.32ms]
+batch byte bound raised to 640 KiB: exit=1 31 pass 2 fail
+    (fail) mod delivery > queue bounds (2,048 records) and batch bounds (128 records, 64 KiB) [221.68ms]
+    (fail) mod delivery > queue byte bound (8 MiB) with long escaped identifiers [115.48ms]
+prompt text leaked: exit=1 31 pass 2 fail
+    (fail) middleware contract > observations carry no prompt text, tool input or output, or assistant text [12.59ms]
+    (fail) provenance and identity > accepted-human core-acceptance proof for prompt.submit [13.69ms]
