@@ -1,0 +1,49 @@
+{
+  "bootstrap": {
+    "agentIdentifier": "ai.scalinity.threadspace.agent",
+    "appIdentifier": "ai.scalinity.threadspace",
+    "detail": {
+      "aborted": "preparation failed; service left registered",
+      "steps": [
+        {
+          "detail": {
+            "companionPid": 43784,
+            "startMicroseconds": 103201,
+            "startSeconds": "1791296386"
+          },
+          "elapsedMs": 0,
+          "ok": true,
+          "step": "connect"
+        },
+        {
+          "detail": null,
+          "elapsedMs": 1,
+          "ok": true,
+          "step": "record-observation-disabled"
+        },
+        {
+          "detail": "Err(\"companion refused: Internal: maintenance preparation failed: qualification fault: backup failed\")",
+          "elapsedMs": 1,
+          "ok": false,
+          "step": "prepare-maintenance"
+        },
+        {
+          "detail": null,
+          "elapsedMs": 2,
+          "ok": true,
+          "step": "restore-observation-enabled"
+        }
+      ],
+      "unregistered": false
+    },
+    "elapsedMs": 30,
+    "exitStatus": 1,
+    "ok": false,
+    "operation": "stop",
+    "statusAfter": "ENABLED"
+  },
+  "companionUnchanged": true,
+  "maintenancePhase": "NONE",
+  "observationEnabled": true,
+  "serviceStatus": "ENABLED"
+}

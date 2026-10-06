@@ -1,0 +1,83 @@
+{
+  "backupsPresent": [
+    "backup-176339-1791294767719.sqlite3",
+    "backup-254034-1791296392732.sqlite3",
+    "backup-186033-1791295765262.sqlite3",
+    "backup-186027-1791295763032.sqlite3",
+    "backup-176345-1791294770137.sqlite3",
+    "backup-176043-1791289581195.sqlite3"
+  ],
+  "bootstrap": {
+    "agentIdentifier": "ai.scalinity.threadspace.agent",
+    "appIdentifier": "ai.scalinity.threadspace",
+    "detail": {
+      "steps": [
+        {
+          "detail": {
+            "companionPid": 43784,
+            "startMicroseconds": 103201,
+            "startSeconds": "1791296386"
+          },
+          "elapsedMs": 0,
+          "ok": true,
+          "step": "connect"
+        },
+        {
+          "detail": null,
+          "elapsedMs": 0,
+          "ok": true,
+          "step": "record-observation-disabled"
+        },
+        {
+          "detail": {
+            "backupBytes": 71229440,
+            "backupCursor": "254034",
+            "backupFile": "backup-254034-1791296392732.sqlite3",
+            "phase": "PREPARED"
+          },
+          "elapsedMs": 364,
+          "ok": true,
+          "step": "prepare-maintenance"
+        },
+        {
+          "detail": {
+            "error": null,
+            "operation": "unregister",
+            "statusAfter": "NOT_REGISTERED",
+            "statusBefore": "ENABLED"
+          },
+          "elapsedMs": 415,
+          "ok": true,
+          "step": "unregister"
+        },
+        {
+          "detail": {
+            "waitedMs": 0
+          },
+          "elapsedMs": 415,
+          "ok": true,
+          "step": "verify-old-incarnation-exited"
+        },
+        {
+          "detail": "Ok(true)",
+          "elapsedMs": 415,
+          "ok": true,
+          "step": "verify-writer-lock-released"
+        }
+      ],
+      "unregistered": true
+    },
+    "elapsedMs": 441,
+    "exitStatus": 0,
+    "ok": true,
+    "operation": "stop",
+    "statusAfter": "NOT_REGISTERED"
+  },
+  "companionLogOrder": [
+    "OBSERVATION_PREFERENCE",
+    "MAINTENANCE_PREPARING",
+    "MAINTENANCE_PREPARED"
+  ],
+  "companionProcessesAfter": 0,
+  "serviceStatus": "NOT_REGISTERED"
+}

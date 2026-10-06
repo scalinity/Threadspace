@@ -1,0 +1,88 @@
+{
+  "agreement": [],
+  "checks": {
+    "domJournalAgreementPerMinute": false,
+    "hideDuringInitDoesNotRevive": true,
+    "injectedVisibleLossOneBoundedRebuild": true,
+    "lossWhileHiddenRevivesNothing": true,
+    "minimizeDisposesAndStopsFrames": true,
+    "pixelsChangingWhileLive": {
+      "changed": 26,
+      "pairs": 29,
+      "pass": false,
+      "ratio": 0.896551724137931
+    },
+    "reloadWithResourceInFlight": true,
+    "repeatedHideShowFreshGenerations": true,
+    "repeatedLossFallsBackOperational": true,
+    "returnRebuildsFreshAttestedRenderer": true,
+    "twoDModeDisposesAndDomStaysOperational": true
+  },
+  "elapsedS": 378,
+  "finalLifecycle": {
+    "counts": {
+      "confirmationFailures": 0,
+      "discardedLateInits": 0,
+      "disposals": 0,
+      "disposeFailures": 0,
+      "ignoredLateCallbacks": 0,
+      "initFailures": 0,
+      "inits": 1,
+      "rebuilds": 0,
+      "recoveryRebuilds": 0,
+      "rendererErrors": 0,
+      "staleConfirmations": 0
+    },
+    "frames": {
+      "cancelled": 0,
+      "fired": 544,
+      "pending": 1,
+      "requested": 545,
+      "requestedSinceDisposal": null
+    },
+    "generation": 1,
+    "lossCounts": {
+      "injected": 0,
+      "natural": 0
+    },
+    "state": "live"
+  },
+  "gate": "G15",
+  "injectedLossLabel": "every device loss in this run was qualification-injected; none is a natural GPU loss",
+  "minutes": 3,
+  "motionFixture": {
+    "canvasCrop": [
+      "600",
+      "104",
+      "720",
+      "1198"
+    ],
+    "cleanup": {
+      "notificationsCleared": {
+        "removedDelivered": 26
+      },
+      "resolved": {
+        "failed": 0,
+        "matched": 34,
+        "reason": "g15 motion fixture",
+        "resolved": 34
+      }
+    },
+    "raised": [
+      {
+        "outcome": {
+          "attentionId": "d9fd4c17-9f34-44ae-9b3b-6bc57de4bfe6"
+        },
+        "sessionId": "5083b960-5c8d-4fd0-a774-a9f3a6c92fcb"
+      },
+      {
+        "outcome": {
+          "attentionId": "02cfe21e-704c-4b3c-af11-9000019cd74c"
+        },
+        "sessionId": "38f9d3b5-3648-45e0-ac96-ac3802f44181"
+      }
+    ]
+  },
+  "pass": false,
+  "reduceMotion": false
+}

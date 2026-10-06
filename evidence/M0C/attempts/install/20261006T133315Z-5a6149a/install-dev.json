@@ -1,0 +1,73 @@
+{
+  "installed": {
+    "companionBuildInfo": {
+      "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+      "channel": "dev",
+      "executableSha256": "dabcc7c17ffb6aee90b581ae191f2904c49ba8ca31b565101ab42c6d5c31197f",
+      "qualificationBuild": true,
+      "sourceCommit": "5a6149a8383e9ac6d11a44a48f745ef28e7db59e",
+      "sourceTreeDirty": false,
+      "version": "0.1.0"
+    },
+    "companionSha256": "dabcc7c17ffb6aee90b581ae191f2904c49ba8ca31b565101ab42c6d5c31197f",
+    "executableSha256": "1721dfae9f4ee13616ad58528e9f97373f520de4d373dbda7919a961b0394ddc"
+  },
+  "newCompanion": {
+    "incarnation": {
+      "pid": 97364,
+      "ppid": 1,
+      "startMicroseconds": 793121,
+      "startSeconds": 1791293594
+    },
+    "waitedMs": 110
+  },
+  "pass": true,
+  "service": "ENABLED",
+  "steps": [
+    {
+      "result": {
+        "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": null,
+          "operation": "unregister",
+          "statusAfter": "NOT_REGISTERED",
+          "statusBefore": "ENABLED"
+        },
+        "elapsedMs": 59,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "unregister",
+        "statusAfter": "NOT_REGISTERED"
+      },
+      "step": "unregister-old"
+    },
+    {
+      "step": "old-companion-exit",
+      "waitedMs": 0
+    },
+    {
+      "ok": true,
+      "step": "move-old-bundle",
+      "to": "~/Library/Application Support/threadspace-qualification/rollback/ai.scalinity.threadspace.dev-20261006T133314Z"
+    },
+    {
+      "result": {
+        "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 307,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "register",
+        "statusAfter": "ENABLED"
+      },
+      "step": "register-new"
+    }
+  ]
+}

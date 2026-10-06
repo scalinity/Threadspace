@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "milestone": "M0C",
+  "title": "Platform Reliability / Recovery Qualification",
+  "verdict": "CANDIDATE \u2014 every required M0C portion passes natively on the installed 8c82212 build except G12, which waits on one owner action; pending independent review",
+  "verdictScope": "Only native runs on the installed 8c82212 identities are claimed. Superseded and failed runs are kept under attempts/ with their diagnoses. Cells that cannot run safely here are BLOCKED or MANUAL_EXTERNAL_REQUIRED, never passed.",
+  "generatedAt": "2026-10-06T15:10:00Z",
+  "baseCommit": "8558854fad5162c0182dd36d76f8f8ae5d282529",
+  "branch": "m0c",
+  "applicationCommit": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb",
+  "harnessCommit": "89d857267ba0fe5ffde7cbad51db5b4123189f98",
+  "applicationSourcesUnchangedSince": "8c82212 (git diff 8c82212..harnessCommit -- apps packages crates is empty)",
+  "evidenceCommit": "the commit that adds this manifest",
+  "target": {
+    "os": "macOS 27.2 (26B5091g)",
+    "machine": "Apple M5 Pro, built-in Retina panel only",
+    "claudeCode": "2.1.291",
+    "terminal": "2.15 (dictionary sha256 cd4dad3e\u2026)",
+    "sqlite": "3.53.4",
+    "tauri": "3.0.0-alpha.4",
+    "three": "r186"
+  },
+  "install": "evidence/M0C/install/20261006T140713Z-8c82212/",
+  "tests": "evidence/M0C/build/tests.txt (Rust 156 passed, 0 failed; TypeScript 33 passed)",
+  "gates": {
+    "G01": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/install/20261006T140713Z-8c82212/",
+        "evidence/M0C/build/tests.txt"
+      ]
+    },
+    "G02": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g02-launches/20261006T141307Z-packaged-prod/",
+        "evidence/M0C/g02-launches/20261006T143510Z-dev/"
+      ]
+    },
+    "G03": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g03-ipc/20261006T141342Z-prod/"
+      ]
+    },
+    "G04": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g04-stream/20261006T141347Z-prod/",
+        "evidence/M0C/view-recovery/20261006T144300Z-prod/"
+      ]
+    },
+    "G05": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g05-notifications/20261006T143608Z-denied-dev/"
+      ]
+    },
+    "G06": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g06-notifications/20261006T140836Z-prod/"
+      ]
+    },
+    "G07": {
+      "result": "PASS with D-0004 open",
+      "evidence": [
+        "evidence/M0C/codex/",
+        "docs/decisions/D-0004-codex-runtime-modes-and-daemon-probe.md"
+      ],
+      "notRun": "Codex detached-hook ancestry (D-0004: M0C forbids starting provider work; M6)"
+    },
+    "G08": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g08-terminal/20261006T144151Z-prod/"
+      ],
+      "blocked": "Terminal restart (C-08)"
+    },
+    "G09": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g09-companion/20261006T141203Z-prod/"
+      ]
+    },
+    "G10": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g10-sqlite-live/20261006T140951Z-prod/",
+        "evidence/M0C/sqlite/"
+      ]
+    },
+    "G11": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g11-restarts/20261006T141850Z-prod/"
+      ]
+    },
+    "G12": {
+      "result": "PENDING_OWNER_ACTION",
+      "reason": "waking needs a root-scheduled pmset wake (one owner command); the harness then runs five cycles unattended (threadspace-m0c g12-sleep-wake prod 5)"
+    },
+    "G13": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g13-g14-renderer/20261006T141258Z-prod/"
+      ]
+    },
+    "G14": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g13-g14-renderer/20261006T141258Z-prod/"
+      ]
+    },
+    "G15": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g15-graphics/20261006T144536Z-prod/"
+      ]
+    },
+    "G16": {
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g16-window/20261006T140724Z-prod/",
+        "evidence/M0C/g16-window/display-reconfiguration-observed/ (observed, another session's actions)"
+      ],
+      "manualExternalRequired": "display disconnect (C-09)"
+    },
+    "G17": {
+      "result": "CANDIDATE",
+      "evidence": [
+        "evidence/M0C/gate-checklist.md",
+        "evidence/M0C/failure-ledger.md"
+      ]
+    }
+  },
+  "maintenanceOrdering": {
+    "result": "PASS",
+    "evidence": [
+      "evidence/M0C/maintenance/20261006T141952Z-prod/"
+    ]
+  },
+  "providerSemantics": {
+    "claude": "docs/decisions/D-0005-claude-2.1.291-observer-semantics.md; evidence/M0C/provider/claude/",
+    "codex": "docs/decisions/D-0004-codex-runtime-modes-and-daemon-probe.md; evidence/M0C/codex/"
+  },
+  "defectsFixed": [
+    "C-01 device pixel ratio (7e8043d)",
+    "C-02 login item's companion as the only enabled writer (d602c6b)",
+    "C-03 keyboard focus after fullscreen/zoom (8c82212)"
+  ],
+  "risks": [
+    "C-04 retired office window shells after recovery: +1 off-screen window and about 33 KB each; web content released (owner: M1 or the next Tauri pin)",
+    "C-07 worker layout order changes after a view re-subscribes (M1 office layout)"
+  ],
+  "ownerLimited": {
+    "C-08 Terminal restart": "BLOCKED",
+    "C-09 display disconnect": "MANUAL_EXTERNAL_REQUIRED",
+    "C-10 G12 sleep/wake": "needs one root-scheduled wake command"
+  },
+  "harness": "tests/native/README.md (threadspace-m0c runners, ts-native helper)",
+  "commits": [
+    "8ac3405 Add M0C qualification crate skeletons for the Codex probe and SQLite crash runner",
+    "3284077 Add M0C recovery paths: bounded views, maintenance gates, view recreation",
+    "8fe82b3 Add a generation-serialized renderer lifecycle for the office scene",
+    "9ec7143 Run the office scene through the renderer lifecycle with a 2D view",
+    "c2e230b Confirm renderer visibility natively and route renderer qualification commands",
+    "0463a83 Implement the M0C read-only Codex platform probe",
+    "96a0575 Record M0C Codex platform probe evidence",
+    "15f1a25 Add the reusable native qualification harness and record D-0004",
+    "75c89b2 Add idempotent admission, crash points, backup and restore to the journal",
+    "c8e9873 Implement the M0C SQLite crash and backup qualification runner",
+    "36f83b8 Record M0C SQLite crash, receipt and backup/restore evidence",
+    "7a81f4f Prepare maintenance with the journal's verified consistent backup",
+    "205841d Add G02-G04 and view-recovery runners and the remote-origin probe",
+    "9b8d604 Add the pinned Claude observer mod and its engine-test-kit suites",
+    "a8323f3 Exercise the 8 MiB queue bound and the 128-record batch bound",
+    "d8b4822 Record M0C Claude observer-mod qualification evidence",
+    "52604d0 Add the CLAUDE_NATIVE_OBSERVER capability profile for Claude Code 2.1.291",
+    "43fb997 Keep the M0C Claude qualification harness beside its evidence",
+    "04c689e Base stall detection on native window state; log retirements; harden runners",
+    "b7dd660 Add notification-free durable admission and own-notification cleanup for qualification",
+    "26ce728 Carry the capture time in qualification admissions; add a System Settings switch probe",
+    "9548043 Add graphics, window and sleep/wake runners; retire the IPC cancellation probe first",
+    "a6ef67a Await the recreated view's hydration after recovery, not the first attachment",
+    "8e5481c Make the GUI lock re-entrant; prove G09 discovery with a disposable session",
+    "00a316d Accept Claude folder trust explicitly; wait for WebKit's accessibility tree",
+    "7e8043d Follow device-pixel-ratio changes in the renderer; qualify them on the panel",
+    "a983837 Animate and measure the office canvas in G15; find System Settings row switches",
+    "5a6149a Re-check G15's on-camera workers each phase; Option-Tab and canvas proof in G16",
+    "d602c6b Keep the login item's companion as the only enabled writer",
+    "8c82212 Return keyboard focus to the office web view after fullscreen and zoom",
+    "1b46091 Separate unverified from wrong targets in the G08 readback race",
+    "89d8572 Capture the on-screen office window; measure retired window shells"
+  ],
+  "nextMilestoneStarted": false,
+  "captures": "Committed: a curated set (official G15 first/last per phase and every tenth sustained frame, first/last G02 launch per context, every image an ATTEMPT-NOTE names, all other official captures). The full 612 captures (327 MB) stay on disk under evidence/M0C/captures-full/ (git-ignored). Every capture's pixel statistics and diffs are in the committed timelines."
+}

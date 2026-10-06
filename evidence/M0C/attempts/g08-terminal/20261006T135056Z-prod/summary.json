@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "case": "baseline-exact",
+      "pass": true
+    },
+    {
+      "case": "reorder",
+      "pass": true
+    },
+    {
+      "case": "move",
+      "pass": true
+    },
+    {
+      "case": "minimize-then-return",
+      "pass": false
+    },
+    {
+      "case": "fullscreen-space-then-return",
+      "pass": true
+    },
+    {
+      "case": "foreground-process-mismatch",
+      "pass": false
+    },
+    {
+      "case": "selection-readback-race",
+      "pass": true
+    },
+    {
+      "case": "target-closed",
+      "pass": true
+    },
+    {
+      "case": "stale-tty-pathname",
+      "pass": true
+    },
+    {
+      "case": "target-closed-during-route",
+      "pass": true
+    },
+    {
+      "case": "terminal-restart",
+      "pass": false
+    }
+  ],
+  "disposableRoot": "/private/tmp/ts-m0c-route-19f6fe45",
+  "gate": "G08",
+  "pass": false,
+  "terminalIncarnationUnchanged": true,
+  "terminalRestart": "NOT_RUN (hosts this session)",
+  "wrongTargets": 0
+}

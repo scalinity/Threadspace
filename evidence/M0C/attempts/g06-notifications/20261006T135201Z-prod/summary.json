@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "case": "ui-open",
+      "pass": true
+    },
+    {
+      "case": "ui-quit-cold-start",
+      "pass": true
+    },
+    {
+      "case": "helper-restarted",
+      "pass": true
+    },
+    {
+      "case": "attention-already-resolved",
+      "pass": true
+    },
+    {
+      "case": "real-session-exact-return",
+      "pass": true
+    },
+    {
+      "case": "target-changed",
+      "pass": true
+    },
+    {
+      "case": "response-during-recovery",
+      "pass": true
+    },
+    {
+      "case": "maintenance-prepared",
+      "pass": true
+    },
+    {
+      "case": "observation-stopped-cold-start",
+      "pass": true
+    },
+    {
+      "case": "ui-open-after-recovery",
+      "pass": true
+    }
+  ],
+  "gate": "G06",
+  "grouped": "NOT_SUPPORTED in this phase: the companion submits one notification per attention item; grouping arrives with the attention policy (M5).",
+  "interactions": 10,
+  "pass": true,
+  "passed": 10
+}

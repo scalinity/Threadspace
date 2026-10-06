@@ -1,0 +1,337 @@
+{
+  "faults": [
+    {
+      "burstDone": {
+        "committed": 20,
+        "elapsedMs": 1908,
+        "event": "SYNTHETIC_RUN_DONE",
+        "failed": 0,
+        "lastCursor": 253903,
+        "level": "info",
+        "pid": 38050,
+        "runId": "d25502a8-0ddd-45f9-8654-1d1b28205739",
+        "ts": 1791296094995
+      },
+      "burstRequest": "SyntheticChangesStarted { run_id: \"d25502a8-0ddd-45f9-8654-1d1b28205739\", first_cursor: \"\" }",
+      "connectsAfter": 2,
+      "connectsBefore": 1,
+      "desktopLog": [],
+      "fault": "missing-frame-then-delivery",
+      "pass": true,
+      "projection": {
+        "attention": 25,
+        "companionCursor": "253903",
+        "companionDigest": "e4bdf22f7c558ba2382a22f9476ea68e3e0e9030aae4995232473dd3d260c7eb",
+        "complete": true,
+        "equal": true,
+        "label": "missing-frame-then-delivery",
+        "sessions": 52,
+        "viewCursor": "253903",
+        "viewDigest": "e4bdf22f7c558ba2382a22f9476ea68e3e0e9030aae4995232473dd3d260c7eb",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 25,
+          "totalSessions": 52
+        },
+        "viewStream": {
+          "connects": 2,
+          "framesApplied": 10070,
+          "hydratedAtMs": 65348,
+          "intentsApplied": 5,
+          "lastFrameAtMs": 82183,
+          "lastSeq": 31,
+          "patchesApplied": 10018,
+          "snapshotsApplied": 2
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "drop-frames",
+        "intentId": "1bff4408-a820-45ac-beac-095da9434f20",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "next",
+          "dropped": 0,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "burstDone": {
+        "committed": 20,
+        "elapsedMs": 1909,
+        "event": "SYNTHETIC_RUN_DONE",
+        "failed": 0,
+        "lastCursor": 253923,
+        "level": "info",
+        "pid": 38050,
+        "runId": "7dc60ff6-500e-43f1-88d3-4679a9aa3321",
+        "ts": 1791296112124
+      },
+      "burstRequest": "SyntheticChangesStarted { run_id: \"7dc60ff6-500e-43f1-88d3-4679a9aa3321\", first_cursor: \"\" }",
+      "connectsAfter": 3,
+      "connectsBefore": 2,
+      "desktopLog": [],
+      "fault": "missing-frames-no-further-delivery",
+      "pass": true,
+      "projection": {
+        "attention": 25,
+        "companionCursor": "253923",
+        "companionDigest": "c04deaa16febb0e3bc0d94c2a853920ac31f2046db0b2d34910436491b5e0b7a",
+        "complete": true,
+        "equal": true,
+        "label": "missing-frames-no-further-delivery",
+        "sessions": 52,
+        "viewCursor": "253923",
+        "viewDigest": "c04deaa16febb0e3bc0d94c2a853920ac31f2046db0b2d34910436491b5e0b7a",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 25,
+          "totalSessions": 52
+        },
+        "viewStream": {
+          "connects": 3,
+          "framesApplied": 10082,
+          "hydratedAtMs": 87446,
+          "intentsApplied": 8,
+          "lastFrameAtMs": 99309,
+          "lastSeq": 10,
+          "patchesApplied": 10018,
+          "snapshotsApplied": 3
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "drop-frames",
+        "intentId": "0ede02ed-1402-4627-8a72-0b0d16c2c33f",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "all",
+          "dropped": 1,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "burstDone": {
+        "committed": 60,
+        "elapsedMs": 1974,
+        "event": "SYNTHETIC_RUN_DONE",
+        "failed": 0,
+        "lastCursor": 253983,
+        "level": "info",
+        "pid": 38050,
+        "runId": "6a4739cb-127e-475b-9231-29d9707d949d",
+        "ts": 1791296129314
+      },
+      "burstRequest": "SyntheticChangesStarted { run_id: \"6a4739cb-127e-475b-9231-29d9707d949d\", first_cursor: \"\" }",
+      "connectsAfter": 4,
+      "connectsBefore": 3,
+      "desktopLog": [
+        {
+          "detail": {
+            "reason": "WindowExhausted",
+            "subscriptionId": "b6d9c2de-8dff-40e0-9b43-1121226f45b6"
+          },
+          "event": "SUBSCRIPTION_RETIRED",
+          "ms": 1791296128378,
+          "pid": 39095
+        }
+      ],
+      "fault": "missing-acks-stalled-window",
+      "pass": true,
+      "projection": {
+        "attention": 25,
+        "companionCursor": "253983",
+        "companionDigest": "d9349bae15fc00364286386a5de3815aa65dfcc115663aef91b67b8b3ed61f20",
+        "complete": true,
+        "equal": true,
+        "label": "missing-acks-stalled-window",
+        "sessions": 52,
+        "viewCursor": "253983",
+        "viewDigest": "d9349bae15fc00364286386a5de3815aa65dfcc115663aef91b67b8b3ed61f20",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 25,
+          "totalSessions": 52
+        },
+        "viewStream": {
+          "connects": 4,
+          "framesApplied": 10126,
+          "hydratedAtMs": 105533,
+          "intentsApplied": 11,
+          "lastFrameAtMs": 116449,
+          "lastSeq": 10,
+          "patchesApplied": 10049,
+          "snapshotsApplied": 4
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "ack-mode",
+        "intentId": "4641d256-0314-407f-98f1-db8cfe4c0cbe",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 0,
+          "dropFrames": "none",
+          "dropped": 23,
+          "stallNext": false,
+          "withholdAcks": true
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "burstDone": {
+        "committed": 20,
+        "elapsedMs": 1907,
+        "event": "SYNTHETIC_RUN_DONE",
+        "failed": 0,
+        "lastCursor": 254003,
+        "level": "info",
+        "pid": 38050,
+        "runId": "8f12ae21-af44-45f6-a4f7-4d8e36a7b4fa",
+        "ts": 1791296146386
+      },
+      "burstRequest": "SyntheticChangesStarted { run_id: \"8f12ae21-af44-45f6-a4f7-4d8e36a7b4fa\", first_cursor: \"\" }",
+      "connectsAfter": 4,
+      "connectsBefore": 4,
+      "desktopLog": [],
+      "fault": "delayed-acks",
+      "pass": true,
+      "projection": {
+        "attention": 25,
+        "companionCursor": "254003",
+        "companionDigest": "08a52d5382f402613e6edbfdf9248950524382c7ee49ba5defde300327fc74f7",
+        "complete": true,
+        "equal": true,
+        "label": "delayed-acks",
+        "sessions": 52,
+        "viewCursor": "254003",
+        "viewDigest": "08a52d5382f402613e6edbfdf9248950524382c7ee49ba5defde300327fc74f7",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 25,
+          "totalSessions": 52
+        },
+        "viewStream": {
+          "connects": 4,
+          "framesApplied": 10157,
+          "hydratedAtMs": 105533,
+          "intentsApplied": 14,
+          "lastFrameAtMs": 133587,
+          "lastSeq": 41,
+          "patchesApplied": 10069,
+          "snapshotsApplied": 4
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": false,
+      "setup": {
+        "command": "ack-mode",
+        "intentId": "52c6d2f8-1e67-4169-bc6a-62da93b5d3f0",
+        "ok": true,
+        "result": {
+          "ackDelayMs": 400,
+          "dropFrames": "none",
+          "dropped": 23,
+          "stallNext": false,
+          "withholdAcks": false
+        }
+      },
+      "viewRecoveries": 0
+    },
+    {
+      "burstDone": {
+        "committed": 20,
+        "elapsedMs": 1903,
+        "event": "SYNTHETIC_RUN_DONE",
+        "failed": 0,
+        "lastCursor": 254023,
+        "level": "info",
+        "pid": 38050,
+        "runId": "83f7a0bc-b953-4b95-af8b-58807ed294da",
+        "ts": 1791296163561
+      },
+      "burstRequest": "SyntheticChangesStarted { run_id: \"83f7a0bc-b953-4b95-af8b-58807ed294da\", first_cursor: \"\" }",
+      "connectsAfter": 5,
+      "connectsBefore": 4,
+      "desktopLog": [],
+      "fault": "renderer-reconnect",
+      "pass": true,
+      "projection": {
+        "attention": 25,
+        "companionCursor": "254023",
+        "companionDigest": "005b09d33eb645c1f57fd3de57a947b2c20c7957264280ba18eb1b63897e7824",
+        "complete": true,
+        "equal": true,
+        "label": "renderer-reconnect",
+        "sessions": 52,
+        "viewCursor": "254023",
+        "viewDigest": "005b09d33eb645c1f57fd3de57a947b2c20c7957264280ba18eb1b63897e7824",
+        "viewPaging": {
+          "complete": true,
+          "invalidations": 0,
+          "pagesLoaded": 0,
+          "staleRepliesIgnored": 0,
+          "totalAttention": 25,
+          "totalSessions": 52
+        },
+        "viewStream": {
+          "connects": 5,
+          "framesApplied": 10196,
+          "hydratedAtMs": 133763,
+          "intentsApplied": 21,
+          "lastFrameAtMs": 150769,
+          "lastSeq": 33,
+          "patchesApplied": 10089,
+          "snapshotsApplied": 5
+        }
+      },
+      "projectionEqual": true,
+      "reconnected": true,
+      "setup": {
+        "command": "reconnect",
+        "intentId": "e822a845-d3c1-46d7-a7ae-abd8bc5f1e19",
+        "ok": true,
+        "result": {
+          "reconnecting": true
+        }
+      },
+      "viewRecoveries": 0
+    }
+  ],
+  "gate": "G04",
+  "pass": true,
+  "workload": {
+    "committed": 10000,
+    "count": 10000,
+    "durationMs": 60000,
+    "elapsedMs": 59996,
+    "failed": 0,
+    "finalProjectionEqual": true,
+    "viewRecoveries": 0,
+    "viewRetiredBackpressure": 0
+  }
+}

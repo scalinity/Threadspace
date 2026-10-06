@@ -1,0 +1,78 @@
+{
+  "backupsPresent": [
+    "backup-176043-1791289581195.sqlite3"
+  ],
+  "bootstrap": {
+    "agentIdentifier": "ai.scalinity.threadspace.agent",
+    "appIdentifier": "ai.scalinity.threadspace",
+    "detail": {
+      "steps": [
+        {
+          "detail": {
+            "companionPid": 26209,
+            "startMicroseconds": 367723,
+            "startSeconds": "1791289574"
+          },
+          "elapsedMs": 0,
+          "ok": true,
+          "step": "connect"
+        },
+        {
+          "detail": null,
+          "elapsedMs": 0,
+          "ok": true,
+          "step": "record-observation-disabled"
+        },
+        {
+          "detail": {
+            "backupBytes": 52338688,
+            "backupCursor": "176043",
+            "backupFile": "backup-176043-1791289581195.sqlite3",
+            "phase": "PREPARED"
+          },
+          "elapsedMs": 576,
+          "ok": true,
+          "step": "prepare-maintenance"
+        },
+        {
+          "detail": {
+            "error": null,
+            "operation": "unregister",
+            "statusAfter": "NOT_REGISTERED",
+            "statusBefore": "ENABLED"
+          },
+          "elapsedMs": 837,
+          "ok": true,
+          "step": "unregister"
+        },
+        {
+          "detail": {
+            "waitedMs": 0
+          },
+          "elapsedMs": 837,
+          "ok": true,
+          "step": "verify-old-incarnation-exited"
+        },
+        {
+          "detail": "Ok(true)",
+          "elapsedMs": 837,
+          "ok": true,
+          "step": "verify-writer-lock-released"
+        }
+      ],
+      "unregistered": true
+    },
+    "elapsedMs": 880,
+    "exitStatus": 0,
+    "ok": true,
+    "operation": "stop",
+    "statusAfter": "NOT_REGISTERED"
+  },
+  "companionLogOrder": [
+    "OBSERVATION_PREFERENCE",
+    "MAINTENANCE_PREPARING",
+    "MAINTENANCE_PREPARED"
+  ],
+  "companionProcessesAfter": 0,
+  "serviceStatus": "NOT_REGISTERED"
+}

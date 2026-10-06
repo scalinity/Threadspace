@@ -1,0 +1,118 @@
+{
+  "area": "view-recovery",
+  "cases": [
+    {
+      "case": "document-replacement",
+      "pass": true
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "pass": true
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "pass": false
+    },
+    {
+      "case": "repeated-replacement-01",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-02",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-03",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-04",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-05",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-06",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-07",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-08",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-09",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-10",
+      "pass": true
+    },
+    {
+      "case": "bootstrap-with-companion-unavailable",
+      "pass": true
+    }
+  ],
+  "pass": false,
+  "passed": 13,
+  "recoveryDelays": [
+    {
+      "case": "document-replacement",
+      "delayMs": 0
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "delayMs": 0
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-01",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-02",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-03",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-04",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-05",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-06",
+      "delayMs": 15000
+    },
+    {
+      "case": "repeated-replacement-07",
+      "delayMs": 15000
+    },
+    {
+      "case": "repeated-replacement-08",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-09",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-10",
+      "delayMs": 10000
+    }
+  ],
+  "total": 14
+}

@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "check": "traffic-lights",
+      "pass": true
+    },
+    {
+      "check": "focus-main-frontmost",
+      "pass": true
+    },
+    {
+      "check": "content-drag-does-not-move",
+      "pass": true
+    },
+    {
+      "check": "titlebar-drag-moves",
+      "pass": true
+    },
+    {
+      "check": "minimize-button",
+      "pass": true
+    },
+    {
+      "check": "restore-focus",
+      "pass": true
+    },
+    {
+      "check": "zoom-toggles",
+      "pass": true
+    },
+    {
+      "check": "fullscreen-enter-exit",
+      "pass": true
+    },
+    {
+      "check": "keyboard-navigation",
+      "pass": false
+    },
+    {
+      "check": "accessibility-tree",
+      "pass": false
+    },
+    {
+      "check": "bounds-restored-across-relaunch",
+      "pass": true
+    },
+    {
+      "check": "offscreen-bounds-corrected",
+      "pass": true
+    },
+    {
+      "check": "reduce-motion",
+      "pass": false
+    },
+    {
+      "check": "dpr-change",
+      "pass": false
+    }
+  ],
+  "gate": "G16",
+  "notRun": [
+    "dpr-change (no non-2x or external display available)"
+  ],
+  "pass": false
+}

@@ -1,0 +1,167 @@
+{
+  "agreement": [
+    {
+      "axSessionsRow": 33,
+      "minute": 7,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 8,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 9,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 10,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 11,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 12,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 13,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 14,
+      "projectionEqual": true,
+      "sessions": 36
+    },
+    {
+      "axSessionsRow": 33,
+      "minute": 15,
+      "projectionEqual": true,
+      "sessions": 36
+    }
+  ],
+  "checks": {
+    "domJournalAgreementPerMinute": true,
+    "hideDuringInitDoesNotRevive": true,
+    "injectedVisibleLossOneBoundedRebuild": true,
+    "lossWhileHiddenRevivesNothing": true,
+    "minimizeDisposesAndStopsFrames": true,
+    "pixelsChangingWhileLive": {
+      "changed": 122,
+      "pairs": 123,
+      "pass": true,
+      "ratio": 0.991869918699187
+    },
+    "reloadWithResourceInFlight": true,
+    "repeatedHideShowFreshGenerations": true,
+    "repeatedLossFallsBackOperational": true,
+    "returnRebuildsFreshAttestedRenderer": true,
+    "twoDModeDisposesAndDomStaysOperational": true
+  },
+  "elapsedS": 905,
+  "finalLifecycle": {
+    "counts": {
+      "confirmationFailures": 0,
+      "discardedLateInits": 0,
+      "disposals": 0,
+      "disposeFailures": 0,
+      "ignoredLateCallbacks": 0,
+      "initFailures": 0,
+      "inits": 1,
+      "rebuilds": 0,
+      "recoveryRebuilds": 0,
+      "rendererErrors": 0,
+      "staleConfirmations": 0
+    },
+    "frames": {
+      "cancelled": 0,
+      "fired": 32158,
+      "pending": 1,
+      "requested": 32159,
+      "requestedSinceDisposal": null
+    },
+    "generation": 1,
+    "lossCounts": {
+      "injected": 0,
+      "natural": 0
+    },
+    "state": "live"
+  },
+  "gate": "G15",
+  "injectedLossLabel": "every device loss in this run was qualification-injected; none is a natural GPU loss",
+  "minutes": 15,
+  "motionFixture": {
+    "canvasCrop": [
+      "600",
+      "104",
+      "720",
+      "1198"
+    ],
+    "cleanup": {
+      "notificationsCleared": {
+        "removedDelivered": 6
+      },
+      "resolved": {
+        "failed": 0,
+        "matched": 6,
+        "reason": "g15 motion fixture",
+        "resolved": 6
+      }
+    },
+    "raised": [
+      {
+        "outcome": {
+          "attentionId": "45302dbd-298d-45ae-a4e5-0b7babc4063f"
+        },
+        "sessionId": "ad5159fd-2f96-4859-ad82-3f905766e159"
+      },
+      {
+        "outcome": {
+          "attentionId": "c5002387-f1d0-4738-8863-394498cc3542"
+        },
+        "sessionId": "06c224b3-3ab8-43f9-83f4-1635c2055102"
+      },
+      {
+        "outcome": {
+          "attentionId": "509bc112-ab7d-4599-b1af-42604bed18fc"
+        },
+        "sessionId": "f0c131a7-3dda-4be0-9e76-677ac048e9c0"
+      },
+      {
+        "outcome": {
+          "attentionId": "5f8bd77f-6351-46ab-9730-b1392749afa0"
+        },
+        "sessionId": "672d28d1-1f4d-40e5-b1df-5e07bb1599c2"
+      },
+      {
+        "outcome": {
+          "attentionId": "918507ad-92d5-49e5-9b0a-1221d6e2d74c"
+        },
+        "sessionId": "b11c2850-d19f-4334-a1d3-c3f535a811c6"
+      },
+      {
+        "outcome": {
+          "attentionId": "72c82d56-3823-4073-bb57-a26ae89e32ba"
+        },
+        "sessionId": "81c29425-10e3-4161-8029-460e9a63bcb7"
+      }
+    ]
+  },
+  "pass": true,
+  "reduceMotion": false
+}

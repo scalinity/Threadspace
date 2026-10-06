@@ -1,0 +1,182 @@
+{
+  "command": "ipc-suite",
+  "intentId": "8ee58497-2f9f-42cc-be34-8c10c182f48a",
+  "ok": true,
+  "result": {
+    "elapsedMs": 981,
+    "latencyMs": {
+      "max": 9,
+      "p50": 1,
+      "p95": 1
+    },
+    "passed": 27,
+    "results": [
+      {
+        "expectation": "UNKNOWN_SUBSCRIPTION and nothing committed",
+        "name": "cancellation: action after retirement",
+        "outcome": "UNKNOWN_SUBSCRIPTION (unknown or retired subscription)",
+        "pass": true
+      },
+      {
+        "expectation": "UNKNOWN_SUBSCRIPTION",
+        "name": "cancellation: page after retirement",
+        "outcome": "UNKNOWN_SUBSCRIPTION (unknown or retired subscription)",
+        "pass": true
+      },
+      {
+        "expectation": "item still unresolved",
+        "name": "cancellation: target unchanged",
+        "outcome": "unresolved",
+        "pass": true
+      },
+      {
+        "expectation": "ConnectionStatus",
+        "name": "typed success",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "Diagnostics",
+        "name": "typed success with context",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "SessionDetail NOT_IMPLEMENTED_FOR_MILESTONE",
+        "name": "typed error (query)",
+        "outcome": "NOT_IMPLEMENTED_FOR_MILESTONE (SessionDetail is not implemented in milestone M0A)",
+        "pass": true
+      },
+      {
+        "expectation": "SnoozeAttention NOT_IMPLEMENTED_FOR_MILESTONE",
+        "name": "typed error (action)",
+        "outcome": "NOT_IMPLEMENTED_FOR_MILESTONE (SnoozeAttention is not implemented in milestone M0A)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: extra field",
+        "outcome": "INVALID_REQUEST (unknown field `sql`, there are no fields)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: unknown action",
+        "outcome": "INVALID_REQUEST (unknown variant `RunShell`, expected one of `AcknowledgeAttention`, `RequestNotificationAuthorization`, `RequestTerminalAutomation`, `RecordQualificationReport`)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: non-UUID requestId",
+        "outcome": "INVALID_REQUEST (requestId must be a canonical lowercase UUID)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: wrong field type",
+        "outcome": "INVALID_REQUEST (invalid type: string \"5\", expected u32)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: page limit 0",
+        "outcome": "INVALID_REQUEST (limit must be 1-500)",
+        "pass": true
+      },
+      {
+        "expectation": "INVALID_REQUEST",
+        "name": "malformed: Mark handled without reason",
+        "outcome": "INVALID_REQUEST (a resolution reason is required)",
+        "pass": true
+      },
+      {
+        "expectation": "UNSUPPORTED_PROTOCOL",
+        "name": "unsupported protocol",
+        "outcome": "UNSUPPORTED_PROTOCOL (unsupported UI protocol version)",
+        "pass": true
+      },
+      {
+        "expectation": "STALE_CONTEXT: a used epoch never reconnects",
+        "name": "reused view epoch",
+        "outcome": "STALE_CONTEXT (view epoch was already used)",
+        "pass": true
+      },
+      {
+        "expectation": "STALE_CONTEXT",
+        "name": "stale context: view epoch",
+        "outcome": "STALE_CONTEXT (subscription belongs to another view)",
+        "pass": true
+      },
+      {
+        "expectation": "STALE_CONTEXT",
+        "name": "stale context: core generation",
+        "outcome": "STALE_CONTEXT (companion generation changed)",
+        "pass": true
+      },
+      {
+        "expectation": "UNKNOWN_SUBSCRIPTION",
+        "name": "stale context: unknown subscription",
+        "outcome": "UNKNOWN_SUBSCRIPTION (unknown or retired subscription)",
+        "pass": true
+      },
+      {
+        "expectation": "ACK_REJECTED",
+        "name": "future ACK",
+        "outcome": "ACK_REJECTED (FutureSequence { last_sent: 10 })",
+        "pass": true
+      },
+      {
+        "expectation": "ACK_REJECTED: sequence 1 was acknowledged long ago",
+        "name": "stale ACK",
+        "outcome": "ACK_REJECTED (NotMonotonic { acked_through: 10 })",
+        "pass": true
+      },
+      {
+        "expectation": "STALE_CONTEXT or UNKNOWN_SUBSCRIPTION",
+        "name": "old-epoch ACK",
+        "outcome": "STALE_CONTEXT (subscription belongs to another view)",
+        "pass": true
+      },
+      {
+        "expectation": "plugin:window|close refused by the capability",
+        "name": "disallowed core command",
+        "outcome": "IPC_REFUSED (Command plugin:window|close not allowed by ACL)",
+        "pass": true
+      },
+      {
+        "expectation": "ui_shell refused",
+        "name": "unknown command",
+        "outcome": "IPC_REFUSED (Command ui_shell not allowed by ACL)",
+        "pass": true
+      },
+      {
+        "expectation": "some of 12 concurrent pages refused TOO_MANY_IN_FLIGHT, the rest typed",
+        "name": "query concurrency bound",
+        "outcome": "OK,OK,OK,OK,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT,TOO_MANY_IN_FLIGHT",
+        "pass": true
+      },
+      {
+        "expectation": "AcknowledgeAttention COMMITTED (or ALREADY_COMMITTED on a rerun)",
+        "name": "owner command",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "same requestId returns ALREADY_COMMITTED",
+        "name": "idempotent retry",
+        "outcome": "OK",
+        "pass": true
+      },
+      {
+        "expectation": "CONFLICT: same requestId, different payload",
+        "name": "conflicting reused request ID",
+        "outcome": "CONFLICT (command e9574fb6-86fa-4d67-8a36-38ec9a0b2a3b was already used for a different payload)",
+        "pass": true
+      }
+    ],
+    "roundTripFailures": {},
+    "roundTripsOk": true,
+    "rounds": 1000,
+    "total": 27
+  }
+}

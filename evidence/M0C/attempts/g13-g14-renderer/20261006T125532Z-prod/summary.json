@@ -1,0 +1,21 @@
+{
+  "gates": [
+    "G13",
+    "G14"
+  ],
+  "pass": true,
+  "runs": [
+    {
+      "backend": "WEBGPU",
+      "pass": true,
+      "run": "webgpu",
+      "webgpuGate": "PASS"
+    },
+    {
+      "backend": "WEBGL2_COMPATIBILITY",
+      "pass": true,
+      "run": "forced-webgl2",
+      "webgpuGate": "FAIL"
+    }
+  ]
+}

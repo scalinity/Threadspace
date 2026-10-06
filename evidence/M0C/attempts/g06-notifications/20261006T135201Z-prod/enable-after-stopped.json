@@ -1,0 +1,48 @@
+{
+  "agentIdentifier": "ai.scalinity.threadspace.agent",
+  "appIdentifier": "ai.scalinity.threadspace",
+  "detail": {
+    "steps": [
+      {
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 60,
+        "ok": true,
+        "step": "register"
+      },
+      {
+        "detail": {
+          "companionPid": 16719,
+          "waitedMs": 0
+        },
+        "elapsedMs": 60,
+        "ok": true,
+        "step": "connect"
+      },
+      {
+        "detail": {
+          "error": null,
+          "phase": "PREPARED"
+        },
+        "elapsedMs": 62,
+        "ok": true,
+        "step": "leave-maintenance"
+      },
+      {
+        "detail": null,
+        "elapsedMs": 63,
+        "ok": true,
+        "step": "record-observation-enabled"
+      }
+    ]
+  },
+  "elapsedMs": 86,
+  "exitStatus": 0,
+  "ok": true,
+  "operation": "enable",
+  "statusAfter": "ENABLED"
+}

@@ -1,0 +1,25 @@
+npm notice run npx
+npm notice run 'tauri' dev --config src-tauri/tauri.dev.conf.json --features qualification
+        Info `tauri-build` dependency has workspace inheritance enabled. The features array won't be automatically rewritten. Expected features: []
+        Info `tauri` dependency has workspace inheritance enabled. The features array won't be automatically rewritten. Expected features: []
+     Running BeforeDevCommand (`npm run dev`)
+npm notice run @threadspace/desktop@0.1.0 dev
+npm notice run vite
+
+  VITE v8.3.3  ready in 60 ms
+
+  ➜  Local:   http://localhost:1420/
+     Running DevCommand (`cargo  run --features qualification --color always --`)
+        Info Watching ~/Documents/Tools/Threadspace/apps/desktop/src-tauri for changes...
+        Info Watching ~/Documents/Tools/Threadspace/crates/contracts for changes...
+        Info Watching ~/Documents/Tools/Threadspace/crates/relay for changes...
+        Info Watching ~/Documents/Tools/Threadspace/crates/surfaces-macos for changes...
+[1m[92m    Finished[0m `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+[1m[92m     Running[0m `~/Documents/Tools/Threadspace/target/aarch64-apple-darwin/debug/threadspace-desktop`
+npm error Lifecycle script `dev` failed with error:
+npm error code 143
+npm error path ~/Documents/Tools/Threadspace/apps/desktop
+npm error workspace @threadspace/desktop@0.1.0
+npm error location ~/Documents/Tools/Threadspace/apps/desktop
+npm error command failed
+npm error command sh -c vite
