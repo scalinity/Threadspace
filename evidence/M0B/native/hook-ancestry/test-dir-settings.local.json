@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/threadspace-hook-probe --out ~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/hook-ancestry.jsonl --versions-dir ~/.local/share/claude/versions" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/threadspace-hook-probe --out ~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/hook-ancestry.jsonl --versions-dir ~/.local/share/claude/versions" } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/threadspace-hook-probe --out ~/Documents/Tools/ts-m0b-samecwd/.threadspace-m0b/hook-ancestry.jsonl --versions-dir ~/.local/share/claude/versions" } ] }
+    ]
+  }
+}
