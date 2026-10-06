@@ -11,11 +11,19 @@
 //!   threadspace-m0c g03-ipc <prod|dev> [rounds]
 //!   threadspace-m0c g04-stream <prod|dev> [count] [duration-ms]
 //!   threadspace-m0c view-recovery <prod|dev> [repeats]
+//!   threadspace-m0c g09-companion <prod|dev> [crashes]
+//!   threadspace-m0c g10-live <prod|dev> [rounds]
+//!   threadspace-m0c g11-restarts <prod|dev> [cycles]
+//!   threadspace-m0c maintenance <prod|dev>
+//!   threadspace-m0c g08-terminal <prod|dev>
+//!   threadspace-m0c view-command <prod|dev> <command> [json-args]
 
 mod bridge_gates;
 mod ctx;
 mod install;
 mod launches;
+mod service_gates;
+mod terminal_gates;
 
 use std::process::ExitCode;
 
@@ -45,6 +53,33 @@ fn main() -> ExitCode {
             bridge_gates::stream(&ctx, number(&args, 2, 10_000), number(&args, 3, 60_000))
         }
         "view-recovery" => bridge_gates::recovery(&ctx, number(&args, 2, 10)),
+        "g09-companion" => service_gates::companion_independence(&ctx, number(&args, 2, 3)),
+        "g10-live" => service_gates::sqlite_live(&ctx, number(&args, 2, 5)),
+        "g11-restarts" => service_gates::restarts(&ctx, number(&args, 2, 10)),
+        "maintenance" => service_gates::maintenance(&ctx),
+        "g08-terminal" => terminal_gates::negatives(&ctx),
+        "synthetic" => ctx
+            .companion()
+            .request(
+                threadspace_contracts::control::ControlRequestBody::QualifySyntheticChanges {
+                    count: number(&args, 2, 60),
+                    duration_ms: number(&args, 3, 2000),
+                    sessions: 4,
+                },
+                std::time::Duration::from_secs(10),
+            )
+            .map(|reply| json!(format!("{reply:?}"))),
+        "view-command" => match args.get(2) {
+            Some(command) => {
+                let input = args
+                    .get(3)
+                    .and_then(|text| serde_json::from_str(text).ok())
+                    .unwrap_or(json!({}));
+                ctx.app()
+                    .view_command(command, input, std::time::Duration::from_secs(900))
+            }
+            None => Err("view-command needs a command".into()),
+        },
         "install" => match args.get(2) {
             Some(built) => install::install(&ctx, std::path::Path::new(built), &rollback_root()),
             None => Err("install needs the built bundle path".into()),

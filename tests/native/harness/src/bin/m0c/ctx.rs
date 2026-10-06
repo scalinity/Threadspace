@@ -33,6 +33,12 @@ impl Ctx {
         self.repo.join("evidence/M0C")
     }
 
+    /// Holds the machine-wide GUI automation lock for one short segment.
+    pub fn gui(&self, label: &str) -> Result<threadspace_harness::idle::GuiLock, String> {
+        threadspace_harness::idle::GuiLock::acquire(&format!("threadspace-m0c: {label}"))
+            .map_err(|e| e.to_string())
+    }
+
     pub fn channel_name(&self) -> &'static str {
         match self.id.channel {
             threadspace_harness::identity::Channel::Prod => "prod",

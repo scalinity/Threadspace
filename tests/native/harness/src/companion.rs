@@ -109,16 +109,29 @@ impl<'a> Companion<'a> {
 pub struct LogCursor {
     path: PathBuf,
     offset: u64,
+    /// Lines read from the file but not yet handed out by `wait_for`.
+    pending: std::collections::VecDeque<Value>,
 }
 
 impl LogCursor {
     pub fn at_end(path: PathBuf) -> Self {
         let offset = std::fs::metadata(&path).map(|meta| meta.len()).unwrap_or(0);
-        Self { path, offset }
+        Self {
+            path,
+            offset,
+            pending: std::collections::VecDeque::new(),
+        }
     }
 
-    /// New complete lines since the last read (a rotated file restarts at 0).
+    /// New complete lines since the last read (a rotated file restarts at 0),
+    /// including any a previous `wait_for` read but did not hand out.
     pub fn read_new(&mut self) -> Vec<Value> {
+        let mut lines: Vec<Value> = self.pending.drain(..).collect();
+        lines.extend(self.read_file());
+        lines
+    }
+
+    fn read_file(&mut self) -> Vec<Value> {
         let Ok(mut file) = File::open(&self.path) else {
             return Vec::new();
         };
@@ -156,10 +169,13 @@ impl LogCursor {
     ) -> Option<Value> {
         let started = Instant::now();
         loop {
-            for line in self.read_new() {
+            let mut batch: std::collections::VecDeque<Value> = self.read_new().into();
+            while let Some(line) = batch.pop_front() {
                 let hit = line["event"] == event && matches(&line);
                 seen.push(line.clone());
                 if hit {
+                    // Keep the rest of this batch for the next wait.
+                    self.pending.extend(batch);
                     return Some(line);
                 }
             }

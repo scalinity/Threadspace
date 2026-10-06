@@ -79,6 +79,10 @@ pub fn main_entry() -> i32 {
                     window::recover(&hook_app, &bridge, &hook_launch, incarnation, reason);
                 }
             }));
+            let log_app = app.handle().clone();
+            setup_bridge.set_event_log(Box::new(move |event, detail| {
+                prefs::log(&log_app, event, detail)
+            }));
             let activate_app = app.handle().clone();
             let activate_bridge = Arc::clone(&setup_bridge);
             let activate_launch = setup_launch.clone();

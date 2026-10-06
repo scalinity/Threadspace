@@ -36,13 +36,14 @@ impl<'a> App<'a> {
         procs::with_executable(&self.id.executable)
     }
 
-    /// `open -a <bundle> [--args ...]`, then waits for a new UI incarnation.
+    /// `open -g -a <bundle> [--args ...]` (launched without activation, so the
+    /// owner's keyboard focus stays put), then waits for a new UI incarnation.
     pub fn launch_packaged(&self, args: &[&str]) -> Result<Launched, String> {
         let before = self.processes();
         let started_ms = crate::now_ms();
         let started = Instant::now();
         let bundle = self.id.bundle.display().to_string();
-        let mut argv = vec!["-a", bundle.as_str()];
+        let mut argv = vec!["-g", "-a", bundle.as_str()];
         if !args.is_empty() {
             argv.push("--args");
             argv.extend_from_slice(args);
@@ -164,6 +165,16 @@ impl<'a> App<'a> {
         )
         .map(|(_, report)| report["report"].clone())
         .ok_or_else(|| format!("no report for {command} within {timeout:?}"))
+    }
+
+    /// Sends a qualification command whose effect replaces or recreates the
+    /// view (so that view may never report); evidence comes from native logs.
+    pub fn view_command_nowait(&self, command: &str, args: Value) -> Result<Value, String> {
+        let (intent_id, views) = Companion::new(self.id).view_command(command, args)?;
+        if views == 0 {
+            return Err("no hydrated view to receive the command".into());
+        }
+        Ok(json!({ "intentId": intent_id, "hydratedViews": views, "waitedForReport": false }))
     }
 
     pub fn desktop_log(&self) -> LogCursor {

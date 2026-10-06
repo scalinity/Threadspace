@@ -44,10 +44,8 @@ impl Identity {
         };
         let home = home_dir()?;
         let bundle = home.join("Applications").join(bundle_name);
-        let main = match channel {
-            Channel::Prod => "Threadspace",
-            Channel::Dev => "Threadspace Dev",
-        };
+        // Both channels share `mainBinaryName`; only the bundle name differs.
+        let main = "Threadspace";
         let agent_identifier = agent_identifier_for(app_identifier);
         Some(Self {
             channel,

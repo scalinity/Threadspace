@@ -19,10 +19,22 @@ use crate::ctx::Ctx;
 
 /// Makes sure exactly one hydrated UI is running; returns its incarnation.
 pub fn ensure_ui(ctx: &Ctx) -> Result<procs::Incarnation, String> {
+    // Iterating under `tauri dev`: drive the attached development UI instead
+    // of launching the packaged bundle (both share the dev identifier).
+    if std::env::var_os("THREADSPACE_HARNESS_ATTACHED_DEV_UI").is_some() {
+        return procs::with_executable(
+            &ctx.repo
+                .join("target/aarch64-apple-darwin/debug/threadspace-desktop"),
+        )
+        .into_iter()
+        .next()
+        .ok_or_else(|| "no attached tauri dev UI".to_owned());
+    }
     let app = ctx.app();
     if let Some(ui) = app.processes().into_iter().next() {
         return Ok(ui);
     }
+    let _gui = ctx.gui("launch office")?;
     let mut cursor = ctx.companion().log();
     let launched = app.launch_packaged(&[])?;
     app.wait_hydrated(&mut cursor, Duration::from_secs(30))
@@ -193,6 +205,7 @@ pub fn ipc(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
         && result["rounds"].as_u64() >= Some(1000);
 
     // Unlisted WebView and remote origin: relaunch with the probe flags.
+    let _gui = ctx.gui("g03 probe launch")?;
     let app = ctx.app();
     app.stop_all();
     let since = threadspace_harness::now_ms();
@@ -374,30 +387,32 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
     let mut results = Vec::new();
     let mut fault = |name: &str,
                      setup: &dyn Fn() -> Result<Value, String>,
-                     expect_recovery: bool|
+                     expect_recovery: bool,
+                     changes: u32|
      -> Result<(), String> {
         let mut desktop = app.desktop_log();
         let mut companion = ctx.companion().log();
         let before = app.view_command("projection-digest", json!({}), Duration::from_secs(20))?;
         let connects_before = before["result"]["stream"]["connects"].as_u64().unwrap_or(0);
         let setup_result = setup()?;
-        // Drive a few committed changes so a broken stream has something to miss.
-        let _ = ctx.companion().request(
+        // Drive committed changes so a broken stream has something to miss.
+        let burst = ctx.companion().request(
             ControlRequestBody::QualifySyntheticChanges {
-                count: 20,
+                count: changes,
                 duration_ms: 2000,
                 sessions: 4,
             },
             Duration::from_secs(10),
         );
         let mut seen = Vec::new();
-        let _ = wait_event(
+        let burst_done = wait_event(
             &mut companion,
             "SYNTHETIC_RUN_DONE",
             Duration::from_secs(30),
             &mut seen,
         );
-        // Allow the independent watchdog (5 s stall + status check) to act.
+        // Allow the independent watchdog (5 s stall + status check) to act,
+        // then a settled steady state before the next fault.
         threadspace_harness::pause_ms(15_000);
         let projection = compare_projection(ctx, name);
         let connects_after = projection["viewStream"]["connects"].as_u64().unwrap_or(0);
@@ -409,13 +424,18 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
         let reconnected = connects_after > connects_before || recovered_view > 0;
         let record = json!({
             "fault": name,
+            "burstRequest": burst.as_ref().map(|reply| format!("{reply:?}")).unwrap_or_else(|e| format!("error: {e}")),
+            "burstDone": burst_done,
             "setup": setup_result,
             "connectsBefore": connects_before,
             "connectsAfter": connects_after,
             "viewRecoveries": recovered_view,
             "reconnected": reconnected,
             "projectionEqual": projection["equal"],
-            "pass": projection["equal"] == true && (!expect_recovery || reconnected),
+            "pass": burst.is_ok()
+                && burst_done.is_some()
+                && projection["equal"] == true
+                && (!expect_recovery || reconnected),
             "projection": projection,
             "desktopLog": desktop_lines,
         });
@@ -434,6 +454,7 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
             )
         },
         true,
+        20,
     )?;
     fault(
         "missing-frames-no-further-delivery",
@@ -445,6 +466,7 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
             )
         },
         true,
+        20,
     )?;
     fault(
         "missing-acks-stalled-window",
@@ -456,6 +478,7 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
             )
         },
         true,
+        60,
     )?;
     fault(
         "delayed-acks",
@@ -467,6 +490,7 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
             )
         },
         false,
+        20,
     )?;
     let _ = app.view_command("ack-mode", json!({}), Duration::from_secs(20));
     fault(
@@ -479,6 +503,7 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
             )
         },
         true,
+        20,
     )?;
     Ok(results)
 }
@@ -496,6 +521,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
                     trigger: &dyn Fn() -> Result<Value, String>,
                     expected: &str|
      -> Result<(), String> {
+        let _gui = ctx.gui(&format!("view recovery: {name}"))?;
         let mut desktop = app.desktop_log();
         let mut companion = ctx.companion().log();
         let triggered = trigger()?;
@@ -542,12 +568,12 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     };
     case(
         "document-replacement",
-        &|| app.view_command("reload", json!({}), Duration::from_secs(20)),
+        &|| app.view_command_nowait("reload", json!({})),
         "MAIN_DOCUMENT_REPLACED",
     )?;
     case(
         "replacement-with-request-in-flight",
-        &|| app.view_command("request-then-reload", json!({}), Duration::from_secs(20)),
+        &|| app.view_command_nowait("request-then-reload", json!({})),
         "MAIN_DOCUMENT_REPLACED",
     )?;
     case(
@@ -558,10 +584,9 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
                 json!({ "stallNext": true }),
                 Duration::from_secs(20),
             )?;
-            app.view_command(
+            app.view_command_nowait(
                 "reconnect",
                 json!({ "reason": "qualification: stall next stream" }),
-                Duration::from_secs(20),
             )
         },
         "UNCONSUMED_DATA_ON_RETIREMENT",
@@ -569,7 +594,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     for index in 1..=repeats {
         case(
             &format!("repeated-replacement-{index:02}"),
-            &|| app.view_command("reload", json!({}), Duration::from_secs(20)),
+            &|| app.view_command_nowait("reload", json!({})),
             "MAIN_DOCUMENT_REPLACED",
         )?;
     }
@@ -583,6 +608,15 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         .collect();
 
     // Companion unavailable during UI bootstrap: freeze it, start a UI, thaw it.
+    // (Packaged only: an attached dev UI shares the dev identifier's UI lock.)
+    let _gui = ctx.gui("view recovery: bootstrap with companion frozen")?;
+    if std::env::var_os("THREADSPACE_HARNESS_ATTACHED_DEV_UI").is_some() {
+        let passed = cases.iter().filter(|c| c["pass"] == true).count();
+        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "recoveryDelays": delays });
+        run.write_json("summary.json", &summary)
+            .map_err(|e| e.to_string())?;
+        return Ok(json!({ "summary": summary, "dir": run.dir }));
+    }
     app.stop_all();
     let companion = ctx.companion().incarnation().ok_or("no companion")?;
     let mut cursor = ctx.companion().log();

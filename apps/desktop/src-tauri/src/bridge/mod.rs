@@ -34,6 +34,8 @@ const LARGE_REPLY_WINDOW: Duration = Duration::from_secs(30);
 
 /// Asks the shell to retire and recreate the office view (SPEC §18.5).
 pub type RecoveryHook = Box<dyn Fn(Uuid, &'static str) + Send + Sync>;
+/// Writes one native event to the shell log.
+pub type EventLog = Box<dyn Fn(&str, serde_json::Value) + Send + Sync>;
 /// Bounded memory of epochs already used; a used epoch never reconnects.
 const REMEMBERED_EPOCHS: usize = 1024;
 
@@ -57,6 +59,7 @@ pub struct Bridge {
     queries_in_flight: AtomicUsize,
     large_replies: Mutex<HashMap<Uuid, Instant>>,
     recovery: Mutex<Option<RecoveryHook>>,
+    event_log: Mutex<Option<EventLog>>,
 }
 
 pub fn link_error(error: LinkError) -> UiError {
@@ -116,6 +119,21 @@ impl Bridge {
             queries_in_flight: AtomicUsize::new(0),
             large_replies: Mutex::new(HashMap::new()),
             recovery: Mutex::new(None),
+            event_log: Mutex::new(None),
+        }
+    }
+
+    pub fn set_event_log(&self, log: EventLog) {
+        if let Ok(mut slot) = self.event_log.lock() {
+            *slot = Some(log);
+        }
+    }
+
+    fn log(&self, event: &str, detail: serde_json::Value) {
+        if let Ok(slot) = self.event_log.lock()
+            && let Some(log) = slot.as_ref()
+        {
+            log(event, detail);
         }
     }
 
@@ -523,7 +541,10 @@ impl Bridge {
             ControlMessage::Response { .. } => return,
         };
         if let Some(Err(error)) = outcome {
-            eprintln!("threadspace: retiring subscription after stream error {error:?}");
+            self.log(
+                "SUBSCRIPTION_RETIRED",
+                serde_json::json!({ "subscriptionId": subscription_id, "reason": format!("{error:?}") }),
+            );
             self.retire(&subscription_id);
         }
     }
@@ -558,12 +579,16 @@ impl Bridge {
             .map(|map| map.values().cloned().collect())
             .unwrap_or_default();
         for subscription in subscriptions {
-            let failed = subscription
+            let failure = subscription
                 .stream
                 .lock()
-                .map(|mut stream| stream.heartbeat().is_err())
-                .unwrap_or(true);
-            if failed {
+                .map(|mut stream| stream.heartbeat().err())
+                .unwrap_or(Some(StreamError::Retired));
+            if let Some(error) = failure {
+                self.log(
+                    "SUBSCRIPTION_RETIRED",
+                    serde_json::json!({ "subscriptionId": subscription.id, "reason": format!("heartbeat: {error:?}") }),
+                );
                 self.retire(&subscription.id);
             }
         }

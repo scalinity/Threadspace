@@ -70,6 +70,7 @@ pub fn packaged(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let mut launches = Vec::new();
     let mut hydrate_ms = Vec::new();
     for index in 1..=count {
+        let _gui = ctx.gui(&format!("g02 packaged launch {index}"))?;
         let mut cursor = ctx.companion().log();
         let since = threadspace_harness::now_ms();
         let started = Instant::now();
@@ -165,6 +166,7 @@ pub fn dev(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let companion_before = ctx.companion().incarnation();
     let mut launches = Vec::new();
     for index in 1..=count {
+        let _gui = ctx.gui(&format!("g02 dev launch {index}"))?;
         let mut cursor = ctx.companion().log();
         let since = threadspace_harness::now_ms();
         let log = run_dir.path(&format!("tauri-dev-{index:02}.log"));

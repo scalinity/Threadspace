@@ -184,6 +184,7 @@ export class BridgeClient {
   private ackPending: FrameHeader | null = null;
   private readonly pendingReports: Array<{ kind: string; report: unknown }> = [];
   private lastWatchdogMs = Date.now();
+  private stallCheckInFlight = false;
   /**
    * Qualification-only stream faults (inert unless `launch.qualificationBuild`):
    * drop frames as though lost in transit, withhold or delay ACKs.
@@ -328,7 +329,13 @@ export class BridgeClient {
     void this.connect(reason);
   }
 
+  /** Watchdog ticks observed (qualification diagnostics: timer throttling). */
+  watchdogTicks = 0;
+  /** Last stall decisions (qualification diagnostics). */
+  readonly stallDecisions: Array<{ atMs: number; silentMs: number; decision: string; window: unknown }> = [];
+
   private watchdog(): void {
+    this.watchdogTicks += 1;
     const wall = Date.now();
     const suspended = wall - this.lastWatchdogMs > SUSPENSION_GAP_MS;
     this.lastWatchdogMs = wall;
@@ -344,16 +351,35 @@ export class BridgeClient {
       this.reconnect("hydration deadline exceeded");
       return;
     }
-    // The bridge heartbeat runs only while the office is visible.
-    if (document.visibilityState !== "visible") return;
-    if (active.hydrated && now - this.state.stream.lastFrameAtMs > STALL_MS) {
-      // Independent status check: a stalled Channel cannot deliver its own reset.
-      void ipc
-        .query({ query: { kind: "ConnectionStatus" }, context: null })
-        .then((result) => (result.kind === "ConnectionStatus" ? result.companion.state : "unknown"))
-        .catch(() => "query failed")
-        .then((status) => {
-          if (this.active === active) this.reconnect(`no stream progress for 5 s (companion ${status})`);
+    if (active.hydrated && now - this.state.stream.lastFrameAtMs > STALL_MS && !this.stallCheckInFlight) {
+      // Independent status check: a stalled Channel cannot deliver its own
+      // reset. Heartbeats flow only while the native window is visible and
+      // not minimized, so silence is a stall only in that state — read from
+      // AppKit, the same source the heartbeat uses, not from page visibility
+      // (WebKit reports an occluded window's page as hidden).
+      this.stallCheckInFlight = true;
+      void Promise.all([
+        ipc
+          .query({ query: { kind: "ConnectionStatus" }, context: null })
+          .then((result) => (result.kind === "ConnectionStatus" ? result.companion.state : "unknown"))
+          .catch(() => "query failed"),
+        ipc
+          .query({ query: { kind: "WindowState" }, context: null })
+          .then((result) => (result.kind === "WindowState" ? result : null))
+          .catch(() => null),
+      ])
+        .then(([status, window]) => {
+          const record = (decision: string) => {
+            this.stallDecisions.push({ atMs: Date.now(), silentMs: Math.round(performance.now() - this.state.stream.lastFrameAtMs), decision, window });
+            if (this.stallDecisions.length > 12) this.stallDecisions.shift();
+          };
+          if (this.active !== active) return record("superseded");
+          if (window && (!window.visible || window.minimized)) return record("window hidden: no heartbeats expected");
+          record("reconnect");
+          this.reconnect(`no stream progress for 5 s (companion ${status})`);
+        })
+        .finally(() => {
+          this.stallCheckInFlight = false;
         });
     }
   }
