@@ -52,6 +52,11 @@ pub enum BridgeRequest {
     },
     /// Open (or activate) the containing Threadspace application.
     OpenContainingApp,
+    /// Remove this app's delivered and pending notifications (qualification).
+    #[cfg(feature = "qualification")]
+    ClearNotifications {
+        correlation_id: u64,
+    },
 }
 
 /// Events from the Apple layer.
@@ -89,6 +94,10 @@ pub enum BridgeEvent {
         bundle_identifier: Option<String>,
         pid: i32,
     },
+    NotificationsCleared {
+        correlation_id: u64,
+        removed: u32,
+    },
     /// `NSWorkspace` will-sleep / did-wake (`WILL_SLEEP`, `DID_WAKE`).
     Power {
         phase: String,
@@ -112,7 +121,8 @@ impl BridgeEvent {
             | Self::AutomationPermission { correlation_id, .. }
             | Self::RunningApplication { correlation_id, .. }
             | Self::AccessibilityPreferences { correlation_id, .. }
-            | Self::FrontmostApplication { correlation_id, .. } => Some(*correlation_id),
+            | Self::FrontmostApplication { correlation_id, .. }
+            | Self::NotificationsCleared { correlation_id, .. } => Some(*correlation_id),
             Self::NotificationResponse { .. } | Self::Power { .. } => None,
         }
     }

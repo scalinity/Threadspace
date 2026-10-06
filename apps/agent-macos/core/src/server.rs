@@ -479,6 +479,8 @@ fn dispatch(
         ),
         #[cfg(feature = "qualification")]
         ControlRequestBody::QualifyRaiseAttention { .. }
+        | ControlRequestBody::QualifyAdmit { .. }
+        | ControlRequestBody::QualifyClearNotifications
         | ControlRequestBody::QualifySyntheticChanges { .. }
         | ControlRequestBody::QualifyPopulate { .. }
         | ControlRequestBody::QualifyViewCommand { .. }
@@ -512,6 +514,40 @@ fn dispatch(
                 ),
                 Err(error) => refuse(outbound, request_id, ControlErrorCode::Internal, &error),
             }
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyAdmit { observation_id } => to_writer(
+            context,
+            outbound,
+            request_id,
+            WriterCommand::Admit {
+                request_id,
+                observation_id,
+                outbound: outbound_clone,
+            },
+        ),
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyClearNotifications => {
+            let outcome = crate::bridge::call(
+                |correlation_id| crate::bridge::BridgeRequest::ClearNotifications {
+                    correlation_id,
+                },
+                Duration::from_secs(10),
+            );
+            let reply = match outcome {
+                Ok(crate::bridge::BridgeEvent::NotificationsCleared { removed, .. }) => {
+                    log::info(
+                        "QUALIFICATION_NOTIFICATIONS_CLEARED",
+                        json!({ "removed": removed }),
+                    );
+                    Ok(ControlResponseBody::NotificationsCleared { removed })
+                }
+                other => Err(ControlError::new(
+                    ControlErrorCode::Unavailable,
+                    format!("{other:?}"),
+                )),
+            };
+            respond(outbound, request_id, reply);
         }
         #[cfg(feature = "qualification")]
         ControlRequestBody::QualifyPopulate {

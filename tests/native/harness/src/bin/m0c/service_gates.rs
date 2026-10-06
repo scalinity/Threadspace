@@ -248,21 +248,20 @@ pub fn sqlite_live(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
                 let mut index = 0;
                 while !stop.load(std::sync::atomic::Ordering::Acquire) {
                     index += 1;
-                    if let Ok(ControlResponseBody::AttentionRaised {
-                        attention_id,
-                        cursor,
-                        ..
-                    }) = companion.request(
-                        ControlRequestBody::QualifyRaiseAttention {
-                            label: format!("g10-live-{round}-{index}"),
-                            session_id: None,
+                    // A durable fixture record per request: no attention item
+                    // and no notification. A reply arrives only after COMMIT.
+                    let observation_id = uuid::Uuid::new_v4().to_string();
+                    if let Ok(ControlResponseBody::Admitted { cursor, .. }) = companion.request(
+                        ControlRequestBody::QualifyAdmit {
+                            observation_id: observation_id.clone(),
                         },
                         Duration::from_secs(2),
                     ) && let Ok(mut list) = acknowledged.lock()
                     {
-                        list.push((attention_id, cursor));
+                        list.push((observation_id, cursor));
                     }
                 }
+                let _ = index;
             })
         };
         threadspace_harness::pause_ms(1500 + u64::from(round) * 137);
@@ -273,15 +272,18 @@ pub fn sqlite_live(ctx: &Ctx, rounds: u32) -> Result<Value, String> {
             .lock()
             .map(|list| list.clone())
             .unwrap_or_default();
-        let (_, snapshot) = companion_snapshot(ctx)?;
-        let present: BTreeSet<String> = snapshot
-            .attention
-            .iter()
-            .map(|a| a.attention_id.clone())
-            .collect();
+        // Presence by re-admission: every acknowledged UUID must answer
+        // ALREADY_COMMITTED at the cursor its first receipt named.
+        let mut client = ctx.companion().client(Duration::from_secs(10))?;
         let lost: Vec<&(String, String)> = acked
             .iter()
-            .filter(|(id, _)| !present.contains(id))
+            .filter(|(id, cursor)| {
+                !matches!(
+                    client.request(ControlRequestBody::QualifyAdmit { observation_id: id.clone() }),
+                    Ok(ControlResponseBody::Admitted { status: threadspace_contracts::ui::ReceiptStatus::AlreadyCommitted, cursor: again, .. })
+                        if &again == cursor
+                )
+            })
             .collect();
         let record = json!({
             "round": round,

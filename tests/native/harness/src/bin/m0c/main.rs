@@ -16,12 +16,18 @@
 //!   threadspace-m0c g11-restarts <prod|dev> [cycles]
 //!   threadspace-m0c maintenance <prod|dev>
 //!   threadspace-m0c g08-terminal <prod|dev>
+//!   threadspace-m0c g06-notifications prod
+//!   threadspace-m0c g05-denied dev
+//!   threadspace-m0c clear-notifications <prod|dev>
+//!   threadspace-m0c resolve-qualification <prod|dev> [reason]
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
 
 mod bridge_gates;
+mod cleanup;
 mod ctx;
 mod install;
 mod launches;
+mod notifications;
 mod service_gates;
 mod terminal_gates;
 
@@ -58,6 +64,15 @@ fn main() -> ExitCode {
         "g11-restarts" => service_gates::restarts(&ctx, number(&args, 2, 10)),
         "maintenance" => service_gates::maintenance(&ctx),
         "g08-terminal" => terminal_gates::negatives(&ctx),
+        "g06-notifications" => notifications::lifecycle(&ctx),
+        "g05-denied" => notifications::denied(&ctx),
+        "clear-notifications" => cleanup::clear_notifications(&ctx),
+        "resolve-qualification" => cleanup::resolve_qualification(
+            &ctx,
+            args.get(2)
+                .map(String::as_str)
+                .unwrap_or("qualification cleanup"),
+        ),
         "synthetic" => ctx
             .companion()
             .request(

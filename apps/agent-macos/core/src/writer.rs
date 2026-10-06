@@ -177,6 +177,12 @@ pub enum WriterCommand {
         args: serde_json::Value,
         outbound: Outbound,
     },
+    #[cfg(feature = "qualification")]
+    Admit {
+        request_id: u64,
+        observation_id: String,
+        outbound: Outbound,
+    },
 }
 
 struct View {
@@ -861,6 +867,42 @@ impl Writer {
                     }
                     Err(error) => respond(&outbound, request_id, Err(journal_error(&error))),
                 }
+            }
+            #[cfg(feature = "qualification")]
+            WriterCommand::Admit {
+                request_id,
+                observation_id,
+                outbound,
+            } => {
+                if !RUNTIME.writes_open() {
+                    respond(&outbound, request_id, Err(gated()));
+                    return;
+                }
+                let payload = json!({ "fixture": "durability" });
+                let epoch = self.journal.store_generation().to_owned();
+                let admitted = self.journal.admit_observation(
+                    &threadspace_journal::ObservationAdmission {
+                        observation_id: &observation_id,
+                        source_id: "qualification.durability",
+                        source_epoch: &epoch,
+                        source_sequence: None,
+                        native_event: "QUALIFY_DURABILITY_RECORD",
+                        captured_wall_ms: log::now_ms(),
+                        payload: &payload,
+                    },
+                    log::now_ms(),
+                );
+                respond(
+                    &outbound,
+                    request_id,
+                    admitted
+                        .map(|receipt| ControlResponseBody::Admitted {
+                            observation_id: receipt.observation_id,
+                            status: receipt.status,
+                            cursor: format_cursor(receipt.cursor),
+                        })
+                        .map_err(|error| journal_error(&error)),
+                );
             }
             #[cfg(feature = "qualification")]
             WriterCommand::ViewCommand {

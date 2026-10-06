@@ -146,6 +146,17 @@ pub enum ControlRequestBody {
     QualifyArmFault {
         fault: QualificationFault,
     },
+    /// Qualification only: durably admit one fixture record by UUID and
+    /// answer with its receipt after COMMIT (no attention, no notification).
+    /// A repeat returns ALREADY_COMMITTED at the original cursor.
+    #[cfg(feature = "qualification")]
+    QualifyAdmit {
+        observation_id: String,
+    },
+    /// Qualification only: remove this companion's own delivered and pending
+    /// notifications from Notification Center.
+    #[cfg(feature = "qualification")]
+    QualifyClearNotifications,
     /// Qualification only: journaled identity and route observations after a
     /// cursor, for the evidence ledger.
     #[cfg(feature = "qualification")]
@@ -215,6 +226,16 @@ pub enum ControlResponseBody {
     Populated {
         sessions: u32,
         cursor: String,
+    },
+    #[cfg(feature = "qualification")]
+    Admitted {
+        observation_id: String,
+        status: crate::ui::ReceiptStatus,
+        cursor: String,
+    },
+    #[cfg(feature = "qualification")]
+    NotificationsCleared {
+        removed: u32,
     },
     #[cfg(feature = "qualification")]
     ViewCommandQueued {

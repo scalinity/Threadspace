@@ -94,6 +94,14 @@ enum AgentBridge {
             }
         case "OpenContainingApp":
             DispatchQueue.main.async { openContainingApp() }
+        case "ClearNotifications":
+            // Qualification only: the core never sends this from a release build.
+            let center = UNUserNotificationCenter.current()
+            center.getDeliveredNotifications { delivered in
+                center.removeAllDeliveredNotifications()
+                center.removeAllPendingNotificationRequests()
+                deliverToCore(["kind": "NotificationsCleared", "correlationId": correlationId, "removed": delivered.count])
+            }
         default:
             break
         }
