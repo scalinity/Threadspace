@@ -6,6 +6,7 @@
 
 import type { BridgeClient } from "../bridge/client";
 import { BridgeError, ipc, normalizeFailure } from "../bridge/ipc";
+import { sceneModel } from "../ui/SceneView";
 import { runRendererQualificationCommand } from "./rendererQualification";
 
 interface Outcome {
@@ -258,6 +259,9 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
       case "reload":
         setTimeout(() => location.reload(), 50);
         return { reloading: true };
+      case "scene-workers":
+        // The office lays workers out in this order, centred on the camera.
+        return { workers: sceneModel(client.getSnapshot()).workers.map(({ id, state }) => ({ id, state })) };
       case "request-then-reload":
         // A slow native request is still in flight when the document is replaced.
         void client.action({ kind: "RefreshEvidence" }).catch(() => {});

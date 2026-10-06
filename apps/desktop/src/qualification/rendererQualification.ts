@@ -15,17 +15,27 @@ export function registerRendererLifecycle(lifecycle: RendererLifecycle): () => v
   };
 }
 
-/** The live canvas's drawing buffer against its CSS size: the pixel ratio actually applied. */
+/**
+ * The live canvas's drawing buffer against its CSS size (the pixel ratio
+ * actually applied), and where it sits in the viewport, so the harness can
+ * measure the scene's own pixels in a window capture.
+ */
 export interface SurfaceFacts {
   devicePixelRatio: number;
-  canvas: { width: number; height: number; clientWidth: number; clientHeight: number } | null;
+  viewport: { width: number; height: number };
+  canvas: { width: number; height: number; clientWidth: number; clientHeight: number; left: number; top: number } | null;
 }
 
 function surfaceFacts(): SurfaceFacts {
   const canvas = document.querySelector<HTMLCanvasElement>("canvas.scene-canvas");
+  const rect = canvas?.getBoundingClientRect();
   return {
     devicePixelRatio: window.devicePixelRatio,
-    canvas: canvas === null ? null : { width: canvas.width, height: canvas.height, clientWidth: canvas.clientWidth, clientHeight: canvas.clientHeight },
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+    canvas:
+      canvas === null || rect === undefined
+        ? null
+        : { width: canvas.width, height: canvas.height, clientWidth: canvas.clientWidth, clientHeight: canvas.clientHeight, left: rect.left, top: rect.top },
   };
 }
 

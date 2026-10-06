@@ -14,7 +14,7 @@ qualification` on the companion and desktop; the `QUALIFICATION` client role;
 | `harness/src/identity.rs` | The installed production (`Threadspace.app`) and development (`Threadspace Dev.app`) identities and every path the harness reads |
 | `harness/src/run.rs` | Bounded argv execution with a minimal environment; `osascript` with values as argv |
 | `harness/src/evidence.rs` | Evidence run directories (`<area>/<UTC>-<label>/`), JSONL appends, hashes |
-| `harness/src/native.rs` + `swift/ts-native.swift` | Accessibility window inspection/actions, traffic-light presses, notification banner press, labelled System Settings switches, synthetic drag/keys, window capture, pixel statistics and diffs, owner idle time, displays |
+| `harness/src/native.rs` + `swift/ts-native.swift` | Accessibility window inspection/actions, traffic-light presses, notification banner press, labelled System Settings switches, synthetic drag/keys, window capture, pixel statistics and diffs (optionally cropped), owner idle time, displays, an app-scoped 1x display mode for device-pixel-ratio changes |
 | `harness/src/procs.rs` | Process incarnations by kernel executable path (PID + birth), exits, working directories |
 | `harness/src/companion.rs` | The companion's verified qualification client, incarnation, relaunch waits and its JSON-lines log |
 | `harness/src/app.rs` | Packaged launch without activation (`open -g`), `tauri dev` in its own process group, hydration from the companion log, qualification reports and view commands |
@@ -81,7 +81,9 @@ Utilities: `env`, `view-command <ch> <command> [json]`, `synthetic <ch> <count> 
 - **Side effects are cleaned up.** Qualification attention items are
   resolved through the journaled owner command with a reason; the companion
   removes its own delivered notifications; System Settings switches the
-  harness flips are restored to their original value.
+  harness flips are restored to their original value; a display-mode change
+  is scoped to the helper process, so macOS restores the display when the
+  helper exits, however it exits.
 - **Honest labels.** Injected device losses are labelled injected;
   observations made through another session's actions are labelled observed;
   a check that cannot run says NOT_RUN with its reason.

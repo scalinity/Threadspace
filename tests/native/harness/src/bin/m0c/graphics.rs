@@ -8,6 +8,7 @@
 use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
+use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody};
 use threadspace_harness::evidence::Run;
 use threadspace_harness::native::Native;
 use threadspace_harness::procs::Incarnation;
@@ -102,6 +103,9 @@ struct Captures<'a> {
     pid: u32,
     previous: Option<(String, Option<(f64, f64)>)>,
     index: u32,
+    /// The canvas rectangle in capture pixels: comparisons measure the
+    /// scene's own pixels, never DOM text elsewhere in the window.
+    crop: Option<[String; 4]>,
 }
 
 impl Captures<'_> {
@@ -121,13 +125,75 @@ impl Captures<'_> {
         let size = stats["width"].as_f64().zip(stats["height"].as_f64());
         let diff = match &self.previous {
             Some((prev, prev_size)) if *prev_size == size => {
-                Some(self.ctx.native.json(&["pixels-diff", prev, &path.display().to_string()]))
+                let current = path.display().to_string();
+                let mut args = vec!["pixels-diff", prev.as_str(), current.as_str()];
+                if let Some(crop) = &self.crop {
+                    args.extend(crop.iter().map(String::as_str));
+                }
+                Some(self.ctx.native.json(&args))
             }
             _ => None,
         };
         self.previous = Some((path.display().to_string(), size));
         json!({ "phase": phase, "captured": true, "file": name, "stats": stats, "diffFromPrevious": diff, "atMs": threadspace_harness::now_ms() })
     }
+}
+
+/// The canvas's rectangle in a window capture's pixels, from the view's
+/// surface facts: the scale comes from the widths, and any extra capture
+/// height above the viewport is titlebar.
+fn canvas_crop(state: &Value, capture_width: f64, capture_height: f64) -> Option<[String; 4]> {
+    let canvas = &state["surface"]["canvas"];
+    let viewport = &state["surface"]["viewport"];
+    let scale = capture_width / viewport["width"].as_f64()?;
+    let top_offset = capture_height - viewport["height"].as_f64()? * scale;
+    let px = |v: f64| (v.round().max(0.0) as u64).to_string();
+    Some([
+        px(canvas["left"].as_f64()? * scale),
+        px(top_offset + canvas["top"].as_f64()? * scale),
+        px(canvas["clientWidth"].as_f64()? * scale),
+        px(canvas["clientHeight"].as_f64()? * scale),
+    ])
+}
+
+/// A settled office has no visible idle motion: only a worker in the
+/// attention state pulses (its marker also spins). The office lays workers
+/// out in view order centred on the camera, so the two nearest the centre
+/// are on screen; each one not already in attention gets a labelled
+/// qualification attention item, resolved when the run ends.
+fn keep_centre_animated(ctx: &Ctx, raised: &mut Vec<Value>) -> Value {
+    let workers = ctx
+        .app()
+        .view_command("scene-workers", json!({}), Duration::from_secs(30))
+        .map(|r| r["result"]["workers"].clone())
+        .unwrap_or_default();
+    let list = workers.as_array().cloned().unwrap_or_default();
+    if list.is_empty() {
+        return json!({ "workers": 0 });
+    }
+    let mut centre = vec![(list.len() - 1) / 2, list.len() / 2];
+    centre.dedup();
+    let mut added = 0;
+    for &index in &centre {
+        let worker = &list[index];
+        if worker["state"] == "attention" {
+            continue;
+        }
+        let Some(session) = worker["id"].as_str() else { continue };
+        let outcome = match ctx.companion().request(
+            ControlRequestBody::QualifyRaiseAttention { label: "g15-motion-fixture".into(), session_id: Some(session.to_owned()) },
+            Duration::from_secs(10),
+        ) {
+            Ok(ControlResponseBody::AttentionRaised { attention_id, .. }) => json!({ "attentionId": attention_id }),
+            other => json!({ "error": format!("{other:?}") }),
+        };
+        raised.push(json!({ "sessionId": session, "outcome": outcome }));
+        added += 1;
+    }
+    if added > 0 {
+        threadspace_harness::pause_ms(1500);
+    }
+    json!({ "workers": list.len(), "centre": centre.iter().map(|&i| list[i].clone()).collect::<Vec<_>>(), "raised": added })
 }
 
 fn changed(capture: &Value) -> bool {
@@ -151,7 +217,8 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     let pid = ui.pid as u32;
     ctx.native.ax_action(pid, "raise", Some("Threadspace"));
     let started = Instant::now();
-    let mut captures = Captures { ctx, run: &run_dir, pid, previous: None, index: 0 };
+    let mut captures = Captures { ctx, run: &run_dir, pid, previous: None, index: 0, crop: None };
+    let mut fixture: Vec<Value> = Vec::new();
     let mut timeline = Vec::new();
     let mut log = |event: &str, detail: Value| {
         let entry = json!({ "atS": started.elapsed().as_secs_f64(), "event": event, "detail": detail });
@@ -179,7 +246,19 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         }
     };
 
-    // 1. Steady visible animation.
+    // 1. Steady visible animation, measured inside the canvas.
+    let centre = keep_centre_animated(ctx, &mut fixture);
+    let calibration = captures.take("calibration");
+    let surface = state(ctx);
+    captures.crop = calibration["stats"]["width"]
+        .as_f64()
+        .zip(calibration["stats"]["height"].as_f64())
+        .and_then(|(w, h)| canvas_crop(&surface, w, h));
+    captures.previous = None;
+    log("motion-fixture", json!({ "centre": centre, "surface": surface["surface"], "canvasCrop": captures.crop }));
+    if captures.crop.is_none() {
+        return Err("the canvas rectangle could not be located in a window capture".into());
+    }
     wait_live(50, "steady", &mut captures, &mut log, &mut sample);
 
     // 2. Minimize: the renderer is disposed and schedules no frames.
@@ -318,10 +397,11 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         if minute > minute_mark {
             minute_mark = minute;
             let _ = ctx.companion().request(
-                threadspace_contracts::control::ControlRequestBody::QualifySyntheticChanges { count: 4, duration_ms: 1000, sessions: 4 },
+                ControlRequestBody::QualifySyntheticChanges { count: 4, duration_ms: 1000, sessions: 4 },
                 Duration::from_secs(10),
             );
             threadspace_harness::pause_ms(3000);
+            log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
             let projection = compare_projection(ctx, &format!("minute-{minute}"));
             let texts = ax_texts(ctx, pid);
             agreement.push(json!({ "minute": minute, "projectionEqual": projection["equal"], "axSessionsRow": texts.iter().filter(|t| t.contains("Stream ")).count(), "sessions": projection["sessions"] }));
@@ -329,6 +409,10 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
     }
     let final_state = state(ctx);
     log("final", final_state.clone());
+    let fixture_cleanup = json!({
+        "resolved": crate::cleanup::resolve_qualification(ctx, "g15 motion fixture").unwrap_or_else(|e| json!({ "error": e })),
+        "notificationsCleared": crate::cleanup::clear_notifications(ctx).unwrap_or_else(|e| json!({ "error": e })),
+    });
     drop(gui);
     app.stop_all();
 
@@ -358,6 +442,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         "agreement": agreement,
         "finalLifecycle": { "state": final_state["state"], "generation": final_state["generation"], "counts": final_state["counts"], "lossCounts": final_state["lossCounts"], "frames": final_state["frames"] },
         "injectedLossLabel": "every device loss in this run was qualification-injected; none is a natural GPU loss",
+        "motionFixture": { "raised": fixture, "canvasCrop": captures.crop, "cleanup": fixture_cleanup },
     });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(json!({ "summary": summary, "dir": run_dir.dir }))

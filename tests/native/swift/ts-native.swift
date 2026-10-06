@@ -141,17 +141,32 @@ func findPressable(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> 
 
 // MARK: Labelled controls in another app (System Settings switches)
 
+func isSwitch(_ element: AXUIElement) -> Bool {
+    let role: String = attribute(element, kAXRoleAttribute) ?? ""
+    return role == "AXCheckBox" || role == "AXSwitch" || role == "AXToggle"
+}
+
+func ownLabel(_ element: AXUIElement) -> String {
+    [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"]
+        .compactMap { attribute(element, $0) as String? }
+        .joined(separator: " ")
+}
+
+/// A switch labelled `needle`: by its own title/description, or (a System
+/// Settings row) an unlabelled switch directly after a static text that
+/// reads exactly `needle`.
 func findLabelled(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> AXUIElement? {
     guard depth < 30 else { return nil }
-    let role: String = attribute(element, kAXRoleAttribute) ?? ""
-    if role == "AXCheckBox" || role == "AXSwitch" || role == "AXToggle" {
-        let label = [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"]
-            .compactMap { attribute(element, $0) as String? }
-            .joined(separator: " ")
-        if label.localizedCaseInsensitiveContains(needle) { return element }
-    }
+    if isSwitch(element) && ownLabel(element).localizedCaseInsensitiveContains(needle) { return element }
     let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
+    var rowLabel: String?
     for child in children {
+        if isSwitch(child), ownLabel(child).trimmingCharacters(in: .whitespaces).isEmpty,
+           rowLabel?.caseInsensitiveCompare(needle) == .orderedSame {
+            return child
+        }
+        let role: String = attribute(child, kAXRoleAttribute) ?? ""
+        rowLabel = role == "AXStaticText" ? attribute(child, kAXValueAttribute) : nil
         if let hit = findLabelled(child, needle, depth: depth + 1) { return hit }
     }
     return nil

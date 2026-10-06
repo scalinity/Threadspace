@@ -176,7 +176,7 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
     let original = reduce_motion(ctx);
     let mut motion = json!({ "original": original });
     if original == Some(false) {
-        open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Display");
+        open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Motion");
         threadspace_harness::pause_ms(2500);
         let on = ctx.native.json(&["ax-switch", "com.apple.systempreferences", "Reduce motion", "press"]);
         threadspace_harness::pause_ms(3000);
@@ -199,7 +199,7 @@ pub fn matrix(ctx: &Ctx) -> Result<Value, String> {
         } else {
             json!(null)
         };
-        open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Display");
+        open_settings("x-apple.systempreferences:com.apple.Accessibility-Settings.extension?Motion");
         threadspace_harness::pause_ms(2500);
         let off = ctx.native.json(&["ax-switch", "com.apple.systempreferences", "Reduce motion", "press"]);
         threadspace_harness::pause_ms(3000);
