@@ -165,7 +165,8 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
     );
     let elapsed = started.elapsed().as_millis() as u64;
     threadspace_harness::pause_ms(300);
-    let selected = terminal::selected_tty();
+    let readback = terminal::selected_tty_read();
+    let selected = readback.as_ref().ok().cloned();
     let front = frontmost_bundle();
     match outcome {
         Ok(ControlResponseBody::Routed { result }) => {
@@ -182,9 +183,13 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
                 "harnessElapsedMs": elapsed,
                 "exact": exact,
                 "independentSelectedTty": selected,
+                "independentReadbackError": readback.as_ref().err(),
                 "independentFrontmost": front,
                 "expectedTty": expected_tty,
-                "wrongTarget": exact && expected_tty.is_some() && !readback_matches,
+                // Wrong only when a different tab is read back; an exact
+                // claim that cannot be read back is unverified, not wrong.
+                "wrongTarget": exact && expected_tty.is_some() && selected.is_some() && !readback_matches,
+                "unverifiedExact": exact && expected_tty.is_some() && selected.is_none(),
             })
         }
         Ok(other) => json!({ "error": format!("unexpected {other:?}") }),
@@ -368,11 +373,15 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
         .iter()
         .filter(|r| r["wrongTarget"] == true)
         .count();
+    let race_unverified = race_results
+        .iter()
+        .filter(|r| r["unverifiedExact"] == true)
+        .count();
     record(
         &mut cases,
         "selection-readback-race",
-        json!({ "routes": race_results, "wrongTargets": race_wrong }),
-        race_wrong == 0,
+        json!({ "routes": race_results, "wrongTargets": race_wrong, "unverifiedExact": race_unverified }),
+        race_wrong == 0 && race_unverified == 0,
     )?;
 
     // Target close, then a stale TTY pathname reused by a new tab.

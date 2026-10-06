@@ -88,4 +88,7 @@ scene visibly animates; resolve afterwards with `resolve-qualification`).
   helper exits, however it exits.
 - **Honest labels.** Injected device losses are labelled injected;
   observations made through another session's actions are labelled observed;
-  a check that cannot run says NOT_RUN with its reason.
+  a check that cannot run safely says BLOCKED (it would disturb unrelated
+  owner work, such as quitting Terminal) or MANUAL_EXTERNAL_REQUIRED (it
+  needs hardware or an owner-only action, such as an external display or a
+  root-scheduled wake), with its reason.

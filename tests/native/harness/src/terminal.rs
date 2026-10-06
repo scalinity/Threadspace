@@ -261,8 +261,23 @@ impl Tab {
 }
 
 pub fn selected_tty() -> Option<String> {
-    let out = osascript(SELECTED_TTY, &[], timeout());
-    out.ok.then(|| out.stdout.trim().to_owned())
+    selected_tty_read().ok()
+}
+
+/// The front window's selected tab TTY, retried briefly: while another
+/// window is being raised, Terminal can fail the query (the error text is
+/// returned when every attempt fails).
+pub fn selected_tty_read() -> Result<String, String> {
+    let mut last = String::new();
+    for _ in 0..5 {
+        let out = osascript(SELECTED_TTY, &[], timeout());
+        if out.ok {
+            return Ok(out.stdout.trim().to_owned());
+        }
+        last = out.stderr.trim().to_owned();
+        crate::pause_ms(200);
+    }
+    Err(last)
 }
 
 pub fn shell_quote(value: &str) -> String {
