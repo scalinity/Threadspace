@@ -1,0 +1,17 @@
+[package]
+name = "threadspace-qualify"
+description = "Qualification client for the companion control socket. Never shipped."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-contracts = { workspace = true, features = ["qualification"] }
+threadspace-relay.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
