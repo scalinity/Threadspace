@@ -5,7 +5,7 @@
 // the rejection a timed-out `$.process.run` gives.
 
 import { describe, expect, mock, test } from 'claude-code/testing'
-import { ARGV, OPTIONS, START, commitAll, installCore, installHelper, receipt, toolCallInput, type Batch } from './kit.ts'
+import { ARGV, OPTIONS, START, commitAll, installCore, installHelper, receipt, spawnInput, toolCallInput, type Batch } from './kit.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const ids = (batch: Batch | undefined) => (batch?.records ?? []).map((record: any) => record.observationId)
@@ -188,6 +188,65 @@ describe('mod delivery', () => {
       expect(batch.records.length).toBeLessThanOrEqual(128)
       expect(new TextEncoder().encode(JSON.stringify(batch.envelope)).length).toBeLessThanOrEqual(64 * 1024)
     }
+  })
+
+  test('batch record bound (128) binds for small records', { ...OPTIONS, timeoutMs: 60_000 }, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    installCore(on)
+
+    // session.attach records carry no session, turn or actor IDs and average
+    // under 512 bytes, so 128 of them fit in 64 KiB and the record bound binds.
+    for (let call = 0; call < 300; call += 1) await $.session.attach({ surface: 'terminal', clientId: `c${call}` } as any)
+    await clock.settle()
+    for (let step = 0; step < 40; step += 1) await clock.advance(250)
+
+    const encoder = new TextEncoder()
+    const bytesOf = (value: unknown) => encoder.encode(JSON.stringify(value)).length
+    const largest = Math.max(...helper.records().map(bytesOf))
+    expect(helper.records().length).toBe(600)
+    expect(helper.batches.map(batch => batch.records.length).slice(0, 4)).toEqual([128, 128, 128, 128])
+    for (const batch of helper.batches) {
+      expect(bytesOf(batch.envelope)).toBeLessThanOrEqual(64 * 1024)
+      // Room for one more record remained: the record bound, not the byte
+      // bound, ended each full batch.
+      if (batch.records.length === 128) expect(bytesOf(batch.envelope) + largest + 1).toBeLessThanOrEqual(64 * 1024)
+    }
+  })
+
+  test('queue byte bound (8 MiB) with long escaped identifiers', { ...OPTIONS, timeoutMs: 120_000 }, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    installCore(on)
+
+    // Identifiers are capped at 256 characters, but JSON escapes a control
+    // character as six bytes. A spawn's records carry three or four such
+    // fields (~6 KiB each), so 2,000 records overshoot 8 MiB and the byte
+    // bound binds well before the 2,048-record bound.
+    const wide = (seed: string) => `${seed}${'\u0001'.repeat(256)}`.slice(0, 256)
+    const calls = 1000
+    for (let call = 0; call < calls; call += 1) {
+      await $.agent.spawn({
+        ...spawnInput(wide(`tu-${call}-`)),
+        subagentType: wide(`type-${call}-`),
+        parentAgentId: wide(`parent-${call}-`),
+      } as any)
+    }
+    await clock.settle()
+    let seen = -1
+    for (let step = 0; step < 2_000 && helper.batches.length !== seen; step += 1) {
+      seen = helper.batches.length
+      await clock.advance(250)
+    }
+
+    const encoder = new TextEncoder()
+    const delivered = helper.records()
+    const bytes = delivered.reduce((sum: number, record: any) => sum + encoder.encode(JSON.stringify(record)).length, 0)
+    expect(delivered.length).toBeLessThan(1800)
+    expect(bytes).toBeLessThanOrEqual(8 * 1024 * 1024)
+    expect(bytes).toBeGreaterThan(8 * 1024 * 1024 - 16 * 1024)
+    expect(helper.batches[helper.batches.length - 1]?.envelope.droppedRecords).toBe(calls * 2 - delivered.length)
+    for (const batch of helper.batches) expect(encoder.encode(JSON.stringify(batch.envelope)).length).toBeLessThanOrEqual(64 * 1024)
   })
 
   test('retry backoff runs 250 ms to 5 s and resets on success', { ...OPTIONS, timeoutMs: 20_000 }, async ($, on) => {
