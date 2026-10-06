@@ -129,6 +129,8 @@ impl Native {
     }
 
     /// The largest on-screen window owned by `pid`, if any.
+    /// The process's main window: on screen first (a retired office window
+    /// can linger off screen at the same size), then the largest.
     pub fn main_window_id(&self, pid: u32) -> Option<u64> {
         let report = self.json(&["windows", &pid.to_string()]);
         report["windows"]
@@ -136,11 +138,22 @@ impl Native {
             .iter()
             .filter(|w| w["layer"].as_i64() == Some(0))
             .max_by(|a, b| {
-                let area = |w: &&Value| {
-                    w["width"].as_f64().unwrap_or(0.0) * w["height"].as_f64().unwrap_or(0.0)
+                let rank = |w: &&Value| {
+                    (
+                        w["onScreen"] == true,
+                        w["width"].as_f64().unwrap_or(0.0) * w["height"].as_f64().unwrap_or(0.0),
+                    )
                 };
-                area(a).total_cmp(&area(b))
+                let (a, b) = (rank(a), rank(b));
+                a.0.cmp(&b.0).then(a.1.total_cmp(&b.1))
             })
             .and_then(|w| w["id"].as_u64())
+    }
+
+    /// Layer-0 windows the process still owns, on screen or not.
+    pub fn window_count(&self, pid: u32) -> usize {
+        self.json(&["windows", &pid.to_string()])["windows"]
+            .as_array()
+            .map_or(0, |ws| ws.iter().filter(|w| w["layer"].as_i64() == Some(0)).count())
     }
 }

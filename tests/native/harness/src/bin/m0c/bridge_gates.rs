@@ -600,6 +600,10 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         },
         "UNCONSUMED_DATA_ON_RETIREMENT",
     )?;
+    // Native window shells: each recovery's retired window is measured, not
+    // assumed gone (Tauri alpha.4 deregisters it; AppKit can keep it).
+    let ui_pid = app.processes().first().map(|ui| ui.pid as u32);
+    let windows_before = ui_pid.map(|pid| ctx.native.window_count(pid));
     for index in 1..=repeats {
         case(
             &format!("repeated-replacement-{index:02}"),
@@ -607,6 +611,8 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             "MAIN_DOCUMENT_REPLACED",
         )?;
     }
+    let windows_after = ui_pid.map(|pid| ctx.native.window_count(pid));
+    let window_shells = json!({ "uiPid": ui_pid, "before": windows_before, "after": windows_after, "recoveries": repeats });
     let delays: Vec<Value> = cases
         .iter()
         .filter_map(|c| {
@@ -621,7 +627,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let _gui = ctx.gui("view recovery: bootstrap with companion frozen")?;
     if std::env::var_os("THREADSPACE_HARNESS_ATTACHED_DEV_UI").is_some() {
         let passed = cases.iter().filter(|c| c["pass"] == true).count();
-        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "recoveryDelays": delays });
+        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "recoveryDelays": delays, "nativeWindowShells": window_shells });
         run.write_json("summary.json", &summary)
             .map_err(|e| e.to_string())?;
         return Ok(json!({ "summary": summary, "dir": run.dir }));
@@ -657,6 +663,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         "passed": passed,
         "total": cases.len(),
         "recoveryDelays": delays,
+        "nativeWindowShells": window_shells,
         "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
     });
     run.write_json("summary.json", &summary)
