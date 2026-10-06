@@ -39,7 +39,7 @@ pub async fn ui_connect<R: Runtime>(
     request: Value,
     events: Channel<UiFrame>,
 ) -> Result<UiConnectReply, UiError> {
-    let incarnation = bridge.views.verify(&webview)?;
+    let incarnation = verified(&bridge, &webview, "ui_connect")?;
     let request: UiConnectRequest = parse_request(request)?;
     bridge
         .inner()
@@ -53,7 +53,7 @@ pub async fn ui_ack<R: Runtime>(
     bridge: State<'_, Arc<Bridge>>,
     request: Value,
 ) -> Result<UiAckReply, UiError> {
-    let incarnation = bridge.views.verify(&webview)?;
+    let incarnation = verified(&bridge, &webview, "ui_ack")?;
     let request: UiAckRequest = parse_request(request)?;
     bridge.inner().ack(incarnation, &request)
 }
@@ -64,9 +64,25 @@ pub async fn ui_disconnect<R: Runtime>(
     bridge: State<'_, Arc<Bridge>>,
     request: Value,
 ) -> Result<(), UiError> {
-    let incarnation = bridge.views.verify(&webview)?;
+    let incarnation = verified(&bridge, &webview, "ui_disconnect")?;
     let request: UiDisconnectRequest = parse_request(request)?;
     bridge.inner().disconnect(incarnation, &request)
+}
+
+/// Verifies the caller is the active office incarnation; refusals are
+/// logged natively as evidence that retired views cannot act (SPEC §18.3).
+fn verified<R: Runtime>(
+    bridge: &Bridge,
+    webview: &Webview<R>,
+    command: &str,
+) -> Result<uuid::Uuid, UiError> {
+    bridge.views.verify(webview).inspect_err(|error| {
+        crate::prefs::log(
+            webview.app_handle(),
+            "STALE_VIEW_REFUSED",
+            serde_json::json!({ "command": command, "label": webview.label(), "code": error.code }),
+        );
+    })
 }
 
 fn bounded<T: serde::Serialize>(
@@ -93,7 +109,7 @@ pub async fn ui_query<R: Runtime>(
     bridge: State<'_, Arc<Bridge>>,
     request: Value,
 ) -> Result<UiQueryResult, UiError> {
-    let incarnation = bridge.views.verify(&webview)?;
+    let incarnation = verified(&bridge, &webview, "ui_query")?;
     let request: UiQueryRequest = parse_request(request)?;
     let bridge = bridge.inner();
     let _slot = bridge.acquire_query_slot()?;
@@ -225,7 +241,7 @@ pub async fn ui_action<R: Runtime>(
     bridge: State<'_, Arc<Bridge>>,
     request: Value,
 ) -> Result<UiActionResult, UiError> {
-    let incarnation = bridge.views.verify(&webview)?;
+    let incarnation = verified(&bridge, &webview, "ui_action")?;
     let request: UiActionRequest = parse_request(request)?;
     parse_uuid(&request.request_id, "requestId")?;
     let bridge = bridge.inner();

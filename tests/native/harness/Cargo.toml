@@ -1,0 +1,30 @@
+[package]
+name = "threadspace-harness"
+description = "Reusable native qualification harness (M0C onward): app, companion, service, Terminal, notification, window, pixel and power controllers. Never shipped."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lib]
+name = "threadspace_harness"
+path = "src/lib.rs"
+
+[[bin]]
+name = "threadspace-m0c"
+path = "src/bin/m0c/main.rs"
+
+[dependencies]
+threadspace-contracts = { workspace = true, features = ["qualification"] }
+threadspace-relay.workspace = true
+threadspace-surfaces-macos.workspace = true
+threadspace-provider-claude.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+sha2.workspace = true
+libc.workspace = true
+
+[lints]
+workspace = true
