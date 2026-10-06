@@ -51,12 +51,24 @@ fn same_dir(a: &str, b: &Path) -> bool {
 /// accepts the folder-trust prompt in that window only, and waits for the
 /// companion to bind it to that window's TTY.
 pub fn spawn_claude(ctx: &Ctx, dir: PathBuf) -> Result<ClaudeTab, String> {
+    spawn(ctx, dir, true)
+}
+
+/// As `spawn_claude`, but Claude runs as a job of the window's interactive
+/// shell (as when someone types `claude`), so stopping it hands the
+/// terminal's foreground back to the shell.
+pub fn spawn_claude_job(ctx: &Ctx, dir: PathBuf) -> Result<ClaudeTab, String> {
+    spawn(ctx, dir, false)
+}
+
+fn spawn(ctx: &Ctx, dir: PathBuf, exec: bool) -> Result<ClaudeTab, String> {
     let launcher = threadspace_relay::paths::home_dir()
         .ok_or("no home")?
         .join(".local/bin/claude");
     let command = format!(
-        "cd {} && exec {}",
+        "cd {} && {}{}",
         terminal::shell_quote(&dir.display().to_string()),
+        if exec { "exec " } else { "" },
         terminal::shell_quote(&launcher.display().to_string())
     );
     let tab = {
@@ -114,6 +126,13 @@ pub fn spawn_claude(ctx: &Ctx, dir: PathBuf) -> Result<ClaudeTab, String> {
         }
         threadspace_harness::pause_ms(1000);
     }
+}
+
+/// `(process group, terminal foreground process group)` of `pid`.
+fn foreground_group(pid: i32) -> Option<(i64, i64)> {
+    let out = run("/bin/ps", &["-o", "pgid=,tpgid=", "-p", &pid.to_string()], Duration::from_secs(3));
+    let mut fields = out.stdout.split_whitespace().map(|f| f.parse::<i64>().ok());
+    Some((fields.next()??, fields.next()??))
 }
 
 fn frontmost_bundle() -> Option<String> {
@@ -217,7 +236,7 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
         .write_json("idle-gate.json", &json!(gate))
         .map_err(|e| e.to_string())?;
     let a = spawn_claude(ctx, root.join("a"))?;
-    let b = spawn_claude(ctx, root.join("b"))?;
+    let b = spawn_claude_job(ctx, root.join("b"))?;
     let spare = locked(ctx, "g08 open spare window", || {
         Tab::open_inert(root.join("spare"))
     })?;
@@ -254,18 +273,20 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
     });
     record(&mut cases, "move", moved.clone(), exact_ok(&moved))?;
 
-    // Minimize, then Return must unminimize and read back exactly.
+    // Minimize, then Return must unminimize and read back exactly. The
+    // window is addressed by its recorded ID: Claude sets its own title.
     let (minimized, restore, after) = locked(ctx, "g08 minimize", || {
-        let minimized = ctx.native.ax_action(tpid, "minimize", Some(&a.tab.title()));
+        let minimized = a.tab.set_miniaturized(true);
+        threadspace_harness::pause_ms(1000);
         let restore = route(ctx, &a.session_id, Some(&a.tab.tty));
-        let after = ctx.native.ax_window(tpid, Some(&a.tab.title()));
+        let after = a.tab.miniaturized();
         (minimized, restore, after)
     });
-    let minimize_ok = exact_ok(&restore) && after["minimized"] == false;
+    let minimize_ok = minimized == Some(true) && exact_ok(&restore) && after == Some(false);
     record(
         &mut cases,
         "minimize-then-return",
-        json!({ "minimize": minimized["performed"], "route": restore, "windowAfter": after }),
+        json!({ "minimizedByWindowId": minimized, "route": restore, "miniaturizedAfterReturn": after }),
         minimize_ok,
     )?;
 
@@ -290,22 +311,36 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
         full_ok,
     )?;
 
-    // Foreground mismatch: provider stopped in the background.
-    let background = locked(ctx, "g08 foreground mismatch", || {
-        procs::signal(b.pid, libc::SIGTSTP);
+    // Foreground mismatch: the provider is stopped and its shell holds the
+    // terminal's foreground. `b` runs as a shell job; SIGSTOP cannot be
+    // caught. `fg` is typed only once the shell owns the foreground, so it
+    // never reaches Claude as a prompt.
+    let (foreground_before, foreground_stopped, background, foreground_after) = locked(ctx, "g08 foreground mismatch", || {
+        let before = foreground_group(b.pid);
+        procs::signal(b.pid, libc::SIGSTOP);
         threadspace_harness::pause_ms(1500);
+        let stopped = foreground_group(b.pid);
+        let shell_has_foreground = stopped.as_ref().is_some_and(|(pgid, tpgid)| pgid != tpgid);
         let background = route(ctx, &b.session_id, Some(&b.tab.tty));
-        procs::signal(b.pid, libc::SIGCONT);
-        b.tab.type_line("fg");
+        if shell_has_foreground {
+            b.tab.type_line("fg");
+        } else {
+            procs::signal(b.pid, libc::SIGCONT);
+        }
         threadspace_harness::pause_ms(1500);
-        background
+        (before, stopped, background, foreground_group(b.pid))
     });
-    let readiness_ok = background["inputReadiness"] != "FOREGROUND_COMPATIBLE"
+    let shell_held = foreground_stopped.as_ref().is_some_and(|(pgid, tpgid)| pgid != tpgid);
+    let readiness_ok = shell_held
+        && background["inputReadiness"] != "FOREGROUND_COMPATIBLE"
         && background["wrongTarget"] == false;
     record(
         &mut cases,
         "foreground-process-mismatch",
-        background.clone(),
+        json!({
+            "claudeGroupAndForeground": { "before": foreground_before, "stopped": foreground_stopped, "after": foreground_after },
+            "route": background,
+        }),
         readiness_ok,
     )?;
 
@@ -403,7 +438,7 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
     record(
         &mut cases,
         "terminal-restart",
-        json!({ "status": "NOT_RUN", "reason": "Terminal.app hosts the session running this harness; quitting it would end the qualification and every other Terminal session. Stale Terminal generations are covered by route-model tests (crates/surfaces) and by M0B's closed/recreated-tab evidence." }),
+        json!({ "status": "BLOCKED", "reason": "quitting Terminal.app ends every Terminal session on this Mac, including unrelated owner sessions and the one running this harness; the case can run only when no other Terminal session is open. Stale Terminal generations are covered by route-model tests (crates/surfaces) and by M0B's closed/recreated-tab evidence." }),
         false,
     )?;
 
@@ -428,7 +463,7 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
     let summary = json!({
         "gate": "G08",
         "pass": required.iter().all(|c| c["pass"] == true) && wrong_total == 0,
-        "terminalRestart": "NOT_RUN (hosts this session)",
+        "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
         "wrongTargets": wrong_total,
         "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
         "terminalIncarnationUnchanged": terminal_before == terminal_after,

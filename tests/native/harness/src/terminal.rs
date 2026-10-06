@@ -70,6 +70,17 @@ tell application "Terminal" to close (window id ((item 1 of argv) as integer))
 return "closed"
 end run"#;
 
+const SET_MINIATURIZED: &str = r#"on run argv
+tell application "Terminal"
+  set miniaturized of window id ((item 1 of argv) as integer) to ((item 2 of argv) is "true")
+  return (miniaturized of window id ((item 1 of argv) as integer)) as text
+end tell
+end run"#;
+
+const MINIATURIZED: &str = r#"on run argv
+tell application "Terminal" to return (miniaturized of window id ((item 1 of argv) as integer)) as text
+end run"#;
+
 const SET_BOUNDS: &str = r#"on run argv
 tell application "Terminal" to set bounds of window id ((item 1 of argv) as integer) to {(item 2 of argv) as integer, (item 3 of argv) as integer, (item 4 of argv) as integer, (item 5 of argv) as integer}
 return "ok"
@@ -195,6 +206,18 @@ impl Tab {
         .stdout
         .trim()
             == "ok"
+    }
+
+    /// Minimizes or restores this window by its recorded ID (the title is
+    /// unreliable once a provider sets its own terminal title).
+    pub fn set_miniaturized(&self, miniaturized: bool) -> Option<bool> {
+        let out = osascript(SET_MINIATURIZED, &[&self.window_id.to_string(), if miniaturized { "true" } else { "false" }], timeout());
+        out.ok.then(|| out.stdout.trim() == "true")
+    }
+
+    pub fn miniaturized(&self) -> Option<bool> {
+        let out = osascript(MINIATURIZED, &[&self.window_id.to_string()], timeout());
+        out.ok.then(|| out.stdout.trim() == "true")
     }
 
     pub fn set_bounds(&self, left: i32, top: i32, right: i32, bottom: i32) -> bool {

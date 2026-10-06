@@ -28,3 +28,18 @@ pub fn status(id: &Identity) -> String {
         .unwrap_or("UNKNOWN")
         .to_owned()
 }
+
+/// The PID launchd runs for the login-item job itself (`gui/<uid>/<label>`),
+/// as opposed to a copy LaunchServices started for a notification.
+pub fn login_item_pid(id: &Identity) -> Option<u32> {
+    // SAFETY: getuid has no preconditions.
+    let uid = unsafe { libc::getuid() };
+    let out = run(
+        "/bin/launchctl",
+        &["print", &format!("gui/{uid}/{}", id.agent_identifier)],
+        Duration::from_secs(10),
+    );
+    out.stdout
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("pid = ")?.trim().parse().ok())
+}

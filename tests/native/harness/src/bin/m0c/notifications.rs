@@ -347,6 +347,20 @@ pub fn lifecycle(ctx: &Ctx) -> Result<Value, String> {
     run_dir
         .write_json("enable-after-stopped.json", &enabled)
         .map_err(|e| e.to_string())?;
+    // The notification cold start must hand the store to the login item's
+    // own companion, which launchd relaunches after a crash (SPEC §19.5).
+    let companion = ctx.companion().incarnation();
+    let login_item = service::login_item_pid(&ctx.id);
+    let handed_over = enabled["ok"] == true
+        && companion.as_ref().is_some_and(|c| login_item == Some(c.pid as u32))
+        && ctx.companion().processes().len() == 1;
+    records.push(json!({
+        "case": "enable-hands-over-to-login-item",
+        "pass": handed_over,
+        "enable": enabled,
+        "companion": companion,
+        "loginItemPid": login_item,
+    }));
 
     // 10. UI open again after recovery, plain interaction.
     ensure_ui(ctx)?;

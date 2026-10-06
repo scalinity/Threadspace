@@ -310,6 +310,9 @@ pub enum ControlErrorCode {
     MaintenanceGated,
     /// Observation is disabled; only control/inspection operations run.
     ObservationDisabled,
+    /// This companion was not started by its login item (a notification
+    /// cold start); it hands the store to the login item's companion.
+    NotSupervised,
     Internal,
 }
 

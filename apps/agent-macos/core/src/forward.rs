@@ -14,7 +14,7 @@ use threadspace_contracts::control::{ClientRole, ControlRequestBody};
 use threadspace_relay::client::connect;
 
 use crate::log;
-use crate::{EXIT_RUNNING, EXIT_WRITER_LOCK_HELD};
+use crate::EXIT_WRITER_LOCK_HELD;
 
 /// Long enough for a launch-time notification response to arrive.
 const FORWARD_WINDOW: Duration = Duration::from_secs(15);
@@ -57,5 +57,7 @@ pub fn notification_response(request_id: &str, attention_id: &str) {
         "NOTIFICATION_RESPONSE_FORWARDED",
         json!({ "requestId": request_id, "attentionId": attention_id, "ok": outcome.is_ok(), "error": outcome.err() }),
     );
-    std::process::exit(EXIT_RUNNING);
+    // Never a successful exit: when this instance is the login item's, launchd
+    // relaunches it until it holds the writer lock (SPEC §18.9).
+    std::process::exit(EXIT_WRITER_LOCK_HELD);
 }

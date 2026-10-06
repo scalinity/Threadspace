@@ -11,6 +11,9 @@ use threadspace_contracts::diagnostics::PowerHistory;
 
 pub struct Runtime {
     observation_enabled: AtomicBool,
+    /// False only for a companion its login item did not start (a
+    /// notification cold start), which never becomes the enabled writer.
+    supervised: AtomicBool,
     maintenance: Mutex<MaintenancePhase>,
     asleep: AtomicBool,
     power: Mutex<PowerHistory>,
@@ -20,6 +23,7 @@ pub struct Runtime {
 
 pub static RUNTIME: Runtime = Runtime {
     observation_enabled: AtomicBool::new(true),
+    supervised: AtomicBool::new(true),
     maintenance: Mutex::new(MaintenancePhase::None),
     asleep: AtomicBool::new(false),
     power: Mutex::new(PowerHistory {
@@ -41,6 +45,14 @@ impl Runtime {
 
     pub fn set_observation_enabled(&self, enabled: bool) {
         self.observation_enabled.store(enabled, Ordering::Release);
+    }
+
+    pub fn supervised(&self) -> bool {
+        self.supervised.load(Ordering::Acquire)
+    }
+
+    pub fn set_supervised(&self, supervised: bool) {
+        self.supervised.store(supervised, Ordering::Release);
     }
 
     pub fn maintenance(&self) -> MaintenancePhase {

@@ -22,10 +22,10 @@ use objc2_foundation::NSString;
 use objc2_service_management::{SMAppService, SMAppServiceStatus};
 use serde_json::{Value, json};
 use threadspace_contracts::control::{
-    ClientRole, ControlRequestBody, ControlResponseBody, MaintenancePurpose,
+    ClientRole, ControlErrorCode, ControlRequestBody, ControlResponseBody, MaintenancePurpose,
 };
 use threadspace_contracts::diagnostics::{ProcessIdentity, ServiceReport, ServiceStatus};
-use threadspace_relay::client::{BlockingClient, connect};
+use threadspace_relay::client::{BlockingClient, ClientError, connect};
 use threadspace_relay::paths::AgentPaths;
 use threadspace_surfaces_macos::process;
 
@@ -59,6 +59,10 @@ impl ServiceCommand {
 const CONTROL_TIMEOUT: Duration = Duration::from_secs(120);
 const EXIT_WAIT: Duration = Duration::from_secs(15);
 const START_WAIT: Duration = Duration::from_secs(30);
+/// A notification cold start hands the store to the login item's companion,
+/// which launchd relaunches (at most every ten seconds) until it holds the
+/// writer lock.
+const HANDOVER_WAIT: Duration = Duration::from_secs(45);
 
 fn service(agent_identifier: &str) -> Retained<SMAppService> {
     let identifier = NSString::from_str(agent_identifier);
@@ -335,10 +339,40 @@ pub fn enable(agent_identifier: &str) -> (bool, Value) {
             return (false, json!({ "steps": steps }));
         }
     }
-    let enabled = request(
-        &mut client,
-        ControlRequestBody::SetObservationEnabled { enabled: true },
-    );
+    // Only the login item's companion opens observation (SPEC §19.5); a
+    // notification cold start refuses, exits and hands the store over.
+    let handover = Instant::now();
+    let mut handovers = 0;
+    let enabled = loop {
+        match client.request(ControlRequestBody::SetObservationEnabled { enabled: true }) {
+            Err(ClientError::Rejected(error))
+                if error.code == ControlErrorCode::NotSupervised && handover.elapsed() < HANDOVER_WAIT =>
+            {
+                handovers += 1;
+                thread::sleep(Duration::from_secs(1));
+                client = loop {
+                    match bootstrap_client(&paths) {
+                        Ok(client) => break client,
+                        Err(error) if handover.elapsed() >= HANDOVER_WAIT => {
+                            step(&mut steps, "handover", started, false, json!(error));
+                            return (false, json!({ "steps": steps }));
+                        }
+                        Err(_) => thread::sleep(Duration::from_millis(250)),
+                    }
+                };
+            }
+            other => break other.map_err(|error| error.to_string()),
+        }
+    };
+    if handovers > 0 {
+        step(
+            &mut steps,
+            "handover",
+            started,
+            enabled.is_ok(),
+            json!({ "refusals": handovers, "companionPid": client.connection().hello.companion.pid, "waitedMs": handover.elapsed().as_millis() as u64 }),
+        );
+    }
     let ok = matches!(enabled, Ok(ControlResponseBody::Done));
     step(
         &mut steps,

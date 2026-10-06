@@ -588,6 +588,29 @@ impl Writer {
             }
             WriterCommand::SetObservationEnabled {
                 request_id,
+                enabled: true,
+                outbound,
+            } if !RUNTIME.supervised() => {
+                // Only the companion its login item started opens observation
+                // (SPEC §19.5). This notification cold start answers, then
+                // exits with observation still disabled (a permitted
+                // deliberate exit), releasing the writer lock to it.
+                log::info("UNSUPERVISED_HANDOVER", json!({}));
+                respond(
+                    &outbound,
+                    request_id,
+                    Err(ControlError::new(
+                        ControlErrorCode::NotSupervised,
+                        "not started by the login item; handing the store to its companion",
+                    )),
+                );
+                let _ = thread::Builder::new().name("handover-exit".into()).spawn(|| {
+                    thread::sleep(std::time::Duration::from_millis(500));
+                    std::process::exit(crate::EXIT_RUNNING);
+                });
+            }
+            WriterCommand::SetObservationEnabled {
+                request_id,
                 enabled,
                 outbound,
             } => match self.journal.set_observation_enabled(enabled, log::now_ms()) {

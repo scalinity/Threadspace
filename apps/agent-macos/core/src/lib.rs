@@ -163,10 +163,18 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         return EXIT_CONFIG;
     };
     log::init(&paths.log_dir);
+    // launchd names a login-item job after its bundle identifier, and an
+    // application LaunchServices started (a notification cold start)
+    // `application.<identifier>.<n>.<n>`.
+    let supervised = std::env::var("XPC_SERVICE_NAME").map_or(true, |name| {
+        !name.starts_with(&format!("application.{}.", config.bundle_identifier))
+    });
+    RUNTIME.set_supervised(supervised);
     log::info(
         "CORE_START",
         json!({
             "bundleIdentifier": config.bundle_identifier,
+            "supervised": supervised,
             "bundlePath": threadspace_relay::paths::redact_home(&config.bundle_path),
             "qualificationBuild": cfg!(feature = "qualification"),
         }),
