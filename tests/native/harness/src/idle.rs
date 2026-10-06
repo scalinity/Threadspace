@@ -47,17 +47,29 @@ pub fn wait_for_idle(native: &Native, required_seconds: f64, max_wait: Duration)
 /// sends input, activates or moves windows, or launches a focus-taking app
 /// holds it for one short segment, so two harnesses never race for focus or
 /// type into each other's windows. Dropping the guard releases it.
+///
+/// Re-entrant on one thread: `flock` locks belong to an open file
+/// description, so a second open in the same process would wait on the first
+/// forever. A nested guard holds nothing; the outermost one releases.
 pub struct GuiLock {
-    file: std::fs::File,
+    file: Option<std::fs::File>,
     pub waited_ms: u64,
 }
 
 pub const GUI_LOCK_PATH: &str = "/private/tmp/mac-gui-automation.lock";
 
+thread_local! {
+    static DEPTH: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 impl GuiLock {
     pub fn acquire(label: &str) -> std::io::Result<Self> {
         use std::io::Write;
         use std::os::fd::AsRawFd;
+        if DEPTH.get() > 0 {
+            DEPTH.set(DEPTH.get() + 1);
+            return Ok(Self { file: None, waited_ms: 0 });
+        }
         let started = Instant::now();
         let mut file = std::fs::OpenOptions::new()
             .read(true)
@@ -75,8 +87,9 @@ impl GuiLock {
             "{}",
             serde_json::json!({ "pid": std::process::id(), "label": label, "sinceMs": crate::now_ms() })
         );
+        DEPTH.set(1);
         Ok(Self {
-            file,
+            file: Some(file),
             waited_ms: started.elapsed().as_millis() as u64,
         })
     }
@@ -85,8 +98,11 @@ impl GuiLock {
 impl Drop for GuiLock {
     fn drop(&mut self) {
         use std::os::fd::AsRawFd;
-        let _ = self.file.set_len(0);
-        // SAFETY: releasing the lock this guard took on its own descriptor.
-        unsafe { libc::flock(self.file.as_raw_fd(), libc::LOCK_UN) };
+        DEPTH.set(DEPTH.get().saturating_sub(1));
+        if let Some(file) = &self.file {
+            let _ = file.set_len(0);
+            // SAFETY: releasing the lock this guard took on its own descriptor.
+            unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_UN) };
+        }
     }
 }

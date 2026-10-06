@@ -106,6 +106,10 @@ pub fn companion_independence(ctx: &Ctx, crashes: u32) -> Result<Value, String> 
     let run_dir = Run::create(&ctx.evidence_root(), "g09-companion", ctx.channel_name())
         .map_err(|e| e.to_string())?;
     let app = ctx.app();
+    let root = std::path::PathBuf::from(format!(
+        "/private/tmp/ts-m0c-g09-{}",
+        &uuid::Uuid::new_v4().to_string()[..8]
+    ));
     let mut cases = Vec::new();
     for (name, how) in [
         ("ui-quit-cmd-q", "cmd-q"),
@@ -113,7 +117,7 @@ pub fn companion_independence(ctx: &Ctx, crashes: u32) -> Result<Value, String> 
         ("ui-sigkill", "kill"),
     ] {
         let ui = ensure_ui(ctx)?;
-        let _gui = ctx.gui(&format!("g09 {name}"))?;
+        let gui = ctx.gui(&format!("g09 {name}"))?;
         let companion_before = ctx.companion().incarnation();
         let idle = if how == "cmd-q" {
             let waited = wait_for_idle(&ctx.native, 5.0, Duration::from_secs(600));
@@ -133,24 +137,43 @@ pub fn companion_independence(ctx: &Ctx, crashes: u32) -> Result<Value, String> 
             None
         };
         let exited = procs::wait_exit(&ui, Duration::from_secs(15));
+        drop(gui);
         let mut cursor = ctx.companion().log();
         let capture = raise(ctx, &format!("g09-{name}"));
+        // Discovery logs a pass only when it commits a change, so a new
+        // disposable Claude session gives its own five-second loop one to
+        // find; nothing else (no UI, no hook) may connect meanwhile.
+        let dir = root.join(name);
+        let spawned = std::fs::create_dir_all(&dir)
+            .map_err(|e| e.to_string())
+            .and_then(|_| crate::terminal_gates::spawn_claude(ctx, dir.clone()));
         let mut seen = Vec::new();
         let pass_seen = cursor.wait_for(
             "DISCOVERY_PASS",
-            |_| true,
-            Duration::from_secs(12),
+            |line| line["started"].as_u64().unwrap_or(0) >= 1,
+            Duration::from_secs(5),
             &mut seen,
         );
+        let closed = spawned.as_ref().map(|claude| claude.tab.close()).ok();
+        seen.extend(cursor.read_new());
+        let other_clients: Vec<Value> = seen
+            .iter()
+            .filter(|l| l["event"] == "CLIENT_CONNECTED" && l["role"] != "QUALIFICATION")
+            .cloned()
+            .collect();
         let companion_after = ctx.companion().incarnation();
+        let discovered = spawned.is_ok() && pass_seen.is_some() && other_clients.is_empty();
         let record = json!({
             "case": name,
             "idleGate": idle,
             "uiExitedMs": exited,
             "companionUnchanged": companion_before.is_some() && companion_before == companion_after,
             "captureWhileUiAbsent": capture.as_ref().map(|(id, c)| json!({ "attentionId": id, "cursor": c })).unwrap_or_else(|e| json!(e)),
-            "discoveryPassAfterUiDeath": pass_seen.is_some(),
-            "pass": exited.is_some() && companion_before == companion_after && capture.is_ok() && pass_seen.is_some(),
+            "disposableSession": spawned.as_ref().map(|c| json!({ "sessionId": c.session_id, "nativeSessionId": c.native_session_id, "tty": c.tab.tty, "dir": dir.display().to_string() })).unwrap_or_else(|e| json!({ "error": e })),
+            "discoveryPassAfterUiDeath": pass_seen,
+            "nonQualificationClients": other_clients,
+            "disposableClosed": closed,
+            "pass": exited.is_some() && companion_before == companion_after && capture.is_ok() && discovered,
         });
         run_dir
             .append("cases.jsonl", &record)
@@ -203,7 +226,7 @@ pub fn companion_independence(ctx: &Ctx, crashes: u32) -> Result<Value, String> 
         cases.push(record);
     }
     let passed = cases.iter().filter(|c| c["pass"] == true).count();
-    let summary = json!({ "gate": "G09", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "service": service::status(&ctx.id) });
+    let summary = json!({ "gate": "G09", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "service": service::status(&ctx.id), "disposableRoot": root.display().to_string() });
     run_dir
         .write_json("summary.json", &summary)
         .map_err(|e| e.to_string())?;
