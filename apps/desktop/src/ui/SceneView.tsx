@@ -1,9 +1,16 @@
 import { useCallback } from "react";
 
-import { OfficeScene, type SceneModel, type WorkerVisualState } from "@threadspace/scene";
+import {
+  RendererLifecycle,
+  createThreeRendererPlatform,
+  documentVisibilityConfirmation,
+  type SceneModel,
+  type WorkerVisualState,
+} from "@threadspace/scene";
 
 import type { BridgeClient, ViewState } from "../bridge/client";
 import { launch } from "../launch";
+import { registerRendererLifecycle } from "../qualification/rendererQualification";
 
 function workerState(state: ViewState, sessionId: string): WorkerVisualState {
   const open = state.attention.filter((item) => item.sessionId === sessionId && item.resolvedAtMs === null);
@@ -22,41 +29,60 @@ export function sceneModel(state: ViewState): SceneModel {
   };
 }
 
+const lifecycles = new WeakMap<BridgeClient, RendererLifecycle>();
+
 /**
- * Mounts the WebGPU scene with a callback ref. The scene subscribes to the
- * bridge store directly, so projection changes reach it without React
- * re-rendering the canvas.
+ * The one renderer lifecycle for a bridge client. Construction has no side
+ * effects; the lifecycle starts work only when SceneView attaches it.
+ * `confirmVisibility` is the single injection point for a native-confirmed
+ * hidden/minimized signal.
  */
-export function SceneView({ client }: { client: BridgeClient }) {
-  const mount = useCallback(
-    (canvas: HTMLCanvasElement | null) => {
-      if (!canvas) return;
-      let disposed = false;
-      let scene: OfficeScene | null = null;
-      let unsubscribe: (() => void) | null = null;
-      OfficeScene.create(canvas, {
+export function rendererLifecycleFor(client: BridgeClient): RendererLifecycle {
+  let lifecycle = lifecycles.get(client);
+  if (!lifecycle) {
+    lifecycle = new RendererLifecycle({
+      platform: createThreeRendererPlatform({
         forceWebGL: launch.rendererMode === "webgl2-compatibility",
-        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        canvasLabel: "Office scene: one desk and worker per session",
         onSelect: (sessionId) => client.select(sessionId),
-      })
-        .then((created) => {
-          if (disposed) {
-            void created.dispose();
-            return;
-          }
-          scene = created;
-          client.setRenderer(created.attestation);
-          created.update(sceneModel(client.getSnapshot()));
-          unsubscribe = client.subscribe(() => created.update(sceneModel(client.getSnapshot())));
-        })
-        .catch((error: unknown) => client.setRendererError(error instanceof Error ? error.message : String(error)));
+      }),
+      confirmVisibility: documentVisibilityConfirmation,
+      qualification: launch.qualificationBuild,
+      frameTarget: launch.qualificationBuild ? window : null,
+      matchMedia: (query) => window.matchMedia(query),
+      onAttested: (attestation) => client.setRenderer(attestation),
+      onFallback: (reason) => client.setRendererError(reason),
+      report: (report) => client.recordQualificationReport("renderer-lifecycle", report),
+    });
+    lifecycles.set(client, lifecycle);
+  }
+  return lifecycle;
+}
+
+/**
+ * Mounts the renderer lifecycle on a host element with a callback ref. The
+ * lifecycle creates a fresh canvas per renderer generation inside the host;
+ * projection changes reach it through the bridge store without React
+ * re-rendering the scene, and visibility changes are confirmed before acting.
+ */
+export function SceneView({ client, lifecycle, hidden }: { client: BridgeClient; lifecycle: RendererLifecycle; hidden: boolean }) {
+  const mount = useCallback(
+    (host: HTMLDivElement | null) => {
+      if (!host) return;
+      const unregister = launch.qualificationBuild ? registerRendererLifecycle(lifecycle) : null;
+      lifecycle.setModel(sceneModel(client.getSnapshot()));
+      lifecycle.attach(host);
+      const unsubscribe = client.subscribe(() => lifecycle.setModel(sceneModel(client.getSnapshot())));
+      const onVisibility = () => lifecycle.setHostVisibility(document.visibilityState === "visible" ? "visible" : "hidden");
+      document.addEventListener("visibilitychange", onVisibility);
       return () => {
-        disposed = true;
-        unsubscribe?.();
-        void scene?.dispose();
+        document.removeEventListener("visibilitychange", onVisibility);
+        unsubscribe();
+        lifecycle.detach();
+        unregister?.();
       };
     },
-    [client],
+    [client, lifecycle],
   );
-  return <canvas ref={mount} className="scene-canvas" aria-label="Office scene: one desk and worker per session" />;
+  return <div ref={mount} className="scene-host" hidden={hidden} />;
 }

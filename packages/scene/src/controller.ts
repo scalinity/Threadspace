@@ -2,6 +2,10 @@
 // (SPEC §15.1–15.2). M0A uses a deliberately simple geometric qualification
 // skin: a floor, one desk per worker, a capsule worker and a TSL-shaded
 // attention marker whose colour and motion follow the projected state.
+//
+// An OfficeScene is built on an already initialized renderer and lives for
+// exactly one renderer generation; `RendererLifecycle` creates, attests and
+// disposes renderers (SPEC §15.6).
 
 import {
   BoxGeometry,
@@ -17,12 +21,13 @@ import {
   PlaneGeometry,
   Raycaster,
   Scene,
+  type Texture,
   Vector2,
-  WebGPURenderer,
+  type WebGPURenderer,
 } from "three/webgpu";
-import { color, float, mix, oscSine, time, uniform } from "three/tsl";
+import { color, float, mix, oscSine, texture, time, uniform, uv, vec2 } from "three/tsl";
 
-import { attest, type RendererAttestation } from "./backend";
+import type { LifecycleScene, SceneAsset } from "./lifecycle";
 
 export type WorkerVisualState = "attention" | "acknowledged" | "idle";
 
@@ -38,7 +43,6 @@ export interface SceneModel {
 }
 
 export interface OfficeSceneOptions {
-  forceWebGL: boolean;
   reducedMotion: boolean;
   onSelect: (workerId: string | null) => void;
 }
@@ -47,6 +51,11 @@ export interface FrameStats {
   frames: number;
   lastFrameAtMs: number;
   modelRevision: number;
+}
+
+/** The bundled floor-grain texture, owned by one renderer generation. */
+export interface FloorTexture extends SceneAsset {
+  readonly texture: Texture;
 }
 
 // Quiet Editorial palette (warm paper, deep teal, lavender).
@@ -68,44 +77,39 @@ interface WorkerNodes {
   pulse: ReturnType<typeof uniform>;
 }
 
-export class OfficeScene {
-  readonly attestation: RendererAttestation;
+export class OfficeScene implements LifecycleScene<FloorTexture> {
   private readonly renderer: WebGPURenderer;
+  private readonly canvas: HTMLCanvasElement;
   private readonly scene = new Scene();
   private readonly camera: OrthographicCamera;
   private readonly workers = new Map<string, WorkerNodes>();
   private readonly raycaster = new Raycaster();
   private readonly resizeObserver: ResizeObserver;
   private readonly stats: FrameStats = { frames: 0, lastFrameAtMs: 0, modelRevision: 0 };
-  private disposed = false;
+  /** 1 = idle motion on, 0 = reduced motion. Shared by every marker's TSL graph. */
+  private readonly motion = uniform(1);
+  private readonly floorMaterial = new MeshStandardNodeMaterial({ roughness: 0.95 });
+  private reducedMotion: boolean;
+  private released = false;
 
-  private constructor(
-    private readonly canvas: HTMLCanvasElement,
+  /** Builds the room on an initialized renderer and starts its application frame callback. */
+  constructor(
     renderer: WebGPURenderer,
-    attestation: RendererAttestation,
     private readonly options: OfficeSceneOptions,
   ) {
     this.renderer = renderer;
-    this.attestation = attestation;
+    this.canvas = renderer.domElement;
+    this.reducedMotion = options.reducedMotion;
+    this.motion.value = options.reducedMotion ? 0 : 1;
     this.camera = new OrthographicCamera(-6, 6, 4, -4, 0.1, 100);
     this.camera.position.set(9, 9, 9);
     this.camera.lookAt(0, 0.6, 0);
     this.buildRoom();
     this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(canvas);
+    this.resizeObserver.observe(this.canvas);
     this.resize();
-    canvas.addEventListener("pointerdown", this.onPointerDown);
+    this.canvas.addEventListener("pointerdown", this.onPointerDown);
     void this.renderer.setAnimationLoop(() => this.frame());
-  }
-
-  /** Creates and asynchronously initializes the renderer, then attests its backend. */
-  static async create(canvas: HTMLCanvasElement, options: OfficeSceneOptions): Promise<OfficeScene> {
-    const started = performance.now();
-    const renderer = new WebGPURenderer({ canvas, antialias: true, forceWebGL: options.forceWebGL });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    await renderer.init();
-    const attestation = attest(renderer, options.forceWebGL, Math.round(performance.now() - started));
-    return new OfficeScene(canvas, renderer, attestation, options);
   }
 
   get frameStats(): FrameStats {
@@ -119,9 +123,8 @@ export class OfficeScene {
     sun.position.set(5, 10, 4);
     this.scene.add(sun);
 
-    const floorMaterial = new MeshStandardNodeMaterial({ roughness: 0.95 });
-    floorMaterial.colorNode = color(PALETTE.floor);
-    const floor = new Mesh(new PlaneGeometry(14, 10), floorMaterial);
+    this.floorMaterial.colorNode = color(PALETTE.floor);
+    const floor = new Mesh(new PlaneGeometry(14, 10), this.floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     this.scene.add(floor);
   }
@@ -145,10 +148,11 @@ export class OfficeScene {
 
     // TSL: the marker blends between lavender and teal over time while the
     // worker needs attention; once acknowledged the pulse uniform drops to 0
-    // and it settles on a steady teal.
+    // and it settles on a steady teal. Reduced motion holds the blend still
+    // while keeping the attention and acknowledged colours distinct.
     const pulse = uniform(1);
     const markerMaterial = new MeshStandardNodeMaterial({ roughness: 0.35, metalness: 0.1 });
-    const wave = this.options.reducedMotion ? float(0.5) : oscSine(time.mul(0.6));
+    const wave = mix(float(0.5), oscSine(time.mul(0.6)), this.motion);
     markerMaterial.colorNode = mix(color(PALETTE.acknowledged), mix(color(PALETTE.attentionB), color(PALETTE.attentionA), wave), pulse);
     markerMaterial.emissiveNode = mix(color("#000000"), color(PALETTE.attentionA).mul(0.35), pulse.mul(wave));
     const marker = new Mesh(new OctahedronGeometry(0.22), markerMaterial);
@@ -162,7 +166,7 @@ export class OfficeScene {
 
   /** Applies a projected model. Missing workers are removed and their GPU resources released. */
   update(model: SceneModel): void {
-    if (this.disposed) return;
+    if (this.released) return;
     const seen = new Set<string>();
     model.workers.forEach((worker, index) => {
       seen.add(worker.id);
@@ -177,26 +181,40 @@ export class OfficeScene {
     });
     for (const [id, nodes] of this.workers) {
       if (!seen.has(id)) {
-        this.release(nodes);
+        this.releaseObject(nodes.root);
+        this.scene.remove(nodes.root);
         this.workers.delete(id);
       }
     }
     this.stats.modelRevision += 1;
   }
 
-  private release(nodes: WorkerNodes): void {
-    nodes.root.traverse((object) => {
+  /** Stops idle motion (marker spin and pulse) without changing any state-driven appearance. */
+  setReducedMotion(reduced: boolean): void {
+    this.reducedMotion = reduced;
+    this.motion.value = reduced ? 0 : 1;
+  }
+
+  /** Adds the bundled paper grain to the floor. The texture stays owned by its generation's asset. */
+  applyAsset(asset: FloorTexture): void {
+    if (this.released) return;
+    const grain = texture(asset.texture, uv().mul(vec2(7, 5))).r;
+    this.floorMaterial.colorNode = color(PALETTE.floor).mul(grain.mul(0.12).add(0.88));
+    this.floorMaterial.needsUpdate = true;
+  }
+
+  private releaseObject(root: Object3D): void {
+    root.traverse((object) => {
       if (object instanceof Mesh) {
         object.geometry.dispose();
         (object.material as MeshStandardNodeMaterial).dispose();
       }
     });
-    this.scene.remove(nodes.root);
   }
 
   private frame(): void {
-    if (this.disposed) return;
-    if (!this.options.reducedMotion) {
+    if (this.released) return;
+    if (!this.reducedMotion) {
       for (const nodes of this.workers.values()) {
         nodes.marker.rotation.y += 0.02;
       }
@@ -207,6 +225,7 @@ export class OfficeScene {
   }
 
   private resize(): void {
+    if (this.released) return;
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
     const aspect = width / height;
@@ -231,15 +250,19 @@ export class OfficeScene {
     this.options.onSelect(typeof workerId === "string" ? workerId : null);
   };
 
-  /** Stops the loop and awaits the pinned renderer's asynchronous disposal. */
-  async dispose(): Promise<void> {
-    if (this.disposed) return;
-    this.disposed = true;
+  /**
+   * Clears the application frame callback and releases this scene's GPU
+   * resources. The internal Three loop keeps running until the lifecycle
+   * awaits `renderer.dispose()`.
+   */
+  async release(): Promise<void> {
+    if (this.released) return;
+    this.released = true;
     this.canvas.removeEventListener("pointerdown", this.onPointerDown);
     this.resizeObserver.disconnect();
     await this.renderer.setAnimationLoop(null);
-    for (const nodes of this.workers.values()) this.release(nodes);
+    this.releaseObject(this.scene);
     this.workers.clear();
-    await this.renderer.dispose();
+    this.scene.clear();
   }
 }
