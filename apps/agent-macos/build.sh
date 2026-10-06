@@ -65,7 +65,7 @@ cat > "$OUT_DIR/build-info.json" <<EOF
   "agentIdentifier": "$AGENT_IDENTIFIER",
   "version": "$VERSION",
   "sourceCommit": "$(git -C "$ROOT" rev-parse HEAD)",
-  "sourceTreeDirty": $( [ -n "$(git -C "$ROOT" status --porcelain)" ] && echo true || echo false ),
+  "sourceTreeDirty": $( [ -n "$(git -C "$ROOT" status --porcelain --untracked-files=no)" ] && echo true || echo false ),
   "executableSha256": "$EXECUTABLE_SHA256",
   "qualificationBuild": true
 }
