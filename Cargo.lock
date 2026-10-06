@@ -3444,6 +3444,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "threadspace-codex-probe"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "threadspace-contracts"
 version = "0.1.0"
 dependencies = [
@@ -3491,6 +3498,14 @@ dependencies = [
  "sha2 0.11.0",
  "threadspace-contracts",
  "uuid",
+]
+
+[[package]]
+name = "threadspace-journal-crash"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "threadspace-journal",
 ]
 
 [[package]]
