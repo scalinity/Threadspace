@@ -505,6 +505,19 @@ fn terminal_not_frontmost_after_activation_is_not_exact() {
 }
 
 #[test]
+fn a_frontmost_process_other_than_the_terminal_incarnation_is_not_exact() {
+    let mut mock = Mock::healthy();
+    // Something else carrying Terminal's bundle identifier is frontmost.
+    mock.frontmost = Some(FrontmostApplication {
+        bundle_identifier: Some(TERMINAL_BUNDLE_ID.into()),
+        pid: 35621,
+    });
+    let result = go(&mock, &target(vec![bound(PID, "b1")]));
+    assert_eq!(result.reason_code, "ACTIVATION_REFUSED");
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
+
+#[test]
 fn a_session_change_seen_after_focus_downgrades_verification() {
     let mut mock = Mock::healthy();
     mock.inventory = Seq::of(vec![

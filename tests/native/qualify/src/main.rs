@@ -204,8 +204,10 @@ fn route_loop(client: &mut BlockingClient, count: u32, out: &Path, sessions: &[S
         Err(error) => return json!({ "ok": false, "error": error.to_string() }),
     };
     let baseline = snapshot_bindings(client).unwrap_or(Value::Null);
+    // Identity of the tracked sessions' bindings, as a set: the snapshot is
+    // ordered by revision, which every recorded route advances.
     let tracked = |snapshot: &Value| -> Vec<Value> {
-        snapshot
+        let mut list: Vec<Value> = snapshot
             .as_array()
             .map(|list| {
                 list.iter()
@@ -225,7 +227,9 @@ fn route_loop(client: &mut BlockingClient, count: u32, out: &Path, sessions: &[S
                     })
                     .collect()
             })
-            .unwrap_or_default()
+            .unwrap_or_default();
+        list.sort_by_key(|entry| entry[0].as_str().unwrap_or_default().to_owned());
+        list
     };
     let baseline_tracked = tracked(&baseline);
     let mut latencies = Vec::new();
@@ -255,7 +259,8 @@ fn route_loop(client: &mut BlockingClient, count: u32, out: &Path, sessions: &[S
             let round_trip_ms = sent.elapsed().as_millis() as u32;
             let check = independent_check(&native);
             let after = snapshot_bindings(client).unwrap_or(Value::Null);
-            let unchanged = tracked(&after) == baseline_tracked;
+            let after_tracked = tracked(&after);
+            let unchanged = after_tracked == baseline_tracked;
             if !unchanged {
                 unrelated_changes += 1;
             }
@@ -301,6 +306,7 @@ fn route_loop(client: &mut BlockingClient, count: u32, out: &Path, sessions: &[S
                         "independentOk": independent_ok,
                         "companionReadbackAgrees": agrees,
                         "unrelatedBindingsUnchanged": unchanged,
+                        "trackedBindingsAfter": after_tracked,
                         "result": result,
                         "independent": check,
                     })
@@ -336,6 +342,7 @@ fn route_loop(client: &mut BlockingClient, count: u32, out: &Path, sessions: &[S
             "samples": latencies.len(),
         },
         "baseline": baseline,
+        "baselineTracked": baseline_tracked,
         "out": out.display().to_string(),
     })
 }

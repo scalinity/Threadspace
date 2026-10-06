@@ -553,6 +553,10 @@ pub fn route<N: RouteNative>(
             vec![],
         );
     }
+    let terminal_pid = match &gen_before {
+        Ok(Some(generation)) => Some(generation.pid),
+        _ => None,
+    };
     let surface_tty = match matches.as_slice() {
         [] => {
             return run.finish(
@@ -715,10 +719,12 @@ pub fn route<N: RouteNative>(
             vec![],
         );
     }
-    let terminal_frontmost = frontmost
-        .as_ref()
-        .and_then(|app| app.bundle_identifier.as_deref())
-        == Some(TERMINAL_BUNDLE_ID);
+    // The frontmost application must be Terminal's proven incarnation, not
+    // merely something carrying Terminal's bundle identifier.
+    let terminal_frontmost = frontmost.as_ref().is_some_and(|app| {
+        app.bundle_identifier.as_deref() == Some(TERMINAL_BUNDLE_ID)
+            && Some(app.pid.max(0) as u32) == terminal_pid
+    });
     if !terminal_frontmost {
         return run.finish(
             request,

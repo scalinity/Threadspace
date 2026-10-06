@@ -83,12 +83,18 @@ impl DiscoveryContext {
     }
 }
 
-/// Terminal.app's current incarnation, if exactly one instance runs.
+/// Terminal.app's current incarnation from kernel evidence: the one live
+/// process running Terminal's executable, sampled for its birth. `None` when
+/// it is not running; several such processes are an error, never a choice.
+/// (NSRunningApplication's list for Terminal's bundle identifier also names
+/// transient osascript processes while they run, so it is not used.)
 pub fn terminal_generation() -> Result<Option<AppGeneration>, String> {
-    let pid = bridge::running_application_pid(TERMINAL_BUNDLE_ID, QUICK)
+    let pids = process::pids_with_executable(terminal::TERMINAL_EXECUTABLE)
         .map_err(|error| error.to_string())?;
-    let Some(pid) = pid else {
-        return Ok(None);
+    let pid = match pids.as_slice() {
+        [] => return Ok(None),
+        [pid] => *pid,
+        _ => return Err("MULTIPLE_TERMINAL_PROCESSES".to_owned()),
     };
     let sample = process::sample(pid).map_err(|error| error.to_string())?;
     Ok(Some(AppGeneration {

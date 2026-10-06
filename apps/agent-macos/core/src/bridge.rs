@@ -79,11 +79,6 @@ pub enum BridgeEvent {
     RunningApplication {
         correlation_id: u64,
         running: bool,
-        #[serde(default)]
-        instances: u32,
-        /// Present only when exactly one instance runs.
-        #[serde(default)]
-        pid: Option<i32>,
     },
     AccessibilityPreferences {
         correlation_id: u64,
@@ -230,24 +225,6 @@ pub fn application_running(
         timeout,
     )? {
         BridgeEvent::RunningApplication { running, .. } => Ok(running),
-        _ => Err(BridgeError::Unexpected),
-    }
-}
-
-/// The PID of the single running instance of an application, `None` when it
-/// is not running or more than one instance runs.
-pub fn running_application_pid(
-    bundle_identifier: &str,
-    timeout: Duration,
-) -> Result<Option<i32>, BridgeError> {
-    match call(
-        |correlation_id| BridgeRequest::RunningApplication {
-            correlation_id,
-            bundle_identifier: bundle_identifier.to_owned(),
-        },
-        timeout,
-    )? {
-        BridgeEvent::RunningApplication { pid, .. } => Ok(pid),
         _ => Err(BridgeError::Unexpected),
     }
 }

@@ -13,6 +13,9 @@ use crate::exec::{BoundedCommand, ExecError, run_bounded};
 
 pub const TERMINAL_BUNDLE_ID: &str = "com.apple.Terminal";
 pub const TERMINAL_APP_PATH: &str = "/System/Applications/Utilities/Terminal.app";
+/// Terminal's executable; its unique live process is the application incarnation.
+pub const TERMINAL_EXECUTABLE: &str =
+    "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
 const SDEF: &str = "/usr/bin/sdef";
 const OSASCRIPT: &str = "/usr/bin/osascript";
 const PLUTIL: &str = "/usr/bin/plutil";

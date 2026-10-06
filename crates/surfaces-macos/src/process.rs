@@ -223,6 +223,43 @@ pub fn executable_path(pid: i32) -> Result<PathBuf, ProcessError> {
     Ok(PathBuf::from(String::from_utf8_lossy(&buffer).into_owned()))
 }
 
+/// Every live PID whose kernel executable path is exactly `path`. This is how
+/// an application's process is found for incarnation sampling: LaunchServices'
+/// running-application list can also attribute transient helper processes to
+/// an application's bundle identifier, so it is not identity evidence.
+pub fn pids_with_executable(path: &str) -> Result<Vec<i32>, ProcessError> {
+    // SAFETY: a null buffer asks only for the current count.
+    let estimate = unsafe { libc::proc_listallpids(std::ptr::null_mut(), 0) };
+    if estimate <= 0 {
+        return Err(ProcessError::Sysctl {
+            name: "proc_listallpids",
+            errno: errno(),
+        });
+    }
+    let mut pids = vec![0i32; estimate as usize + 128];
+    // SAFETY: the buffer is writable for the byte size passed.
+    let count = unsafe {
+        libc::proc_listallpids(
+            pids.as_mut_ptr().cast(),
+            (pids.len() * size_of::<i32>()) as i32,
+        )
+    };
+    if count <= 0 {
+        return Err(ProcessError::Sysctl {
+            name: "proc_listallpids",
+            errno: errno(),
+        });
+    }
+    pids.truncate((count as usize).min(pids.len()));
+    Ok(pids
+        .into_iter()
+        .filter(|pid| *pid > 1)
+        .filter(|pid| {
+            executable_path(*pid).is_ok_and(|exe| exe.as_os_str() == std::ffi::OsStr::new(path))
+        })
+        .collect())
+}
+
 /// `dev:ino` of the file currently at `path`, or `None` if it cannot be stat'ed.
 fn file_id(path: &str) -> Option<String> {
     let text = CString::new(path).ok()?;
@@ -427,6 +464,19 @@ mod tests {
         );
         assert_ne!(before.executable, after.executable, "image replaced");
         assert!(!before.same_process_and_image(&after));
+    }
+
+    #[test]
+    fn finds_this_process_by_exact_executable_path() {
+        let pid = std::process::id() as i32;
+        let path = executable_path(pid).expect("path").display().to_string();
+        let found = pids_with_executable(&path).expect("scan");
+        assert!(found.contains(&pid), "{found:?}");
+        assert!(
+            pids_with_executable("/nonexistent/executable")
+                .expect("scan")
+                .is_empty()
+        );
     }
 
     #[test]
