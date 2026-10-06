@@ -15,6 +15,8 @@
 //   ts-native pixels-stats <png> [x y w h]
 //   ts-native pixels-diff <png-a> <png-b> [x y w h]
 //   ts-native ax-switch <bundle-id> <label> [press]   (read, or press, a labelled switch/checkbox)
+//   ts-native ax-press <bundle-id> <label>            (press any labelled pressable element)
+//   ts-native ax-focused <pid>                         (the focused element's role and label)
 //   ts-native idle
 //   ts-native displays
 import AppKit
@@ -97,6 +99,9 @@ func tree(_ element: AXUIElement, depth: Int, maxDepth: Int, into nodes: inout [
         .joined(separator: " | ")
     var node: [String: Any] = ["depth": depth, "role": role]
     if !label.isEmpty { node["label"] = String(label.prefix(160)) }
+    if role == "AXStaticText" || role == "AXHeading", let value: String = attribute(element, kAXValueAttribute), !value.isEmpty {
+        node["value"] = String(value.prefix(200))
+    }
     if let subrole: String = attribute(element, kAXSubroleAttribute) { node["subrole"] = subrole }
     if let focused: Bool = attribute(element, kAXFocusedAttribute), focused { node["focused"] = true }
     if let enabled: Bool = attribute(element, kAXEnabledAttribute), !enabled { node["enabled"] = false }
@@ -147,6 +152,23 @@ func findLabelled(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> A
     let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
     for child in children {
         if let hit = findLabelled(child, needle, depth: depth + 1) { return hit }
+    }
+    return nil
+}
+
+func findPressableLabelled(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> AXUIElement? {
+    guard depth < 30 else { return nil }
+    let label = [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"]
+        .compactMap { attribute(element, $0) as String? }
+        .joined(separator: " ")
+    if label.localizedCaseInsensitiveContains(needle) {
+        var actions: CFArray?
+        AXUIElementCopyActionNames(element, &actions)
+        if (actions as? [String] ?? []).contains(kAXPressAction) { return element }
+    }
+    let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
+    for child in children {
+        if let hit = findPressableLabelled(child, needle, depth: depth + 1) { return hit }
     }
     return nil
 }
@@ -385,6 +407,33 @@ case "ax-switch":
         pause(1.0)
     }
     emit(["bundle": bundle, "label": needle, "found": true, "valueBefore": before ?? -1, "pressed": pressed, "valueAfter": switchValue(control) ?? -1])
+
+case "ax-press":
+    guard args.count >= 3, AXIsProcessTrusted() else { usage() }
+    let bundle = args[1], needle = args[2]
+    var element: AXUIElement?
+    let deadline = Date(timeIntervalSinceNow: 15)
+    while element == nil && Date() < deadline {
+        for app in NSRunningApplication.runningApplications(withBundleIdentifier: bundle) {
+            element = findPressableLabelled(AXUIElementCreateApplication(app.processIdentifier), needle)
+            if element != nil { break }
+        }
+        if element == nil { pause(0.5) }
+    }
+    guard let control = element else { emit(["bundle": bundle, "label": needle, "found": false], ok: false) }
+    let ok = AXUIElementPerformAction(control, kAXPressAction as CFString) == .success
+    pause(1.0)
+    emit(["bundle": bundle, "label": needle, "found": true, "pressed": ok], ok: ok)
+
+case "ax-focused":
+    guard args.count >= 2, let pid = pid_t(args[1]), AXIsProcessTrusted() else { usage() }
+    let app = AXUIElementCreateApplication(pid)
+    guard let focused: AXUIElement = attribute(app, kAXFocusedUIElementAttribute) else { emit(["pid": pid, "found": false], ok: false) }
+    let label = [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"]
+        .compactMap { attribute(focused, $0) as String? }
+        .filter { !$0.isEmpty }
+        .joined(separator: " | ")
+    emit(["pid": pid, "found": true, "role": (attribute(focused, kAXRoleAttribute) as String?) ?? "", "label": label])
 
 case "idle":
     var iterator: io_iterator_t = 0

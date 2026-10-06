@@ -18,6 +18,11 @@
 //!   threadspace-m0c g08-terminal <prod|dev>
 //!   threadspace-m0c g06-notifications prod
 //!   threadspace-m0c g05-denied dev
+//!   threadspace-m0c g13-renderer prod
+//!   threadspace-m0c g15-graphics prod [minutes]
+//!   threadspace-m0c g16-window prod
+//!   threadspace-m0c g12-sleep-wake prod [cycles]
+//!   threadspace-m0c wake-schedule prod
 //!   threadspace-m0c clear-notifications <prod|dev>
 //!   threadspace-m0c resolve-qualification <prod|dev> [reason]
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
@@ -25,11 +30,14 @@
 mod bridge_gates;
 mod cleanup;
 mod ctx;
+mod graphics;
 mod install;
 mod launches;
 mod notifications;
+mod power;
 mod service_gates;
 mod terminal_gates;
+mod window_gates;
 
 use std::process::ExitCode;
 
@@ -66,6 +74,11 @@ fn main() -> ExitCode {
         "g08-terminal" => terminal_gates::negatives(&ctx),
         "g06-notifications" => notifications::lifecycle(&ctx),
         "g05-denied" => notifications::denied(&ctx),
+        "g13-renderer" => graphics::renderer(&ctx),
+        "g15-graphics" => graphics::sustained(&ctx, u64::from(number(&args, 2, 15))),
+        "g16-window" => window_gates::matrix(&ctx),
+        "g12-sleep-wake" => power::cycles(&ctx, number(&args, 2, 5)),
+        "wake-schedule" => Ok(json!({ "futureWakes": power::scheduled_wakes() })),
         "clear-notifications" => cleanup::clear_notifications(&ctx),
         "resolve-qualification" => cleanup::resolve_qualification(
             &ctx,

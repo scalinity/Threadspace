@@ -48,6 +48,44 @@ async function ipcSuite(client: BridgeClient, rounds: number): Promise<unknown> 
   const context = client.context();
   const started = performance.now();
 
+  // Cancellation: an action whose subscription was retired is refused before
+  // any effect, and the target is unchanged. It runs first: the native side
+  // cannot tell whether a reply of 8 KiB or more was fetched, so retiring any
+  // subscription within 30 s of one (the page burst below) recreates the
+  // whole view (SPEC §18.5).
+  const throwawayEpoch = crypto.randomUUID();
+  const { Channel } = await import("@tauri-apps/api/core");
+  const throwawayChannel = new Channel<unknown>();
+  // A well-behaved subscriber acknowledges what it applied; retiring a
+  // stream with unacknowledged large frames would (correctly) make the
+  // native side recreate this whole view (SPEC §18.5).
+  let lastHeader: { streamSeq: number; cursor: string } | null = null;
+  throwawayChannel.onmessage = (raw) => {
+    const header = (raw as { header?: { streamSeq?: unknown; cursor?: unknown } }).header;
+    if (typeof header?.streamSeq === "number" && typeof header.cursor === "string") lastHeader = { streamSeq: header.streamSeq, cursor: header.cursor };
+  };
+  const throwaway = await outcomeOf(() => ipc.connect({ protocolVersion: 1, viewEpoch: throwawayEpoch }, throwawayChannel));
+  const victim = client.getSnapshot().attention.find((item) => item.resolvedAtMs === null);
+  if (throwaway.ok && victim) {
+    const reply = throwaway.value as { subscriptionId: string; viewEpoch: string; coreGeneration: string; storeGeneration: string };
+    const retiredContext = { subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch, coreGeneration: reply.coreGeneration, storeGeneration: reply.storeGeneration };
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const applied = lastHeader as { streamSeq: number; cursor: string } | null;
+    if (applied) {
+      await ipc.ack({ subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch, highestAppliedStreamSeq: applied.streamSeq, appliedJournalCursor: applied.cursor }).catch(() => {});
+    }
+    await ipc.disconnect({ subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch });
+    await check("cancellation: action after retirement", "UNKNOWN_SUBSCRIPTION and nothing committed", () =>
+      ipc.action({ action: { kind: "ResolveAttention", attentionId: victim.attentionId, reason: "qualification cancellation probe" }, expectedRevision: null, requestId: crypto.randomUUID(), context: retiredContext }), (o) =>
+      !o.ok && o.code === "UNKNOWN_SUBSCRIPTION");
+    await check("cancellation: page after retirement", "UNKNOWN_SUBSCRIPTION", () =>
+      ipc.query({ query: { kind: "FleetPage", after: null, limit: 5 }, context: retiredContext }), (o) => !o.ok && o.code === "UNKNOWN_SUBSCRIPTION");
+    const stillOpen = client.getSnapshot().attention.find((item) => item.attentionId === victim.attentionId);
+    results.push({ name: "cancellation: target unchanged", expectation: "item still unresolved", outcome: String(stillOpen?.resolvedAtMs ?? "unresolved"), pass: stillOpen !== undefined && stillOpen.resolvedAtMs === null });
+  } else {
+    results.push({ name: "cancellation", expectation: "throwaway subscription and an open item", outcome: throwaway.code, pass: false });
+  }
+
   // Volume: real round trips through the three paths a view uses.
   const latencies: number[] = [];
   const failures: Record<string, number> = {};
@@ -127,41 +165,6 @@ async function ipcSuite(client: BridgeClient, rounds: number): Promise<unknown> 
     outcome: burst.map((o) => o.code).join(","),
     pass: burst.every((o) => o.ok || o.code === "TOO_MANY_IN_FLIGHT") && burst.some((o) => o.ok),
   });
-
-  // Cancellation: an action whose subscription was retired is refused before
-  // any effect, and the target is unchanged.
-  const throwawayEpoch = crypto.randomUUID();
-  const { Channel } = await import("@tauri-apps/api/core");
-  const throwawayChannel = new Channel<unknown>();
-  // A well-behaved subscriber acknowledges what it applied; retiring a
-  // stream with unacknowledged large frames would (correctly) make the
-  // native side recreate this whole view (SPEC §18.5).
-  let lastHeader: { streamSeq: number; cursor: string } | null = null;
-  throwawayChannel.onmessage = (raw) => {
-    const header = (raw as { header?: { streamSeq?: unknown; cursor?: unknown } }).header;
-    if (typeof header?.streamSeq === "number" && typeof header.cursor === "string") lastHeader = { streamSeq: header.streamSeq, cursor: header.cursor };
-  };
-  const throwaway = await outcomeOf(() => ipc.connect({ protocolVersion: 1, viewEpoch: throwawayEpoch }, throwawayChannel));
-  const victim = client.getSnapshot().attention.find((item) => item.resolvedAtMs === null);
-  if (throwaway.ok && victim) {
-    const reply = throwaway.value as { subscriptionId: string; viewEpoch: string; coreGeneration: string; storeGeneration: string };
-    const retiredContext = { subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch, coreGeneration: reply.coreGeneration, storeGeneration: reply.storeGeneration };
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const applied = lastHeader as { streamSeq: number; cursor: string } | null;
-    if (applied) {
-      await ipc.ack({ subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch, highestAppliedStreamSeq: applied.streamSeq, appliedJournalCursor: applied.cursor }).catch(() => {});
-    }
-    await ipc.disconnect({ subscriptionId: reply.subscriptionId, viewEpoch: reply.viewEpoch });
-    await check("cancellation: action after retirement", "UNKNOWN_SUBSCRIPTION and nothing committed", () =>
-      ipc.action({ action: { kind: "ResolveAttention", attentionId: victim.attentionId, reason: "qualification cancellation probe" }, expectedRevision: null, requestId: crypto.randomUUID(), context: retiredContext }), (o) =>
-      !o.ok && o.code === "UNKNOWN_SUBSCRIPTION");
-    await check("cancellation: page after retirement", "UNKNOWN_SUBSCRIPTION", () =>
-      ipc.query({ query: { kind: "FleetPage", after: null, limit: 5 }, context: retiredContext }), (o) => !o.ok && o.code === "UNKNOWN_SUBSCRIPTION");
-    const stillOpen = client.getSnapshot().attention.find((item) => item.attentionId === victim.attentionId);
-    results.push({ name: "cancellation: target unchanged", expectation: "item still unresolved", outcome: String(stillOpen?.resolvedAtMs ?? "unresolved"), pass: stillOpen !== undefined && stillOpen.resolvedAtMs === null });
-  } else {
-    results.push({ name: "cancellation", expectation: "throwaway subscription and an open item", outcome: throwaway.code, pass: false });
-  }
 
   // Durable owner command: commit, idempotent retry, conflicting reuse.
   const target = client.getSnapshot().attention.find((item) => item.resolvedAtMs === null);
