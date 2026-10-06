@@ -2,13 +2,13 @@
   "schema": 1,
   "milestone": "M0C",
   "title": "Platform Reliability / Recovery Qualification",
-  "verdict": "CANDIDATE \u2014 every required M0C portion passes natively on the installed 8c82212 build except G12, which waits on one owner action; pending independent review",
+  "verdict": "CANDIDATE \u2014 every required M0C portion passes natively on the installed 8c82212 build; pending independent review",
   "verdictScope": "Only native runs on the installed 8c82212 identities are claimed. Superseded and failed runs are kept under attempts/ with their diagnoses. Cells that cannot run safely here are BLOCKED or MANUAL_EXTERNAL_REQUIRED, never passed.",
   "generatedAt": "2026-10-06T15:10:00Z",
   "baseCommit": "8558854fad5162c0182dd36d76f8f8ae5d282529",
   "branch": "m0c",
   "applicationCommit": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb",
-  "harnessCommit": "89d857267ba0fe5ffde7cbad51db5b4123189f98",
+  "harnessCommit": "df4c75ee0b16c5ecbdcb445e82f30329c3216d87",
   "applicationSourcesUnchangedSince": "8c82212 (git diff 8c82212..harnessCommit -- apps packages crates is empty)",
   "evidenceCommit": "the commit that adds this manifest",
   "target": {
@@ -97,8 +97,14 @@
       ]
     },
     "G12": {
-      "result": "PENDING_OWNER_ACTION",
-      "reason": "waking needs a root-scheduled pmset wake (one owner command); the harness then runs five cycles unattended (threadspace-m0c g12-sleep-wake prod 5)"
+      "result": "PASS",
+      "evidence": [
+        "evidence/M0C/g12-sleep-wake/20261006T210745Z-prod/"
+      ],
+      "superseded": [
+        "evidence/M0C/attempts/g12-sleep-wake/20261006T194006Z-prod/",
+        "evidence/M0C/attempts/g12-sleep-wake/20261006T202617Z-prod/"
+      ]
     },
     "G13": {
       "result": "PASS",
@@ -156,7 +162,7 @@
   "ownerLimited": {
     "C-08 Terminal restart": "BLOCKED",
     "C-09 display disconnect": "MANUAL_EXTERNAL_REQUIRED",
-    "C-10 G12 sleep/wake": "needs one root-scheduled wake command"
+    "C-10 G12 sleep/wake": "resolved: two harness defects fixed, five scheduled cycles pass"
   },
   "harness": "tests/native/README.md (threadspace-m0c runners, ts-native helper)",
   "commits": [

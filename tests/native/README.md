@@ -58,7 +58,7 @@ $M maintenance prod          # prepare-before-unregister ordering, failure, seco
 $M g13-renderer prod         # WebGPU attestation + forced WebGL2 negative
 $M g15-graphics prod 15      # fifteen minutes of packaged graphics
 $M g16-window prod           # window, display and accessibility matrix
-$M g12-sleep-wake prod 5     # needs five root-scheduled wakes (see below)
+$M g12-sleep-wake prod 5     # needs six root-scheduled wakes, one spare (see below)
 ```
 
 Utilities: `env`, `view-command <ch> <command> [json]`, `synthetic <ch> <count> <ms>`,
@@ -80,6 +80,15 @@ scene visibly animates; resolve afterwards with `resolve-qualification`).
   reserves to the owner. Waking from sleep needs a root-scheduled power
   event: the owner runs one `sudo pmset schedule wake …` command, after which
   `g12-sleep-wake` reads the schedule (`pmset -g sched`) and runs unattended.
+  Schedule one wake more than the cycles, first one about 5 minutes out and
+  the rest 4 minutes apart (the spare covers a cycle that overruns). The
+  runner holds a `caffeinate -i` assertion until just before each
+  `pmset sleepnow`, because macOS otherwise idle-sleeps on battery and uses
+  up a scheduled wake; it sleeps into the first wake at least 90 s ahead, and
+  a cycle fails unless it slept at least 30 s and the OS-recorded wake is
+  within 20 s of that wake's scheduled time. Start the runner once the
+  schedule exists (it reads the schedule once, at startup); it finishes with
+  the Mac awake, so it can signal completion.
 - **Side effects are cleaned up.** Qualification attention items are
   resolved through the journaled owner command with a reason; the companion
   removes its own delivered notifications; System Settings switches the

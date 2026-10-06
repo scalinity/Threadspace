@@ -32,7 +32,7 @@ then the official `8c82212`. Harness fixes after `8c82212` (`1b46091`,
 | --- | --- | --- | --- |
 | C-08 | G08 Terminal restart | BLOCKED | Quitting Terminal.app ends every Terminal session on this Mac, including unrelated owner sessions and the one running the harness. Covered meanwhile by route-model tests and M0B's closed/recreated-tab evidence. |
 | C-09 | G16 display disconnect | MANUAL_EXTERNAL_REQUIRED | The only display is the built-in panel; the case needs an external display physically attached and removed. Display reconfiguration and DPR change are covered natively. |
-| C-10 | G12 sleep/wake | see the gate checklist | Waking needs a root-scheduled power event (`pmset schedule wake`), one owner command; the harness then sleeps, wakes and verifies unattended. |
+| C-10 | G12 sleep/wake | `attempts/g12-sleep-wake/` | Two harness defects found and fixed, no product defect. (1) The wake-time discovery check opened its log cursor after the wake, so it could never see a line the product logs within 0.3 s of waking. (2) macOS idle-slept between cycles on battery and consumed a scheduled wake, which shifted every later sleep by one wake and left the last with none. The harness now holds an idle-sleep assertion until each `pmset sleepnow`, and rejects any cycle whose sleep is under 30 s or whose OS-recorded wake is not within 20 s of its scheduled time. Waking still needs one owner `sudo pmset schedule wake` command. |
 
 ## Harness defects
 
