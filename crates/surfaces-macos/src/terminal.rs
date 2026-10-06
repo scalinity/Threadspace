@@ -82,20 +82,25 @@ pub fn probe_dictionary(app: &Path) -> Result<TerminalDictionary, TerminalError>
     })
 }
 
-/// `CFBundleShortVersionString` of an installed application.
-pub fn application_version(app: &Path) -> Option<String> {
-    let info: PathBuf = app.join("Contents/Info.plist");
+/// A string value from a property list, read by the bounded `plutil` worker.
+pub fn plist_string(plist: &Path, key: &str) -> Option<String> {
     let output = run_bounded(
         &BoundedCommand::new(PLUTIL, Duration::from_secs(2), 256)
             .arg("-extract")
-            .arg("CFBundleShortVersionString")
+            .arg(key)
             .arg("raw")
-            .arg(info),
+            .arg(plist),
     )
     .ok()?;
     output
         .succeeded()
         .then(|| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+}
+
+/// `CFBundleShortVersionString` of an installed application.
+pub fn application_version(app: &Path) -> Option<String> {
+    let info: PathBuf = app.join("Contents/Info.plist");
+    plist_string(&info, "CFBundleShortVersionString")
 }
 
 /// Parses the fixed inventory script's output: one `<window id>\t<tty>` line per tab.

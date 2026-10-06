@@ -1,0 +1,16 @@
+{
+  "identifier": "office-local",
+  "description": "Threadspace views and typed owner actions; native titlebar drag regions (docs/decisions/D-0002).",
+  "local": true,
+  "webviews": ["office"],
+  "permissions": [
+    "allow-ui-connect",
+    "allow-ui-ack",
+    "allow-ui-disconnect",
+    "allow-ui-query",
+    "allow-ui-action",
+    "core:window:allow-start-dragging",
+    "core:window:allow-internal-toggle-maximize"
+  ],
+  "platforms": ["macOS"]
+}

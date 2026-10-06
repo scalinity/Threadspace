@@ -139,6 +139,23 @@ pub fn os_product_version() -> Result<(u32, u32, u32), ProcessError> {
     Ok((parts.next().unwrap_or(0), parts.next().unwrap_or(0), parts.next().unwrap_or(0)))
 }
 
+/// The macOS build identifier from `kern.osversion` (for example `26B5091g`).
+pub fn os_build_version() -> Result<String, ProcessError> {
+    const NAME: &CStr = c"kern.osversion";
+    let mut buffer = [0u8; 32];
+    let mut length = buffer.len();
+    // SAFETY: as in `boot_session_id`.
+    let rc = unsafe {
+        libc::sysctlbyname(NAME.as_ptr(), buffer.as_mut_ptr().cast(), &mut length, std::ptr::null_mut(), 0)
+    };
+    if rc != 0 {
+        return Err(ProcessError::Sysctl { name: "kern.osversion", errno: errno() });
+    }
+    Ok(CStr::from_bytes_until_nul(&buffer[..length.min(buffer.len())])
+        .map(|value| value.to_string_lossy().into_owned())
+        .unwrap_or_default())
+}
+
 /// The selected deployment floor (SPEC §18.9): macOS 26.0, enforced at runtime
 /// as well as in bundle configuration.
 pub fn meets_minimum_macos() -> bool {
