@@ -1,0 +1,15 @@
+[package]
+name = "threadspace-hook-probe"
+description = "M0B evidence probe: captures a Claude command hook's own ProcessKey and validated ancestry. Never shipped."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-surfaces-macos.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

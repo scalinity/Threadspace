@@ -3436,7 +3436,9 @@ dependencies = [
  "serde_json",
  "threadspace-contracts",
  "threadspace-journal",
+ "threadspace-provider-claude",
  "threadspace-relay",
+ "threadspace-surfaces",
  "threadspace-surfaces-macos",
  "uuid",
 ]
@@ -3471,6 +3473,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "threadspace-hook-probe"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "threadspace-surfaces-macos",
+]
+
+[[package]]
 name = "threadspace-journal"
 version = "0.1.0"
 dependencies = [
@@ -3499,7 +3509,9 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "threadspace-contracts",
+ "threadspace-provider-claude",
  "threadspace-relay",
+ "threadspace-surfaces-macos",
  "uuid",
 ]
 
