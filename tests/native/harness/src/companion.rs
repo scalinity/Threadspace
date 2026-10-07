@@ -150,9 +150,13 @@ impl LogCursor {
                 break;
             }
             self.offset += read as u64;
-            if let Ok(value) = serde_json::from_str::<Value>(line.trim()) {
-                lines.push(value);
-            }
+            // A companion killed between a record and its newline leaves the
+            // next process's record on the same line: read every record.
+            lines.extend(
+                serde_json::Deserializer::from_str(line.trim())
+                    .into_iter::<Value>()
+                    .map_while(Result::ok),
+            );
             line.clear();
         }
         lines

@@ -240,12 +240,12 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
 /// Runs one case segment while holding the shared GUI lock. A lock that
 /// cannot be taken (I/O error) does not stop the case; it is recorded by the
 /// guard's absence only.
-fn locked<T>(ctx: &Ctx, label: &str, action: impl FnOnce() -> T) -> T {
+pub(crate) fn locked<T>(ctx: &Ctx, label: &str, action: impl FnOnce() -> T) -> T {
     let _gui = ctx.gui(label);
     action()
 }
 
-fn terminal_pid() -> Result<u32, String> {
+pub(crate) fn terminal_pid() -> Result<u32, String> {
     let list = terminal::terminal_process();
     match list.as_slice() {
         [one] => Ok(one.pid as u32),
@@ -543,7 +543,7 @@ tell application "Terminal"
 end tell
 end run"#;
 
-fn window_selection() -> Value {
+pub(crate) fn window_selection() -> Value {
     let out = threadspace_harness::run::osascript(WINDOW_SELECTION, &[], Duration::from_secs(10));
     let mut front = None;
     let mut windows = serde_json::Map::new();
@@ -560,7 +560,7 @@ fn window_selection() -> Value {
     json!({ "atMs": threadspace_harness::now_ms(), "front": front, "selected": windows, "error": (!out.ok).then(|| out.stderr.trim().to_owned()) })
 }
 
-fn raise_window(window_id: i64) -> bool {
+pub(crate) fn raise_window(window_id: i64) -> bool {
     threadspace_harness::run::osascript(
         RAISE_WINDOW,
         &[&window_id.to_string()],
@@ -571,7 +571,7 @@ fn raise_window(window_id: i64) -> bool {
 
 /// Reads `read` until `done` holds or `timeout` passes; returns the last
 /// reading, whether it held and how long it took.
-fn poll(
+pub(crate) fn poll(
     timeout: Duration,
     read: impl Fn() -> Value,
     done: impl Fn(&Value) -> bool,

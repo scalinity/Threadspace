@@ -45,13 +45,13 @@ use crate::terminal_gates::{StartedClaude, start_claude};
 const SAMPLE_MS: u64 = 200;
 
 /// Companion log lines since the run started, kept in order.
-struct Log {
-    cursor: LogCursor,
-    seen: Vec<Value>,
+pub(crate) struct Log {
+    pub(crate) cursor: LogCursor,
+    pub(crate) seen: Vec<Value>,
 }
 
 impl Log {
-    fn find(&self, event: &str, matches: &dyn Fn(&Value) -> bool) -> Option<Value> {
+    pub(crate) fn find(&self, event: &str, matches: &dyn Fn(&Value) -> bool) -> Option<Value> {
         self.seen
             .iter()
             .find(|line| line["event"] == event && matches(line))
@@ -59,7 +59,7 @@ impl Log {
     }
 
     /// The first matching line, already read or arriving within `timeout`.
-    fn wait(
+    pub(crate) fn wait(
         &mut self,
         event: &str,
         matches: &dyn Fn(&Value) -> bool,
@@ -76,12 +76,12 @@ impl Log {
         )
     }
 
-    fn drain(&mut self) {
+    pub(crate) fn drain(&mut self) {
         let lines = self.cursor.read_new();
         self.seen.extend(lines);
     }
 
-    fn of_pid(&self, pid: i32, event: &str) -> Vec<Value> {
+    pub(crate) fn of_pid(&self, pid: i32, event: &str) -> Vec<Value> {
         self.seen
             .iter()
             .filter(|line| line["pid"] == pid && line["event"] == event)
@@ -92,7 +92,7 @@ impl Log {
 
 /// A companion log line fit for public evidence: home paths shortened to
 /// `~` and a client's executable reduced to its file name.
-fn public_line(line: &Value) -> Value {
+pub(crate) fn public_line(line: &Value) -> Value {
     let mut line = line.clone();
     if let Some(map) = line.as_object_mut() {
         for (key, value) in map.iter_mut() {
@@ -112,13 +112,13 @@ fn public_line(line: &Value) -> Value {
     line
 }
 
-fn is_pid(pid: i32) -> impl Fn(&Value) -> bool {
+pub(crate) fn is_pid(pid: i32) -> impl Fn(&Value) -> bool {
     move |line: &Value| line["pid"] == pid
 }
 
 /// The companion's own launch evidence, read independently from the kernel:
 /// its launchd job label and its parent.
-fn launch_witness(pid: i32) -> Value {
+pub(crate) fn launch_witness(pid: i32) -> Value {
     let env = run(
         "/bin/ps",
         &["eww", "-o", "command=", "-p", &pid.to_string()],
@@ -138,7 +138,7 @@ fn launch_witness(pid: i32) -> Value {
 }
 
 /// A request through the qualification client, keeping a refusal's code.
-fn ask(ctx: &Ctx, body: ControlRequestBody) -> Value {
+pub(crate) fn ask(ctx: &Ctx, body: ControlRequestBody) -> Value {
     let mut client = match ctx.companion().client(Duration::from_secs(5)) {
         Ok(client) => client,
         Err(error) => return json!({ "ok": false, "connect": error }),
@@ -167,7 +167,7 @@ fn admit(ctx: &Ctx, observation_id: &str, captured_wall_ms: i64) -> Value {
     )
 }
 
-fn diagnostics(ctx: &Ctx) -> Value {
+pub(crate) fn diagnostics(ctx: &Ctx) -> Value {
     match ctx.companion().diagnostics() {
         Ok(d) => json!({
             "pid": d["process"]["pid"],
@@ -183,7 +183,7 @@ fn diagnostics(ctx: &Ctx) -> Value {
 }
 
 /// Every fact the invariants need at one moment.
-fn checkpoint(ctx: &Ctx, label: &str) -> Value {
+pub(crate) fn checkpoint(ctx: &Ctx, label: &str) -> Value {
     json!({
         "label": label,
         "atMs": threadspace_harness::now_ms(),
@@ -198,7 +198,7 @@ fn checkpoint(ctx: &Ctx, label: &str) -> Value {
 }
 
 /// One live companion, the locator's, holding the lock.
-fn single_writer(point: &Value) -> bool {
+pub(crate) fn single_writer(point: &Value) -> bool {
     let processes = point["companionProcesses"].as_array().map_or(0, Vec::len);
     processes == 1
         && point["writerLockFree"] == false
@@ -206,12 +206,12 @@ fn single_writer(point: &Value) -> bool {
 }
 
 /// The login item's job is the locator's process.
-fn login_item_owns(point: &Value) -> bool {
+pub(crate) fn login_item_owns(point: &Value) -> bool {
     point["loginItemPid"].as_u64().is_some()
         && point["loginItemPid"].as_u64() == point["locatorIncarnation"]["pid"].as_u64()
 }
 
-fn raise(ctx: &Ctx, label: &str) -> Result<(String, String), String> {
+pub(crate) fn raise(ctx: &Ctx, label: &str) -> Result<(String, String), String> {
     match ctx.companion().request(
         ControlRequestBody::QualifyRaiseAttention {
             label: label.to_owned(),
@@ -228,7 +228,7 @@ fn raise(ctx: &Ctx, label: &str) -> Result<(String, String), String> {
     }
 }
 
-fn attention_state(ctx: &Ctx, attention_id: &str) -> Value {
+pub(crate) fn attention_state(ctx: &Ctx, attention_id: &str) -> Value {
     match companion_snapshot(ctx) {
         Ok((_, snapshot)) => snapshot
             .attention
@@ -240,7 +240,7 @@ fn attention_state(ctx: &Ctx, attention_id: &str) -> Value {
     }
 }
 
-fn outstanding(state: &Value) -> bool {
+pub(crate) fn outstanding(state: &Value) -> bool {
     state["present"] == true
         && state["acknowledgedAtMs"].is_null()
         && state["resolvedAtMs"].is_null()
@@ -256,12 +256,18 @@ fn session_journaled(ctx: &Ctx, native_session_id: &str) -> Value {
     }
 }
 
-fn press(ctx: &Ctx, label: &str) -> Value {
+pub(crate) fn press(ctx: &Ctx, label: &str) -> Value {
     let _gui = ctx.gui("c02 notification press");
+    press_held(ctx, label)
+}
+
+/// Presses a banner while the caller already holds the shared GUI lock, so
+/// that waiting for the lock cannot outlast the banner.
+pub(crate) fn press_held(ctx: &Ctx, label: &str) -> Value {
     ctx.native.json(&["notification", "press", label, "20"])
 }
 
-fn wait_new_companion(ctx: &Ctx, known: &[i32], timeout_s: u64) -> Option<Incarnation> {
+pub(crate) fn wait_new_companion(ctx: &Ctx, known: &[i32], timeout_s: u64) -> Option<Incarnation> {
     let started = std::time::Instant::now();
     while started.elapsed() < Duration::from_secs(timeout_s) {
         if let Some(fresh) = ctx
@@ -278,7 +284,7 @@ fn wait_new_companion(ctx: &Ctx, known: &[i32], timeout_s: u64) -> Option<Incarn
 }
 
 /// Waits until the locator names the login item's own job.
-fn wait_login_item_owner(ctx: &Ctx, timeout_s: u64) -> Option<u64> {
+pub(crate) fn wait_login_item_owner(ctx: &Ctx, timeout_s: u64) -> Option<u64> {
     let started = std::time::Instant::now();
     while started.elapsed() < Duration::from_secs(timeout_s) {
         if let (Some(job), Some(locator)) = (
@@ -298,14 +304,14 @@ fn wait_login_item_owner(ctx: &Ctx, timeout_s: u64) -> Option<u64> {
 type Sample = (i64, Vec<i32>);
 
 /// Samples the live companion processes every `SAMPLE_MS` until stopped.
-struct Sampler {
+pub(crate) struct Sampler {
     stop: Arc<AtomicBool>,
     samples: Arc<Mutex<Vec<Sample>>>,
     handle: Option<std::thread::JoinHandle<()>>,
 }
 
 impl Sampler {
-    fn start(executable: PathBuf) -> Self {
+    pub(crate) fn start(executable: PathBuf) -> Self {
         let stop = Arc::new(AtomicBool::new(false));
         let samples = Arc::new(Mutex::new(Vec::new()));
         let (thread_stop, thread_samples) = (Arc::clone(&stop), Arc::clone(&samples));
@@ -328,7 +334,7 @@ impl Sampler {
         }
     }
 
-    fn finish(mut self) -> Vec<(i64, Vec<i32>)> {
+    pub(crate) fn finish(mut self) -> Vec<(i64, Vec<i32>)> {
         self.stop.store(true, Ordering::Release);
         if let Some(handle) = self.handle.take() {
             let _ = handle.join();
@@ -339,7 +345,7 @@ impl Sampler {
 
 /// F: per-process writer and observer intervals from the companion's own log
 /// and the sampler, and their overlaps.
-fn invariants(log: &Log, samples: &[(i64, Vec<i32>)]) -> Value {
+pub(crate) fn invariants(log: &Log, samples: &[(i64, Vec<i32>)]) -> Value {
     #[derive(Default)]
     struct Proc {
         provenance: Option<Value>,
@@ -436,7 +442,7 @@ fn invariants(log: &Log, samples: &[(i64, Vec<i32>)]) -> Value {
 }
 
 /// Restores the registered, enabled login item as the store's only writer.
-fn restore(ctx: &Ctx, log: &mut Log) -> Value {
+pub(crate) fn restore(ctx: &Ctx, log: &mut Log) -> Value {
     let mut steps = Vec::new();
     if service::status(&ctx.id) != "ENABLED" {
         steps.push(json!({ "register": service::bootstrap(&ctx.id, "register") }));
@@ -462,7 +468,7 @@ fn restore(ctx: &Ctx, log: &mut Log) -> Value {
     json!({ "steps": steps, "after": checkpoint(ctx, "restored") })
 }
 
-fn record(
+pub(crate) fn record(
     run_dir: &Run,
     cases: &mut Vec<Value>,
     case: &str,
@@ -969,6 +975,8 @@ fn case_d(
     app.stop_all();
     let supervised = ctx.companion().incarnation().ok_or("no companion")?;
     let label = format!("c02-d-{}", &uuid::Uuid::new_v4().to_string()[..6]);
+    // One GUI segment from the banner's submission to its press.
+    let gui = ctx.gui("c02 D banner");
     let (attention, _) = raise(ctx, &label)?;
     open_attention.push(attention.clone());
     let submitted = log.wait(
@@ -976,12 +984,25 @@ fn case_d(
         &|l| l["attentionId"] == attention.as_str() && l["state"] == "SUBMITTED",
         20,
     );
+    let stop_started = threadspace_harness::now_ms();
     let stopped = service::bootstrap(&ctx.id, "stop");
     let exited = procs::wait_exit(&supervised, Duration::from_secs(20));
     let since = threadspace_harness::now_ms();
-    let pressed = press(ctx, &label);
-    let cold = wait_new_companion(ctx, &[supervised.pid], 30)
-        .ok_or("the notification did not start a companion")?;
+    let pressed = press_held(ctx, &label);
+    drop(gui);
+    let Some(cold) = wait_new_companion(ctx, &[supervised.pid], 30) else {
+        return record(
+            run_dir,
+            cases,
+            "D-stop-cold-start-enable-crash",
+            false,
+            json!({
+                "error": "the notification did not start a companion",
+                "notificationSubmitted": submitted, "stop": stopped, "stopTookMs": since - stop_started,
+                "supervisedExitedAfterMs": exited, "press": pressed,
+            }),
+        );
+    };
     // Read while the cold-started process is alive: enable hands it over.
     let witness = launch_witness(cold.pid);
     let start = log.wait("CORE_START", &is_pid(cold.pid), 20);

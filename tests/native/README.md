@@ -72,7 +72,19 @@ $M c02-supervision prod all  # supervision/admission cases A-F; `A,legacy` runs 
 $M h10-terminal prod         # Terminal fullscreen/Space by window number; target close during a held route
 $M h11-graphics prod         # renderer init and tauri:// resource held pending across hide and reload
 $M h12-voiceover prod        # VoiceOver navigation and activation via VoiceOver's scripting interface
+$M c02-handoff prod all      # intent ownership across handoff: AGB, CF, D, E (or E1/E2)
+$M c11-deadline prod         # one Return deadline: ordinary, fullscreen, and expiry at focus/settle/decision
 ```
+
+`c02-handoff` places notification responses at exact handoff phases with
+`QualifyNotificationResponse` (the banner click's own acceptance path) and the
+`HOLD_NEXT_YIELD_*` / `DROP_NEXT_YIELD_REPLY` faults. It delays the UI's
+hydration by launching a UI process of its own and suspending it before it
+connects, and resumes it after the handoff. Cold starts are real banner
+clicks while the runner holds the GUI lock from submission to press; when no
+banner is found, LaunchServices starts the companion instead, and the case
+records which happened. `c11-deadline` releases route holds relative to the
+remaining budget each barrier reports.
 
 `h12-voiceover` needs VoiceOver's scripting enabled for the run: VoiceOver
 Utility > General > "Allow VoiceOver to be controlled with AppleScript",
