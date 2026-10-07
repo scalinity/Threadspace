@@ -268,6 +268,8 @@ pub fn recover<R: Runtime>(
                 .get_webview_window(OFFICE_LABEL)
                 .and_then(|window| native_state(&window).ok());
             if let Some(window) = app.get_webview_window(OFFICE_LABEL) {
+                #[cfg(feature = "qualification")]
+                shells::track(&window, incarnation);
                 let _ = window.destroy();
             }
             let removal = Instant::now();
@@ -315,7 +317,158 @@ pub fn recover<R: Runtime>(
                     "elapsedMs": started.elapsed().as_millis() as u64,
                 }),
             );
+            #[cfg(feature = "qualification")]
+            shells::report(&app, incarnation);
         });
+}
+
+/// Qualification-only (C-04): weak references to each retired office
+/// window's native objects, read back after its recovery to show which of
+/// them AppKit has released, beside AppKit's own window list. A weak
+/// reference neither retains nor owns; every pointer is borrowed from the
+/// live view on the main thread and only for the duration of that call.
+#[cfg(feature = "qualification")]
+mod shells {
+    use std::cell::RefCell;
+    use std::ffi::c_void;
+    use std::sync::mpsc;
+    use std::thread;
+    use std::time::Duration;
+
+    use objc2::rc::{Retained, Weak};
+    use objc2::runtime::AnyObject;
+    use objc2::{class, msg_send};
+    use serde_json::{Value, json};
+    use tauri::{AppHandle, Manager, Runtime, WebviewWindow};
+    use uuid::Uuid;
+
+    /// Long enough for the closed window's own deferred release.
+    const SETTLE: Duration = Duration::from_secs(1);
+
+    struct Retired {
+        incarnation: Uuid,
+        number: isize,
+        /// `retainCount` just before destruction, while the runtime still
+        /// holds the window.
+        retain_count_live: usize,
+        window: Weak<AnyObject>,
+        delegate: Option<Weak<AnyObject>>,
+        content_view: Option<Weak<AnyObject>>,
+        webview: Option<Weak<AnyObject>>,
+    }
+
+    thread_local! {
+        // Touched on the main thread only.
+        static RETIRED: RefCell<Vec<Retired>> = const { RefCell::new(Vec::new()) };
+    }
+
+    /// Before destruction: remembers the window, its delegate, its content
+    /// view and the web view, weakly.
+    pub fn track<R: Runtime>(window: &WebviewWindow<R>, incarnation: Uuid) {
+        let (done, wait) = mpsc::channel();
+        let sent = window.with_webview(move |platform| {
+            if let Some(webview) = platform.downcast_ref::<tauri_runtime_wry::Webview>() {
+                remember(incarnation, webview.ns_window(), webview.inner());
+            }
+            let _ = done.send(());
+        });
+        if sent.is_ok() {
+            let _ = wait.recv_timeout(Duration::from_secs(5));
+        }
+    }
+
+    fn remember(incarnation: Uuid, ns_window: *const c_void, webview: *const c_void) {
+        // SAFETY: both pointers come from the live view, on the main thread,
+        // and are borrowed only for this call.
+        let Some(window) = (unsafe { ns_window.cast::<AnyObject>().as_ref() }) else {
+            return;
+        };
+        // SAFETY: as above.
+        let webview = unsafe { webview.cast::<AnyObject>().as_ref() };
+        // SAFETY: NSWindow getters, on the main thread.
+        let number: isize = unsafe { msg_send![window, windowNumber] };
+        // SAFETY: as above.
+        let retain_count_live: usize = unsafe { msg_send![window, retainCount] };
+        // SAFETY: as above.
+        let delegate: Option<Retained<AnyObject>> = unsafe { msg_send![window, delegate] };
+        // SAFETY: as above.
+        let content_view: Option<Retained<AnyObject>> = unsafe { msg_send![window, contentView] };
+        RETIRED.with_borrow_mut(|retired| {
+            retired.push(Retired {
+                incarnation,
+                number,
+                retain_count_live,
+                window: Weak::new(window),
+                delegate: delegate.as_deref().map(Weak::new),
+                content_view: content_view.as_deref().map(Weak::new),
+                webview: webview.map(Weak::new),
+            });
+        });
+    }
+
+    /// After a recovery: logs `OFFICE_NATIVE_WINDOWS` once its retired
+    /// window has had time to be released.
+    pub fn report<R: Runtime>(app: &AppHandle<R>, retired_incarnation: Uuid) {
+        thread::sleep(SETTLE);
+        let logged = app.clone();
+        let _ = app.run_on_main_thread(move || {
+            let mut detail = snapshot();
+            detail["afterRecoveryOf"] = json!(retired_incarnation);
+            crate::prefs::log(&logged, "OFFICE_NATIVE_WINDOWS", detail);
+        });
+    }
+
+    fn alive(weak: Option<&Weak<AnyObject>>) -> Value {
+        weak.map_or(Value::Null, |weak| json!(weak.load().is_some()))
+    }
+
+    fn snapshot() -> Value {
+        let retired: Vec<Value> = RETIRED.with_borrow(|retired| {
+            retired
+                .iter()
+                .map(|r| {
+                    let window = r.window.load();
+                    // Includes this probe's own reference.
+                    let retain_count = window.as_ref().map(|window| {
+                        // SAFETY: NSObject's retainCount, on a live object.
+                        let count: usize = unsafe { msg_send![&**window, retainCount] };
+                        count
+                    });
+                    json!({
+                        "incarnation": r.incarnation,
+                        "windowNumber": r.number,
+                        "windowAlive": window.is_some(),
+                        "windowRetainCountLive": r.retain_count_live,
+                        "windowRetainCount": retain_count,
+                        "delegateAlive": alive(r.delegate.as_ref()),
+                        "contentViewAlive": alive(r.content_view.as_ref()),
+                        "webviewAlive": alive(r.webview.as_ref()),
+                    })
+                })
+                .collect()
+        });
+        // SAFETY: NSApplication's shared instance and window list, on the
+        // main thread.
+        let windows: Retained<AnyObject> = unsafe {
+            let app: Retained<AnyObject> = msg_send![class!(NSApplication), sharedApplication];
+            msg_send![&app, windows]
+        };
+        // SAFETY: NSArray count.
+        let count: usize = unsafe { msg_send![&windows, count] };
+        let app_windows: Vec<Value> = (0..count)
+            .map(|index| {
+                // SAFETY: an index below the array's count; NSWindow getters.
+                let (number, visible, class) = unsafe {
+                    let window: Retained<AnyObject> = msg_send![&windows, objectAtIndex: index];
+                    let number: isize = msg_send![&window, windowNumber];
+                    let visible: bool = msg_send![&window, isVisible];
+                    (number, visible, window.class().name().to_string_lossy().into_owned())
+                };
+                json!({ "number": number, "visible": visible, "class": class })
+            })
+            .collect();
+        json!({ "retired": retired, "appWindows": app_windows })
+    }
 }
 
 /// Fullscreen and zoom transitions leave the window itself as first
