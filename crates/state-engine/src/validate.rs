@@ -17,7 +17,7 @@ pub const CATEGORY_MAX_CHARS: usize = 64;
 /// Predecessor keys carried by one causal point.
 pub const PREDECESSORS_MAX: usize = 32;
 /// Bytes of one binding proof's evidence.
-pub const PROOF_MAX_BYTES: usize = 8 * 1024;
+pub const PROOF_MAX_BYTES: usize = 16 * 1024;
 
 fn bounded(value: &str, max: usize) -> bool {
     value.chars().count() <= max && !value.chars().any(char::is_control)

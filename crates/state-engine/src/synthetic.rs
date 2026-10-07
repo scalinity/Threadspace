@@ -20,6 +20,38 @@ use threadspace_contracts::projection::ObservationState;
 use threadspace_contracts::route::ProcessKey;
 
 pub const ADAPTER_ID: &str = "synthetic";
+
+/// Payload keys the synthetic adapter reads; nothing else is retained.
+pub const RETAINED_KEYS: &[&str] = &[
+    "source", "displayName", "agentType", "mode", "presence", "runtimeId", "device", "reason",
+    "reasonCode", "summary", "origin", "submission", "proof", "toolCategory", "phase", "result",
+    "category", "signal", "subtype", "generation", "requestId", "parentAgentId", "teammate",
+    "outcome", "surface", "method", "executable", "windowHint", "tabHint", "evidence", "present",
+    "row", "interval", "link", "domain", "detail", "stopHookActive", "orderDomain", "nativeKey",
+    "after",
+];
+
+/// Normalization plus the retained payload for admission.
+pub fn normalize_envelope(envelope: &ObservationEnvelope) -> crate::normalize::Normalized {
+    let retained = crate::normalize::retain(&envelope.payload, RETAINED_KEYS);
+    match normalize(envelope) {
+        Ok(drafts) => crate::normalize::Normalized {
+            drafts,
+            retained,
+            unsupported: None,
+        },
+        Err(NormalizeError::Unsupported(reason)) => crate::normalize::Normalized {
+            drafts: Vec::new(),
+            retained,
+            unsupported: Some(format!("UNSUPPORTED: {reason}")),
+        },
+        Err(NormalizeError::Malformed(field)) => crate::normalize::Normalized {
+            drafts: Vec::new(),
+            retained,
+            unsupported: Some(format!("MALFORMED: {field}")),
+        },
+    }
+}
 pub const ADAPTER_VERSION: &str = "1";
 
 /// Why an envelope produced no drafts.

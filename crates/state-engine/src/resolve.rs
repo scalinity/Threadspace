@@ -113,7 +113,10 @@ pub struct Unresolved {
 pub struct Resolver<'a> {
     index: &'a IdentityIndex,
     pending: BTreeMap<String, Assignment>,
+    /// Every new native key, in allocation order.
     order: Vec<String>,
+    /// How much of `order` `drain_new` already returned.
+    drained: usize,
     allocator: &'a mut dyn Allocator,
     endpoint_id: &'a str,
 }
@@ -193,6 +196,7 @@ impl<'a> Resolver<'a> {
             index,
             pending: BTreeMap::new(),
             order: Vec::new(),
+            drained: 0,
             allocator,
             endpoint_id,
         }
@@ -396,6 +400,18 @@ impl<'a> Resolver<'a> {
             refs.session_id = Some(item.session_id.clone());
         }
         Ok(refs)
+    }
+
+    /// Assignments allocated since the last drain, in allocation order. They
+    /// stay visible to later lookups in this batch, and `into_assignments`
+    /// still returns them.
+    pub fn drain_new(&mut self) -> Vec<Assignment> {
+        let fresh = self.order[self.drained..]
+            .iter()
+            .filter_map(|key| self.pending.get(key).cloned())
+            .collect();
+        self.drained = self.order.len();
+        fresh
     }
 
     /// The new assignments in allocation order.

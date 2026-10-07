@@ -243,6 +243,12 @@ impl Engine {
         &self.index
     }
 
+    /// Re-derives every record from its stored evidence (a migrated
+    /// baseline). Deterministic and side-effect free.
+    pub fn rederive(&mut self, cursor: i64, endpoint_id: &str) -> ReduceOutput {
+        crate::reduce::rederive(self, cursor, endpoint_id)
+    }
+
     /// Reduces one admitted entry. Deterministic and side-effect free.
     pub fn apply(&mut self, entry: &JournalEntry) -> ReduceOutput {
         crate::reduce::apply(self, entry)

@@ -34,7 +34,7 @@ use crate::causal::compare;
 use crate::engine::{Before, Engine, Index, Note, ReduceOutput, settle, settle_plain, snap};
 use crate::ids::derived_id;
 use crate::profiles;
-use crate::{FIXTURE_PROFILE, FIXTURE_PROVIDER, keys};
+use crate::{FIXTURE_PROFILES, FIXTURE_PROVIDER, keys};
 
 const PRIORITY_ERROR: u8 = 90;
 const PRIORITY_BLOCKED: u8 = 90;
@@ -73,6 +73,56 @@ pub(crate) fn apply(engine: &mut Engine, entry: &JournalEntry) -> ReduceOutput {
     }
     tx.derive();
     tx.state.through_cursor = tx.state.through_cursor.max(entry.cursor);
+    tx.finish()
+}
+
+/// Re-derives every record from its evidence at `cursor` (a migrated
+/// baseline): no facts, no outbox intents (bootstrap delivery).
+pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> ReduceOutput {
+    let entry = JournalEntry {
+        cursor,
+        endpoint_id: endpoint_id.to_owned(),
+        observation_id: String::new(),
+        source_id: "baseline".to_owned(),
+        source_epoch: "baseline".to_owned(),
+        source_sequence: None,
+        sequence_meaning: None,
+        captured_wall_ms: 0,
+        delivery: Delivery::Bootstrap,
+        facts: Vec::new(),
+    };
+    let mut tx = Tx {
+        state: &mut engine.state,
+        index: &mut engine.index,
+        entry: &entry,
+        before: Before::default(),
+        relations_changed: false,
+        commands: BTreeSet::new(),
+        trigger: BTreeMap::new(),
+        notes: Vec::new(),
+        new_outbox: Vec::new(),
+    };
+    let ids = |keys: Vec<&String>| keys.into_iter().cloned().collect::<Vec<_>>();
+    for id in ids(tx.state.processes.keys().collect()) {
+        tx.touch_process(&id);
+    }
+    for id in ids(tx.state.executions.keys().collect()) {
+        tx.touch_execution(&id);
+    }
+    for id in ids(tx.state.bindings.keys().collect()) {
+        tx.touch_binding(&id);
+    }
+    for id in ids(tx.state.turns.keys().collect()) {
+        tx.touch_turn(&id);
+    }
+    for id in ids(tx.state.attention.keys().collect()) {
+        tx.touch_attention(&id);
+    }
+    for id in ids(tx.state.sessions.keys().collect()) {
+        tx.touch_session(&id);
+    }
+    tx.derive();
+    tx.state.through_cursor = tx.state.through_cursor.max(cursor);
     tx.finish()
 }
 
@@ -306,7 +356,8 @@ impl Tx<'_> {
             && !self.state.sessions.contains_key(session_id)
         {
             self.touch_session(session_id);
-            let fixture = session.provider == FIXTURE_PROVIDER && session.profile_ref == FIXTURE_PROFILE;
+            let fixture = session.provider == FIXTURE_PROVIDER
+                && FIXTURE_PROFILES.contains(&session.profile_ref.as_str());
             self.state.sessions.insert(
                 session_id.clone(),
                 SessionRecord {
@@ -1850,6 +1901,22 @@ impl Tx<'_> {
         settle(&mut state.outbox, &before.outbox, &mut changed.outbox, cursor, |r| &mut r.revision, false);
         settle(&mut state.coverage, &before.coverage, &mut changed.coverage, cursor, |r| &mut r.revision, false);
         settle_plain(&state.frontiers, &before.frontiers, &mut changed.frontiers);
+        // A session's view shows its activations, bindings and turns: its
+        // revision advances whenever one of them changed (SPEC §18.4 row
+        // revisions), even if the session record itself did not.
+        let parents: Vec<String> = changed
+            .executions
+            .iter()
+            .filter_map(|id| state.executions.get(id).map(|e| e.session_id.clone()))
+            .chain(changed.bindings.iter().filter_map(|id| state.bindings.get(id).map(|b| b.session_id.clone())))
+            .chain(changed.turns.iter().filter_map(|id| state.turns.get(id).map(|t| t.session_id.clone())))
+            .collect();
+        for id in parents {
+            if let Some(session) = state.sessions.get_mut(&id) {
+                session.revision = cursor;
+                changed.sessions.insert(id);
+            }
+        }
         changed.relations = self.relations_changed;
         changed.commands = self.commands;
         output

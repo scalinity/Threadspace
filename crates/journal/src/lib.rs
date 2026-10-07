@@ -7,10 +7,13 @@
 
 mod admission;
 mod backup;
+mod baseline;
+mod canonical;
 #[cfg(feature = "qualification")]
 mod crash;
 mod identity;
 mod lock;
+mod materialize;
 mod owner;
 pub mod paging;
 mod projection;
@@ -22,11 +25,21 @@ use std::path::{Path, PathBuf};
 
 use rusqlite::{Connection, OpenFlags, OptionalExtension, TransactionBehavior, params};
 use serde::Serialize;
-use sha2::{Digest, Sha256};
+use threadspace_contracts::canonical::command::{OwnerAction, OwnerCommand};
+use threadspace_contracts::canonical::fact::{
+    BindingMethod, BindingProof, CanonicalRefs, Delivery, EvidenceClass, ExecutionMode,
+    AttachedPresence, FactPayload, NativeFactDraft, NativeRefs, ResolvedFact, TurnOutcome,
+};
+use threadspace_contracts::canonical::keys::{NativeExecutionRef, NativeSessionRef, NativeSurfaceRef};
+use threadspace_contracts::canonical::FACT_PAYLOAD_VERSION;
 use threadspace_contracts::cursor::format_cursor;
+use threadspace_contracts::route::ProcessKey;
+use threadspace_state_engine::engine::Engine;
+use threadspace_state_engine::ids::{Allocator, RandomAllocator};
+use threadspace_state_engine::resolve::IdentityIndex;
 use threadspace_contracts::diagnostics::SqliteDiagnostics;
 use threadspace_contracts::projection::{FleetSnapshot, NotificationState, ProjectionPatch};
-use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
+use threadspace_contracts::ui::CommandReceipt;
 use uuid::Uuid;
 
 pub use admission::{AdmissionReceipt, ObservationAdmission};
@@ -44,20 +57,25 @@ pub use identity::{
     ActivationChange, ApplyOutcome, BindingRow, DiscoveryApplication, LiveExecutionRow,
     ObservedSessionRecord, ProcessRecord, RouteTargetRow, SurfaceRecord,
 };
+pub use canonical::{
+    BatchOutcome, CHECKPOINT_INTERVAL, EnvelopeAdmission, OBSERVATION_MAX_BYTES, RecordOutcome,
+    ReplayDigest, validate_envelope,
+};
 pub use lock::{LockError, WriterLock};
-pub use schema::SCHEMA_VERSION;
+pub use schema::{SCHEMA_VERSION, catalog as migration_catalog};
 
 pub const REQUIRED_SQLITE_VERSION: &str = "3.53.4";
 pub const REQUIRED_SQLITE_SOURCE_ID: &str =
     "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc";
 
-const FIXTURE_PROVIDER: &str = "synthetic";
-const FIXTURE_PROFILE: &str = "m0a-fixture";
+const FIXTURE_PROVIDER: &str = threadspace_state_engine::FIXTURE_PROVIDER;
+const FIXTURE_PROFILE: &str = threadspace_state_engine::FIXTURE_PROFILE;
 const FIXTURE_NATIVE_SESSION: &str = "m0a-fixture-session-1";
 const FIXTURE_NATIVE_TURN: &str = "m0a-fixture-turn-1";
 const SOURCE_FIXTURE: &str = "m0a.fixture";
 const SOURCE_OWNER: &str = "owner";
 const SOURCE_NOTIFICATIONS: &str = "companion.notifications";
+const FIXTURE_ACTIVATION: &str = "fixture-activation-1";
 
 #[derive(Debug)]
 pub enum JournalError {
@@ -145,6 +163,15 @@ pub struct Journal {
     store_generation: String,
     endpoint_id: String,
     source_epoch: String,
+    /// The canonical reducer's state: equal to the journal's replay, and to
+    /// the materialized projections, after every commit.
+    engine: Engine,
+    /// Recorded native key → canonical ID assignments.
+    index: IdentityIndex,
+    allocator: Box<dyn Allocator + Send>,
+    entries_since_checkpoint: u64,
+    /// Set if the engine could not be rebuilt after a failed transaction.
+    poisoned: bool,
     #[cfg(feature = "qualification")]
     crash: crash::CrashState,
 }
@@ -177,15 +204,21 @@ fn enum_text<T: Serialize>(value: &T) -> String {
     }
 }
 
-fn fingerprint(payload: &serde_json::Value) -> String {
-    let digest = Sha256::digest(payload.to_string().as_bytes());
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
 impl Journal {
     /// Opens (creating if needed) the journal at `path`. The caller must hold
     /// the `WriterLock` for the containing store directory.
     pub fn open(path: &Path, source_epoch: &str, now_ms: i64) -> Result<Self, JournalError> {
+        Self::open_with(path, source_epoch, now_ms, Box::new(RandomAllocator))
+    }
+
+    /// Opens with an explicit identity allocator (seeded in reproducible
+    /// synthetic runs; random in the companion).
+    pub fn open_with(
+        path: &Path,
+        source_epoch: &str,
+        now_ms: i64,
+        mut allocator: Box<dyn Allocator + Send>,
+    ) -> Result<Self, JournalError> {
         #[cfg(feature = "qualification")]
         let crash = crash::CrashState::from_env()?;
         let mut conn = Connection::open_with_flags(
@@ -221,9 +254,13 @@ impl Journal {
         schema::migrate(&mut conn, now_ms)?;
 
         let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
-        let store_generation = meta_get_or_insert(&tx, "store_generation")?;
-        let endpoint_id = meta_get_or_insert(&tx, "endpoint_id")?;
+        let store_generation = meta_get_or_insert(&tx, "store_generation", allocator.as_mut())?;
+        let endpoint_id = meta_get_or_insert(&tx, "endpoint_id", allocator.as_mut())?;
         tx.commit()?;
+
+        Self::bootstrap_canonical(&mut conn, now_ms)?;
+        let (engine, replayed) = canonical::load_engine(&conn, &endpoint_id)?;
+        let index = canonical::load_index(&conn)?;
 
         let mut journal = Self {
             conn,
@@ -231,11 +268,51 @@ impl Journal {
             store_generation,
             endpoint_id,
             source_epoch: source_epoch.to_owned(),
+            engine,
+            index,
+            allocator,
+            entries_since_checkpoint: replayed,
+            poisoned: false,
             #[cfg(feature = "qualification")]
             crash,
         };
         journal.ensure_fixture(now_ms)?;
         Ok(journal)
+    }
+
+    /// Gives a store its first checkpoint: the baseline of an M0 store's
+    /// rows, or an empty state at the current cursor.
+    fn bootstrap_canonical(conn: &mut Connection, now_ms: i64) -> Result<(), JournalError> {
+        let checkpoints: i64 =
+            conn.query_row("SELECT COUNT(*) FROM projection_checkpoints", [], |row| row.get(0))?;
+        if checkpoints > 0 {
+            return Ok(());
+        }
+        let (state, assignments, origin) = if baseline::needed(conn)? {
+            let (state, assignments) = baseline::from_m0(conn)?;
+            (state, assignments, "M0_BASELINE")
+        } else {
+            let mut engine = Engine::empty();
+            engine.state.through_cursor =
+                conn.query_row("SELECT COALESCE(MAX(ingest_seq), 0) FROM observations", [], |row| row.get(0))?;
+            (engine.state, Vec::new(), "EMPTY")
+        };
+        let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        for assignment in &assignments {
+            tx.execute(
+                "INSERT INTO identity_assignments (native_key, entity, canonical_id, ingest_seq)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![
+                    assignment.native_key,
+                    assignment.entity.as_str(),
+                    assignment.id,
+                    state.through_cursor
+                ],
+            )?;
+        }
+        canonical::initial_checkpoint(&tx, &state, origin, now_ms)?;
+        tx.commit()?;
+        Ok(())
     }
 
     pub fn path(&self) -> &Path {
@@ -376,14 +453,38 @@ impl Journal {
         Ok((observation_id, tx.last_insert_rowid()))
     }
 
-    /// Seeds the minimal M0 fixture once per store: Session, ProcessKey,
-    /// activation, SurfaceBinding, Turn and one AttentionItem, journaled as a
-    /// single `FIXTURE_SEEDED` observation.
+    /// A fact the companion builds with canonical references it already
+    /// holds (owner, notification and route records).
+    pub(crate) fn prebuilt_fact(
+        &mut self,
+        observation_id: &str,
+        refs: CanonicalRefs,
+        provenance: EvidenceClass,
+        payload: FactPayload,
+    ) -> ResolvedFact {
+        ResolvedFact {
+            fact_id: self.allocate_id(),
+            observation_id: observation_id.to_owned(),
+            fact_index: 0,
+            native: NativeRefs {
+                attention: refs.attention_id.clone(),
+                ..NativeRefs::default()
+            },
+            refs,
+            provenance,
+            causal: None,
+            payload_version: FACT_PAYLOAD_VERSION,
+            payload,
+        }
+    }
+
+    /// Seeds the minimal M0 fixture once per store through canonical
+    /// admission (bootstrap delivery: no notification intent): Session,
+    /// ProcessKey, activation, SurfaceBinding, completed Turn and its
+    /// AttentionItem, journaled as one `FIXTURE_SEEDED` observation.
     fn ensure_fixture(&mut self, now_ms: i64) -> Result<(), JournalError> {
-        let tx = self
+        let seeded: Option<String> = self
             .conn
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
-        let seeded: Option<String> = tx
             .query_row(
                 "SELECT value FROM store_meta WHERE key = 'fixture_seeded'",
                 [],
@@ -393,68 +494,104 @@ impl Journal {
         if seeded.is_some() {
             return Ok(());
         }
+        let session = NativeSessionRef {
+            provider: FIXTURE_PROVIDER.into(),
+            profile_ref: FIXTURE_PROFILE.into(),
+            native_session_id: FIXTURE_NATIVE_SESSION.into(),
+        };
+        let process = ProcessKey {
+            endpoint_id: String::new(),
+            boot_id: "fixture-boot".into(),
+            pid: 4242,
+            start_seconds: "1759000000".into(),
+            start_microseconds: 0,
+        };
+        let execution = NativeExecutionRef::Activation {
+            activation_ref: FIXTURE_ACTIVATION.into(),
+        };
+        let at = |refs: NativeRefs, payload: FactPayload| NativeFactDraft {
+            refs,
+            provenance: EvidenceClass::Derived,
+            causal: None,
+            payload,
+        };
+        let session_refs = NativeRefs {
+            session: Some(session.clone()),
+            ..NativeRefs::default()
+        };
+        let drafts = vec![
+            at(session_refs.clone(), FactPayload::SessionIdentified {
+                display_name: Some("Fixture worker".into()),
+                start_source: None,
+            }),
+            at(
+                NativeRefs { process: Some(process.clone()), ..NativeRefs::default() },
+                FactPayload::ProcessObserved { executable_identity: "fixture:synthetic-process".into() },
+            ),
+            at(
+                NativeRefs {
+                    execution: Some(execution.clone()),
+                    process: Some(process),
+                    ..session_refs.clone()
+                },
+                FactPayload::ExecutionAttached {
+                    mode: ExecutionMode::TerminalEmbedded,
+                    presence: AttachedPresence::Live,
+                    native_runtime_id: None,
+                    controlling_device: None,
+                },
+            ),
+            at(
+                NativeRefs {
+                    execution: Some(execution),
+                    surface: Some(NativeSurfaceRef {
+                        surface_kind: "fixture".into(),
+                        app_generation: "fixture".into(),
+                        locator: "fixture:surface-1".into(),
+                        device_number: None,
+                        surface_generation: "fixture".into(),
+                    }),
+                    ..session_refs.clone()
+                },
+                FactPayload::SurfaceBindingRecorded {
+                    proof: BindingProof {
+                        method: BindingMethod::Fixture,
+                        executable_identity: Some("fixture:synthetic-process".into()),
+                        window_hint: None,
+                        tab_hint: None,
+                        evidence: serde_json::Value::Null,
+                    },
+                },
+            ),
+            at(
+                NativeRefs { turn: Some(FIXTURE_NATIVE_TURN.into()), ..session_refs },
+                FactPayload::TurnOutcomeObserved {
+                    outcome: TurnOutcome::Completed,
+                    reason: None,
+                    summary: Some("Fixture turn completed".into()),
+                },
+            ),
+        ];
+        let observation_id = self.allocate_id();
         let payload = serde_json::json!({ "fixture": FIXTURE_PROFILE });
-        let (observation_id, cursor) = Self::insert_observation(
-            &tx,
+        self.admit_internal(
+            observation_id,
             SOURCE_FIXTURE,
-            &self.source_epoch,
             "FIXTURE_SEEDED",
             &payload,
+            &drafts,
+            Vec::new(),
+            Delivery::Bootstrap,
             now_ms,
+            now_ms,
+            |tx, _, cursor| {
+                tx.execute(
+                    "INSERT INTO store_meta (key, value) VALUES ('fixture_seeded', ?1)",
+                    params![format_cursor(cursor)],
+                )?;
+                Ok(())
+            },
         )?;
-
-        let namespace_id = Uuid::new_v4().to_string();
-        let session_id = Uuid::new_v4().to_string();
-        let process_id = Uuid::new_v4().to_string();
-        let execution_id = Uuid::new_v4().to_string();
-        let binding_id = Uuid::new_v4().to_string();
-        let turn_id = Uuid::new_v4().to_string();
-        let attention_id = Uuid::new_v4().to_string();
-
-        tx.execute(
-            "INSERT INTO provider_namespaces (id, provider, endpoint_id, profile_ref) VALUES (?1, ?2, ?3, ?4)",
-            params![namespace_id, FIXTURE_PROVIDER, self.endpoint_id, FIXTURE_PROFILE],
-        )?;
-        tx.execute(
-            "INSERT INTO sessions (id, namespace_id, native_session_id, record_state, display_name, fixture, revision)
-             VALUES (?1, ?2, ?3, 'KNOWN', 'Fixture worker', 1, ?4)",
-            params![session_id, namespace_id, FIXTURE_NATIVE_SESSION, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO process_incarnations (id, endpoint_id, boot_id, pid, start_seconds, start_microseconds, executable_identity)
-             VALUES (?1, ?2, 'fixture-boot', 4242, 1759000000, 0, 'fixture:synthetic-process')",
-            params![process_id, self.endpoint_id],
-        )?;
-        tx.execute(
-            "INSERT INTO executions (id, session_id, activation, mode, presence)
-             VALUES (?1, ?2, 1, 'terminal_embedded', 'LIVE')",
-            params![execution_id, session_id],
-        )?;
-        tx.execute(
-            "INSERT INTO execution_processes (execution_id, process_id, role) VALUES (?1, ?2, 'provider')",
-            params![execution_id, process_id],
-        )?;
-        tx.execute(
-            "INSERT INTO surface_bindings (id, session_id, execution_id, surface_kind, native_locator, proof, revision, valid)
-             VALUES (?1, ?2, ?3, 'fixture', 'fixture:surface-1', 'FIXTURE', ?4, 1)",
-            params![binding_id, session_id, execution_id, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO turns (id, session_id, execution_id, native_turn_id, identity_kind, state, created_cursor)
-             VALUES (?1, ?2, ?3, ?4, 'NATIVE', 'COMPLETED', ?5)",
-            params![turn_id, session_id, execution_id, FIXTURE_NATIVE_TURN, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO attention_items (id, session_id, turn_id, category, scope_kind, scope_key, priority, summary,
-               created_by_observation, created_at_ms, notification_state, revision)
-             VALUES (?1, ?2, ?3, 'TURN_COMPLETE', 'TURN_OUTPUT', ?3, 40, 'Fixture turn completed', ?4, ?5, 'NOT_REQUESTED', ?6)",
-            params![attention_id, session_id, turn_id, observation_id, now_ms, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO store_meta (key, value) VALUES ('fixture_seeded', ?1)",
-            params![format_cursor(cursor)],
-        )?;
-        tx.commit()?;
         Ok(())
     }
 
@@ -468,104 +605,15 @@ impl Journal {
         expected_revision: Option<i64>,
         now_ms: i64,
     ) -> Result<CommandOutcome, JournalError> {
-        let payload = serde_json::json!({
-            "action": "AcknowledgeAttention",
-            "attentionId": attention_id,
-            "expectedRevision": expected_revision.map(format_cursor),
-        });
-        let print = fingerprint(&payload);
-        let tx = self
-            .conn
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
-
-        let existing: Option<(String, String)> = tx
-            .query_row(
-                "SELECT payload_fingerprint, result_json FROM attention_commands WHERE command_id = ?1",
-                params![command_id],
-                |row| Ok((row.get(0)?, row.get(1)?)),
-            )
-            .optional()?;
-        if let Some((recorded_print, result_json)) = existing {
-            if recorded_print != print {
-                return Err(JournalError::Conflict {
-                    detail: format!(
-                        "command {command_id} was already used for a different payload"
-                    ),
-                });
-            }
-            let mut receipt: CommandReceipt =
-                serde_json::from_str(&result_json).map_err(|error| JournalError::Invalid {
-                    detail: error.to_string(),
-                })?;
-            receipt.status = ReceiptStatus::AlreadyCommitted;
-            return Ok(CommandOutcome {
-                receipt,
-                change: None,
-            });
-        }
-
-        let current: Option<(String, i64)> = tx
-            .query_row(
-                "SELECT session_id, revision FROM attention_items WHERE id = ?1",
-                params![attention_id],
-                |row| Ok((row.get(0)?, row.get(1)?)),
-            )
-            .optional()?;
-        let Some((session_id, revision)) = current else {
-            return Err(JournalError::NotFound {
-                entity: "attention",
-                id: attention_id.to_owned(),
-            });
-        };
-        if let Some(expected) = expected_revision
-            && expected != revision
-        {
-            return Err(JournalError::Conflict {
-                detail: format!(
-                    "attention {attention_id} is at revision {revision}, not {expected}"
-                ),
-            });
-        }
-
-        let (observation_id, cursor) = Self::insert_observation(
-            &tx,
-            SOURCE_OWNER,
-            &self.source_epoch,
-            "OWNER_COMMAND",
-            &payload,
+        self.admit_owner_command(
+            &OwnerCommand {
+                command_id: command_id.to_owned(),
+                attention_id: attention_id.to_owned(),
+                expected_revision: expected_revision.map(format_cursor),
+                action: OwnerAction::Acknowledge,
+            },
             now_ms,
-        )?;
-        tx.execute(
-            "UPDATE attention_items
-               SET acknowledged_at_ms = COALESCE(acknowledged_at_ms, ?2), revision = ?3
-             WHERE id = ?1",
-            params![attention_id, now_ms, cursor],
-        )?;
-        let receipt = CommandReceipt {
-            command_id: command_id.to_owned(),
-            status: ReceiptStatus::Committed,
-            cursor: format_cursor(cursor),
-            target_revision: format_cursor(cursor),
-        };
-        let result_json =
-            serde_json::to_string(&receipt).map_err(|error| JournalError::Invalid {
-                detail: error.to_string(),
-            })?;
-        tx.execute(
-            "INSERT INTO attention_commands (command_id, attention_id, action, payload_json, payload_fingerprint,
-               result_json, observation_id)
-             VALUES (?1, ?2, 'AcknowledgeAttention', ?3, ?4, ?5, ?6)",
-            params![command_id, attention_id, payload.to_string(), print, result_json, observation_id],
-        )?;
-        tx.commit()?;
-        Ok(CommandOutcome {
-            receipt,
-            change: Some(Change {
-                cursor,
-                session_ids: vec![session_id],
-                attention_ids: vec![attention_id.to_owned()],
-            }),
-        })
+        )
     }
 
     /// Records a notification submission outcome. OS acceptance is not proof
@@ -578,48 +626,58 @@ impl Journal {
         detail: &str,
         now_ms: i64,
     ) -> Result<Change, JournalError> {
-        let tx = self
-            .conn
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
-        let target: Option<(String, String)> = tx
-            .query_row(
-                "SELECT o.attention_id, a.session_id FROM notification_outbox o
-                   JOIN attention_items a ON a.id = o.attention_id
-                 WHERE o.request_id = ?1",
-                params![request_id],
-                |row| Ok((row.get(0)?, row.get(1)?)),
-            )
-            .optional()?;
-        let Some((attention_id, session_id)) = target else {
+        let Some(attention_id) = self
+            .engine
+            .state
+            .outbox
+            .get(request_id)
+            .map(|o| o.attention_id.clone())
+        else {
             return Err(JournalError::NotFound {
                 entity: "notification request",
                 id: request_id.to_owned(),
             });
         };
-        let state_text = enum_text(state);
+        let session_id = self
+            .engine
+            .state
+            .attention
+            .get(&attention_id)
+            .map(|a| a.session_id.clone())
+            .unwrap_or_default();
         let payload = serde_json::json!({
             "requestId": request_id,
             "attentionId": attention_id,
-            "state": state_text,
+            "state": enum_text(state),
             "detail": detail,
         });
-        let (_, cursor) = Self::insert_observation(
-            &tx,
+        let observation_id = self.allocate_id();
+        let fact = self.prebuilt_fact(
+            &observation_id,
+            CanonicalRefs {
+                session_id: Some(session_id.clone()),
+                attention_id: Some(attention_id.clone()),
+                ..CanonicalRefs::default()
+            },
+            EvidenceClass::Derived,
+            FactPayload::NotificationDeliveryRecorded {
+                request_id: request_id.to_owned(),
+                state: state.clone(),
+                detail: detail.chars().take(240).collect(),
+            },
+        );
+        let (cursor, _) = self.admit_internal(
+            observation_id,
             SOURCE_NOTIFICATIONS,
-            &self.source_epoch,
             "NOTIFICATION_DELIVERY_RECORDED",
             &payload,
+            &[],
+            vec![fact],
+            Delivery::Live,
             now_ms,
+            now_ms,
+            |_, _, _| Ok(()),
         )?;
-        tx.execute(
-            "UPDATE notification_outbox SET state = ?2, updated_at_ms = ?3, outcome_detail = ?4 WHERE request_id = ?1",
-            params![request_id, state_text, now_ms, detail],
-        )?;
-        tx.execute(
-            "UPDATE attention_items SET notification_state = ?2, revision = ?3 WHERE id = ?1",
-            params![attention_id, state_text, cursor],
-        )?;
-        tx.commit()?;
         Ok(Change {
             cursor,
             session_ids: vec![session_id],
@@ -657,64 +715,7 @@ impl Journal {
         label: &str,
         now_ms: i64,
     ) -> Result<RaisedAttention, JournalError> {
-        let tx = self
-            .conn
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
-        let (session_id, execution_id): (String, String) = tx.query_row(
-            "SELECT s.id, e.id FROM sessions s JOIN executions e ON e.session_id = s.id
-              WHERE s.fixture = 1 ORDER BY e.activation DESC LIMIT 1",
-            [],
-            |row| Ok((row.get(0)?, row.get(1)?)),
-        )?;
-        let payload = serde_json::json!({ "label": label });
-        let (observation_id, cursor) = Self::insert_observation(
-            &tx,
-            "qualification",
-            &self.source_epoch,
-            "QUALIFY_ATTENTION_RAISED",
-            &payload,
-            now_ms,
-        )?;
-        let turn_id = Uuid::new_v4().to_string();
-        let attention_id = Uuid::new_v4().to_string();
-        let request_id = Uuid::new_v4().to_string();
-        let native_turn = format!("m0a-qualification-turn-{cursor}");
-        let summary = format!("Fixture turn completed — {label}");
-        tx.execute(
-            "INSERT INTO turns (id, session_id, execution_id, native_turn_id, identity_kind, state, created_cursor)
-             VALUES (?1, ?2, ?3, ?4, 'NATIVE', 'COMPLETED', ?5)",
-            params![turn_id, session_id, execution_id, native_turn, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO attention_items (id, session_id, turn_id, category, scope_kind, scope_key, priority, summary,
-               created_by_observation, created_at_ms, notification_state, revision)
-             VALUES (?1, ?2, ?3, 'TURN_COMPLETE', 'TURN_OUTPUT', ?3, 40, ?4, ?5, ?6, 'PENDING', ?7)",
-            params![attention_id, session_id, turn_id, summary, observation_id, now_ms, cursor],
-        )?;
-        tx.execute(
-            "INSERT INTO notification_outbox (request_id, attention_id, state, created_at_ms, updated_at_ms)
-             VALUES (?1, ?2, 'PENDING', ?3, ?3)",
-            params![request_id, attention_id, now_ms],
-        )?;
-        tx.execute(
-            "UPDATE sessions SET revision = ?2 WHERE id = ?1",
-            params![session_id, cursor],
-        )?;
-        tx.commit()?;
-        Ok(RaisedAttention {
-            change: Change {
-                cursor,
-                session_ids: vec![session_id.clone()],
-                attention_ids: vec![attention_id.clone()],
-            },
-            intent: NotificationIntent {
-                request_id,
-                attention_id,
-                session_id,
-                title: "Fixture worker finished a turn".to_owned(),
-                body: summary,
-            },
-        })
+        self.raise_attention_on(label, None, now_ms)
     }
 
     pub fn sqlite_diagnostics(&self) -> Result<SqliteDiagnostics, JournalError> {
@@ -750,7 +751,11 @@ impl Journal {
     }
 }
 
-fn meta_get_or_insert(tx: &rusqlite::Transaction<'_>, key: &str) -> Result<String, JournalError> {
+fn meta_get_or_insert(
+    tx: &rusqlite::Transaction<'_>,
+    key: &str,
+    allocator: &mut dyn Allocator,
+) -> Result<String, JournalError> {
     let existing: Option<String> = tx
         .query_row(
             "SELECT value FROM store_meta WHERE key = ?1",
@@ -761,7 +766,7 @@ fn meta_get_or_insert(tx: &rusqlite::Transaction<'_>, key: &str) -> Result<Strin
     if let Some(value) = existing {
         return Ok(value);
     }
-    let value = Uuid::new_v4().to_string();
+    let value = allocator.allocate();
     tx.execute(
         "INSERT INTO store_meta (key, value) VALUES (?1, ?2)",
         params![key, value],

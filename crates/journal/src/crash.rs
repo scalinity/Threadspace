@@ -24,6 +24,10 @@ pub enum CrashPoint {
     BeforeTransaction,
     /// The record's rows are written but COMMIT has not run.
     InTransaction,
+    /// Canonical admission: facts and identity assignments journaled, not yet reduced.
+    AfterFacts,
+    /// Canonical admission: reduced and materialized, COMMIT not yet run.
+    AfterReduce,
     /// COMMIT returned; the receipt has not been returned to the caller.
     AfterCommitBeforeReceipt,
 }
@@ -35,10 +39,21 @@ impl CrashPoint {
         Self::AfterCommitBeforeReceipt,
     ];
 
+    /// Every position of the canonical admission transaction (M1).
+    pub const CANONICAL: [Self; 5] = [
+        Self::BeforeTransaction,
+        Self::InTransaction,
+        Self::AfterFacts,
+        Self::AfterReduce,
+        Self::AfterCommitBeforeReceipt,
+    ];
+
     pub fn name(self) -> &'static str {
         match self {
             Self::BeforeTransaction => "before-transaction",
             Self::InTransaction => "in-transaction",
+            Self::AfterFacts => "after-facts",
+            Self::AfterReduce => "after-reduce",
             Self::AfterCommitBeforeReceipt => "after-commit-before-receipt",
         }
     }
@@ -48,7 +63,7 @@ impl FromStr for CrashPoint {
     type Err = JournalError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        Self::ALL
+        Self::CANONICAL
             .into_iter()
             .find(|point| point.name() == value)
             .ok_or_else(|| JournalError::Invalid {

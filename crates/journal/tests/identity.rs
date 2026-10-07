@@ -107,13 +107,13 @@ fn bindings(journal: &mut Journal, session: &str) -> Vec<threadspace_journal::Bi
 }
 
 #[test]
-fn migration_two_keeps_the_frozen_engine_and_m0a_fixture() {
+fn the_m1_schema_keeps_the_frozen_engine_and_m0a_fixture() {
     let store = TempStore::new();
     let mut journal = Journal::open(&store.db(), "epoch", NOW).expect("open");
     let diagnostics = journal.sqlite_diagnostics().expect("diagnostics");
     assert_eq!(diagnostics.version, "3.53.4", "D-0001 engine unchanged");
     assert_eq!(diagnostics.schema_version, SCHEMA_VERSION);
-    assert_eq!(SCHEMA_VERSION, 2);
+    assert_eq!(SCHEMA_VERSION, 3, "M1 canonical schema");
     let (_, snapshot) = journal.snapshot().expect("snapshot");
     assert_eq!(snapshot.sessions.len(), 1, "M0A fixture retained");
     let fixture = snapshot.sessions[0].session_id.clone();

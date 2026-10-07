@@ -1,12 +1,14 @@
-//! Versioned migrations. The M0 schema holds only the records the M0 gates
-//! need (MILESTONES "Prototype contract"); M1 completes the canonical schema.
+//! Versioned migrations. Migrations 1–2 hold the M0 records; migration 3
+//! (M1) adds the canonical journal (facts, identity assignments, checkpoints,
+//! admission diagnostics) and promotes the M0 tables to the canonical
+//! reducer's materialized projections, adding the records M0 lacked.
 
 use rusqlite::{Connection, params};
 use sha2::{Digest, Sha256};
 
 use crate::JournalError;
 
-pub const SCHEMA_VERSION: u32 = 2;
+pub const SCHEMA_VERSION: u32 = 3;
 
 const MIGRATION_0001: &str = r"
 CREATE TABLE store_meta (
@@ -192,6 +194,165 @@ CREATE TABLE route_results (
 CREATE INDEX route_results_session ON route_results(session_id, recorded_at_ms);
 ";
 
+/// M1: the canonical journal and projections (SPEC §5, §9.2). Observations
+/// that are canonical entries record how they were delivered; their facts,
+/// with canonical and native references, are journaled beside them.
+const MIGRATION_0003: &str = r"
+ALTER TABLE observations ADD COLUMN canonical INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE observations ADD COLUMN delivery TEXT;
+ALTER TABLE observations ADD COLUMN sequence_meaning TEXT;
+
+CREATE TABLE facts (
+  fact_id         TEXT PRIMARY KEY,
+  observation_id  TEXT NOT NULL REFERENCES observations(observation_id),
+  fact_index      INTEGER NOT NULL,
+  ingest_seq      INTEGER NOT NULL,
+  kind            TEXT NOT NULL,
+  session_id      TEXT,
+  fact_json       TEXT NOT NULL,
+  UNIQUE(observation_id, fact_index)
+) STRICT;
+CREATE INDEX facts_by_cursor ON facts(ingest_seq, fact_index);
+
+-- Recorded native key -> canonical ID assignments (SPEC §5.1).
+CREATE TABLE identity_assignments (
+  native_key    TEXT PRIMARY KEY,
+  entity        TEXT NOT NULL,
+  canonical_id  TEXT NOT NULL,
+  ingest_seq    INTEGER NOT NULL
+) STRICT;
+CREATE INDEX identity_assignments_by_id ON identity_assignments(canonical_id);
+
+-- Bounded admission diagnostics: unresolved drafts, unsupported events.
+CREATE TABLE admission_diagnostics (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  ingest_seq      INTEGER,
+  observation_id  TEXT,
+  code            TEXT NOT NULL,
+  detail          TEXT NOT NULL,
+  recorded_at_ms  INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE projection_checkpoints (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  reducer_version INTEGER NOT NULL,
+  schema_version  INTEGER NOT NULL,
+  through_cursor  INTEGER NOT NULL,
+  state_json      TEXT NOT NULL,
+  state_sha256    TEXT NOT NULL,
+  origin          TEXT NOT NULL,
+  created_at_ms   INTEGER NOT NULL
+) STRICT;
+
+ALTER TABLE sessions ADD COLUMN execution_presence TEXT;
+ALTER TABLE sessions ADD COLUMN observation TEXT;
+ALTER TABLE sessions ADD COLUMN turn_state TEXT;
+ALTER TABLE sessions ADD COLUMN created_cursor INTEGER;
+
+ALTER TABLE process_incarnations ADD COLUMN exited INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE process_incarnations ADD COLUMN images_json TEXT;
+
+ALTER TABLE executions ADD COLUMN actor_id TEXT;
+ALTER TABLE executions ADD COLUMN activation_ref TEXT;
+ALTER TABLE executions ADD COLUMN attached TEXT;
+ALTER TABLE executions ADD COLUMN native_runtime_id TEXT;
+
+CREATE TABLE source_surfaces (
+  id                  TEXT PRIMARY KEY,
+  endpoint_id         TEXT NOT NULL,
+  surface_kind        TEXT NOT NULL,
+  app_generation      TEXT NOT NULL,
+  locator             TEXT NOT NULL,
+  device_number       INTEGER,
+  surface_generation  TEXT NOT NULL,
+  revision            INTEGER NOT NULL
+) STRICT;
+
+ALTER TABLE surface_bindings ADD COLUMN surface_id TEXT REFERENCES source_surfaces(id);
+
+CREATE TABLE actors (
+  id               TEXT PRIMARY KEY,
+  session_id       TEXT NOT NULL REFERENCES sessions(id),
+  native_json      TEXT NOT NULL,
+  role             TEXT NOT NULL,
+  agent_types_json TEXT NOT NULL,
+  runs_ended       INTEGER NOT NULL,
+  revision         INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE actor_relations (
+  actor_id          TEXT NOT NULL REFERENCES actors(id),
+  related_actor_id  TEXT NOT NULL REFERENCES actors(id),
+  relation          TEXT NOT NULL,
+  PRIMARY KEY (actor_id, related_actor_id, relation)
+) STRICT;
+
+ALTER TABLE turns ADD COLUMN actor_id TEXT REFERENCES actors(id);
+ALTER TABLE turns ADD COLUMN owner_facing INTEGER;
+ALTER TABLE turns ADD COLUMN outcome_conflict INTEGER;
+ALTER TABLE turns ADD COLUMN output_ready INTEGER;
+ALTER TABLE turns ADD COLUMN revision INTEGER;
+
+CREATE TABLE inputs (
+  id               TEXT PRIMARY KEY,
+  session_id       TEXT NOT NULL REFERENCES sessions(id),
+  actor_id         TEXT NOT NULL REFERENCES actors(id),
+  native_key       TEXT NOT NULL,
+  origin           TEXT,
+  submission_json  TEXT,
+  active_turn_id   TEXT,
+  accepted         INTEGER NOT NULL,
+  rejected         INTEGER NOT NULL,
+  started_turns_json TEXT NOT NULL,
+  revision         INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE activities (
+  id                    TEXT PRIMARY KEY,
+  session_id            TEXT NOT NULL REFERENCES sessions(id),
+  actor_id              TEXT NOT NULL REFERENCES actors(id),
+  turn_id               TEXT,
+  native_occurrence_id  TEXT NOT NULL,
+  tool_categories_json  TEXT NOT NULL,
+  proposed              INTEGER NOT NULL,
+  started               INTEGER NOT NULL,
+  finished_json         TEXT NOT NULL,
+  permission_checked    INTEGER NOT NULL,
+  revision              INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE wait_scopes (
+  key            TEXT PRIMARY KEY,
+  session_id     TEXT NOT NULL REFERENCES sessions(id),
+  actor_id       TEXT,
+  execution_id   TEXT,
+  turn_id        TEXT,
+  category       TEXT NOT NULL,
+  generation     TEXT,
+  episodes_json  TEXT NOT NULL,
+  revision       INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE source_coverage (
+  key                 TEXT PRIMARY KEY,
+  source_id           TEXT NOT NULL,
+  source_epoch        TEXT NOT NULL,
+  meaning             TEXT NOT NULL,
+  seen_json           TEXT NOT NULL,
+  gaps_json           TEXT NOT NULL,
+  reported_gaps_json  TEXT NOT NULL,
+  revision            INTEGER NOT NULL
+) STRICT;
+
+ALTER TABLE attention_items ADD COLUMN actor_id TEXT;
+ALTER TABLE attention_items ADD COLUMN resolution_reason TEXT;
+ALTER TABLE attention_items ADD COLUMN snoozed_until_ms INTEGER;
+ALTER TABLE attention_items ADD COLUMN created_by_fact TEXT;
+ALTER TABLE attention_items ADD COLUMN scope_json TEXT;
+
+ALTER TABLE notification_outbox ADD COLUMN revision INTEGER;
+";
+
 struct Migration {
     id: u32,
     name: &'static str,
@@ -209,7 +370,21 @@ const MIGRATIONS: &[Migration] = &[
         name: "m0b-identity-and-routes",
         sql: MIGRATION_0002,
     },
+    Migration {
+        id: 3,
+        name: "m1-canonical-journal",
+        sql: MIGRATION_0003,
+    },
 ];
+
+/// Each migration's ID, name and SHA-256 checksum, for the M1 evidence
+/// catalog.
+pub fn catalog() -> Vec<(u32, &'static str, String)> {
+    MIGRATIONS
+        .iter()
+        .map(|m| (m.id, m.name, checksum(m.sql)))
+        .collect()
+}
 
 fn checksum(sql: &str) -> String {
     let digest = Sha256::digest(sql.as_bytes());
@@ -219,6 +394,17 @@ fn checksum(sql: &str) -> String {
 /// Applies pending migrations inside one immediate transaction each, refusing
 /// a store written by a newer schema (SPEC §9.4).
 pub fn migrate(conn: &mut Connection, now_ms: i64) -> Result<u32, JournalError> {
+    migrate_to(conn, SCHEMA_VERSION, now_ms).map(|(_, now)| now)
+}
+
+/// Applies migrations up to `target` and returns (version before, version
+/// after). A target below the current schema is only for building old-store
+/// fixtures in tests.
+pub fn migrate_to(
+    conn: &mut Connection,
+    target: u32,
+    now_ms: i64,
+) -> Result<(u32, u32), JournalError> {
     conn.execute_batch(
         "CREATE TABLE IF NOT EXISTS schema_migrations (
            id            INTEGER PRIMARY KEY,
@@ -235,7 +421,7 @@ pub fn migrate(conn: &mut Connection, now_ms: i64) -> Result<u32, JournalError> 
     if applied > SCHEMA_VERSION {
         return Err(JournalError::SchemaTooNew { found: applied });
     }
-    for migration in MIGRATIONS {
+    for migration in MIGRATIONS.iter().filter(|m| m.id <= target) {
         let sum = checksum(migration.sql);
         if migration.id <= applied {
             let recorded: String = conn.query_row(
@@ -256,7 +442,7 @@ pub fn migrate(conn: &mut Connection, now_ms: i64) -> Result<u32, JournalError> 
         )?;
         tx.commit()?;
     }
-    Ok(SCHEMA_VERSION)
+    Ok((applied, target.max(applied)))
 }
 
 /// Checks, without changing anything, that `conn` holds exactly this
