@@ -1,0 +1,19 @@
+[package]
+name = "threadspace-synthetic"
+description = "Deterministic synthetic provider, replay CLI and M1 qualification runners (no model calls)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+threadspace-contracts.workspace = true
+threadspace-state-engine = { workspace = true, features = ["synthetic"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
