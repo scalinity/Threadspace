@@ -1,0 +1,127 @@
+
+==== Kill test, run 1 of 3 (repaired log.rs): cargo test -p threadspace-agent --test log_framing -- --nocapture ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.74s
+     Running tests/log_framing.rs (target/aarch64-apple-darwin/debug/deps/log_framing-8e56f7d7820a11c2)
+
+running 2 tests
+test writer_child ... ok
+log framing: 240 rounds; 240 writers confirmed SIGKILLed (30 at spawn, 210 after READY); 37481 lines; 31433 killed-writer records and 6000 post-kill records parsed; 48 torn records planted; 48 torn lines found on their own line; 0 joined lines; 0 violations
+test records_never_share_a_line_across_a_killed_writer ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.19s
+
+
+==== Kill test, run 2 of 3 (repaired log.rs): cargo test -p threadspace-agent --test log_framing -- --nocapture ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running tests/log_framing.rs (target/aarch64-apple-darwin/debug/deps/log_framing-8e56f7d7820a11c2)
+
+running 2 tests
+test writer_child ... ok
+log framing: 240 rounds; 240 writers confirmed SIGKILLed (30 at spawn, 210 after READY); 37108 lines; 31060 killed-writer records and 6000 post-kill records parsed; 48 torn records planted; 48 torn lines found on their own line; 0 joined lines; 0 violations
+test records_never_share_a_line_across_a_killed_writer ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.21s
+
+
+==== Kill test, run 3 of 3 (repaired log.rs): cargo test -p threadspace-agent --test log_framing -- --nocapture ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running tests/log_framing.rs (target/aarch64-apple-darwin/debug/deps/log_framing-8e56f7d7820a11c2)
+
+running 2 tests
+test writer_child ... ok
+log framing: 240 rounds; 240 writers confirmed SIGKILLed (30 at spawn, 210 after READY); 38256 lines; 32208 killed-writer records and 6000 post-kill records parsed; 48 torn records planted; 48 torn lines found on their own line; 0 joined lines; 0 violations
+test records_never_share_a_line_across_a_killed_writer ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.14s
+
+
+==== Agent crate (repaired): cargo test -p threadspace-agent ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.76s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_agent-1d4b5d389d931a70)
+
+running 23 tests
+test native_ops::tests::classifies_apple_event_statuses ... ok
+test tests::only_launchds_login_item_job_is_supervised ... ok
+test tests::a_notification_cold_start_is_launch_services ... ok
+test state::tests::the_enabled_preference_alone_never_opens_admission ... ok
+test state::tests::admission_needs_preference_supervision_no_maintenance_and_awake ... ok
+test tests::missing_or_malformed_provenance_is_unknown_not_supervised ... ok
+test state::tests::nothing_is_supervised_before_classification ... ok
+test intent_store::tests::the_first_store_format_still_loads ... ok
+test intent_store::tests::a_malformed_backlog_is_kept_aside_never_overwritten ... ok
+test intent_store::tests::a_failed_directory_sync_commits_without_power_loss_confirmation ... ok
+test intent_store::tests::a_malformed_record_is_kept_aside ... ok
+test intent_store::tests::consumed_ids_survive_a_reload ... ok
+test intent_store::tests::leftover_temporaries_are_removed_and_never_read ... ok
+test intent_store::tests::a_committed_backlog_reloads_exactly_in_order ... ok
+test intent_store::tests::records_are_kept_once_bounded_and_removed_only_on_success ... ok
+test intent_store::tests::a_failed_record_write_leaves_no_record ... ok
+test intent_store::tests::every_failure_before_the_rename_keeps_the_previous_backlog ... ok
+test writer::tests::consuming_an_intent_whose_removal_committed_is_done_without_a_write ... ok
+test writer::tests::a_repeated_consumption_is_done_once_its_retry_commits_the_removal ... ok
+test writer::tests::a_repeated_consumption_is_not_done_while_the_backlog_still_lists_the_intent ... ok
+test writer::tests::a_writer_killed_before_the_removal_commits_leaves_the_intent_to_its_claimant ... ok
+test writer::tests::retrying_one_removal_keeps_every_other_intent_and_the_current_revision ... ok
+test intent_store::tests::records_beyond_the_bound_are_refused_before_acceptance ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+     Running tests/log_framing.rs (target/aarch64-apple-darwin/debug/deps/log_framing-8e56f7d7820a11c2)
+
+running 2 tests
+test writer_child ... ok
+test records_never_share_a_line_across_a_killed_writer ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.20s
+
+   Doc-tests threadspace_agent
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+==== Harness crate (repaired LogCursor): cargo test -p threadspace-harness ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.58s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_harness-adf429cd110949d3)
+
+running 2 tests
+test evidence::tests::utc_stamp_matches_a_known_instant ... ok
+test companion::tests::reads_one_record_per_complete_line_and_counts_torn_lines ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/m0c/main.rs (target/aarch64-apple-darwin/debug/deps/threadspace_m0c-6a1820e85545ca88)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests threadspace_harness
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+==== Control: the kill test against the accepted M0C log.rs (cd9e376), restored afterwards: cargo test -p threadspace-agent --test log_framing -- --nocapture ====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.78s
+     Running tests/log_framing.rs (target/aarch64-apple-darwin/debug/deps/log_framing-8e56f7d7820a11c2)
+
+running 2 tests
+test writer_child ... ok
+log framing: 240 rounds; 240 writers confirmed SIGKILLed (30 at spawn, 210 after READY); 32092 lines; 26092 killed-writer records and 4050 post-kill records parsed; 32 torn records planted; 0 torn lines found on their own line; 78 joined lines; 2060 violations
+
+thread 'records_never_share_a_line_across_a_killed_writer' (54233681) panicked at apps/agent-macos/core/tests/log_framing.rs:264:5:
+2060 violations, first: ["round 2: line 29 holds 2 record starts", "round 2: line 30 is out of sequence: {\"event\":\"framing.probe\",\"level\":\"info\",\"pad\":\"xxxxxxx\",\"pid\":276,\"seq\":1,\"tag\":\"after\",\"ts\":1791415444726}", "round 2: line 31 is out of sequence: {\"event\":\"framing.probe\",\"level\":\"info\",\"pad\":\"xxxxxxxxxxxxxx\",\"pid\":276,\"seq\":2,\"tag\":\"after\",\"ts\":1791415444726}", "round 2: line 32 is out of sequence: {\"event\":\"framing.probe\",\"level\":\"info\",\"pad\":\"xxxxxxxxxxxxxxxxxxxxx\",\"pid\":276,\"seq\":3,\"tag\":\"after\",\"ts\":1791415444726}", "round 2: line 33 is out of sequence: {\"event\":\"framing.probe\",\"level\":\"info\",\"pad\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"pid\":276,\"seq\":4,\"tag\":\"after\",\"ts\":1791415444726}"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test records_never_share_a_line_across_a_killed_writer ... FAILED
+
+failures:
+
+failures:
+    records_never_share_a_line_across_a_killed_writer
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.33s
+
+error: test failed, to rerun pass `-p threadspace-agent --test log_framing`

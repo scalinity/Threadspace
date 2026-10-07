@@ -105,12 +105,16 @@ impl<'a> Companion<'a> {
     }
 }
 
-/// Reads JSON lines appended after a recorded file position.
+/// Reads JSON lines appended after a recorded file position, one record per
+/// complete line. A complete line that is not one JSON object (a record torn
+/// by a companion killed while writing it) is skipped and counted. A final
+/// line without its newline is left unread: it may still be being written.
 pub struct LogCursor {
     path: PathBuf,
     offset: u64,
     /// Lines read from the file but not yet handed out by `wait_for`.
     pending: std::collections::VecDeque<Value>,
+    torn: u64,
 }
 
 impl LogCursor {
@@ -120,7 +124,13 @@ impl LogCursor {
             path,
             offset,
             pending: std::collections::VecDeque::new(),
+            torn: 0,
         }
+    }
+
+    /// Complete lines skipped so far because they were not one JSON object.
+    pub fn torn_records(&self) -> u64 {
+        self.torn
     }
 
     /// New complete lines since the last read (a rotated file restarts at 0),
@@ -144,19 +154,18 @@ impl LogCursor {
         }
         let mut lines = Vec::new();
         let mut reader = BufReader::new(file);
-        let mut line = String::new();
-        while let Ok(read) = reader.read_line(&mut line) {
-            if read == 0 || !line.ends_with('\n') {
+        // Bytes, not `read_line`: a record torn inside a UTF-8 sequence must be
+        // skipped, not stop the cursor at that line.
+        let mut line = Vec::new();
+        while let Ok(read) = reader.read_until(b'\n', &mut line) {
+            if read == 0 || line.last() != Some(&b'\n') {
                 break;
             }
             self.offset += read as u64;
-            // A companion killed between a record and its newline leaves the
-            // next process's record on the same line: read every record.
-            lines.extend(
-                serde_json::Deserializer::from_str(line.trim())
-                    .into_iter::<Value>()
-                    .map_while(Result::ok),
-            );
+            match serde_json::from_slice::<Value>(&line) {
+                Ok(record) if record.is_object() => lines.push(record),
+                _ => self.torn += 1,
+            }
             line.clear();
         }
         lines
@@ -188,5 +197,57 @@ impl LogCursor {
             }
             crate::pause_ms(100);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Write;
+
+    use super::LogCursor;
+
+    fn append(path: &std::path::Path, bytes: &[u8]) {
+        std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .and_then(|mut file| file.write_all(bytes))
+            .expect("append to log");
+    }
+
+    fn events(records: &[serde_json::Value]) -> Vec<&str> {
+        records
+            .iter()
+            .map(|record| record["event"].as_str().unwrap_or("?"))
+            .collect()
+    }
+
+    #[test]
+    fn reads_one_record_per_complete_line_and_counts_torn_lines() {
+        let dir =
+            std::env::temp_dir().join(format!("threadspace-logcursor-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let path = dir.join("agent.log");
+        append(&path, b"{\"event\":\"before\"}\n");
+        let mut cursor = LogCursor::at_end(path.clone());
+
+        // A record still being written is not consumed.
+        append(&path, b"{\"event\":\"a\"}\n{\"event\":\"b\",\"n\"");
+        assert_eq!(events(&cursor.read_new()), ["a"]);
+        assert_eq!(cursor.torn_records(), 0);
+
+        // Its writer was killed: the next process ends the torn record on its
+        // own line. Two records sharing a line, a non-object and a line torn
+        // inside a UTF-8 sequence are each one torn line; reading continues.
+        append(&path, b"\n{\"event\":\"c\"}\n{\"event\":\"d\"}{\"event\":\"e\"}\n[1,2]\n{\"event\":\"\xe2\x80\n{\"event\":\"f\"}\n{\"event\":\"g\"");
+        assert_eq!(events(&cursor.read_new()), ["c", "f"]);
+        assert_eq!(cursor.torn_records(), 4);
+
+        append(&path, b",\"n\":1}\n");
+        assert_eq!(events(&cursor.read_new()), ["g"]);
+        assert_eq!(cursor.torn_records(), 4);
+        assert!(cursor.read_new().is_empty());
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
