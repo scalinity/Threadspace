@@ -230,9 +230,11 @@ struct Writer {
     /// Committed backlog revision and the consumed intent IDs it remembers.
     revision: u64,
     consumed: VecDeque<String>,
-    /// The committed backlog still lists an intent a view consumed, because
-    /// recording the consumption failed; the next commit retries it.
-    backlog_stale: bool,
+    /// Intents a view consumed that the committed backlog still lists,
+    /// because recording the consumption failed. Every commit writes the
+    /// backlog without them, so the next successful one records them all;
+    /// they number at most the backlog's bound.
+    unrecorded: Vec<String>,
     /// The backlog could not be read at start, so it is never overwritten.
     backlog_unavailable: bool,
     /// Responses whose Return is in flight; their records stay until the
@@ -464,7 +466,7 @@ impl Writer {
         let commit = self.commit(&pending, &self.consumed)?;
         let count = pending.len();
         self.revision += 1;
-        self.backlog_stale = false;
+        self.unrecorded.clear();
         log::info(
             "INTENT_ACCEPTED",
             json!({
@@ -504,59 +506,66 @@ impl Writer {
         self.deliver_all();
     }
 
-    /// A view consumed an intent. Its durable removal is complete only when
-    /// the backlog without it commits; otherwise the caller is told so, the
-    /// intent is not delivered again by this process, and every later commit
-    /// retries the removal. If no commit succeeds before a restart, the next
-    /// writer delivers it once more and the shell, which remembers what its
-    /// views applied, does not apply it again.
+    /// A view consumed an intent. The consumption is done only when the
+    /// committed backlog no longer lists it: when the backlog without it
+    /// commits, now or with any later commit. Until then the caller is told
+    /// so, the intent is not delivered again by this process, and a repeated
+    /// consumption retries the removal and is done only if that commits. If
+    /// no commit succeeds before a restart, the next writer delivers it once
+    /// more and the shell, which remembers what its views applied, does not
+    /// apply it again.
     fn consume(&mut self, intent_id: &str) -> Result<ControlResponseBody, ControlError> {
         for view in self.views.values_mut() {
             view.delivered.remove(intent_id);
         }
-        let Some(position) = self
+        let position = self
             .intents
             .iter()
-            .position(|intent| intent.intent_id == intent_id)
-        else {
-            return Ok(ControlResponseBody::Done);
-        };
-        let Some(intent) = self.intents.remove(position) else {
-            return Ok(ControlResponseBody::Done);
-        };
-        let mut outcome = Ok(ControlResponseBody::Done);
-        if intent_store::durable(&intent) {
-            self.consumed.push_back(intent_id.to_owned());
-            while self.consumed.len() > intent_store::CONSUMED_MEMORY {
-                self.consumed.pop_front();
-            }
-            match self.commit(&self.durable_pending(), &self.consumed) {
-                Ok(_) => {
-                    self.revision += 1;
-                    self.backlog_stale = false;
-                    log::info(
-                        "INTENT_CONSUMED",
-                        json!({ "intentId": intent_id, "revision": self.revision, "pending": self.intents.len() }),
-                    );
+            .position(|intent| intent.intent_id == intent_id);
+        let retry = match position.and_then(|position| self.intents.remove(position)) {
+            Some(intent) if intent_store::durable(&intent) => {
+                self.consumed.push_back(intent_id.to_owned());
+                while self.consumed.len() > intent_store::CONSUMED_MEMORY {
+                    self.consumed.pop_front();
                 }
-                Err(failure) => {
-                    self.backlog_stale = true;
-                    log::error(
-                        "CONSUMPTION_NOT_RECORDED",
-                        json!({ "intentId": intent_id, "failure": failure.json() }),
-                    );
-                    outcome = Err(ControlError::new(
-                        ControlErrorCode::Unavailable,
-                        "consumption not recorded durably; the next store write retries it",
-                    ));
-                }
+                self.unrecorded.push(intent_id.to_owned());
+                false
             }
-        } else {
-            log::info(
-                "INTENT_CONSUMED",
-                json!({ "intentId": intent_id, "transient": true }),
-            );
-        }
+            Some(_) => {
+                log::info(
+                    "INTENT_CONSUMED",
+                    json!({ "intentId": intent_id, "transient": true }),
+                );
+                self.retry_unpromoted();
+                self.deliver_all();
+                return Ok(ControlResponseBody::Done);
+            }
+            // Consumed before, and the committed backlog still lists it.
+            None if self.unrecorded.iter().any(|id| id == intent_id) => true,
+            // Consumed before and recorded, or never held by this store.
+            None => return Ok(ControlResponseBody::Done),
+        };
+        let outcome = match self.commit(&self.durable_pending(), &self.consumed) {
+            Ok(_) => {
+                self.revision += 1;
+                self.unrecorded.clear();
+                log::info(
+                    "INTENT_CONSUMED",
+                    json!({ "intentId": intent_id, "revision": self.revision, "pending": self.intents.len(), "retry": retry }),
+                );
+                Ok(ControlResponseBody::Done)
+            }
+            Err(failure) => {
+                log::error(
+                    "CONSUMPTION_NOT_RECORDED",
+                    json!({ "intentId": intent_id, "retry": retry, "failure": failure.json() }),
+                );
+                Err(ControlError::new(
+                    ControlErrorCode::Unavailable,
+                    "consumption not recorded durably; the next store write retries it",
+                ))
+            }
+        };
         self.retry_unpromoted();
         self.deliver_all();
         outcome
@@ -1482,11 +1491,11 @@ impl Writer {
         #[cfg(feature = "qualification")]
         handoff::pass(handoff::Point::BeforeExit);
         drained += self.drain(commands);
-        if self.backlog_stale {
+        if !self.unrecorded.is_empty() {
             match self.commit(&self.durable_pending(), &self.consumed) {
                 Ok(_) => {
                     self.revision += 1;
-                    self.backlog_stale = false;
+                    self.unrecorded.clear();
                 }
                 Err(failure) => log::error(
                     "RELEASE_BACKLOG_STALE",
@@ -1505,7 +1514,7 @@ impl Writer {
                 "records": intent_store::records(&self.store_dir).iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
                 "unpromoted": self.unpromoted,
                 "returning": self.returning.iter().collect::<Vec<_>>(),
-                "backlogStale": self.backlog_stale,
+                "backlogStale": !self.unrecorded.is_empty(),
             }),
         );
         std::process::exit(code);
@@ -1640,7 +1649,7 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
                 responder,
                 revision: backlog.revision,
                 consumed: backlog.consumed,
-                backlog_stale: false,
+                unrecorded: Vec::new(),
                 backlog_unavailable,
                 returning: HashSet::new(),
                 unpromoted: Vec::new(),
@@ -1774,5 +1783,307 @@ pub mod handoff {
                 "releasedAtMs": log::now_ms(),
             }),
         );
+    }
+}
+
+/// C-02B: `Done` for `IntentConsumed` means the committed backlog no longer
+/// lists the intent. Each test drives the writer's own command handler on a
+/// store of its own, injects failures into the real intent store, and reads
+/// the committed backlog from disk; a restart is a new writer built from
+/// what the store holds, as a writer process starts.
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+    use std::sync::mpsc::sync_channel;
+
+    use super::*;
+    use crate::intent_store::faults::{self, Op, Target};
+
+    struct Rig {
+        writer: Writer,
+        replies: Receiver<ControlMessage>,
+        outbound: Outbound,
+        next_request: u64,
+        _queues: (
+            Receiver<WriterCommand>,
+            Receiver<NotificationIntent>,
+            Receiver<ResponseJob>,
+        ),
+    }
+
+    fn store() -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("ts-writer-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).expect("dir");
+        dir
+    }
+
+    fn start(dir: &Path) -> Rig {
+        let (backlog, _) = intent_store::load_backlog(dir);
+        let journal = Journal::open(&dir.join("journal.sqlite3"), "test", 0).expect("journal");
+        let (commands, commands_rx) = sync_channel(8);
+        let (notifier, notifier_rx) = sync_channel(8);
+        let (responder, responder_rx) = sync_channel(8);
+        let (outbound, replies) = sync_channel(64);
+        let mut writer = Writer {
+            journal,
+            views: HashMap::new(),
+            intents: VecDeque::from(backlog.pending),
+            last_cursor: 0,
+            responder,
+            revision: backlog.revision,
+            consumed: backlog.consumed,
+            unrecorded: Vec::new(),
+            backlog_unavailable: false,
+            returning: HashSet::new(),
+            unpromoted: Vec::new(),
+            commands,
+            identity: ProcessIdentity {
+                pid: std::process::id(),
+                boot_id: String::new(),
+                start_seconds: String::new(),
+                start_microseconds: 0,
+                executable_path: String::new(),
+            },
+            store_dir: dir.to_path_buf(),
+            notifier,
+        };
+        writer.recover();
+        Rig {
+            writer,
+            replies,
+            outbound,
+            next_request: 1,
+            _queues: (commands_rx, notifier_rx, responder_rx),
+        }
+    }
+
+    fn intent(id: &str) -> NativeIntent {
+        NativeIntent {
+            intent_id: id.to_owned(),
+            action: IntentAction::OpenAttention {
+                attention_id: Uuid::new_v4().to_string(),
+                session_id: Uuid::new_v4().to_string(),
+                outstanding: true,
+                source: IntentSource::NotificationResponse,
+                route: None,
+                observation_enabled: false,
+            },
+        }
+    }
+
+    impl Rig {
+        fn accept(&mut self, id: &str) {
+            self.writer.accept_durable(intent(id)).expect("accepted");
+        }
+
+        /// One `IntentConsumed` through the writer's handler, under a new
+        /// request ID, and the reply it got.
+        fn consume(&mut self, id: &str) -> Result<ControlResponseBody, ControlError> {
+            let request_id = self.next_request;
+            self.next_request += 1;
+            self.writer.handle(WriterCommand::IntentConsumed {
+                request_id,
+                intent_id: id.to_owned(),
+                outbound: self.outbound.clone(),
+            });
+            match self.replies.try_recv() {
+                Ok(ControlMessage::Response {
+                    request_id: replied,
+                    outcome,
+                }) if replied == request_id => match outcome {
+                    ControlOutcome::Ok(body) => Ok(*body),
+                    ControlOutcome::Err(error) => Err(error),
+                },
+                other => panic!("no reply to request {request_id}: {other:?}"),
+            }
+        }
+
+        fn pending(&self) -> Vec<String> {
+            self.writer
+                .intents
+                .iter()
+                .map(|intent| intent.intent_id.clone())
+                .collect()
+        }
+    }
+
+    /// The committed backlog's revision and pending intent IDs, from disk.
+    fn committed(dir: &Path) -> (u64, Vec<String>) {
+        let (backlog, _) = intent_store::load_backlog(dir);
+        let ids = backlog
+            .pending
+            .into_iter()
+            .map(|intent| intent.intent_id)
+            .collect();
+        (backlog.revision, ids)
+    }
+
+    fn remembered(dir: &Path) -> Vec<String> {
+        intent_store::load_backlog(dir)
+            .0
+            .consumed
+            .into_iter()
+            .collect()
+    }
+
+    fn done(reply: &Result<ControlResponseBody, ControlError>) -> bool {
+        matches!(reply, Ok(ControlResponseBody::Done))
+    }
+
+    fn unavailable(reply: &Result<ControlResponseBody, ControlError>) -> bool {
+        matches!(reply, Err(error) if error.code == ControlErrorCode::Unavailable)
+    }
+
+    fn id() -> String {
+        Uuid::new_v4().to_string()
+    }
+
+    #[test]
+    fn a_repeated_consumption_is_not_done_while_the_backlog_still_lists_the_intent() {
+        let dir = store();
+        let mut rig = start(&dir);
+        let x = id();
+        rig.accept(&x);
+        assert_eq!(committed(&dir), (1, vec![x.clone()]));
+
+        faults::arm(&dir, Target::Backlog, Op::Rename, 2);
+        let first = rig.consume(&x);
+        assert!(unavailable(&first), "first: {first:?}");
+        assert_eq!(committed(&dir), (1, vec![x.clone()]));
+
+        // No commit succeeds in between: the repeat must not be Done.
+        let second = rig.consume(&x);
+        assert!(unavailable(&second), "second: {second:?}");
+        assert_eq!(committed(&dir), (1, vec![x.clone()]));
+
+        // Storage works again: the repeat commits the removal, then is Done.
+        let third = rig.consume(&x);
+        assert!(done(&third), "third: {third:?}");
+        assert_eq!(committed(&dir), (2, vec![]));
+        assert_eq!(remembered(&dir), vec![x.clone()]);
+
+        drop(rig);
+        assert!(start(&dir).pending().is_empty());
+        std::fs::remove_dir_all(dir).ok();
+    }
+
+    #[test]
+    fn a_writer_killed_before_the_removal_commits_leaves_the_intent_to_its_claimant() {
+        let dir = store();
+        let mut rig = start(&dir);
+        let x = id();
+        rig.accept(&x);
+        faults::arm(&dir, Target::Backlog, Op::Rename, 2);
+        let replies = [rig.consume(&x), rig.consume(&x)];
+        assert!(replies.iter().all(unavailable), "{replies:?}");
+        assert_eq!(committed(&dir), (1, vec![x.clone()]));
+
+        // Killed: no Release, no further commit.
+        drop(rig);
+        let mut claimant = start(&dir);
+        assert_eq!(claimant.pending(), vec![x.clone()]);
+        let reply = claimant.consume(&x);
+        assert!(done(&reply), "{reply:?}");
+        assert_eq!(committed(&dir), (2, vec![]));
+
+        drop(claimant);
+        assert!(start(&dir).pending().is_empty());
+        std::fs::remove_dir_all(dir).ok();
+    }
+
+    #[test]
+    fn a_repeated_consumption_is_done_once_its_retry_commits_the_removal() {
+        let dir = store();
+        let mut rig = start(&dir);
+        let (view, deliveries) = sync_channel(64);
+        rig.writer.views.insert(
+            "view".to_owned(),
+            View {
+                connection_id: 1,
+                outbound: view,
+                hydrated: true,
+                delivered: HashSet::new(),
+            },
+        );
+        let x = id();
+        rig.accept(&x);
+
+        faults::arm(&dir, Target::Backlog, Op::Rename, 1);
+        let first = rig.consume(&x);
+        assert!(unavailable(&first), "first: {first:?}");
+        let second = rig.consume(&x);
+        assert!(done(&second), "second: {second:?}");
+        assert_eq!(committed(&dir), (2, vec![]));
+
+        let delivered = deliveries
+            .try_iter()
+            .filter(|message| matches!(message, ControlMessage::Intent { intent, .. } if intent.intent_id == x))
+            .count();
+        assert_eq!(delivered, 1, "the view is sent the intent once");
+
+        drop(rig);
+        assert!(start(&dir).pending().is_empty());
+        std::fs::remove_dir_all(dir).ok();
+    }
+
+    #[test]
+    fn consuming_an_intent_whose_removal_committed_is_done_without_a_write() {
+        let dir = store();
+        let mut rig = start(&dir);
+        let x = id();
+        rig.accept(&x);
+        assert!(done(&rig.consume(&x)));
+        let file = dir.join("pending-intents.json");
+        let bytes = std::fs::read(&file).expect("backlog");
+        assert_eq!(committed(&dir), (2, vec![]));
+
+        // A write now would fail; the repeat is Done without one.
+        faults::arm(&dir, Target::Backlog, Op::Rename, 1);
+        let again = rig.consume(&x);
+        assert!(done(&again), "{again:?}");
+        let unknown = rig.consume(&id());
+        assert!(done(&unknown), "{unknown:?}");
+        assert_eq!(std::fs::read(&file).expect("backlog"), bytes);
+        assert_eq!(rig.writer.revision, 2);
+        faults::arm(&dir, Target::Backlog, Op::Rename, 0);
+
+        drop(rig);
+        assert!(start(&dir).pending().is_empty());
+        std::fs::remove_dir_all(dir).ok();
+    }
+
+    #[test]
+    fn retrying_one_removal_keeps_every_other_intent_and_the_current_revision() {
+        let dir = store();
+        let mut rig = start(&dir);
+        let (x, y, z, w) = (id(), id(), id(), id());
+        for each in [&x, &y, &z] {
+            rig.accept(each);
+        }
+        assert_eq!(committed(&dir), (3, vec![x.clone(), y.clone(), z.clone()]));
+
+        // X's removal fails, then its retry commits from the current state.
+        faults::arm(&dir, Target::Backlog, Op::Rename, 1);
+        assert!(unavailable(&rig.consume(&x)));
+        assert_eq!(committed(&dir), (3, vec![x.clone(), y.clone(), z.clone()]));
+        assert!(done(&rig.consume(&x)));
+        assert_eq!(committed(&dir), (4, vec![y.clone(), z.clone()]));
+        assert_eq!(remembered(&dir), vec![x.clone()]);
+
+        // Y's removal fails; W is accepted after it. W's commit is written
+        // from the current state, so it records Y's removal too, and the
+        // repeat for Y is Done without writing an older snapshot.
+        faults::arm(&dir, Target::Backlog, Op::Rename, 1);
+        assert!(unavailable(&rig.consume(&y)));
+        assert_eq!(committed(&dir), (4, vec![y.clone(), z.clone()]));
+        rig.accept(&w);
+        assert_eq!(committed(&dir), (5, vec![z.clone(), w.clone()]));
+        assert!(done(&rig.consume(&y)));
+        assert_eq!(committed(&dir), (5, vec![z.clone(), w.clone()]));
+        assert_eq!(remembered(&dir), vec![x.clone(), y.clone()]);
+
+        drop(rig);
+        assert_eq!(start(&dir).pending(), vec![z, w]);
+        std::fs::remove_dir_all(dir).ok();
     }
 }
