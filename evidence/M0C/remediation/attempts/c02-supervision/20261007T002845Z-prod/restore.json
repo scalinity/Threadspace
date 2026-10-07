@@ -1,0 +1,82 @@
+{
+  "after": {
+    "atMs": 1791333154791,
+    "companionProcesses": [
+      {
+        "pid": 14902,
+        "ppid": 1,
+        "startMicroseconds": 495488,
+        "startSeconds": 1791333154
+      }
+    ],
+    "diagnostics": {
+      "error": "malformed frame: missing field `launchProvenance`"
+    },
+    "label": "restored",
+    "locatorIncarnation": {
+      "pid": 14902,
+      "ppid": 1,
+      "startMicroseconds": 495488,
+      "startSeconds": 1791333154
+    },
+    "loginItemPid": 14902,
+    "serviceStatus": "ENABLED",
+    "uiProcesses": [],
+    "writerLockFree": false
+  },
+  "steps": [
+    {
+      "register": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 78,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "register",
+        "statusAfter": "ENABLED"
+      }
+    },
+    {
+      "enable": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "steps": [
+            {
+              "detail": "already enabled",
+              "elapsedMs": 14,
+              "ok": true,
+              "step": "register"
+            },
+            {
+              "detail": {
+                "companionPid": 14902,
+                "waitedMs": 0
+              },
+              "elapsedMs": 14,
+              "ok": true,
+              "step": "connect"
+            },
+            {
+              "detail": null,
+              "elapsedMs": 17,
+              "ok": true,
+              "step": "record-observation-enabled"
+            }
+          ]
+        },
+        "elapsedMs": 43,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "enable",
+        "statusAfter": "ENABLED"
+      }
+    }
+  ]
+}

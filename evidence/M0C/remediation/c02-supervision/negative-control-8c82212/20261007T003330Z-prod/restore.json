@@ -1,0 +1,106 @@
+{
+  "after": {
+    "atMs": 1791333318826,
+    "companionProcesses": [
+      {
+        "pid": 20261,
+        "ppid": 1,
+        "startMicroseconds": 664687,
+        "startSeconds": 1791333318
+      }
+    ],
+    "diagnostics": {
+      "error": "malformed frame: missing field `launchProvenance`"
+    },
+    "label": "restored",
+    "locatorIncarnation": {
+      "pid": 20261,
+      "ppid": 1,
+      "startMicroseconds": 664687,
+      "startSeconds": 1791333318
+    },
+    "loginItemPid": 20261,
+    "serviceStatus": "ENABLED",
+    "uiProcesses": [
+      {
+        "pid": 16505,
+        "ppid": 1,
+        "startMicroseconds": 825609,
+        "startSeconds": 1791333216
+      }
+    ],
+    "writerLockFree": false
+  },
+  "steps": [
+    {
+      "register": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 69,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "register",
+        "statusAfter": "ENABLED"
+      }
+    },
+    {
+      "endedUnsupervisedIncumbent": {
+        "pid": 16500,
+        "ppid": 1,
+        "startMicroseconds": 716105,
+        "startSeconds": 1791333216
+      },
+      "exitedAfterMs": 52,
+      "witness": {
+        "parentPid": 1,
+        "pid": 16500,
+        "xpcServiceName": "application.ai.scalinity.threadspace.agent.135193826.135193831"
+      }
+    },
+    {
+      "loginItemOwnerAfterMs": 225
+    },
+    {
+      "enable": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "steps": [
+            {
+              "detail": "already enabled",
+              "elapsedMs": 13,
+              "ok": true,
+              "step": "register"
+            },
+            {
+              "detail": {
+                "companionPid": 20261,
+                "waitedMs": 0
+              },
+              "elapsedMs": 13,
+              "ok": true,
+              "step": "connect"
+            },
+            {
+              "detail": null,
+              "elapsedMs": 14,
+              "ok": true,
+              "step": "record-observation-enabled"
+            }
+          ]
+        },
+        "elapsedMs": 37,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "enable",
+        "statusAfter": "ENABLED"
+      }
+    }
+  ]
+}

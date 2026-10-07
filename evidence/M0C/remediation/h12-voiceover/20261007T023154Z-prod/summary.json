@@ -1,0 +1,192 @@
+{
+  "checks": {
+    "activatedByVoiceOverChangedPresentation": true,
+    "activationAfterTransitionRestored3d": true,
+    "keyboardRegression": true,
+    "muteRestored": true,
+    "priorStateRecordedOff": true,
+    "projectionEqual": true,
+    "voiceOverActiveAndAnswering": true,
+    "voiceOverCursorOnControlAfterTransition": true,
+    "voiceOverCursorOnLabelledControl": true,
+    "voiceOverMovedItsCursor": true,
+    "voiceOverMovedItsCursorAfterTransition": true,
+    "voiceOverRestoredOff": true,
+    "windowTransition": true
+  },
+  "gate": "G16",
+  "issue": "H-12",
+  "keyboard": {
+    "distinctLabelled": 9,
+    "path": [
+      {
+        "label": "Refresh",
+        "role": "AXButton"
+      },
+      {
+        "label": "Allow notifications",
+        "role": "AXButton"
+      },
+      {
+        "label": "Stop observation",
+        "role": "AXButton"
+      },
+      {
+        "label": "Allow Terminal access",
+        "role": "AXButton"
+      },
+      {
+        "label": "digest:353253270ea6",
+        "role": "AXWebArea"
+      },
+      {
+        "label": "digest:a7647d4ca22d",
+        "role": "AXButton"
+      },
+      {
+        "label": "digest:f9236d9e87b6",
+        "role": "AXButton"
+      },
+      {
+        "label": "digest:35ae399b96c6",
+        "role": "AXButton"
+      },
+      {
+        "label": "digest:f9236d9e87b6",
+        "role": "AXButton"
+      },
+      {
+        "label": "digest:500fddc892e7",
+        "role": "AXButton"
+      }
+    ],
+    "shiftTabLandsOn": {
+      "label": "digest:f9236d9e87b6",
+      "role": "AXButton"
+    }
+  },
+  "navigationSteps": 181,
+  "observed": {
+    "activate1": {
+      "atMs": 1791340383692,
+      "voiceOverCursor": "2D view toggle button"
+    },
+    "activate2": {
+      "atMs": 1791340450198,
+      "voiceOverCursor": "2D view selected toggle button"
+    },
+    "firstReached": {
+      "atMs": 1791340383375,
+      "axFocused": {
+        "label": "2D view",
+        "role": "AXCheckBox"
+      },
+      "command": "move left",
+      "onTarget": true,
+      "round": "first",
+      "voiceOverCursor": "2D view toggle button"
+    },
+    "fullscreen": {
+      "entered": true,
+      "exited": false
+    },
+    "presentationAfterFirst": {
+      "generation": 3,
+      "presentation": "2d",
+      "state": "2d"
+    },
+    "presentationAfterSecond": {
+      "generation": 4,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationBefore": {
+      "generation": 3,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "secondReached": {
+      "atMs": 1791340449895,
+      "axFocused": {
+        "label": "2D view",
+        "role": "AXCheckBox"
+      },
+      "command": "move left",
+      "onTarget": true,
+      "round": "after-transition",
+      "voiceOverCursor": "2D view selected toggle button"
+    },
+    "voiceOverReady": {
+      "afterMs": 622,
+      "firstCursor": "digest:5ec1196c1bed",
+      "ready": true
+    },
+    "voiceOverStart": {
+      "attempts": [
+        {
+          "attempt": 0,
+          "ok": true,
+          "read": {
+            "bundle": "com.apple.systempreferences",
+            "found": true,
+            "label": "VoiceOver",
+            "pressed": false,
+            "valueAfter": 0,
+            "valueBefore": 0
+          },
+          "settingsOpened": true,
+          "switch": {
+            "bundle": "com.apple.systempreferences",
+            "found": true,
+            "label": "VoiceOver",
+            "pressed": true,
+            "valueAfter": 1,
+            "valueBefore": 0
+          }
+        }
+      ],
+      "method": "SETTINGS_SWITCH",
+      "ok": true
+    }
+  },
+  "pass": true,
+  "restored": {
+    "muteRestored": true,
+    "outputMutedAfter": false,
+    "outputMutedBefore": false,
+    "voiceOver": {
+      "method": "VOICEOVER_QUIT_THEN_SWITCH",
+      "quit": "Ok(\"\")",
+      "switch": {
+        "attempts": [
+          {
+            "attempt": 0,
+            "ok": true,
+            "read": {
+              "bundle": "com.apple.systempreferences",
+              "found": true,
+              "label": "VoiceOver",
+              "pressed": false,
+              "valueAfter": 0,
+              "valueBefore": 0
+            },
+            "settingsOpened": true,
+            "switch": {
+              "pressed": false
+            }
+          }
+        ],
+        "method": "SETTINGS_SWITCH",
+        "ok": true
+      }
+    },
+    "voiceOverOffAfter": true,
+    "voiceOverPidsAfter": []
+  },
+  "ui": {
+    "pid": 24546,
+    "ppid": 1,
+    "startMicroseconds": 958629,
+    "startSeconds": 1791339003
+  }
+}

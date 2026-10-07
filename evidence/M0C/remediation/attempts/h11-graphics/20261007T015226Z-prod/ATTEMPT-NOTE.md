@@ -1,0 +1,3 @@
+# Superseded remediation run: h11-graphics/20261007T015226Z-prod
+
+Candidate build 89fce79. The pending init was held and retired correctly. Two harness gaps: (1) after the return, the office switched to 2D at 1791338052331 with no harness command (keyboard focus was on the 2D toggle and Threadspace was in front; outside input), so the pixel check measured a 2D view; (2) the pending-resource count was 2 because the held-init generation's texture, received before its scene existed, is disposed at retirement without a counter. Fixed in 0880017 (interference detection, pending measured as a delta); the cited run is `../../../h11-graphics/20261007T015658Z-prod/`.

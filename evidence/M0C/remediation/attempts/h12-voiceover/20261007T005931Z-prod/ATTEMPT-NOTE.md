@@ -1,0 +1,3 @@
+# Superseded remediation run: h12-voiceover/20261007T005931Z-prod
+
+Candidate build 89fce79, keystroke-driven VoiceOver runner (2861825 and its development states). Superseded: the route was not deterministic. VoiceOver's Command-F5 shortcut is disabled on this Mac, so it was toggled with its System Settings switch, whose reported state lags; VoiceOver acts on injected VO commands only some of the time; its welcome dialog was enabled; and in one run (013026Z, stopped by hand) its Tutorial came to the front and consumed the VO-Right keystrokes. Nothing in Threadspace changed state beyond its own 2D toggle. Owner-environment side effects are recorded in the failure ledger (H-14). Later runs here add the frontmost guard and abort safely.

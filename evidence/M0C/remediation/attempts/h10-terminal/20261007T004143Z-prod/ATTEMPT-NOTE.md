@@ -1,0 +1,3 @@
+# Superseded remediation run: h10-terminal/20261007T004143Z-prod
+
+Intermediate build a6da2f1. Baseline and both held-route close overlaps passed. The fullscreen case found product defect C-11: the Return focus script read `front window` while macOS was still switching to the target's fullscreen Space and reported READBACK_FAILED although it had focused the right tab (front window was the spare, 16556; 300 ms later the independent readback showed the target). Fixed in 88817eb. The case also exposed a harness predicate that expected a fullscreen frame equal to the display; on this panel it sits 26 pt down.

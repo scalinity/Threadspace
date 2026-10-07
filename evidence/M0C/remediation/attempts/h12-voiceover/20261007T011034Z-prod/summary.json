@@ -1,0 +1,213 @@
+{
+  "checks": {
+    "activatedThroughVoiceOverChangedPresentation": false,
+    "activationAfterTransitionRestored3d": true,
+    "keyboardRegression": false,
+    "muteRestored": true,
+    "negativeControlKeystrokesInertWithoutVoiceOver": false,
+    "priorStateRecorded": true,
+    "projectionEqual": true,
+    "voiceOverActive": true,
+    "voiceOverCursorReachedControlAfterTransition": false,
+    "voiceOverCursorReachedLabelledControl": false,
+    "voiceOverMovedItsCursor": true,
+    "voiceOverMovedItsCursorAfterTransition": false,
+    "voiceOverRestoredOff": false,
+    "windowTransition": true
+  },
+  "gate": "G16",
+  "issue": "H-12",
+  "keyboard": {
+    "distinctLabelled": 6,
+    "path": [
+      {
+        "found": true,
+        "label": "2D view",
+        "pid": 42414,
+        "role": "AXCheckBox"
+      },
+      {
+        "found": true,
+        "label": "Refresh",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Refresh",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow notifications",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow notifications",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stop observation",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stop observation",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow Terminal access",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow Terminal access",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Threadspace",
+        "pid": 42414,
+        "role": "AXWebArea"
+      }
+    ],
+    "shiftTabLandsOn": {
+      "found": true,
+      "label": "Threadspace",
+      "pid": 42414,
+      "role": "AXWebArea"
+    }
+  },
+  "navigationSteps": 671,
+  "negativeControl": {
+    "focusAfterControlOptionRight": {
+      "label": "2D view",
+      "role": "AXCheckBox"
+    },
+    "presentationAfterControlOptionSpace": {
+      "generation": 1,
+      "presentation": "2d",
+      "state": "2d"
+    },
+    "presentationBefore": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "toggleFocusedByTab": {
+      "found": true,
+      "label": "2D view",
+      "pid": 42414,
+      "role": "AXCheckBox"
+    },
+    "voiceOverEnabled": true
+  },
+  "observed": {
+    "activate1": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "activate2": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "firstReached": null,
+    "fullscreen": {
+      "entered": true,
+      "exited": false
+    },
+    "presentationAfterFirst": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationAfterSecond": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationBefore": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "secondReached": null,
+    "voiceOverOn": true,
+    "voiceOverStart": {
+      "enabled": true,
+      "method": "SETTINGS_SWITCH",
+      "ok": true,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": false,
+        "valueAfter": 0,
+        "valueBefore": 0
+      },
+      "settingsOpened": true,
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": true,
+        "valueAfter": 1,
+        "valueBefore": 0
+      }
+    },
+    "voiceOverState": {
+      "enabled": true,
+      "pids": []
+    },
+    "welcome": {
+      "shown": false
+    }
+  },
+  "pass": false,
+  "restored": {
+    "muteRestored": true,
+    "outputMutedAfter": false,
+    "outputMutedBefore": false,
+    "voiceOver": {
+      "enabled": true,
+      "method": "SETTINGS_SWITCH",
+      "ok": false,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": false,
+        "label": "digest:f95ccb6e226c"
+      },
+      "settingsOpened": true,
+      "switch": {
+        "pressed": false,
+        "reason": "switch missing or already in the wanted position"
+      }
+    },
+    "voiceOverOffAfter": false,
+    "voiceOverPidsAfter": [
+      58310
+    ]
+  },
+  "ui": {
+    "pid": 42414,
+    "ppid": 1,
+    "startMicroseconds": 856167,
+    "startSeconds": 1791334504
+  }
+}

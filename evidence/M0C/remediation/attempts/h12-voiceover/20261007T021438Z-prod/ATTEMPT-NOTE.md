@@ -1,0 +1,3 @@
+# Superseded remediation run: h12-voiceover/20261007T021438Z-prod
+
+Candidate build 89fce79, scripting-driven VoiceOver runner during development of ec8fd26. VoiceOver answered its scripting interface and was restored off each time; the walk did not yet reach the toggle (VoiceOver will not move right past the scene canvas; after the fullscreen transition it re-anchors on the web view's scroll area; the forward walk through the attention and 2D lists is too long). 023046Z stopped at its frontmost guard because a system crash alert for another app was in front. The cited run is `../../../h12-voiceover/20261007T023154Z-prod/`.

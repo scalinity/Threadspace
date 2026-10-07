@@ -1,0 +1,19 @@
+{
+  "purpose": "Owner VoiceOver settings changed for the H-12 smoke and restored afterwards.",
+  "allowVoiceOverAppleScript": {
+    "before": 0,
+    "duringRun": 1,
+    "after": 0,
+    "markerFilePresentAfter": false,
+    "ownerAction": "administrator authentication to enable (22:09 local) and to disable again"
+  },
+  "displayWelcomeDialog": {
+    "before": 1,
+    "duringRun": 0,
+    "after": 1
+  },
+  "voiceOverAfter": "off: method VOICEOVER_QUIT_THEN_SWITCH (VoiceOver's quit, then its System Settings switch), verified by NSWorkspace and the absence of its process (restore.json)",
+  "outputMute": "restored to its prior value (restore.json)",
+  "automationConsent": "VoiceOver's scripting answered from the first scripted run, so Terminal holds Automation access to VoiceOver from a one-time owner consent; it is inert while VoiceOver scripting is off and was left in place rather than resetting all of Terminal's Apple-event grants",
+  "recordedAt": "2026-10-07T02:39:03Z"
+}

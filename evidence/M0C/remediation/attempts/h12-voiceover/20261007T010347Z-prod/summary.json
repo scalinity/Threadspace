@@ -1,0 +1,196 @@
+{
+  "checks": {
+    "activatedThroughVoiceOverChangedPresentation": false,
+    "activationAfterTransitionRestored3d": true,
+    "keyboardRegression": true,
+    "muteRestored": true,
+    "priorStateRecorded": true,
+    "projectionEqual": true,
+    "voiceOverActive": true,
+    "voiceOverCursorReachedControlAfterTransition": false,
+    "voiceOverCursorReachedLabelledControl": false,
+    "voiceOverMovedItsCursor": true,
+    "voiceOverMovedItsCursorAfterTransition": false,
+    "voiceOverRestoredOff": true,
+    "windowTransition": true
+  },
+  "gate": "G16",
+  "issue": "H-12",
+  "keyboard": {
+    "distinctLabelled": 10,
+    "path": [
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — final banner click (UI quit)",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — final UI-open activation",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Refresh evidence",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59fixturem0c-stre observation unknown · unknown fixture — no native surface",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Return to Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59 | Return to Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stream 14 · change 9998 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59fixturem0c-stre observation unknown · unknown fixture — no native surface",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Return to Stream 14 · change 9998 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59 | Return to Stream 14 · change 9998 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "lawsmith-5bclaudee26ac315 observation current · live · pid 29436 · reported idle Terminal /dev/ttys002 · binding rev 255071",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Return to lawsmith-5b | Return to lawsmith-5b",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "a-5cclaude5199c3ac observation stale · ended · pid 27049 · reported idle unbound — process exited Last return result",
+        "pid": 42414,
+        "role": "AXButton"
+      }
+    ],
+    "shiftTabLandsOn": {
+      "found": true,
+      "label": "Return to lawsmith-5b | Return to lawsmith-5b",
+      "pid": 42414,
+      "role": "AXButton"
+    }
+  },
+  "navigationSteps": 242,
+  "observed": {
+    "activate1": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "activate2": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "firstReached": null,
+    "fullscreen": {
+      "entered": true,
+      "exited": false
+    },
+    "presentationAfterFirst": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationAfterSecond": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationBefore": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "secondReached": null,
+    "voiceOverOn": true,
+    "voiceOverStart": {
+      "enabled": true,
+      "method": "SETTINGS_SWITCH",
+      "ok": true,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "VoiceOver",
+        "pressed": false,
+        "valueAfter": 0,
+        "valueBefore": 0
+      },
+      "settingsOpened": true,
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "VoiceOver",
+        "pressed": true,
+        "valueAfter": 1,
+        "valueBefore": 0
+      }
+    },
+    "voiceOverState": {
+      "enabled": true,
+      "pids": []
+    },
+    "welcome": {
+      "shown": false
+    }
+  },
+  "pass": false,
+  "restored": {
+    "muteRestored": true,
+    "outputMutedAfter": false,
+    "outputMutedBefore": false,
+    "voiceOver": {
+      "enabled": false,
+      "method": "SETTINGS_SWITCH",
+      "ok": true,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "VoiceOver",
+        "pressed": false,
+        "valueAfter": 1,
+        "valueBefore": 1
+      },
+      "settingsOpened": true,
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "VoiceOver",
+        "pressed": true,
+        "valueAfter": 0,
+        "valueBefore": 1
+      }
+    },
+    "voiceOverOffAfter": true,
+    "voiceOverPidsAfter": [
+      52783
+    ]
+  },
+  "ui": {
+    "pid": 42414,
+    "ppid": 1,
+    "startMicroseconds": 856167,
+    "startSeconds": 1791334504
+  }
+}

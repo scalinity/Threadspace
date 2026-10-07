@@ -1,0 +1,62 @@
+# M0C remediation suites at ec8fd26 (application sources as at c3f6de1), 2026-10-07T02:39:57Z
+
+## cargo test -p threadspace-contracts
+test result: ok. 99 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-contracts --features qualification
+test result: ok. 97 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-agent
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-agent --features qualification
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-journal --features qualification
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-relay
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-surfaces
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo test -p threadspace-desktop --features qualification
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+## cargo clippy --all-targets: warning/error lines
+clippy -p threadspace-agent: 0
+clippy -p threadspace-agent --features qualification: 0
+clippy -p threadspace-desktop: 0
+clippy -p threadspace-desktop --features qualification: 0
+clippy -p threadspace-harness: 1 error remaining at 1ac8b9c
+  remaining: clippy::type_complexity at tests/native/harness/src/bin/m0c/graphics.rs (the G15 sustained runner's wait_live closure), unchanged by this remediation and left as is;
+  the remediation's own finding (C-02 sampler type) was fixed by naming the type
+
+## typecheck + vitest
+tsc apps/desktop exit 0
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+ Test Files  1 passed (1)
+      Tests  24 passed (24)

@@ -1,0 +1,166 @@
+{
+  "checks": {
+    "activatedThroughVoiceOverChangedPresentation": false,
+    "activationAfterTransitionRestored3d": true,
+    "keyboardRegression": true,
+    "muteRestored": true,
+    "priorStateRecorded": true,
+    "projectionEqual": true,
+    "voiceOverActive": false,
+    "voiceOverCursorReachedControlAfterTransition": false,
+    "voiceOverCursorReachedLabelledControl": false,
+    "voiceOverRestoredOff": true,
+    "windowTransition": true
+  },
+  "gate": "G16",
+  "issue": "H-12",
+  "keyboard": {
+    "distinctLabelled": 9,
+    "path": [
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification not requested Fixture turn completed",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — UI quit notification test",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — UI open notification test",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — banner click test (UI quit)",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — final banner click (UI quit)",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — final banner click (UI quit)",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Turn complete Acknowledged · notification submitted Fixture turn completed — final UI-open activation",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Refresh evidence",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59fixturem0c-stre observation unknown · unknown fixture — no native surface",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Return to Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59 | Return to Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59",
+        "pid": 42414,
+        "role": "AXButton"
+      }
+    ],
+    "shiftTabLandsOn": {
+      "found": true,
+      "label": "Stream 15 · change 9999 · run 82ae1d75-d25b-46fc-af2a-c57bf13d9e59fixturem0c-stre observation unknown · unknown fixture — no native surface",
+      "pid": 42414,
+      "role": "AXButton"
+    }
+  },
+  "navigationSteps": 120,
+  "observed": {
+    "activate1": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "activate2": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "firstReached": null,
+    "fullscreen": {
+      "entered": true,
+      "exited": false
+    },
+    "presentationAfterFirst": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationAfterSecond": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationBefore": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "secondReached": null,
+    "voiceOverOn": false,
+    "voiceOverStart": {
+      "enabled": false,
+      "method": "SETTINGS_SWITCH",
+      "ok": false,
+      "settingsOpened": true,
+      "shortcutTried": {
+        "flags": [
+          "cmd"
+        ],
+        "keycode": 96
+      },
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": false,
+        "label": "VoiceOver"
+      }
+    },
+    "voiceOverState": {
+      "enabled": false,
+      "pids": []
+    },
+    "welcome": {
+      "shown": false
+    }
+  },
+  "pass": false,
+  "restored": {
+    "muteRestored": true,
+    "outputMutedAfter": false,
+    "outputMutedBefore": false,
+    "voiceOver": "already off",
+    "voiceOverOffAfter": true,
+    "voiceOverPidsAfter": []
+  },
+  "ui": {
+    "pid": 42414,
+    "ppid": 1,
+    "startMicroseconds": 856167,
+    "startSeconds": 1791334504
+  }
+}

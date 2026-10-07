@@ -1,0 +1,194 @@
+{
+  "checks": {
+    "activatedThroughVoiceOverChangedPresentation": false,
+    "activationAfterTransitionRestored3d": true,
+    "keyboardRegression": true,
+    "muteRestored": true,
+    "priorStateRecorded": true,
+    "projectionEqual": true,
+    "voiceOverActive": true,
+    "voiceOverCursorReachedControlAfterTransition": false,
+    "voiceOverCursorReachedLabelledControl": false,
+    "voiceOverRestoredOff": true,
+    "windowTransition": true
+  },
+  "gate": "G16",
+  "issue": "H-12",
+  "keyboard": {
+    "distinctLabelled": 10,
+    "path": [
+      {
+        "found": true,
+        "label": "2D view",
+        "pid": 42414,
+        "role": "AXCheckBox"
+      },
+      {
+        "found": true,
+        "label": "Refresh",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow notifications",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Stop observation",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Allow Terminal access",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "Threadspace",
+        "pid": 42414,
+        "role": "AXWebArea"
+      },
+      {
+        "found": true,
+        "label": "digest:c16977e5bf66",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "digest:0db5f75dd4c1",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "digest:510ab53de29a",
+        "pid": 42414,
+        "role": "AXButton"
+      },
+      {
+        "found": true,
+        "label": "digest:023be4cdacef",
+        "pid": 42414,
+        "role": "AXButton"
+      }
+    ],
+    "shiftTabLandsOn": {
+      "found": true,
+      "label": "digest:510ab53de29a",
+      "pid": 42414,
+      "role": "AXButton"
+    }
+  },
+  "navigationSteps": 120,
+  "observed": {
+    "activate1": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "activate2": {
+      "flags": [
+        "control",
+        "option"
+      ],
+      "keycode": 49
+    },
+    "firstReached": null,
+    "fullscreen": {
+      "entered": true,
+      "exited": false
+    },
+    "presentationAfterFirst": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationAfterSecond": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "presentationBefore": {
+      "generation": 1,
+      "presentation": "3d",
+      "state": "live"
+    },
+    "secondReached": null,
+    "voiceOverOn": true,
+    "voiceOverStart": {
+      "enabled": true,
+      "method": "SETTINGS_SWITCH",
+      "ok": true,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": false,
+        "valueAfter": 0,
+        "valueBefore": 0
+      },
+      "settingsOpened": true,
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": true,
+        "valueAfter": 1,
+        "valueBefore": 0
+      }
+    },
+    "voiceOverState": {
+      "enabled": true,
+      "pids": []
+    },
+    "welcome": {
+      "shown": false
+    }
+  },
+  "pass": false,
+  "restored": {
+    "muteRestored": true,
+    "outputMutedAfter": false,
+    "outputMutedBefore": false,
+    "voiceOver": {
+      "enabled": false,
+      "method": "SETTINGS_SWITCH",
+      "ok": true,
+      "read": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": false,
+        "valueAfter": 1,
+        "valueBefore": 1
+      },
+      "settingsOpened": true,
+      "switch": {
+        "bundle": "com.apple.systempreferences",
+        "found": true,
+        "label": "digest:f95ccb6e226c",
+        "pressed": true,
+        "valueAfter": 0,
+        "valueBefore": 1
+      }
+    },
+    "voiceOverOffAfter": true,
+    "voiceOverPidsAfter": [
+      47344
+    ]
+  },
+  "ui": {
+    "pid": 42414,
+    "ppid": 1,
+    "startMicroseconds": 856167,
+    "startSeconds": 1791334504
+  }
+}

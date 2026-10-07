@@ -1,0 +1,43 @@
+{
+  "baselineChangingPixels": 2,
+  "cases": [
+    {
+      "case": "hide-while-renderer-init-pending",
+      "pass": true
+    },
+    {
+      "case": "reload-while-resource-pending",
+      "pass": true
+    }
+  ],
+  "fixture": [
+    {
+      "outcome": {
+        "attentionId": "20622c59-b365-4ba8-acac-8d4d4155e1de"
+      },
+      "sessionId": "f1edcb12-1e4a-4e0c-97b8-40702e1352a5"
+    },
+    {
+      "outcome": {
+        "attentionId": "e20270c8-a961-4c03-a444-6abf3f68cd4c"
+      },
+      "sessionId": "cc8fe4c2-cd39-4064-baf4-0cd38a7727a3"
+    },
+    {
+      "outcome": {
+        "attentionId": "3e8911dd-7c53-4163-a6f6-7d93f51a8fe3"
+      },
+      "sessionId": "796cf6d5-11f5-48fc-accf-dc6afabe9820"
+    },
+    {
+      "outcome": {
+        "attentionId": "043ce8b5-d261-44a6-9391-726d679025cb"
+      },
+      "sessionId": "bd182466-514b-4f4b-beec-ff1e4266fc67"
+    }
+  ],
+  "gate": "G15",
+  "injected": "none: both overlaps hold real work (the WebGPU adapter request, the tauri:// response) at qualification-only barriers",
+  "issue": "H-11",
+  "pass": true
+}

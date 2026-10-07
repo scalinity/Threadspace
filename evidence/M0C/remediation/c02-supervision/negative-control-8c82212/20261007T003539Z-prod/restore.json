@@ -1,0 +1,65 @@
+{
+  "after": {
+    "atMs": 1791333371882,
+    "companionProcesses": [
+      {
+        "pid": 21268,
+        "ppid": 1,
+        "startMicroseconds": 436991,
+        "startSeconds": 1791333371
+      }
+    ],
+    "diagnostics": {
+      "error": "malformed frame: missing field `launchProvenance`"
+    },
+    "label": "restored",
+    "locatorIncarnation": {
+      "pid": 21268,
+      "ppid": 1,
+      "startMicroseconds": 436991,
+      "startSeconds": 1791333371
+    },
+    "loginItemPid": 21268,
+    "serviceStatus": "ENABLED",
+    "uiProcesses": [],
+    "writerLockFree": false
+  },
+  "steps": [
+    {
+      "enable": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "steps": [
+            {
+              "detail": "already enabled",
+              "elapsedMs": 12,
+              "ok": true,
+              "step": "register"
+            },
+            {
+              "detail": {
+                "companionPid": 21268,
+                "waitedMs": 0
+              },
+              "elapsedMs": 12,
+              "ok": true,
+              "step": "connect"
+            },
+            {
+              "detail": null,
+              "elapsedMs": 15,
+              "ok": true,
+              "step": "record-observation-enabled"
+            }
+          ]
+        },
+        "elapsedMs": 37,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "enable",
+        "statusAfter": "ENABLED"
+      }
+    }
+  ]
+}
