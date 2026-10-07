@@ -40,33 +40,57 @@ use crate::supervision::{
     wait_new_companion,
 };
 
-/// The pending intents and spooled responses in the store, read directly.
-fn durable(ctx: &Ctx) -> Value {
+/// The store's durable owners, read directly: the backlog's pending intent
+/// IDs, revision, remembered consumed IDs and file hash; the response
+/// records; and any temporary file of a commit in progress.
+pub(crate) fn durable(ctx: &Ctx) -> Value {
     let dir = &ctx.id.agent.store_dir;
-    let pending: Vec<Value> = std::fs::read(dir.join("pending-intents.json"))
-        .ok()
-        .and_then(|bytes| serde_json::from_slice::<Vec<Value>>(&bytes).ok())
-        .unwrap_or_default()
+    let bytes = std::fs::read(dir.join("pending-intents.json")).ok();
+    let file: Value = bytes
+        .as_ref()
+        .and_then(|bytes| serde_json::from_slice(bytes).ok())
+        .unwrap_or(Value::Null);
+    // The first store format was a bare array of pending intents.
+    let (pending, revision, consumed) = match &file {
+        Value::Array(intents) => (intents.clone(), Value::Null, 0),
+        Value::Object(_) => (
+            file["pending"].as_array().cloned().unwrap_or_default(),
+            file["revision"].clone(),
+            file["consumed"].as_array().map_or(0, Vec::len),
+        ),
+        _ => (Vec::new(), Value::Null, 0),
+    };
+    let names = |path: std::path::PathBuf| -> Vec<String> {
+        std::fs::read_dir(path)
+            .map(|entries| {
+                entries
+                    .flatten()
+                    .filter_map(|e| e.file_name().to_str().map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let records: Vec<String> = names(dir.join("responses"))
         .iter()
-        .map(|intent| intent["intentId"].clone())
+        .filter_map(|n| n.strip_suffix(".json").map(str::to_owned))
+        .filter(|n| !n.starts_with('.'))
         .collect();
-    let spooled: Vec<String> = std::fs::read_dir(dir.join("responses"))
-        .map(|entries| {
-            entries
-                .flatten()
-                .filter_map(|e| {
-                    e.file_name()
-                        .to_str()?
-                        .strip_suffix(".json")
-                        .map(str::to_owned)
-                })
-                .collect()
-        })
-        .unwrap_or_default();
-    json!({ "atMs": threadspace_harness::now_ms(), "pendingIntents": pending, "spooledResponses": spooled })
+    let temporaries: Vec<String> = names(dir.to_path_buf())
+        .into_iter()
+        .filter(|n| n.starts_with(".pending-intents.json.") && n.ends_with(".tmp"))
+        .collect();
+    json!({
+        "atMs": threadspace_harness::now_ms(),
+        "pendingIntents": pending.iter().map(|intent| intent["intentId"].clone()).collect::<Vec<_>>(),
+        "revision": revision,
+        "consumedRemembered": consumed,
+        "backlogSha256": threadspace_harness::evidence::sha256_file(&dir.join("pending-intents.json")),
+        "records": records,
+        "backlogTemporaries": temporaries,
+    })
 }
 
-fn request(ctx: &Ctx, body: ControlRequestBody) -> Value {
+pub(crate) fn request(ctx: &Ctx, body: ControlRequestBody) -> Value {
     match ctx.companion().request(body, Duration::from_secs(10)) {
         Ok(reply) => {
             json!({ "ok": true, "reply": format!("{reply:?}").chars().take(160).collect::<String>() })
@@ -75,13 +99,13 @@ fn request(ctx: &Ctx, body: ControlRequestBody) -> Value {
     }
 }
 
-fn arm(ctx: &Ctx, fault: QualificationFault) -> Value {
+pub(crate) fn arm(ctx: &Ctx, fault: QualificationFault) -> Value {
     request(ctx, ControlRequestBody::QualifyArmFault { fault })
 }
 
 /// A response accepted by the companion the locator names, as a banner
 /// click would be.
-fn inject(ctx: &Ctx, attention: &(String, String)) -> Value {
+pub(crate) fn inject(ctx: &Ctx, attention: &(String, String)) -> Value {
     let sent_ms = threadspace_harness::now_ms();
     let reply = request(
         ctx,
@@ -97,7 +121,7 @@ fn inject(ctx: &Ctx, attention: &(String, String)) -> Value {
 /// suspends it before it connects, so no view is hydrated and every intent
 /// stays pending until `thaw_ui`. The instance is the harness's own, proven
 /// by executable path and birth.
-fn freeze_ui(ctx: &Ctx) -> (Option<Incarnation>, Value) {
+pub(crate) fn freeze_ui(ctx: &Ctx) -> (Option<Incarnation>, Value) {
     let app = ctx.app();
     app.stop_all();
     let mut cursor = ctx.companion().log();
@@ -125,19 +149,19 @@ fn freeze_ui(ctx: &Ctx) -> (Option<Incarnation>, Value) {
     (Some(launched.ui), detail)
 }
 
-fn thaw_ui(ui: &Option<Incarnation>) -> Value {
+pub(crate) fn thaw_ui(ui: &Option<Incarnation>) -> Value {
     let resumed = ui
         .as_ref()
         .is_some_and(|ui| procs::signal(ui.pid, libc::SIGCONT));
     json!({ "resumed": resumed, "atMs": threadspace_harness::now_ms() })
 }
 
-fn held(hold: &Value) -> bool {
+pub(crate) fn held(hold: &Value) -> bool {
     hold["stopped"] == true && hold["viewAttachedWhileHeld"] == false
 }
 
 /// UI reports of applying `intent_id` since `since_ms`.
-fn applications(ctx: &Ctx, intent_id: &str, since_ms: i64) -> Vec<Value> {
+pub(crate) fn applications(ctx: &Ctx, intent_id: &str, since_ms: i64) -> Vec<Value> {
     ctx.app()
         .reports("notification-intent", since_ms)
         .into_iter()
@@ -148,7 +172,7 @@ fn applications(ctx: &Ctx, intent_id: &str, since_ms: i64) -> Vec<Value> {
 
 /// Waits until every intent was applied, then a little longer, so a late
 /// duplicate would be counted.
-fn applied_once(ctx: &Ctx, ids: &[String], since_ms: i64, timeout: Duration) -> Value {
+pub(crate) fn applied_once(ctx: &Ctx, ids: &[String], since_ms: i64, timeout: Duration) -> Value {
     let started = Instant::now();
     while started.elapsed() < timeout {
         if ids
@@ -182,7 +206,7 @@ fn applied_once(ctx: &Ctx, ids: &[String], since_ms: i64, timeout: Duration) -> 
 }
 
 /// A hydrated UI on the current companion, launched if none runs.
-fn ensure_ui(ctx: &Ctx) -> Value {
+pub(crate) fn ensure_ui(ctx: &Ctx) -> Value {
     let app = ctx.app();
     if !app.processes().is_empty()
         && ctx
@@ -200,7 +224,11 @@ fn ensure_ui(ctx: &Ctx) -> Value {
 }
 
 /// The login item's companion owns the store, with a hydrated UI.
-fn precondition(ctx: &Ctx, log: &mut Log, label: &str) -> Result<(Incarnation, Value), String> {
+pub(crate) fn precondition(
+    ctx: &Ctx,
+    log: &mut Log,
+    label: &str,
+) -> Result<(Incarnation, Value), String> {
     let restored = restore(ctx, log);
     let ui = ensure_ui(ctx);
     let point = checkpoint(ctx, label);
@@ -217,7 +245,7 @@ fn precondition(ctx: &Ctx, log: &mut Log, label: &str) -> Result<(Incarnation, V
 /// The login item's companion goes away (`stop` or `unregister`) and a banner
 /// click cold-starts an unsupervised writer, whose inspector intent the
 /// hydrated UI applies.
-fn cold_start(
+pub(crate) fn cold_start(
     ctx: &Ctx,
     log: &mut Log,
     supervised: &Incarnation,
@@ -282,13 +310,13 @@ fn cold_start(
     ))
 }
 
-fn all_true(checks: &Value) -> bool {
+pub(crate) fn all_true(checks: &Value) -> bool {
     checks
         .as_object()
         .is_some_and(|m| m.values().all(|v| v == true))
 }
 
-fn ts(line: &Option<Value>) -> Option<i64> {
+pub(crate) fn ts(line: &Option<Value>) -> Option<i64> {
     line.as_ref().and_then(|l| l["ts"].as_i64())
 }
 
@@ -342,7 +370,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             // G1: before the yield.
             let g1 = inject(ctx, &x[0]);
             let q1 = log.wait(
-                "INTENT_QUEUED",
+                "INTENT_ACCEPTED",
                 &|l| l["pid"] == pid && l["intentId"] == x[0].1.as_str(),
                 10,
             );
@@ -358,7 +386,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             // A / G2: accepted after the yield drained and replied.
             let g2 = inject(ctx, &x[1]);
             let q2 = log.wait(
-                "INTENT_QUEUED",
+                "INTENT_ACCEPTED",
                 &|l| l["pid"] == pid && l["intentId"] == x[1].1.as_str(),
                 10,
             );
@@ -372,7 +400,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
                 .collect::<Vec<_>>();
             let g3 = inject(ctx, &x[2]);
             let q3 = log.wait(
-                "INTENT_QUEUED",
+                "INTENT_ACCEPTED",
                 &|l| l["pid"] == pid && l["intentId"] == x[2].1.as_str(),
                 10,
             );
@@ -387,7 +415,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             // G4: after the writer stopped accepting, just before it exits.
             let g4 = inject(ctx, &x[3]);
             let spooled = log.wait(
-                "RESPONSE_SPOOLED",
+                "RESPONSE_LEFT_RECORDED",
                 &|l| l["pid"] == pid && l["requestId"] == x[3].1.as_str(),
                 10,
             );
@@ -437,14 +465,14 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
                 "postDrainAcceptedByOldWriter": q2.as_ref().zip(reached.as_ref()).is_some_and(|(q, r)| q["ts"].as_i64() > r["reachedAtMs"].as_i64()) && !reply_reported.contains(&x[1].1),
                 "acceptedWhileClaimantWaits": q3.is_some() && !claimant_waiting.is_empty(),
                 "persistedBeforeRelease": d2["pendingIntents"].as_array().is_some_and(|p| p.len() == 3),
-                "lateResponseSpooled": spooled.is_some() && d3["spooledResponses"].as_array().is_some_and(|s| s.iter().any(|r| r == x[3].1.as_str())),
+                "lateResponseSpooled": spooled.is_some() && d3["records"].as_array().is_some_and(|s| s.iter().any(|r| r == x[3].1.as_str())),
                 "oldWriterExitedOnlyAfterRelease": ts(&released).is_some() && exited.is_some() && released.as_ref().is_some_and(|l| l["pendingIntents"].as_array().is_some_and(|p| p.len() == 3)),
                 "claimedAfterRelease": ts(&claimed) > ts(&released) && owner_after.is_some(),
-                "claimantLoadedAll": loaded.as_ref().is_some_and(|l| l["intents"].as_array().is_some_and(|i| i.len() == 3) && l["spooledResponses"].as_array().is_some_and(|s| s.len() == 1)) && recovered.is_some(),
+                "claimantLoadedAll": loaded.as_ref().is_some_and(|l| l["intents"].as_array().is_some_and(|i| i.len() == 3) && l["records"].as_array().is_some_and(|s| s.len() == 1)) && recovered.is_some(),
                 "hydratedOnClaimant": hydrated.is_some(),
                 "allFourExactlyOnceInOrder": applied["allExactlyOnce"] == true && applied["inAcceptanceOrder"] == true,
                 "coldStartIntentNotRepeated": first_once,
-                "storeEmptyAfterDelivery": d4["pendingIntents"].as_array().is_some_and(Vec::is_empty) && d4["spooledResponses"].as_array().is_some_and(Vec::is_empty),
+                "storeEmptyAfterDelivery": d4["pendingIntents"].as_array().is_some_and(Vec::is_empty) && d4["records"].as_array().is_some_and(Vec::is_empty),
                 "noUnsupervisedAdmission": unsupervised_diag_closed,
                 "claimantObserves": state.as_ref().is_some_and(|l| l["admissionOpen"] == true),
                 "singleWriter": single_writer(&point) && login_item_owns(&point),
@@ -483,7 +511,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             let (ui, hold) = freeze_ui(ctx);
             let g6 = inject(ctx, &x6);
             let q6 = log.wait(
-                "INTENT_QUEUED",
+                "INTENT_ACCEPTED",
                 &|l| l["pid"] == pid && l["intentId"] == x6.1.as_str(),
                 10,
             );
@@ -503,7 +531,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
                 let during = diagnostics(ctx);
                 let g7 = inject(ctx, &x7);
                 let q7 = log.wait(
-                    "INTENT_QUEUED",
+                    "INTENT_ACCEPTED",
                     &|l| l["pid"] == pid && l["intentId"] == x7.1.as_str(),
                     10,
                 );
@@ -575,7 +603,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             let x9 = raise(ctx, &format!("c02h-d9-{tag}"))?;
             let g9 = inject(ctx, &x9);
             let q9 = log.wait(
-                "INTENT_QUEUED",
+                "INTENT_ACCEPTED",
                 &|l| l["pid"] == pid && l["intentId"] == x9.1.as_str(),
                 10,
             );
@@ -720,7 +748,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             );
             let g14 = inject(ctx, &x14);
             let spooled = log.wait(
-                "RESPONSE_SPOOLED",
+                "RESPONSE_LEFT_RECORDED",
                 &|l| l["pid"] == pid && l["requestId"] == x14.1.as_str(),
                 10,
             );
@@ -767,7 +795,7 @@ pub fn c02_handoff(ctx: &Ctx, selection: &str) -> Result<Value, String> {
                 "firstClaimGaveUpWhileOldHeld": reached.is_some() && first_failed.is_some(),
                 "launchdRetriedTheClaim": retry_unanswered.as_ref().is_some_and(|l| l["pid"] == cpid) && cpid as i64 != first_pid,
                 "oldAnsweredTheRetryWhileDraining": yields == 2,
-                "lateResponseSpooledThenRecovered": spooled.is_some() && loaded.as_ref().is_some_and(|l| l["spooledResponses"].as_array().is_some_and(|s| s.iter().any(|r| r == x14.1.as_str()))),
+                "lateResponseSpooledThenRecovered": spooled.is_some() && loaded.as_ref().is_some_and(|l| l["records"].as_array().is_some_and(|s| s.iter().any(|r| r == x14.1.as_str()))),
                 "claimantLoadedPending": loaded.as_ref().is_some_and(|l| l["intents"].as_array().is_some_and(|i| i.iter().any(|v| v == x13.1.as_str()))),
                 "convergedAfterRelease": released.is_some() && exited.is_some() && claimed.is_some() && owner_after.is_some() && ts(&claimed) > ts(&released),
                 "bothExactlyOnce": hydrated.is_some() && applied["allExactlyOnce"] == true,

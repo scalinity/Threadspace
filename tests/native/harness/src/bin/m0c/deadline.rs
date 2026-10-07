@@ -40,7 +40,7 @@ const BUDGET_MS: i64 = 2000;
 
 /// One Return through the companion with its full result, and an independent
 /// readback of Terminal's front window and selected tab right after.
-fn route_full(ctx: &Ctx, session_id: &str) -> Value {
+pub(crate) fn route_full(ctx: &Ctx, session_id: &str) -> Value {
     let request = RouteRequest {
         request_id: uuid::Uuid::new_v4().to_string(),
         session_id: session_id.to_owned(),
@@ -67,7 +67,7 @@ fn route_full(ctx: &Ctx, session_id: &str) -> Value {
     }
 }
 
-fn exact(result: &Value) -> bool {
+pub(crate) fn exact(result: &Value) -> bool {
     result["surfaceResult"] == "EXACT_NATIVE_SURFACE"
         && result["sessionVerification"] == "CURRENT_NATIVE_REVALIDATED"
 }
@@ -610,7 +610,7 @@ pub fn c11(ctx: &Ctx) -> Result<Value, String> {
             &mut seen,
         );
         let queued = log.wait_for(
-            "INTENT_QUEUED",
+            "INTENT_ACCEPTED",
             |l| l["intentId"] == notification_request_id.as_str(),
             Duration::from_secs(10),
             &mut seen,

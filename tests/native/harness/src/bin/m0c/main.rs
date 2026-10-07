@@ -42,6 +42,7 @@ mod handoff;
 mod install;
 mod launches;
 mod notifications;
+mod ownership;
 mod power;
 mod service_gates;
 mod supervision;
@@ -87,6 +88,8 @@ fn main() -> ExitCode {
         "g08-terminal" => terminal_gates::negatives(&ctx),
         "h10-terminal" => terminal_gates::remediation(&ctx),
         "c11-deadline" => deadline::c11(&ctx),
+        "c02-durable" => ownership::c02_durable(&ctx, args.get(2).map_or("all", String::as_str)),
+        "c11-receipt" => ownership::c11_receipt(&ctx),
         "c02-handoff" => handoff::c02_handoff(&ctx, args.get(2).map_or("all", String::as_str)),
         "h11-graphics" => graphics_overlap::overlap(&ctx),
         "h12-voiceover" => voiceover::smoke(&ctx),

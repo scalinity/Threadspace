@@ -74,7 +74,17 @@ $M h11-graphics prod         # renderer init and tauri:// resource held pending 
 $M h12-voiceover prod        # VoiceOver navigation and activation via VoiceOver's scripting interface
 $M c02-handoff prod all      # intent ownership across handoff: AGB, CF, D, E (or E1/E2)
 $M c11-deadline prod         # one Return deadline: ordinary, fullscreen, and expiry at focus/settle/decision
+$M c02-durable prod all      # durable ownership: 40-response backlog (A), storage-failure matrix (B), Return in flight (C)
+$M c11-receipt prod          # notification Return budget from receipt: queued past it, part of it, direct route
 ```
+
+`c02-durable` arms storage failures in the real intent store with
+`QualifyArmStorageFault` and holds a backlog commit before its rename with
+`HOLD_NEXT_BACKLOG_COMMIT`; it reads the store's backlog and response records
+directly at each step and writes a per-response ownership trace
+(`traces.jsonl`). `c11-receipt` holds the first notification Return before
+focus so a second waits in the responder queue, and releases it once the
+first is past its own deadline.
 
 `c02-handoff` places notification responses at exact handoff phases with
 `QualifyNotificationResponse` (the banner click's own acceptance path) and the
