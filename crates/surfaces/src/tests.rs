@@ -4,6 +4,7 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicI64, Ordering};
+use std::time::{Duration, Instant};
 
 use threadspace_provider_claude::inventory::InventoryRow;
 use threadspace_surfaces_macos::process::{ExecutableIdentity, ProcessSample};
@@ -116,6 +117,12 @@ struct Mock {
     focus_calls: Mutex<Vec<String>>,
     frontmost: Option<FrontmostApplication>,
     revisions: Seq<Option<i64>>,
+    /// A qualification hold: the route sleeps this long at the point.
+    hold: Option<(RoutePoint, Duration)>,
+    /// How long the focus script runs before it answers.
+    focus_takes: Duration,
+    /// Each waiting call and the budget it was given.
+    budgets: Mutex<Vec<(&'static str, Duration)>>,
 }
 
 impl Mock {
@@ -146,6 +153,9 @@ impl Mock {
                 pid: 300,
             }),
             revisions: Seq::of(vec![Some(42)]),
+            hold: None,
+            focus_takes: Duration::ZERO,
+            budgets: Mutex::new(Vec::new()),
         }
     }
 
@@ -160,6 +170,18 @@ impl Mock {
     fn focus_count(&self) -> usize {
         self.focus_calls.lock().expect("lock").len()
     }
+
+    fn given(&self, call: &'static str, deadline: &RouteDeadline) {
+        self.budgets
+            .lock()
+            .expect("lock")
+            .push((call, deadline.remaining()));
+    }
+
+    fn calls(&self, call: &str) -> usize {
+        let budgets = self.budgets.lock().expect("lock");
+        budgets.iter().filter(|(name, _)| *name == call).count()
+    }
 }
 
 impl RouteNative for Mock {
@@ -173,16 +195,19 @@ impl RouteNative for Mock {
             .get(&pid)
             .map_or(Err(ProcessError::Vanished { pid }), Seq::next)
     }
-    fn inventory(&self) -> Result<InventorySnapshot, InventoryError> {
+    fn inventory(&self, deadline: &RouteDeadline) -> Result<InventorySnapshot, InventoryError> {
+        self.given("inventory", deadline);
         self.inventory.next()
     }
     fn terminal_generation(&self) -> Result<Option<AppGeneration>, String> {
         self.generations.next()
     }
-    fn automation_authorized(&self) -> Result<bool, String> {
+    fn automation_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String> {
+        self.given("automation", deadline);
         self.authorized.clone()
     }
-    fn enumerate(&self) -> Result<TerminalTabs, String> {
+    fn enumerate(&self, deadline: &RouteDeadline) -> Result<TerminalTabs, String> {
+        self.given("enumerate", deadline);
         self.tabs.next()
     }
     fn device_of(&self, tty: &str) -> Result<u32, TtyError> {
@@ -191,8 +216,14 @@ impl RouteNative for Mock {
             .copied()
             .ok_or(TtyError::Stat { errno: 2 })
     }
-    fn focus(&self, tty: &str) -> Result<(FocusOutcome, u32, u32), String> {
+    fn focus(
+        &self,
+        tty: &str,
+        deadline: &RouteDeadline,
+    ) -> Result<(FocusOutcome, u32, u32), String> {
+        self.given("focus", deadline);
         self.focus_calls.lock().expect("lock").push(tty.to_owned());
+        std::thread::sleep(self.focus_takes);
         self.focus_result.clone().unwrap_or_else(|| {
             let window = self
                 .tabs
@@ -214,11 +245,20 @@ impl RouteNative for Mock {
             ))
         })
     }
-    fn frontmost(&self) -> Option<FrontmostApplication> {
+    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
+        self.given("frontmost", deadline);
         self.frontmost.clone()
     }
-    fn binding_revision(&self, _binding_id: &str) -> Option<i64> {
+    fn binding_revision(&self, _binding_id: &str, deadline: &RouteDeadline) -> Option<i64> {
+        self.given("revision", deadline);
         self.revisions.next()
+    }
+    fn reached(&self, point: RoutePoint, _tty: &str, _deadline: &RouteDeadline) {
+        if let Some((held, duration)) = self.hold
+            && held == point
+        {
+            std::thread::sleep(duration);
+        }
     }
 }
 
@@ -259,7 +299,18 @@ fn request() -> RouteRequest {
 }
 
 fn go(mock: &Mock, target: &SessionTarget) -> RouteResult {
-    route(mock, &request(), target, 1_000)
+    route(
+        mock,
+        &request(),
+        target,
+        RouteDeadline::for_request(Instant::now()),
+    )
+}
+
+/// A deadline `budget` from now, shorter than the real one so expiry tests
+/// stay fast; the route treats it exactly like a received request's.
+fn expiring_in(budget: Duration) -> RouteDeadline {
+    RouteDeadline(Instant::now() + budget)
 }
 
 fn refused(result: &RouteResult, mock: &Mock, reason: &str) {
@@ -442,12 +493,25 @@ fn an_old_queued_request_never_moves_focus() {
     let mock = Mock::healthy();
     let mut stale = request();
     stale.expected_binding_revision = Some("41".into());
-    let result = route(&mock, &stale, &target(vec![bound(PID, "b1")]), 1_000);
+    let result = route(
+        &mock,
+        &stale,
+        &target(vec![bound(PID, "b1")]),
+        RouteDeadline::for_request(Instant::now()),
+    );
     refused(&result, &mock, "BINDING_STALE");
 
     // The request waited past its two-second budget before reaching focus.
     let mock = Mock::healthy();
-    let result = route(&mock, &request(), &target(vec![bound(PID, "b1")]), -5_000);
+    let received = Instant::now()
+        .checked_sub(Duration::from_secs(5))
+        .expect("uptime");
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        RouteDeadline::for_request(received),
+    );
     refused(&result, &mock, "TIMEOUT");
 }
 
@@ -463,7 +527,12 @@ fn multiple_attachments_require_an_explicit_choice() {
     let mock = Mock::healthy();
     let mut chosen = request();
     chosen.chosen_binding_id = Some("b1".into());
-    let routed = route(&mock, &chosen, &both, 1_000);
+    let routed = route(
+        &mock,
+        &chosen,
+        &both,
+        RouteDeadline::for_request(Instant::now()),
+    );
     assert_eq!(routed.reason_code, "OK");
     assert_eq!(routed.binding_id.as_deref(), Some("b1"));
 }
@@ -618,4 +687,158 @@ fn unbound_fixture_and_unknown_sessions_open_the_inspector_only() {
         refused(&result, &mock, reason);
         assert_eq!(result.surface_result, surface);
     }
+}
+
+/// A timed-out attempt: never exact or current, readiness unknown.
+fn timed_out(result: &RouteResult) {
+    assert_eq!(result.reason_code, TIMEOUT, "{result:#?}");
+    assert_eq!(result.surface_result, SurfaceResult::Unavailable);
+    assert_eq!(
+        result.session_verification,
+        SessionVerification::NativeBoundLastKnown
+    );
+    assert_eq!(result.input_readiness, InputReadiness::Unknown);
+    assert_eq!(result.validated_binding_revision, None);
+}
+
+const SHORT: Duration = Duration::from_millis(150);
+const PAST_SHORT: Duration = Duration::from_millis(250);
+
+#[test]
+fn every_phase_draws_on_the_one_attempt_budget() {
+    let mut mock = Mock::healthy();
+    mock.focus_takes = Duration::from_millis(20);
+    let result = go(&mock, &target(vec![bound(PID, "b1")]));
+    assert_eq!(result.reason_code, "OK", "{result:#?}");
+    let budgets = mock.budgets.lock().expect("lock").clone();
+    let names: Vec<_> = budgets.iter().map(|(name, _)| *name).collect();
+    for call in [
+        "automation",
+        "inventory",
+        "enumerate",
+        "revision",
+        "focus",
+        "frontmost",
+    ] {
+        assert!(names.contains(&call), "{call} took no budget: {names:?}");
+    }
+    // Calls in sequence see a budget that only runs down; none is given a
+    // fresh allowance, and none more than the attempt's whole budget.
+    let after_focus: Vec<Duration> = budgets
+        .iter()
+        .skip_while(|(name, _)| *name != "focus")
+        .map(|(_, budget)| *budget)
+        .collect();
+    assert!(after_focus.len() >= 4, "{budgets:?}");
+    assert!(
+        after_focus.windows(2).all(|pair| pair[1] <= pair[0]),
+        "{budgets:?}"
+    );
+    assert!(after_focus[1] + Duration::from_millis(20) <= after_focus[0]);
+    assert!(budgets.iter().all(|(_, budget)| *budget <= ROUTE_BUDGET));
+}
+
+#[test]
+fn a_route_held_before_focus_past_its_deadline_never_focuses() {
+    let mut mock = Mock::healthy();
+    mock.hold = Some((RoutePoint::BeforeFocus, PAST_SHORT));
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(SHORT),
+    );
+    timed_out(&result);
+    refused(&result, &mock, TIMEOUT);
+}
+
+#[test]
+fn a_focus_completing_after_the_deadline_is_recorded_but_not_exact() {
+    // The script selected the right tab and read it back, but only after the
+    // attempt's deadline: the effect is recorded, the success is not.
+    let mut mock = Mock::healthy();
+    mock.focus_takes = PAST_SHORT;
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(SHORT),
+    );
+    timed_out(&result);
+    assert!(result.focus_performed, "the issued focus stays recorded");
+    let focus = result.evidence.focus.as_ref().expect("focus evidence");
+    assert_eq!(focus.outcome, "FOCUSED");
+    assert_eq!(focus.readback_tty.as_deref(), Some(TTY));
+    // Nothing waits past the deadline: no post-focus lookup is started.
+    assert_eq!(mock.calls("inventory"), 1);
+    assert!(result.evidence.post_focus_lookup.is_none());
+
+    // A script stopped at the deadline may have acted: uncertain, not exact.
+    let mut mock = Mock::healthy();
+    mock.focus_takes = PAST_SHORT;
+    mock.focus_result = Some(Err(
+        "osascript failed (status None, timed out true): ".into()
+    ));
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(SHORT),
+    );
+    timed_out(&result);
+    assert!(result.focus_performed);
+}
+
+#[test]
+fn a_readback_held_past_the_deadline_is_not_exact() {
+    let mut mock = Mock::healthy();
+    mock.hold = Some((RoutePoint::BeforeReadback, PAST_SHORT));
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(SHORT),
+    );
+    timed_out(&result);
+    assert!(result.focus_performed);
+    assert_eq!(mock.calls("inventory"), 1);
+}
+
+#[test]
+fn a_late_decision_with_valid_proof_is_not_exact() {
+    // Every check passed, post-focus revalidation included; only the final
+    // decision came after the deadline. This fails if `finish` stops
+    // checking the deadline.
+    let mut mock = Mock::healthy();
+    mock.hold = Some((RoutePoint::BeforeDecision, PAST_SHORT));
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(SHORT),
+    );
+    timed_out(&result);
+    assert!(result.focus_performed);
+    let lookup = result
+        .evidence
+        .post_focus_lookup
+        .as_ref()
+        .expect("post-focus proof");
+    assert!(lookup.error.is_none());
+    assert_eq!(
+        result.evidence.binding_revision_after_focus.as_deref(),
+        Some("42")
+    );
+
+    // The same route inside its budget is exact.
+    let mut mock = Mock::healthy();
+    mock.hold = Some((RoutePoint::BeforeDecision, Duration::from_millis(20)));
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        expiring_in(PAST_SHORT),
+    );
+    assert_eq!(result.reason_code, "OK", "{result:#?}");
+    assert_eq!(result.surface_result, SurfaceResult::ExactNativeSurface);
 }

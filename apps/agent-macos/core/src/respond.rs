@@ -6,6 +6,7 @@
 
 use std::sync::mpsc::{Receiver, SyncSender};
 use std::thread;
+use std::time::Instant;
 
 use serde_json::json;
 use threadspace_contracts::projection::{IntentAction, IntentSource, NativeIntent};
@@ -42,14 +43,14 @@ pub fn spawn(
                     attention_id,
                     session_id,
                 } = job;
-                let received_ms = log::now_ms();
+                let received = Instant::now();
                 let request = RouteRequest {
                     request_id: Uuid::new_v4().to_string(),
                     session_id: session_id.clone(),
                     chosen_binding_id: None,
                     expected_binding_revision: None,
                 };
-                let outcome = route::return_to_session(request, &claude, &discovery, received_ms);
+                let outcome = route::return_to_session(request, &claude, &discovery, received);
                 let (summary, exact) = match outcome {
                     Ok(result) => {
                         let exact = result.surface_result == SurfaceResult::ExactNativeSurface

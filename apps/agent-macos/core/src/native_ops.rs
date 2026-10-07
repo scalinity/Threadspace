@@ -4,7 +4,7 @@
 
 use std::path::PathBuf;
 use std::sync::mpsc::{self, SyncSender};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde_json::json;
 use threadspace_contracts::control::{
@@ -18,7 +18,7 @@ use threadspace_relay::paths::redact_home;
 use threadspace_surfaces_macos::terminal::{self, TERMINAL_APP_PATH, TERMINAL_BUNDLE_ID};
 
 use crate::bridge::{self, BridgeEvent, BridgeRequest};
-use crate::discovery::{DiscoveryContext, Trigger};
+use crate::discovery::{self, DiscoveryContext, Trigger};
 use crate::log;
 use crate::route;
 use crate::server::CoreContext;
@@ -45,8 +45,8 @@ pub struct OpsContext {
     resources_dir: PathBuf,
     claude: DiscoveryContext,
     discovery: SyncSender<Trigger>,
-    /// When the request reached the companion.
-    received_ms: i64,
+    /// When the request reached the companion, on the monotonic clock.
+    received: Instant,
 }
 
 impl From<&CoreContext> for OpsContext {
@@ -60,7 +60,7 @@ impl From<&CoreContext> for OpsContext {
             resources_dir: context.resources_dir.clone(),
             claude: context.claude.clone(),
             discovery: context.discovery.clone(),
-            received_ms: log::now_ms(),
+            received: Instant::now(),
         }
     }
 }
@@ -161,7 +161,7 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
     let automation = classify_automation(status);
     let inventory = if running && automation == AutomationPermission::Authorized {
         let script = context.resources_dir.join("terminal-inventory.applescript");
-        match terminal::enumerate(&script) {
+        match terminal::enumerate(&script, discovery::ENUMERATION_TIMEOUT) {
             Ok(tabs) => Some(tabs.summary()),
             Err(error) => {
                 log::warn(
@@ -257,7 +257,7 @@ pub fn run(
             route,
             &context.claude,
             &context.discovery,
-            context.received_ms,
+            context.received,
         )
         .map(|result| ControlResponseBody::Routed {
             result: Box::new(result),

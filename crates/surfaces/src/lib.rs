@@ -17,8 +17,12 @@
 //! application, and repeats the process and provider checks. A failed check
 //! never falls back to cwd, recency, frontmost or "only candidate" choices:
 //! the default fallback is NONE and the result says why.
+//!
+//! One [`RouteDeadline`] covers the whole attempt: every bounded native call
+//! takes its timeout from what remains of it, and a result reached after it
+//! never claims an exact surface or current verification.
 
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use threadspace_contracts::route::{
     AppGeneration, BindingChoice, FocusEvidence, FrontmostApplication, InputReadiness,
@@ -34,6 +38,58 @@ use threadspace_surfaces_macos::tty::TtyError;
 pub const TERMINAL_BUNDLE_ID: &str = "com.apple.Terminal";
 /// SPEC §13.2: hard per-attempt budget.
 pub const ROUTE_BUDGET: Duration = Duration::from_secs(2);
+/// Reason code of an attempt that ran out of its budget.
+pub const TIMEOUT: &str = "TIMEOUT";
+
+/// The one hard budget of a Return attempt (SPEC §13.2), on the monotonic
+/// clock. It is fixed when the request reaches the companion and can only
+/// run down: every bounded phase takes its timeout from [`remaining`], so no
+/// phase can start an allowance of its own.
+///
+/// [`remaining`]: RouteDeadline::remaining
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RouteDeadline(Instant);
+
+impl RouteDeadline {
+    /// The budget of a request that reached the companion at `received`.
+    pub fn for_request(received: Instant) -> Self {
+        Self(received + ROUTE_BUDGET)
+    }
+
+    /// What is left of the budget; zero once it has run out.
+    pub fn remaining(&self) -> Duration {
+        self.0.saturating_duration_since(Instant::now())
+    }
+
+    pub fn expired(&self) -> bool {
+        self.remaining().is_zero()
+    }
+}
+
+/// Named points of an attempt where a qualification build can hold a route
+/// (SPEC §21.4 race and deadline witnesses).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoutePoint {
+    /// The one tab is proven and the binding is current; the budget check
+    /// and the focus script have not run.
+    BeforeFocus,
+    /// The focus script returned; frontmost readback and post-focus
+    /// revalidation have not run.
+    BeforeReadback,
+    /// Post-focus revalidation has its evidence; the final decision has not
+    /// been made.
+    BeforeDecision,
+}
+
+impl RoutePoint {
+    pub fn code(self) -> &'static str {
+        match self {
+            Self::BeforeFocus => "BEFORE_FOCUS",
+            Self::BeforeReadback => "BEFORE_READBACK",
+            Self::BeforeDecision => "BEFORE_DECISION",
+        }
+    }
+}
 
 /// A stored, valid binding of one live activation to a Terminal surface.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,22 +129,31 @@ pub enum SessionTarget {
 
 /// Every native effect and observation the route needs. The companion
 /// implements it with kernel calls, the Claude CLI, the Terminal scripts and
-/// the AppKit bridge; tests implement it with scripted races.
+/// the AppKit bridge; tests implement it with scripted races. Calls that can
+/// wait take the attempt's deadline and wait no longer than what remains.
 pub trait RouteNative: Sync {
+    /// Wall-clock milliseconds, for evidence only; the budget is `RouteDeadline`.
     fn now_ms(&self) -> i64;
     fn sample(&self, pid: i32) -> Result<Incarnation, ProcessError>;
-    fn inventory(&self) -> Result<InventorySnapshot, InventoryError>;
+    fn inventory(&self, deadline: &RouteDeadline) -> Result<InventorySnapshot, InventoryError>;
     /// Terminal.app's incarnation, `None` when it is not running.
     fn terminal_generation(&self) -> Result<Option<AppGeneration>, String>;
     /// Apple-event authorization for Terminal, checked without prompting.
-    fn automation_authorized(&self) -> Result<bool, String>;
-    fn enumerate(&self) -> Result<TerminalTabs, String>;
+    fn automation_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String>;
+    fn enumerate(&self, deadline: &RouteDeadline) -> Result<TerminalTabs, String>;
     fn device_of(&self, tty: &str) -> Result<u32, TtyError>;
-    /// Runs the focus script: (outcome, sender PID, elapsed ms).
-    fn focus(&self, tty: &str) -> Result<(FocusOutcome, u32, u32), String>;
-    fn frontmost(&self) -> Option<FrontmostApplication>;
+    /// Runs the focus script: (outcome, sender PID, elapsed ms). A script
+    /// stopped at the deadline is an error and may already have acted.
+    fn focus(
+        &self,
+        tty: &str,
+        deadline: &RouteDeadline,
+    ) -> Result<(FocusOutcome, u32, u32), String>;
+    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication>;
     /// The binding's current revision if it is still valid.
-    fn binding_revision(&self, binding_id: &str) -> Option<i64>;
+    fn binding_revision(&self, binding_id: &str, deadline: &RouteDeadline) -> Option<i64>;
+    /// The attempt reached `point`; only qualification builds act on it.
+    fn reached(&self, _point: RoutePoint, _tty: &str, _deadline: &RouteDeadline) {}
 }
 
 fn evidence_of(incarnation: &Incarnation, at_ms: i64) -> ProcessEvidence {
@@ -189,7 +254,7 @@ fn provider_mismatch(
 struct Run<'a, N: RouteNative> {
     native: &'a N,
     started_ms: i64,
-    deadline_ms: i64,
+    deadline: RouteDeadline,
     last_ms: i64,
     evidence: RouteEvidence,
     focus_performed: bool,
@@ -205,6 +270,11 @@ impl<N: RouteNative> Run<'_, N> {
         self.last_ms = now;
     }
 
+    /// Every result leaves through here, so the deadline is checked last,
+    /// after all evidence is in: a result reached after the deadline claims
+    /// neither an exact surface nor current verification, however good its
+    /// late evidence is. Effects already issued stay recorded in
+    /// `focus_performed` and the focus evidence.
     fn finish(
         self,
         request: &RouteRequest,
@@ -213,6 +283,13 @@ impl<N: RouteNative> Run<'_, N> {
         target: Option<&BoundTarget>,
         choices: Vec<BindingChoice>,
     ) -> RouteResult {
+        let claims = surface == SurfaceResult::ExactNativeSurface
+            || verification == SessionVerification::CurrentNativeRevalidated;
+        let (surface, verification, readiness, reason) = if claims && self.deadline.expired() {
+            Self::timed_out()
+        } else {
+            (surface, verification, readiness, reason)
+        };
         let ended = self.native.now_ms();
         RouteResult {
             request_id: request.request_id.clone(),
@@ -232,6 +309,33 @@ impl<N: RouteNative> Run<'_, N> {
             evidence: self.evidence,
         }
     }
+
+    /// The typed result of a spent budget: nothing is exact or current, and
+    /// readiness is unknown.
+    fn timed_out() -> (
+        SurfaceResult,
+        SessionVerification,
+        InputReadiness,
+        &'static str,
+    ) {
+        (
+            SurfaceResult::Unavailable,
+            SessionVerification::NativeBoundLastKnown,
+            InputReadiness::Unknown,
+            TIMEOUT,
+        )
+    }
+
+    fn finish_timed_out(self, request: &RouteRequest, target: &BoundTarget) -> RouteResult {
+        let (surface, verification, readiness, reason) = Self::timed_out();
+        self.finish(
+            request,
+            (surface, verification, readiness),
+            reason,
+            Some(target),
+            vec![],
+        )
+    }
 }
 
 fn choices(bindings: &[BoundTarget]) -> Vec<BindingChoice> {
@@ -246,13 +350,14 @@ fn choices(bindings: &[BoundTarget]) -> Vec<BindingChoice> {
         .collect()
 }
 
-/// One Return-to-Agent attempt. `received_ms` is when the owner's request
-/// reached the companion; work queued past the budget never moves focus.
+/// One Return-to-Agent attempt within `deadline`, which started when the
+/// owner's request reached the companion: work queued past the budget never
+/// moves focus.
 pub fn route<N: RouteNative>(
     native: &N,
     request: &RouteRequest,
     target: &SessionTarget,
-    received_ms: i64,
+    deadline: RouteDeadline,
 ) -> RouteResult {
     use InputReadiness::Unknown as NotReady;
     use SessionVerification as V;
@@ -262,7 +367,7 @@ pub fn route<N: RouteNative>(
     let mut run = Run {
         native,
         started_ms,
-        deadline_ms: received_ms + ROUTE_BUDGET.as_millis() as i64,
+        deadline,
         last_ms: started_ms,
         evidence: RouteEvidence::default(),
         focus_performed: false,
@@ -378,14 +483,14 @@ pub fn route<N: RouteNative>(
 
     // 2. Fresh provider lookup ∥ fresh Terminal enumeration, both inside the
     //    process bracket.
-    let authorized = native.automation_authorized();
+    let authorized = native.automation_authorized(&deadline);
     let (lookup, terminal) = std::thread::scope(|scope| {
-        let lookup = scope.spawn(|| native.inventory());
+        let lookup = scope.spawn(|| native.inventory(&deadline));
         let terminal = match &authorized {
             Ok(true) => {
                 let before = native.terminal_generation();
                 let started = native.now_ms();
-                let tabs = native.enumerate();
+                let tabs = native.enumerate(&deadline);
                 let ended = native.now_ms();
                 let after = native.terminal_generation();
                 Some((before, started, tabs, ended, after))
@@ -580,7 +685,7 @@ pub fn route<N: RouteNative>(
     };
 
     // 4. Binding still current and request still within budget.
-    let revision_now = native.binding_revision(&target.binding_id);
+    let revision_now = native.binding_revision(&target.binding_id, &deadline);
     run.evidence.binding_revision_before_focus = revision_now.map(|r| r.to_string());
     if revision_now != Some(target.revision) {
         return run.finish(
@@ -591,19 +696,14 @@ pub fn route<N: RouteNative>(
             vec![],
         );
     }
-    if native.now_ms() > run.deadline_ms {
-        return run.finish(
-            request,
-            (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-            "TIMEOUT",
-            Some(target),
-            vec![],
-        );
+    native.reached(RoutePoint::BeforeFocus, &surface_tty, &deadline);
+    if deadline.expired() {
+        return run.finish_timed_out(request, target);
     }
 
     // 5. Focus the one proven tab and read back.
     let focus_started = native.now_ms();
-    let focus = native.focus(&surface_tty);
+    let focus = native.focus(&surface_tty, &deadline);
     run.phase("focus + readback");
     let mut focus_evidence = FocusEvidence {
         outcome: "FAILED".into(),
@@ -685,7 +785,8 @@ pub fn route<N: RouteNative>(
             }
         }
     };
-    let frontmost = native.frontmost();
+    native.reached(RoutePoint::BeforeReadback, &surface_tty, &deadline);
+    let frontmost = native.frontmost(&deadline);
     let readback_rdev = native.device_of(&readback.front_selected_tty).ok();
     focus_evidence.target_window_id = Some(readback.window_id);
     focus_evidence.target_tab_index = Some(readback.tab_index);
@@ -697,15 +798,21 @@ pub fn route<N: RouteNative>(
     focus_evidence.frontmost_application = frontmost.clone();
     run.evidence.focus = Some(focus_evidence);
     run.phase("frontmost + readback stat");
+    // Focus may have happened; it is recorded above. A spent budget starts
+    // no further lookup and cannot become an exact result.
+    if deadline.expired() {
+        return run.finish_timed_out(request, target);
+    }
 
     // 6. Post-focus revalidation of process, provider and binding.
     let after_focus = native.sample(pid);
     run.evidence.post_focus_sample = Some(sample_evidence(pid, &after_focus, native.now_ms()));
-    let post_lookup = native.inventory();
+    let post_lookup = native.inventory(&deadline);
     run.evidence.binding_revision_after_focus = native
-        .binding_revision(&target.binding_id)
+        .binding_revision(&target.binding_id, &deadline)
         .map(|r| r.to_string());
     run.phase("post-focus revalidation");
+    native.reached(RoutePoint::BeforeDecision, &surface_tty, &deadline);
 
     // Every readback signal must agree: the selected tab's device, the tab's
     // selection, the target as AppleScript's front window, and Terminal's own

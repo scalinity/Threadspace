@@ -1,6 +1,7 @@
 -- Exact Terminal tab focus (SPEC §13.3). Fixed bundled script run by the
 -- companion's bounded osascript worker; the TTY path arrives as a data
--- argument and is never interpolated into source. It selects one live tab,
+-- argument and is never interpolated into source; the second argument is
+-- what remains of the route's budget, in milliseconds. It selects one live tab,
 -- unminimizes and raises its current window and activates Terminal. It never
 -- types, sends a newline, runs a command or reads terminal contents.
 --
@@ -17,8 +18,9 @@
 --           <target window frontmost> <target tab selected>
 on run argv
 	set separator to character id 9
-	if (count of argv) is not 1 then return "USAGE"
+	if (count of argv) is not 2 then return "USAGE"
 	set targetTty to item 1 of argv
+	set budgetMs to (item 2 of argv) as integer
 	tell application "Terminal"
 		set matchCount to 0
 		set matchWindowId to 0
@@ -46,9 +48,12 @@ on run argv
 		activate
 		-- Showing a window that lives in another Space, such as its own
 		-- fullscreen Space, completes asynchronously: read back once the
-		-- target leads Terminal's window order, waiting at most one second.
-		-- The readback below is unchanged and must still match.
-		repeat 20 times
+		-- target leads Terminal's window order. The polling never sleeps
+		-- longer than the route's remaining budget, and the companion stops
+		-- this script at the route deadline, which also caps the time the
+		-- queries themselves take. The readback below is unchanged and must
+		-- still match.
+		repeat (budgetMs div 50) times
 			if (id of front window) is matchWindowId then exit repeat
 			delay 0.05
 		end repeat

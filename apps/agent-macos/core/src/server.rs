@@ -618,10 +618,13 @@ fn dispatch(
                     RUNTIME.arm_backup_failure()
                 }
                 threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeFocus => {
-                    crate::route::barrier::arm(crate::route::barrier::Point::BeforeFocus)
+                    crate::route::barrier::arm(threadspace_surfaces::RoutePoint::BeforeFocus)
                 }
                 threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeReadback => {
-                    crate::route::barrier::arm(crate::route::barrier::Point::BeforeReadback)
+                    crate::route::barrier::arm(threadspace_surfaces::RoutePoint::BeforeReadback)
+                }
+                threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeDecision => {
+                    crate::route::barrier::arm(threadspace_surfaces::RoutePoint::BeforeDecision)
                 }
             }
             log::info("QUALIFICATION_FAULT_ARMED", json!({ "fault": fault }));

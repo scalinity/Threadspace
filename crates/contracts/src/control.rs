@@ -311,6 +311,9 @@ pub enum QualificationFault {
     /// The next Return holds after its focus script returned and before the
     /// frontmost/device readback and post-focus revalidation.
     HoldNextRouteBeforeReadback,
+    /// The next Return holds after its post-focus revalidation and before
+    /// its final decision.
+    HoldNextRouteBeforeDecision,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -440,6 +443,7 @@ mod release_build_tests {
     fn qualification_requests_do_not_exist_in_release_builds() {
         for body in [
             r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_ROUTE_BEFORE_FOCUS"}"#,
+            r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_ROUTE_BEFORE_DECISION"}"#,
             r#"{"kind":"QualifyReleaseRouteBarrier"}"#,
             r#"{"kind":"QualifyAdmit","observationId":"x","capturedWallMs":1}"#,
         ] {

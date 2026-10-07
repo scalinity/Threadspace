@@ -16,7 +16,9 @@ use threadspace_journal::RouteTargetRow;
 use threadspace_provider_claude::inventory::{
     ClaudeInstall, Inventory, InventoryError, InventorySnapshot,
 };
-use threadspace_surfaces::{BoundTarget, RouteNative, SessionTarget, TERMINAL_BUNDLE_ID, route};
+use threadspace_surfaces::{
+    BoundTarget, RouteDeadline, RouteNative, SessionTarget, TERMINAL_BUNDLE_ID, route,
+};
 use threadspace_surfaces_macos::process::{self, Incarnation, ProcessError};
 use threadspace_surfaces_macos::terminal::{self, FocusOutcome, TerminalTabs};
 use threadspace_surfaces_macos::tty::{self, TtyError};
@@ -27,12 +29,12 @@ use crate::discovery::{self, DiscoveryContext, Trigger};
 use crate::log;
 use crate::writer::WriterCommand;
 
-/// One provider lookup inside a route: shorter than discovery's, because the
-/// whole attempt has a two-second budget.
-const LOOKUP_TIMEOUT: Duration = Duration::from_millis(1500);
 /// Frontmost-application readback: NSWorkspace learns of an activation
-/// asynchronously, so the reading is retried briefly before it is reported.
+/// asynchronously, so the reading is retried briefly, within the route's
+/// remaining budget, before it is reported.
 const FRONTMOST_SETTLE: Duration = Duration::from_millis(250);
+/// Recording a route result happens after its attempt, outside its budget.
+const RECORD_TIMEOUT: Duration = Duration::from_secs(5);
 
 static ROUTES: Mutex<()> = Mutex::new(());
 
@@ -43,11 +45,12 @@ struct Native<'a> {
 
 fn writer_call<T>(
     writer: &SyncSender<WriterCommand>,
+    timeout: Duration,
     build: impl FnOnce(Sender<T>) -> WriterCommand,
 ) -> Option<T> {
     let (reply, answer) = mpsc::channel();
     writer.send(build(reply)).ok()?;
-    answer.recv_timeout(Duration::from_secs(5)).ok()
+    answer.recv_timeout(timeout).ok()
 }
 
 impl RouteNative for Native<'_> {
@@ -59,24 +62,27 @@ impl RouteNative for Native<'_> {
         process::sample_incarnation(pid)
     }
 
-    fn inventory(&self) -> Result<InventorySnapshot, InventoryError> {
-        self.context.cli(&self.install, LOOKUP_TIMEOUT).fetch()
+    fn inventory(&self, deadline: &RouteDeadline) -> Result<InventorySnapshot, InventoryError> {
+        self.context
+            .cli(&self.install, deadline.remaining())
+            .fetch()
     }
 
     fn terminal_generation(&self) -> Result<Option<AppGeneration>, String> {
         discovery::terminal_generation()
     }
 
-    fn automation_authorized(&self) -> Result<bool, String> {
-        discovery::automation_authorized()
+    fn automation_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String> {
+        discovery::automation_authorized(deadline.remaining())
     }
 
-    fn enumerate(&self) -> Result<TerminalTabs, String> {
+    fn enumerate(&self, deadline: &RouteDeadline) -> Result<TerminalTabs, String> {
         terminal::enumerate(
             &self
                 .context
                 .resources_dir
                 .join("terminal-inventory.applescript"),
+            deadline.remaining(),
         )
         .map_err(|error| error.to_string())
     }
@@ -85,44 +91,55 @@ impl RouteNative for Native<'_> {
         tty::character_device(path)
     }
 
-    fn focus(&self, tty: &str) -> Result<(FocusOutcome, u32, u32), String> {
-        #[cfg(feature = "qualification")]
-        barrier::pass(barrier::Point::BeforeFocus, tty);
+    fn focus(
+        &self,
+        tty: &str,
+        deadline: &RouteDeadline,
+    ) -> Result<(FocusOutcome, u32, u32), String> {
         terminal::focus(
             &self
                 .context
                 .resources_dir
                 .join("terminal-focus.applescript"),
             tty,
+            deadline.remaining(),
         )
         .map_err(|error| error.to_string())
     }
 
-    fn frontmost(&self) -> Option<FrontmostApplication> {
-        #[cfg(feature = "qualification")]
-        barrier::pass(barrier::Point::BeforeReadback, "");
-        let deadline = Instant::now() + FRONTMOST_SETTLE;
+    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
+        let settled = Instant::now() + FRONTMOST_SETTLE.min(deadline.remaining());
         loop {
-            let front = bridge::frontmost_application(Duration::from_millis(500));
+            let front = bridge::frontmost_application(deadline.remaining());
             let is_terminal = front
                 .as_ref()
                 .and_then(|app| app.bundle_identifier.as_deref())
                 == Some(TERMINAL_BUNDLE_ID);
-            if is_terminal || Instant::now() >= deadline {
+            if is_terminal || Instant::now() >= settled {
                 return front;
             }
             std::thread::sleep(Duration::from_millis(25));
         }
     }
 
-    fn binding_revision(&self, binding_id: &str) -> Option<i64> {
-        writer_call(&self.context.writer, |reply| {
+    fn binding_revision(&self, binding_id: &str, deadline: &RouteDeadline) -> Option<i64> {
+        writer_call(&self.context.writer, deadline.remaining(), |reply| {
             WriterCommand::BindingRevision {
                 binding_id: binding_id.to_owned(),
                 reply,
             }
         })
         .flatten()
+    }
+
+    #[cfg(feature = "qualification")]
+    fn reached(
+        &self,
+        point: threadspace_surfaces::RoutePoint,
+        tty: &str,
+        deadline: &RouteDeadline,
+    ) {
+        barrier::pass(point, tty, deadline);
     }
 }
 
@@ -174,14 +191,16 @@ fn bad_request(detail: &str) -> ControlError {
     ControlError::new(ControlErrorCode::BadRequest, detail)
 }
 
-/// Runs one Return-to-Agent request. `received_ms` is when the request
-/// reached the companion; work queued past its budget never moves focus.
+/// Runs one Return-to-Agent request. `received` is when the request reached
+/// the companion, on the monotonic clock: the attempt's one deadline starts
+/// there, so work queued past its budget never moves focus.
 pub fn return_to_session(
     request: RouteRequest,
     context: &DiscoveryContext,
     discovery: &SyncSender<Trigger>,
-    received_ms: i64,
+    received: Instant,
 ) -> Result<RouteResult, ControlError> {
+    let deadline = RouteDeadline::for_request(received);
     if !canonical_uuid(&request.request_id) || !canonical_uuid(&request.session_id) {
         return Err(bad_request("request and session IDs must be UUIDs"));
     }
@@ -202,9 +221,11 @@ pub fn return_to_session(
     let _serialized = ROUTES
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner());
-    let Some(Ok(row)) = writer_call(&context.writer, |reply| WriterCommand::RouteTarget {
-        session_id: request.session_id.clone(),
-        reply,
+    let Some(Ok(row)) = writer_call(&context.writer, deadline.remaining(), |reply| {
+        WriterCommand::RouteTarget {
+            session_id: request.session_id.clone(),
+            reply,
+        }
     }) else {
         return Err(ControlError::new(
             ControlErrorCode::Unavailable,
@@ -218,10 +239,12 @@ pub fn return_to_session(
         ));
     };
     let native = Native { context, install };
-    let result = route(&native, &request, &session_target(row), received_ms);
-    match writer_call(&context.writer, |reply| WriterCommand::RecordRoute {
-        result: Box::new(result.clone()),
-        reply,
+    let result = route(&native, &request, &session_target(row), deadline);
+    match writer_call(&context.writer, RECORD_TIMEOUT, |reply| {
+        WriterCommand::RecordRoute {
+            result: Box::new(result.clone()),
+            reply,
+        }
     }) {
         Some(Ok(_)) => {}
         _ => log::warn(
@@ -253,17 +276,18 @@ pub fn return_to_session(
     Ok(result)
 }
 
-/// Qualification only (SPEC §21.4 race witnesses): one armed route holds at a
-/// named point until the harness releases it, so a target close can be made
-/// to overlap a route in flight. The route's own logic is unchanged; only its
-/// timing is held. Release builds contain none of this.
+/// Qualification only (SPEC §21.4 race and deadline witnesses): one armed
+/// route holds at a named point until the harness releases it, so a target
+/// close or the attempt's deadline can be made to overlap a route in flight.
+/// The route's own logic and its deadline are unchanged; only its timing is
+/// held. Release builds contain none of this.
 #[cfg(feature = "qualification")]
 pub mod barrier {
     use std::sync::{Condvar, Mutex};
     use std::time::{Duration, Instant};
 
-    use serde::Serialize;
     use serde_json::json;
+    use threadspace_surfaces::{RouteDeadline, RoutePoint};
 
     use crate::log;
 
@@ -271,18 +295,9 @@ pub mod barrier {
     /// wedge Return-to-Agent.
     const MAX_HOLD: Duration = Duration::from_secs(20);
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-    #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-    pub enum Point {
-        /// The one tab is proven; its focus script has not run.
-        BeforeFocus,
-        /// The focus script returned; readback and revalidation have not run.
-        BeforeReadback,
-    }
-
     struct State {
-        armed: Option<Point>,
-        holding: Option<Point>,
+        armed: Option<RoutePoint>,
+        holding: Option<RoutePoint>,
         released: bool,
     }
 
@@ -293,10 +308,10 @@ pub mod barrier {
     });
     static WAKE: Condvar = Condvar::new();
 
-    pub fn arm(point: Point) {
+    pub fn arm(point: RoutePoint) {
         if let Ok(mut state) = STATE.lock() {
             state.armed = Some(point);
-            log::info("ROUTE_BARRIER_ARMED", json!({ "point": point }));
+            log::info("ROUTE_BARRIER_ARMED", json!({ "point": point.code() }));
         }
     }
 
@@ -313,8 +328,9 @@ pub mod barrier {
         true
     }
 
-    /// Holds the calling route when `point` is armed (one shot).
-    pub fn pass(point: Point, tty: &str) {
+    /// Holds the calling route when `point` is armed (one shot), reporting
+    /// what remains of its budget when it arrives and when it resumes.
+    pub fn pass(point: RoutePoint, tty: &str, deadline: &RouteDeadline) {
         let Ok(mut state) = STATE.lock() else {
             return;
         };
@@ -327,7 +343,12 @@ pub mod barrier {
         let reached = Instant::now();
         log::info(
             "ROUTE_BARRIER_REACHED",
-            json!({ "point": point, "tty": tty, "reachedAtMs": log::now_ms() }),
+            json!({
+                "point": point.code(),
+                "tty": tty,
+                "reachedAtMs": log::now_ms(),
+                "remainingMs": deadline.remaining().as_millis() as u64,
+            }),
         );
         while !state.released && reached.elapsed() < MAX_HOLD {
             let remaining = MAX_HOLD.saturating_sub(reached.elapsed());
@@ -342,10 +363,11 @@ pub mod barrier {
         log::info(
             "ROUTE_BARRIER_RELEASED",
             json!({
-                "point": point,
+                "point": point.code(),
                 "releasedBy": by,
                 "heldMs": reached.elapsed().as_millis() as u64,
                 "releasedAtMs": log::now_ms(),
+                "remainingMs": deadline.remaining().as_millis() as u64,
             }),
         );
     }

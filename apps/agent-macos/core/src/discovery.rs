@@ -43,6 +43,8 @@ pub const PROVIDER: &str = "claude";
 const INTERVAL: Duration = Duration::from_secs(5);
 const INVENTORY_TIMEOUT: Duration = Duration::from_secs(5);
 const QUICK: Duration = Duration::from_secs(3);
+/// A Terminal enumeration outside any route.
+pub const ENUMERATION_TIMEOUT: Duration = Duration::from_secs(2);
 const NO_ERR: i32 = 0;
 
 pub enum Trigger {
@@ -105,8 +107,8 @@ pub fn terminal_generation() -> Result<Option<AppGeneration>, String> {
 }
 
 /// Apple-event authorization for Terminal, asked without prompting.
-pub fn automation_authorized() -> Result<bool, String> {
-    bridge::automation_permission(TERMINAL_BUNDLE_ID, false, QUICK)
+pub fn automation_authorized(timeout: Duration) -> Result<bool, String> {
+    bridge::automation_permission(TERMINAL_BUNDLE_ID, false, timeout)
         .map(|status| status == NO_ERR)
         .map_err(|error| error.to_string())
 }
@@ -209,7 +211,7 @@ fn surface_join(
     if pending.is_empty() {
         return out;
     }
-    match automation_authorized() {
+    match automation_authorized(QUICK) {
         Ok(true) => {}
         Ok(false) => {
             for join in pending {
@@ -229,7 +231,7 @@ fn surface_join(
         .resources_dir
         .join("terminal-inventory.applescript");
     let started = log::now_ms();
-    let tabs = terminal::enumerate(&script);
+    let tabs = terminal::enumerate(&script, ENUMERATION_TIMEOUT);
     let ended = log::now_ms();
     let after = terminal_generation().ok().flatten();
     let tabs = match tabs {

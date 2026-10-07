@@ -241,8 +241,9 @@ fn osascript(
     script: &Path,
     args: &[&str],
     max_bytes: usize,
+    timeout: Duration,
 ) -> Result<(String, u32, u32), TerminalError> {
-    let mut command = BoundedCommand::new(OSASCRIPT, Duration::from_secs(2), max_bytes).arg(script);
+    let mut command = BoundedCommand::new(OSASCRIPT, timeout, max_bytes).arg(script);
     for arg in args {
         command = command.arg(*arg);
     }
@@ -269,8 +270,8 @@ fn osascript(
 /// this while Terminal is already running and automation is authorized:
 /// addressing a stopped application would launch it, and an unauthorized
 /// sender would prompt.
-pub fn enumerate(script: &Path) -> Result<TerminalTabs, TerminalError> {
-    let (output, sender_pid, elapsed_ms) = osascript(script, &[], MAX_INVENTORY_BYTES)?;
+pub fn enumerate(script: &Path, timeout: Duration) -> Result<TerminalTabs, TerminalError> {
+    let (output, sender_pid, elapsed_ms) = osascript(script, &[], MAX_INVENTORY_BYTES, timeout)?;
     let (windows, tabs) = parse_tabs(&output)?;
     Ok(TerminalTabs {
         windows,
@@ -328,10 +329,18 @@ pub fn parse_focus(output: &str) -> Result<FocusOutcome, TerminalError> {
     }
 }
 
-/// Runs the bundled focus script for one TTY locator, passed as data.
-pub fn focus(script: &Path, tty: &str) -> Result<(FocusOutcome, u32, u32), TerminalError> {
+/// Runs the bundled focus script for one TTY locator, passed as data, within
+/// `budget`: the script scales its window-settle polling to the budget, and
+/// the script is stopped when the budget runs out, whatever it is waiting on.
+/// A stopped script may already have acted.
+pub fn focus(
+    script: &Path,
+    tty: &str,
+    budget: Duration,
+) -> Result<(FocusOutcome, u32, u32), TerminalError> {
     let tty = parse_tty(tty)?;
-    let (output, sender_pid, elapsed_ms) = osascript(script, &[&tty], 4096)?;
+    let settle_ms = budget.as_millis().to_string();
+    let (output, sender_pid, elapsed_ms) = osascript(script, &[&tty, &settle_ms], 4096, budget)?;
     Ok((parse_focus(&output)?, sender_pid, elapsed_ms))
 }
 
