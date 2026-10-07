@@ -1,6 +1,6 @@
 # M0C remediation: C-02, C-11, H-10, H-11, H-12
 
-Focused remediation of the independent review recorded at `24035492eed28c342d09c36b52aed61c2bc17a53`, independently re-reviewed at candidate `ccdfc8a38773aac01121601bde6121dd1760b6ea`, then finally remediated from `02947d8dd3a627afef945a0d57497095cfbbae20`. **M0C FINAL REMEDIATION COMPLETE — candidate pending independent acceptance review:** H-10–H-12 were closed on `89fce79`; C-02 handoff intent ownership and C-11 whole-route deadline enforcement are closed on application build `ab11b8a` ([final remediation](#final-remediation)). Valid native workloads remain credited. M0C stays unmerged; M1 has not started. D-0004–D-0006 and C-04 are unchanged.
+Focused remediation of the independent review recorded at `24035492eed28c342d09c36b52aed61c2bc17a53`, independently re-reviewed at candidate `ccdfc8a38773aac01121601bde6121dd1760b6ea`, finally remediated from `02947d8dd3a627afef945a0d57497095cfbbae20`, and, after the final acceptance review of `46dae33d96809e6bfd3979bb3663952c6a627ec8`, repaired once more for durable ownership and the notification receipt deadline. **M0C DURABLE-OWNERSHIP / RECEIPT-DEADLINE REMEDIATION COMPLETE — candidate pending final independent acceptance:** H-10–H-12 were closed on `89fce79`; C-02 and C-11 are closed on application build `6cfac57` ([durable ownership and receipt deadline](#durable-ownership-and-receipt-deadline)). Valid native workloads remain credited. M0C stays unmerged; M1 has not started. D-0004–D-0006, C-04, C-12 and C-13 are unchanged.
 
 ## Builds under test
 
@@ -9,11 +9,71 @@ Focused remediation of the independent review recorded at `24035492eed28c342d09c
 | `8c82212` | previously reviewed M0C application | negative controls only (pre-repair) | `../install/20261006T140713Z-8c82212/` |
 | `a6da2f1` | C-02 repair + qualification barriers | intermediate; superseded runs only | `../install/20261007T003651Z-a6da2f1/` |
 | `89fce79` | application sources as at `c3f6de1` (adds the Return readback settle and the `GPU.prototype` init gate); clean tree | every H-10–H-12 and first C-02 run | `../install/20261007T005438Z-89fce79/` |
-| **`ab11b8a`** | C-11 `fdee5ad`, C-02 `1270175`, SPEC `ab11b8a`; clean tree, no lockfile or toolchain change | **every final remediation run** | `../install/20261007T041247Z-ab11b8a/` |
+| `ab11b8a` | C-11 `fdee5ad`, C-02 `1270175`, SPEC `ab11b8a`; clean tree, no lockfile or toolchain change | first final remediation runs | `../install/20261007T041247Z-ab11b8a/` |
+| **`6cfac57`** | C-11 `75de6bb`, C-02/C-11 `81d72e3`, SPEC `6cfac57`; clean tree, no lockfile or toolchain change | **every durable-ownership / receipt-deadline run** | `../install/20261007T064228Z-6cfac57/` |
 
 Candidate executables (sha256): prod outer `83508af5…`, prod companion `a384f366…`, dev outer `8fbf7de1…`, dev companion `0a24a986…` (full values, signatures with the certificate holder redacted, build info and the post-install supervision smoke of both identities are in the install record). No lockfile or toolchain changed since `8c82212`.
 
 Application commits: `d0598a5` (C-02 supervision), `a6da2f1` (qualification-only barriers), `88817eb` (C-11 Return readback settle), `c3f6de1` (init gate on `GPU.prototype`). Harness commits: `4c1d1c9`, `d23ae65`, `89fce79`, `2861825`, `0880017`, `2df7316`, `0ac5c2e`, `ec8fd26`, `1ac8b9c`.
+
+## Durable ownership and receipt deadline
+
+The final acceptance review of `46dae33` found four remaining defects: the pending-intent bound evicted accepted work (C-02A); storage failures were logged rather than controlling ownership (C-02B); an accepted notification Return became process-only while its route ran (C-02C); and a queued notification Return stamped its receipt at dequeue, renewing its budget (C-11). All four are repaired in application build `6cfac57`: prod outer `6b582a18…`, prod companion `040b93b0…`, dev outer `8eff7579…`, dev companion `36966f68…` (full values, nested signatures with the certificate holder redacted, build info, the empty lockfile diff and both identities' supervision smoke are in `../install/20261007T064228Z-6cfac57/`). Harness `eb23d5d`. Tests and lints: `tests-durable-ownership.txt`.
+
+### Ownership state machine (`81d72e3`)
+
+A live response's **record** is committed in the store, on the native callback thread, before any work on it. A response is durably accepted once its record, or its intent in the **backlog**, commits, and not before; a response that cannot be recorded is still offered to the backlog, and one that neither store accepts is reported `NOTIFICATION_RESPONSE_NOT_ACCEPTED` with the failing step (its attention item stays outstanding). Ownership moves only by committing the next owner first: a record is retired only after its intent's backlog commit succeeds. Every storage step returns a typed `StorageFailure`; a failed promotion keeps the record authoritative and is retried when a view hydrates or consumes and at the next start. A Return is planned only for a recorded response and keeps its record until the resulting intent commits; a record that a starting writer finds opens the inspector and never replays focus.
+
+**Bounds.** The backlog holds at most 256 accepted, unconsumed intents in acceptance order; at the bound (as at 256 unresolved records) a response is refused before it is accepted. Accepted work is never evicted. Each view receives at most 32 unconsumed intents at a time; the rest follow as it consumes. The in-memory backlog mirrors the durable one, so memory is bounded by the same 256. Qualification commands are not owner work: at 32 the oldest gives way.
+
+**Consumption.** A consumption is complete only when the backlog without the intent commits. If that commit fails, the caller is told (`CONSUMPTION_NOT_RECORDED`, an `Unavailable` reply), the intent is not delivered again by that process, and every later commit retries the removal. Only a restart before any successful commit can deliver it again, and the shell, which remembers what its views applied, does not apply it twice. Under storage failure this is at-least-once delivery with at-most-once application per shell; the backlog also remembers the last 256 consumed IDs so a lingering record is not applied again.
+
+**Storage error policy.**
+
+| Case | Result |
+| --- | --- |
+| Commit succeeds | New state visible and survives a process crash; revision advances |
+| Failure creating, writing or syncing the temporary file, or renaming it | Previous file intact; temporary removed; typed failure; previous owner authoritative |
+| Rename succeeds, directory sync fails | Committed (survives a process crash), reported `powerLossConfirmed: false`; power-loss durability is not qualified, as for the journal |
+| Leftover temporary file at start | Removed; never read |
+| Malformed backlog or record at start | Moved aside under a `.corrupt-<ms>` name and kept; a new backlog begins; reported |
+| Backlog unreadable at start (I/O error) | Left in place; every backlog commit refused until it can be read, so it is never overwritten |
+
+### C-02 native closure (`c02-durable-ownership/`)
+
+| Case | Run | Result |
+| --- | --- | --- |
+| A: 40 responses, no view hydrated | `20261007T064627Z-prod/` | 40 accepted, 0 refused; the backlog listed all 40 in acceptance order; the old writer released all 40; the login item loaded all 40 in order; each applied exactly once in acceptance order; delivery window peaked at 32; store empty after. |
+| B1: no false acceptance | `20261007T064655Z-prod/` | Record write and backlog write both failed (`WRITE`): reported not accepted, nothing durable, never applied. |
+| B2: replacement failure | same | Record committed, backlog write failed: `INTENT_NOT_ACCEPTED`, owner `RESPONSE_RECORD`, record kept and backlog unchanged; on view hydration the retry committed it (revision 86) and retired the record; applied once. |
+| B3: retire after commit | same | Held after the backlog's temporary file was written and synced, before its rename: record present, backlog without it, temporary file on disk. Released: intent committed (revision 85), record retired 4 ms later. |
+| B4: consumption failure | same | Delivered and applied; the consumption commit failed and was reported; the backlog still listed it; the same writer did not deliver it again; its Release retried and reported the backlog stale; the login item loaded the stale intent, the shell skipped it (`INTENT_ALREADY_APPLIED`) and the removal converged. Applied once. |
+| B5: Release after storage failure | same | Promotion failed; the writer exited with the record as owner (`WRITER_RELEASED` lists it as record and unpromoted); the login item recovered it as an inspector intent; applied once. |
+| C: Return in flight, crash | `20261007T064752Z-prod/` | Return planned for a recorded response and held before focus; record present, backlog without it. SIGKILL: launchd relaunched the login item in 103 ms; it found the record, opened the inspector, started no Return (0) and Terminal's front window stayed the spare; applied once; attention unacknowledged. |
+| C: Return in flight, Stop | same | Held, then `--service stop`: the companion exited and, with none running, the record survived. `--service enable`: the login item found it, opened the inspector, started no Return; applied once. |
+| C: normal Return | same | Exact; the intent committed, then the record was retired; consumed; after a SIGKILL the relaunched writer loaded nothing; applied once. |
+
+Totals across the new cases: 0 accepted intents lost, 0 duplicate applications, no writer or observer overlap, no unsupervised admission. Every response has a time-ordered ownership trace (`traces.jsonl`: acceptance, owner, store revision, writer, claimant, deliveries, consumption, injected fault, final disposition); each case records the backlog's pending IDs, revision, consumed count and file hash, the records and any temporary file at each step.
+
+**Regressions on `6cfac57`:** prior handoff suite AGB/CF/D/E1/E2 (`c02-intent-handoff/20261007T065133Z-prod/`); supervision A (persisted-enabled unsupervised start), B and D (Stop → notification → Enable → crash) (`c02-supervision/20261007T065525Z-prod/`); G06 11/11 (`../g06-notifications/20261007T065616Z-prod/`); G09 6/6 (`../g09-companion/20261007T065715Z-prod/`); G10 32,211 acknowledged, 0 lost, second writer refused, retry `ALREADY_COMMITTED` (`../g10-sqlite-live/20261007T065810Z-prod/`).
+
+**Negative control.** The prior builds cannot run the storage-fault controls, so no native negative control is claimed. The unit suite's fault injection runs against the store implementation itself: while building it, the injected rename failure exposed a helper that performed the rename before reporting the injected failure (a false "not committed"); the helper now injects instead of the step, and the suite fails if a failed step changes the committed file.
+
+### C-11: receipt deadline (`81d72e3`, `75de6bb`)
+
+The receipt instant is taken first thing in `ts_core_deliver` and carried through the pre-start queue, the writer command and the `ResponseJob::Return`; the responder no longer stamps it at dequeue and logs the queue time and remaining budget (`NOTIFICATION_RETURN_STARTED`). A forwarded response carries how long ago its first instance received it. A Return whose budget is spent before it starts does no native work (`route` returns TIMEOUT before reading the binding). Recorded responses found after a restart have no monotonic receipt and stay inspector-only. The internal `RouteDeadline` is unchanged.
+
+| Case | Run | Result |
+| --- | --- | --- |
+| Q1: queued past its deadline | `c11-notification-receipt-deadline/20261007T064955Z-prod/` | First Return held before focus; second received, recorded while queued; released 2.3 s after its receipt. Second: queued 2,312 ms, 0 ms remaining at dequeue → TIMEOUT, no focus, not current; one inspector intent; attention unacknowledged; Terminal's front window unchanged. |
+| Q2: queued for part of it | same | Second received 1.1 s after the first; the first released past its own deadline (TIMEOUT, no focus). Second: queued 1,205 ms, 794 ms remaining at dequeue, route 719 ms → exact, 1,924 ms after receipt. |
+| Direct control route | same | Exact in 733 ms; receipt still taken before worker dispatch. |
+
+Regression (`c11-route-deadline/20261007T065037Z-prod/`): ordinary exact 709 ms, fullscreen exact 1,017 ms, expiry before focus / in flight / during settle / before decision all TIMEOUT, attention not acknowledged on timeout, 0 wrong targets. Unit: a spent budget makes no native call; a request that waited 1.2 s gives every native call at most what remains.
+
+### Qualification isolation, owner action, environment
+
+`QualifyArmStorageFault` and `HOLD_NEXT_BACKLOG_COMMIT` exist only with the `qualification` feature (the release contract test proves they do not parse) and the store's fault module compiles out of release builds; the response injection, route and handoff holds are unchanged. No owner action was needed; Terminal was not restarted. The Claude CLI updated itself to 2.1.292 before these runs; inventory and routes behaved identically. Product correctness does not read `agent.log` (C-13 remains M1 diagnostics). Not rerun, as unaffected: G12, H-11, H-12, the sustained G15 workload and the M0B 30-route matrix. Superseded: `attempts/c11-notification-receipt-deadline/20261007T064842Z-prod/` (Q2 released the first Return inside its own budget). Privacy: all 843 M0C files rescanned; only milestone names match; 60 home paths in five new run files replaced with `~`, originals kept outside the repository.
 
 ## Final remediation
 

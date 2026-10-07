@@ -1,0 +1,73 @@
+# Test and lint results for the durable-ownership / receipt-deadline remediation (source 6cfac57 application, eb23d5d harness, 2026-10-07T07:00:06Z)
+## cargo test -p threadspace-contracts
+test result: ok. 99 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-contracts --features qualification
+test result: ok. 97 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-surfaces
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-surfaces-macos
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-agent
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.86s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-agent --features qualification
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-desktop
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-desktop --features qualification
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-journal --features qualification
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-relay
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-provider-claude
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## intent-store durability suite (cargo test -p threadspace-agent intent_store)
+test intent_store::tests::the_first_store_format_still_loads ... ok
+test intent_store::tests::a_malformed_backlog_is_kept_aside_never_overwritten ... ok
+test intent_store::tests::consumed_ids_survive_a_reload ... ok
+test intent_store::tests::a_failed_directory_sync_commits_without_power_loss_confirmation ... ok
+test intent_store::tests::a_malformed_record_is_kept_aside ... ok
+test intent_store::tests::a_committed_backlog_reloads_exactly_in_order ... ok
+test intent_store::tests::leftover_temporaries_are_removed_and_never_read ... ok
+test intent_store::tests::records_are_kept_once_bounded_and_removed_only_on_success ... ok
+test intent_store::tests::a_failed_record_write_leaves_no_record ... ok
+test intent_store::tests::every_failure_before_the_rename_keeps_the_previous_backlog ... ok
+test intent_store::tests::records_beyond_the_bound_are_refused_before_acceptance ... ok
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 1.85s
+## route receipt-budget tests (cargo test -p threadspace-surfaces budget)
+test tests::a_request_whose_budget_is_spent_before_it_starts_does_nothing_native ... ok
+test tests::a_request_that_waited_gets_only_what_remains_of_its_budget ... ok
+test tests::every_phase_draws_on_the_one_attempt_budget ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.02s
+## cargo clippy --all-targets -p threadspace-agent -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s
+## cargo clippy --all-targets -p threadspace-agent --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+## cargo clippy --all-targets -p threadspace-desktop -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.30s
+## cargo clippy --all-targets -p threadspace-desktop --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.92s
+## cargo clippy --all-targets -p threadspace-surfaces -p threadspace-surfaces-macos -p threadspace-contracts -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.28s
+## cargo clippy --all-targets -p threadspace-contracts --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+## desktop UI: tsc --noEmit; vitest
+ Test Files  2 passed (2)
+      Tests  13 passed (13)

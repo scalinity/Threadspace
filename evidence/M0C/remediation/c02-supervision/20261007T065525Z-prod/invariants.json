@@ -1,0 +1,109 @@
+{
+  "durability": [
+    {
+      "observationId": "7a3f2a44-7caa-4db0-898c-a4abaabca417",
+      "originalCursor": "339068",
+      "preserved": true,
+      "replay": {
+        "admitted": true,
+        "cursor": "339068",
+        "ok": true,
+        "status": "ALREADY_COMMITTED"
+      }
+    }
+  ],
+  "invariants": {
+    "maxObserverOverlapMs": 0,
+    "maxSimultaneousCompanionProcesses": 1,
+    "maxWriterOverlapMs": 0,
+    "pass": true,
+    "processes": [
+      {
+        "admissionOpen": null,
+        "firstSeenMs": 1791356126000,
+        "forwarder": false,
+        "lastSeenMs": 1791356126464,
+        "launchProvenance": null,
+        "pid": 5236,
+        "writerSinceMs": null
+      },
+      {
+        "admissionOpen": false,
+        "firstSeenMs": 1791356126948,
+        "forwarder": false,
+        "lastSeenMs": 1791356153664,
+        "launchProvenance": "LAUNCH_SERVICES",
+        "pid": 5620,
+        "writerSinceMs": 1791356126762
+      },
+      {
+        "admissionOpen": true,
+        "firstSeenMs": 1791356153916,
+        "forwarder": false,
+        "lastSeenMs": 1791356156082,
+        "launchProvenance": "LOGIN_ITEM",
+        "pid": 6455,
+        "writerSinceMs": 1791356153825
+      },
+      {
+        "admissionOpen": false,
+        "firstSeenMs": 1791356156326,
+        "forwarder": false,
+        "lastSeenMs": 1791356156816,
+        "launchProvenance": "LAUNCH_SERVICES",
+        "pid": 6540,
+        "writerSinceMs": 1791356156228
+      },
+      {
+        "admissionOpen": false,
+        "firstSeenMs": 1791356157056,
+        "forwarder": false,
+        "lastSeenMs": 1791356158015,
+        "launchProvenance": "LOGIN_ITEM",
+        "pid": 6557,
+        "writerSinceMs": 1791356157041
+      },
+      {
+        "admissionOpen": true,
+        "firstSeenMs": 1791356167155,
+        "forwarder": false,
+        "lastSeenMs": 1791356169311,
+        "launchProvenance": "LOGIN_ITEM",
+        "pid": 6699,
+        "writerSinceMs": 1791356167142
+      }
+    ],
+    "sampleIntervalMs": 200,
+    "samples": 181,
+    "unsupervisedObservers": []
+  },
+  "outstandingAttention": [
+    {
+      "attentionId": "1f439593-a72f-4a5e-83a0-f910b97c40b3",
+      "outstanding": true,
+      "state": {
+        "acknowledgedAtMs": null,
+        "present": true,
+        "resolvedAtMs": null
+      }
+    },
+    {
+      "attentionId": "d4aa3031-abdf-4931-a49f-02717cdd5709",
+      "outstanding": true,
+      "state": {
+        "acknowledgedAtMs": null,
+        "present": true,
+        "resolvedAtMs": null
+      }
+    },
+    {
+      "attentionId": "989b8a39-2fa7-43bb-9a6e-3cd9ad1da9a0",
+      "outstanding": true,
+      "state": {
+        "acknowledgedAtMs": null,
+        "present": true,
+        "resolvedAtMs": null
+      }
+    }
+  ]
+}
