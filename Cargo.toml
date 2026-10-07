@@ -7,6 +7,7 @@ members = [
   "crates/surfaces",
   "crates/provider-claude",
   "crates/relay",
+  "crates/state-engine",
   "apps/agent-macos/core",
   "apps/desktop/src-tauri",
   "tests/native/qualify",
@@ -53,6 +54,7 @@ threadspace-relay = { path = "crates/relay" }
 threadspace-surfaces-macos = { path = "crates/surfaces-macos" }
 threadspace-surfaces = { path = "crates/surfaces" }
 threadspace-provider-claude = { path = "crates/provider-claude" }
+threadspace-state-engine = { path = "crates/state-engine" }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"
