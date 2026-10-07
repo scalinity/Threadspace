@@ -5,7 +5,16 @@
 
 import type { RendererLifecycle, RendererLifecycleSnapshot, RendererQualificationCommand } from "@threadspace/scene";
 
+import { launch } from "../launch";
+import { type GpuLike, type InitBarrierState, createInitBarrier } from "./initBarrier";
+
 let active: RendererLifecycle | null = null;
+
+/**
+ * Installed when this module is first evaluated, before the scene mounts and
+ * creates its first renderer; a release build never wraps the adapter request.
+ */
+const initBarrier = createInitBarrier((navigator as unknown as { gpu?: GpuLike }).gpu, launch.qualificationBuild);
 
 /** Registers the mounted lifecycle; the returned function unregisters it. */
 export function registerRendererLifecycle(lifecycle: RendererLifecycle): () => void {
@@ -39,17 +48,37 @@ function surfaceFacts(): SurfaceFacts {
   };
 }
 
+type Reported = RendererLifecycleSnapshot & { surface: SurfaceFacts; initBarrier: InitBarrierState; atMs: number };
+
 /**
  * Runs `inject-device-loss`, `enter-2d`, `exit-2d` or `report-state` against
  * the mounted renderer and resolves with the settled diagnostics and the
  * surface facts. `args.label` (1-48 of [a-z0-9-]) tags the resulting
  * `renderer-lifecycle` report.
+ *
+ * `arm-init-barrier` / `release-init-barrier` drive the init barrier and
+ * `peek-state` reads the diagnostics without waiting for the lifecycle to
+ * settle, so a held init can be observed while it is pending.
  */
 export async function runRendererQualificationCommand(
-  name: RendererQualificationCommand | (string & {}),
+  name: RendererQualificationCommand | "arm-init-barrier" | "release-init-barrier" | "peek-state" | (string & {}),
   args: Readonly<Record<string, unknown>> = {},
-): Promise<RendererLifecycleSnapshot & { surface: SurfaceFacts }> {
+): Promise<Reported> {
   if (active === null) throw new Error("no renderer lifecycle is mounted");
-  const snapshot = await active.runQualificationCommand(name, args);
-  return { ...snapshot, surface: surfaceFacts() };
+  const lifecycle = active;
+  const peek = (): Reported => ({ ...lifecycle.getSnapshot(), surface: surfaceFacts(), initBarrier: initBarrier.state(), atMs: Date.now() });
+  switch (name) {
+    case "arm-init-barrier":
+      initBarrier.arm();
+      return peek();
+    case "release-init-barrier":
+      initBarrier.release();
+      return peek();
+    case "peek-state":
+      return peek();
+    default: {
+      await lifecycle.runQualificationCommand(name, args);
+      return peek();
+    }
+  }
 }

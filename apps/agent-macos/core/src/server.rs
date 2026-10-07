@@ -515,6 +515,7 @@ fn dispatch(
         | ControlRequestBody::QualifyPopulate { .. }
         | ControlRequestBody::QualifyViewCommand { .. }
         | ControlRequestBody::QualifyArmFault { .. }
+        | ControlRequestBody::QualifyReleaseRouteBarrier
             if role != ClientRole::Qualification =>
         {
             refuse(
@@ -616,9 +617,28 @@ fn dispatch(
                 threadspace_contracts::control::QualificationFault::FailNextMaintenanceBackup => {
                     RUNTIME.arm_backup_failure()
                 }
+                threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeFocus => {
+                    crate::route::barrier::arm(crate::route::barrier::Point::BeforeFocus)
+                }
+                threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeReadback => {
+                    crate::route::barrier::arm(crate::route::barrier::Point::BeforeReadback)
+                }
             }
             log::info("QUALIFICATION_FAULT_ARMED", json!({ "fault": fault }));
             respond(outbound, request_id, Ok(ControlResponseBody::Done));
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyReleaseRouteBarrier => {
+            if crate::route::barrier::release() {
+                respond(outbound, request_id, Ok(ControlResponseBody::Done));
+            } else {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::NotFound,
+                    "no route is held at a barrier",
+                );
+            }
         }
         #[cfg(feature = "qualification")]
         ControlRequestBody::QualifyRaiseAttention { label, session_id } => {

@@ -303,6 +303,14 @@ pub enum UiAction {
         report_kind: String,
         report: serde_json::Value,
     },
+    /// Qualification builds only (G15 overlap witness): hold the office
+    /// view's next same-scheme response whose path contains `path_contains`
+    /// inside the shell's own `tauri://` handler, release the held response,
+    /// or report the hold. Release builds answer `NOT_IMPLEMENTED`.
+    QualifyResourceHold {
+        op: ResourceHoldOp,
+        path_contains: Option<String>,
+    },
     /// Return-to-Agent (SPEC §13.2). `chosen_binding_id` answers a
     /// multiple-attachments chooser; `expected_binding_revision` refuses the
     /// route if the binding changed since the owner looked at it.
@@ -362,6 +370,15 @@ pub struct CommandReceipt {
     pub target_revision: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
+pub enum ResourceHoldOp {
+    Arm,
+    Release,
+    Status,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(tag = "kind", rename_all_fields = "camelCase")]
 #[ts(export)]
@@ -379,6 +396,9 @@ pub enum UiActionResult {
     },
     QualificationReportRecorded {
         file_name: String,
+    },
+    ResourceHold {
+        state: serde_json::Value,
     },
     Routed {
         result: Box<RouteResult>,

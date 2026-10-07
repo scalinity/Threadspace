@@ -5,5 +5,6 @@ import type { DiscoverySummary } from "./DiscoverySummary";
 import type { NotificationSettings } from "./NotificationSettings";
 import type { RouteResult } from "./RouteResult";
 import type { ServiceReport } from "./ServiceReport";
+import type { JsonValue } from "./serde_json/JsonValue";
 
-export type UiActionResult = { "kind": "CommandCommitted", receipt: CommandReceipt, } | { "kind": "NotificationAuthorization", granted: boolean, settings: NotificationSettings, } | { "kind": "TerminalAutomation", automation: AutomationPermission, statusCode: number, } | { "kind": "QualificationReportRecorded", fileName: string, } | { "kind": "Routed", result: RouteResult, } | { "kind": "EvidenceRefreshed", summary: DiscoverySummary, } | { "kind": "ObservationChanged", enabled: boolean, service: ServiceReport, detail: string, };
+export type UiActionResult = { "kind": "CommandCommitted", receipt: CommandReceipt, } | { "kind": "NotificationAuthorization", granted: boolean, settings: NotificationSettings, } | { "kind": "TerminalAutomation", automation: AutomationPermission, statusCode: number, } | { "kind": "QualificationReportRecorded", fileName: string, } | { "kind": "ResourceHold", state: JsonValue, } | { "kind": "Routed", result: RouteResult, } | { "kind": "EvidenceRefreshed", summary: DiscoverySummary, } | { "kind": "ObservationChanged", enabled: boolean, service: ServiceReport, detail: string, };

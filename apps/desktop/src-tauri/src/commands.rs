@@ -437,6 +437,10 @@ pub async fn ui_action<R: Runtime>(
                 crate::qualification::record(webview.app_handle(), &report_kind, &report)?;
             UiActionResult::QualificationReportRecorded { file_name }
         }
+        #[cfg(feature = "qualification")]
+        UiAction::QualifyResourceHold { op, path_contains } => UiActionResult::ResourceHold {
+            state: crate::qualification::resource_hold(op, path_contains)?,
+        },
         other => {
             let kind = serde_json::to_value(&other)
                 .ok()

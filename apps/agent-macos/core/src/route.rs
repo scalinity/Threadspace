@@ -86,6 +86,8 @@ impl RouteNative for Native<'_> {
     }
 
     fn focus(&self, tty: &str) -> Result<(FocusOutcome, u32, u32), String> {
+        #[cfg(feature = "qualification")]
+        barrier::pass(barrier::Point::BeforeFocus, tty);
         terminal::focus(
             &self
                 .context
@@ -97,6 +99,8 @@ impl RouteNative for Native<'_> {
     }
 
     fn frontmost(&self) -> Option<FrontmostApplication> {
+        #[cfg(feature = "qualification")]
+        barrier::pass(barrier::Point::BeforeReadback, "");
         let deadline = Instant::now() + FRONTMOST_SETTLE;
         loop {
             let front = bridge::frontmost_application(Duration::from_millis(500));
@@ -247,4 +251,102 @@ pub fn return_to_session(
         });
     }
     Ok(result)
+}
+
+/// Qualification only (SPEC §21.4 race witnesses): one armed route holds at a
+/// named point until the harness releases it, so a target close can be made
+/// to overlap a route in flight. The route's own logic is unchanged; only its
+/// timing is held. Release builds contain none of this.
+#[cfg(feature = "qualification")]
+pub mod barrier {
+    use std::sync::{Condvar, Mutex};
+    use std::time::{Duration, Instant};
+
+    use serde::Serialize;
+    use serde_json::json;
+
+    use crate::log;
+
+    /// A held route always resumes: a harness that never releases cannot
+    /// wedge Return-to-Agent.
+    const MAX_HOLD: Duration = Duration::from_secs(20);
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+    #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+    pub enum Point {
+        /// The one tab is proven; its focus script has not run.
+        BeforeFocus,
+        /// The focus script returned; readback and revalidation have not run.
+        BeforeReadback,
+    }
+
+    struct State {
+        armed: Option<Point>,
+        holding: Option<Point>,
+        released: bool,
+    }
+
+    static STATE: Mutex<State> = Mutex::new(State {
+        armed: None,
+        holding: None,
+        released: false,
+    });
+    static WAKE: Condvar = Condvar::new();
+
+    pub fn arm(point: Point) {
+        if let Ok(mut state) = STATE.lock() {
+            state.armed = Some(point);
+            log::info("ROUTE_BARRIER_ARMED", json!({ "point": point }));
+        }
+    }
+
+    /// Releases a held route; false when none is held.
+    pub fn release() -> bool {
+        let Ok(mut state) = STATE.lock() else {
+            return false;
+        };
+        if state.holding.is_none() {
+            return false;
+        }
+        state.released = true;
+        WAKE.notify_all();
+        true
+    }
+
+    /// Holds the calling route when `point` is armed (one shot).
+    pub fn pass(point: Point, tty: &str) {
+        let Ok(mut state) = STATE.lock() else {
+            return;
+        };
+        if state.armed != Some(point) {
+            return;
+        }
+        state.armed = None;
+        state.holding = Some(point);
+        state.released = false;
+        let reached = Instant::now();
+        log::info(
+            "ROUTE_BARRIER_REACHED",
+            json!({ "point": point, "tty": tty, "reachedAtMs": log::now_ms() }),
+        );
+        while !state.released && reached.elapsed() < MAX_HOLD {
+            let remaining = MAX_HOLD.saturating_sub(reached.elapsed());
+            state = match WAKE.wait_timeout(state, remaining) {
+                Ok((guard, _)) => guard,
+                Err(_) => return,
+            };
+        }
+        let by = if state.released { "COMMAND" } else { "TIMEOUT" };
+        state.holding = None;
+        state.released = false;
+        log::info(
+            "ROUTE_BARRIER_RELEASED",
+            json!({
+                "point": point,
+                "releasedBy": by,
+                "heldMs": reached.elapsed().as_millis() as u64,
+                "releasedAtMs": log::now_ms(),
+            }),
+        );
+    }
 }

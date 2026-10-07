@@ -182,6 +182,8 @@ export interface RendererLifecycleSnapshot {
   generation: number;
   /** The generation currently rendering, if any. */
   liveGeneration: number | null;
+  /** The current generation while its `init()` has not settled, and whether it is already retired. */
+  initPending: { generation: number; retired: boolean } | null;
   visibility: ConfirmedVisibility | null;
   reducedMotion: boolean;
   counts: LifecycleCounts;
@@ -470,6 +472,7 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
   private markRetired(entry: Generation<R, A>): void {
     entry.retired = true;
     entry.abort.abort();
+    this.emit("generation-retired", { generation: entry.id, initialized: entry.initialized });
   }
 
   private schedule(): void {
@@ -752,6 +755,7 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
       presentation: this.failure !== null ? "fallback" : this.mode2d ? "2d" : "3d",
       generation: this.generationCounter,
       liveGeneration: entry !== null && !entry.retired && entry.scene !== null ? entry.id : null,
+      initPending: entry !== null && !entry.initialized ? { generation: entry.id, retired: entry.retired } : null,
       visibility: this.visibility === null ? null : { ...this.visibility },
       reducedMotion: this.reducedMotion,
       counts: { ...this.counts },

@@ -127,6 +127,19 @@ pub fn create_office<R: Runtime>(
                     PageLoadEvent::Finished => page_loaded.store(true, Ordering::Release),
                 }
             });
+    #[cfg(feature = "qualification")]
+    {
+        let hold_app = app.clone();
+        let hold_bridge = Arc::clone(bridge);
+        builder = builder.on_web_resource_request(move |request, _response| {
+            crate::qualification::hold_resource(
+                &hold_app,
+                &hold_bridge,
+                incarnation,
+                request.uri().path(),
+            );
+        });
+    }
     builder = match bounds {
         Some(bounds) => builder
             .inner_size(bounds.width, bounds.height)

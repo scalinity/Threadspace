@@ -119,3 +119,160 @@ pub fn open_origin_probe<R: Runtime>(app: &AppHandle<R>, url: &str) -> tauri::Re
         .build()?;
     Ok(())
 }
+
+/// G15 overlap witness (SPEC §18.5, §21.4): holds the office view's next
+/// same-scheme response whose path contains an armed needle. The hook runs in
+/// Tauri's own `tauri://` handler, on the protocol's async task, after the
+/// asset is resolved and before the response is sent, so the WebView's
+/// request is genuinely outstanding while it is held. One shot; a held
+/// response always resumes after `MAX_RESOURCE_HOLD`.
+mod resource_hold {
+    use std::sync::{Condvar, Mutex};
+    use std::time::{Duration, Instant};
+
+    use serde_json::{Value, json};
+    use uuid::Uuid;
+
+    pub const MAX_RESOURCE_HOLD: Duration = Duration::from_secs(60);
+    const HISTORY: usize = 8;
+
+    pub struct Held {
+        pub hold_id: String,
+        pub path: String,
+        pub incarnation: Uuid,
+        pub held_at_ms: u128,
+    }
+
+    pub struct State {
+        pub armed: Option<String>,
+        pub held: Option<Held>,
+        pub released: bool,
+        pub history: Vec<Value>,
+    }
+
+    pub static STATE: Mutex<State> = Mutex::new(State {
+        armed: None,
+        held: None,
+        released: false,
+        history: Vec::new(),
+    });
+    pub static WAKE: Condvar = Condvar::new();
+
+    pub fn status(state: &State) -> Value {
+        json!({
+            "armed": state.armed,
+            "held": state.held.as_ref().map(|held| json!({
+                "holdId": held.hold_id,
+                "path": held.path,
+                "incarnation": held.incarnation,
+                "heldAtMs": held.held_at_ms,
+            })),
+            "history": state.history,
+        })
+    }
+
+    pub fn remember(state: &mut State, record: Value) {
+        if state.history.len() >= HISTORY {
+            state.history.remove(0);
+        }
+        state.history.push(record);
+    }
+
+    pub fn elapsed_ms(since: Instant) -> u64 {
+        since.elapsed().as_millis() as u64
+    }
+}
+
+/// Arms, releases or reports the resource hold.
+pub fn resource_hold(
+    op: threadspace_contracts::ui::ResourceHoldOp,
+    path_contains: Option<String>,
+) -> Result<Value, UiError> {
+    use threadspace_contracts::ui::ResourceHoldOp;
+    let mut state = resource_hold::STATE
+        .lock()
+        .map_err(|_| UiError::new(UiErrorCode::Internal, "resource hold poisoned"))?;
+    match op {
+        ResourceHoldOp::Arm => {
+            let needle = path_contains.unwrap_or_default();
+            let valid = (1..=64).contains(&needle.len())
+                && needle.bytes().all(|byte| {
+                    byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.' | b'/')
+                });
+            if !valid {
+                return Err(UiError::invalid(
+                    "pathContains must be 1-64 of [A-Za-z0-9-_./]",
+                ));
+            }
+            if state.held.is_some() {
+                return Err(UiError::invalid("a response is already held"));
+            }
+            state.armed = Some(needle);
+        }
+        ResourceHoldOp::Release => {
+            if state.held.is_none() {
+                return Err(UiError::new(UiErrorCode::Conflict, "no response is held"));
+            }
+            state.released = true;
+            resource_hold::WAKE.notify_all();
+        }
+        ResourceHoldOp::Status => {}
+    }
+    Ok(resource_hold::status(&state))
+}
+
+/// The `on_web_resource_request` hook of one office incarnation.
+pub fn hold_resource<R: Runtime>(
+    app: &AppHandle<R>,
+    bridge: &std::sync::Arc<crate::bridge::Bridge>,
+    incarnation: uuid::Uuid,
+    path: &str,
+) {
+    let Ok(mut state) = resource_hold::STATE.lock() else {
+        return;
+    };
+    match &state.armed {
+        Some(needle) if path.contains(needle.as_str()) => {}
+        _ => return,
+    }
+    state.armed = None;
+    state.released = false;
+    let hold_id = uuid::Uuid::new_v4().to_string();
+    let held_at_ms = now_ms();
+    state.held = Some(resource_hold::Held {
+        hold_id: hold_id.clone(),
+        path: path.to_owned(),
+        incarnation,
+        held_at_ms,
+    });
+    crate::prefs::log(
+        app,
+        "QUALIFY_RESOURCE_HELD",
+        json!({ "holdId": hold_id, "path": path, "incarnation": incarnation, "heldAtMs": held_at_ms, "incarnationActive": bridge.views.is_active(incarnation) }),
+    );
+    let started = std::time::Instant::now();
+    while !state.released && started.elapsed() < resource_hold::MAX_RESOURCE_HOLD {
+        let remaining = resource_hold::MAX_RESOURCE_HOLD.saturating_sub(started.elapsed());
+        state = match resource_hold::WAKE.wait_timeout(state, remaining) {
+            Ok((guard, _)) => guard,
+            Err(_) => return,
+        };
+    }
+    let record = json!({
+        "holdId": hold_id,
+        "path": path,
+        "incarnation": incarnation,
+        "heldAtMs": held_at_ms,
+        "releasedAtMs": now_ms(),
+        "heldMs": resource_hold::elapsed_ms(started),
+        "releasedBy": if state.released { "COMMAND" } else { "TIMEOUT" },
+        // The late response goes back to Tauri's responder after this hook;
+        // a retired view's task is no longer valid to receive it.
+        "incarnationActiveAtRelease": bridge.views.is_active(incarnation),
+    });
+    state.held = None;
+    state.released = false;
+    resource_hold::remember(&mut state, record.clone());
+    drop(state);
+    crate::prefs::log(app, "QUALIFY_RESOURCE_RELEASED", record);
+}

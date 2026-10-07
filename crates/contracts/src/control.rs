@@ -159,6 +159,11 @@ pub enum ControlRequestBody {
         /// The record's capture time; a retry repeats it, as a real capture does.
         captured_wall_ms: i64,
     },
+    /// Qualification only: release a route held at an armed route barrier
+    /// (`QualificationFault::HoldNextRoute…`). Answers `NotFound` when no
+    /// route is held.
+    #[cfg(feature = "qualification")]
+    QualifyReleaseRouteBarrier,
     /// Qualification only: remove this companion's own delivered and pending
     /// notifications from Notification Center.
     #[cfg(feature = "qualification")]
@@ -300,6 +305,12 @@ pub struct MaintenanceReport {
 pub enum QualificationFault {
     /// The next `PrepareMaintenance` fails while creating its backup.
     FailNextMaintenanceBackup,
+    /// The next Return holds after it proved its one tab and before its focus
+    /// script runs, until `QualifyReleaseRouteBarrier` (or a bounded timeout).
+    HoldNextRouteBeforeFocus,
+    /// The next Return holds after its focus script returned and before the
+    /// frontmost/device readback and post-focus revalidation.
+    HoldNextRouteBeforeReadback,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -416,5 +427,27 @@ mod tests {
             r#"{"requestId":1,"body":{"kind":"QualifyRaiseAttention","label":"x"}}"#,
         );
         assert!(result.is_err());
+    }
+}
+
+#[cfg(all(test, not(feature = "qualification")))]
+mod release_build_tests {
+    use super::*;
+
+    /// A release build cannot even parse a qualification fault, barrier or
+    /// fixture request: the variants do not exist without the feature.
+    #[test]
+    fn qualification_requests_do_not_exist_in_release_builds() {
+        for body in [
+            r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_ROUTE_BEFORE_FOCUS"}"#,
+            r#"{"kind":"QualifyReleaseRouteBarrier"}"#,
+            r#"{"kind":"QualifyAdmit","observationId":"x","capturedWallMs":1}"#,
+        ] {
+            assert!(
+                serde_json::from_str::<ControlRequestBody>(body).is_err(),
+                "{body} must not parse in a release build"
+            );
+        }
+        assert!(serde_json::from_str::<ControlRequestBody>(r#"{"kind":"YieldWriter"}"#).is_ok());
     }
 }

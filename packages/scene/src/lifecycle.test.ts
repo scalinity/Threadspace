@@ -321,11 +321,15 @@ describe("RendererLifecycle generations", () => {
     await tick();
     const first = env.renderer(0);
     expect(lifecycle.getSnapshot().state).toBe("initializing");
+    expect(lifecycle.getSnapshot().initPending).toEqual({ generation: 1, retired: false });
 
     env.visibility = { visible: false, minimized: false };
     lifecycle.setHostVisibility("hidden");
     await tick();
     expect(first.disposeCalls).toBe(0);
+    // Retired while its init is still pending: the witness the native G15 overlap asserts.
+    expect(lifecycle.getSnapshot().initPending).toEqual({ generation: 1, retired: true });
+    expect(env.reports.some((report) => report.event === "generation-retired" && report.detail?.initialized === false)).toBe(true);
 
     first.initGate.resolve();
     await lifecycle.settled();
@@ -335,6 +339,7 @@ describe("RendererLifecycle generations", () => {
     const snapshot = lifecycle.getSnapshot();
     expect(snapshot.state).toBe("hidden-disposed");
     expect(snapshot.liveGeneration).toBeNull();
+    expect(snapshot.initPending).toBeNull();
     expect(snapshot.counts.discardedLateInits).toBe(1);
   });
 

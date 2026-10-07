@@ -262,6 +262,14 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
       case "scene-workers":
         // The office lays workers out in this order, centred on the camera.
         return { workers: sceneModel(client.getSnapshot()).workers.map(({ id, state }) => ({ id, state })) };
+      case "resource-hold": {
+        // G15 overlap witness: arm, release or read the shell's hold on one
+        // same-scheme response (the shell answers NOT_IMPLEMENTED in release builds).
+        const op = input.op === "ARM" || input.op === "RELEASE" ? input.op : "STATUS";
+        const pathContains = typeof input.pathContains === "string" ? input.pathContains : null;
+        const result = await client.action({ kind: "QualifyResourceHold", op, pathContains });
+        return result.kind === "ResourceHold" ? { ...(result.state as Record<string, unknown>), atMs: Date.now() } : result;
+      }
       case "request-then-reload":
         // A slow native request is still in flight when the document is replaced.
         void client.action({ kind: "RefreshEvidence" }).catch(() => {});
