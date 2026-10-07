@@ -14,7 +14,7 @@ qualification` on the companion and desktop; the `QUALIFICATION` client role;
 | `harness/src/identity.rs` | The installed production (`Threadspace.app`) and development (`Threadspace Dev.app`) identities and every path the harness reads |
 | `harness/src/run.rs` | Bounded argv execution with a minimal environment; `osascript` with values as argv |
 | `harness/src/evidence.rs` | Evidence run directories (`<area>/<UTC>-<label>/`), JSONL appends, hashes |
-| `harness/src/native.rs` + `swift/ts-native.swift` | Accessibility window inspection/actions, traffic-light presses, notification banner press, labelled System Settings switches, synthetic drag/keys, window capture, pixel statistics and diffs (optionally cropped), owner idle time, displays, an app-scoped 1x display mode for device-pixel-ratio changes |
+| `harness/src/native.rs` + `swift/ts-native.swift` | Accessibility window inspection/actions (also by CoreGraphics window number), VoiceOver state, traffic-light presses, notification banner press, labelled System Settings switches, synthetic drag/keys, window capture, pixel statistics and diffs (optionally cropped), owner idle time, displays, an app-scoped 1x display mode for device-pixel-ratio changes |
 | `harness/src/procs.rs` | Process incarnations by kernel executable path (PID + birth), exits, working directories |
 | `harness/src/companion.rs` | The companion's verified qualification client, incarnation, relaunch waits and its JSON-lines log |
 | `harness/src/app.rs` | Packaged launch without activation (`open -g`), `tauri dev` in its own process group, hydration from the companion log, qualification reports and view commands |
@@ -60,6 +60,25 @@ $M g15-graphics prod 15      # fifteen minutes of packaged graphics
 $M g16-window prod           # window, display and accessibility matrix
 $M g12-sleep-wake prod 5     # needs six root-scheduled wakes, one spare (see below)
 ```
+
+M0C remediation runners (evidence under `evidence/M0C/remediation/`):
+
+```sh
+$M c02-supervision prod all  # supervision/admission cases A-F; `A,legacy` runs a negative control on a pre-repair build
+$M h10-terminal prod         # Terminal fullscreen/Space by window number; target close during a held route
+$M h11-graphics prod         # renderer init and tauri:// resource held pending across hide and reload
+$M h12-voiceover prod        # VoiceOver navigation and activation via VoiceOver's scripting interface
+```
+
+`h12-voiceover` needs VoiceOver's scripting enabled for the run: VoiceOver
+Utility > General > "Allow VoiceOver to be controlled with AppleScript",
+which macOS gates behind an administrator authentication, plus a one-time
+Automation consent for Terminal. The runner refuses to start without it,
+turns VoiceOver on with its System Settings switch, sends no keystroke while
+VoiceOver runs, and restores VoiceOver and output mute; turn the scripting
+setting off again afterwards (VoiceOver's welcome dialog, if enabled, is best
+off during the run). VoiceOver inspects every running app, which can upset
+other apps' fragile processes; run it on a quiet Mac.
 
 Utilities: `env`, `view-command <ch> <command> [json]`, `synthetic <ch> <count> <ms>`,
 `clear-notifications <ch>`, `resolve-qualification <ch> [reason]`, `wake-schedule <ch>`,

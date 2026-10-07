@@ -2,7 +2,7 @@
 
 **Architecture date:** October 5, 2026, America/New_York  
 **Normative architecture:** [SPEC.md](SPEC.md)  
-**Status:** M0A/M0B accepted on `8558854`; independent review of M0C `6f903c2` requires remediation. G09 FAIL, G08/G15/G16 BLOCKED and G17 BLOCKED; M0C is unmerged and M1 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the evidence and required closure.
+**Status:** M0A/M0B accepted on `8558854`. Independent review of M0C `6f903c2` required remediation; the remediation closed C-02 and H-10–H-12 on application build `89fce79` (G08/G09/G15/G16 PASS under their accepted scopes) and the candidate awaits independent re-review. M0C is unmerged and M1 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the evidence.
 
 **Target:** Daniel's Apple Silicon Mac, macOS 26 or later; Tauri 3, Rust, React/TypeScript, Three.js WebGPU/TSL, independently supervised native companion and SQLite.
 
@@ -181,7 +181,7 @@ Validate an app-owned native incarnation marker from each incoming WebView's pub
 
 **Non-goals.** Complete M1 domain logic, final office art, every terminal, consumer ChatGPT or public notarization.
 
-**Evidence and final platform exit.** Consolidated seventeen-row checklist with each A/B/C evidence reference; exact versions/declarations/dictionaries; native failure reproducers, signature tree, notification/route/readback recordings, actual backend/pixel and resource measurements. All portions required by the accepted scope must PASS and no unresolved alpha/native defect may invalidate the architecture. Accepted deferrals retain their own non-PASS native facet status. M0C PASS authorizes M1. Current review holds G17 BLOCKED for C-02 startup supervision, G08/G15 missing native preconditions and G16 VoiceOver operation; documentation corrections do not close them.
+**Evidence and final platform exit.** Consolidated seventeen-row checklist with each A/B/C evidence reference; exact versions/declarations/dictionaries; native failure reproducers, signature tree, notification/route/readback recordings, actual backend/pixel and resource measurements. All portions required by the accepted scope must PASS and no unresolved alpha/native defect may invalidate the architecture. Accepted deferrals retain their own non-PASS native facet status. M0C PASS authorizes M1. The remediation closed C-02 startup supervision, the G08/G15 native preconditions and G16 VoiceOver operation with native evidence on the repaired build; G17 awaits independent re-review.
 
 ## M1 — Journal, contracts and deterministic synthetic harness
 

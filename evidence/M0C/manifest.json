@@ -2,15 +2,15 @@
   "schema": 1,
   "milestone": "M0C",
   "title": "Platform Reliability / Recovery Qualification",
-  "verdict": "M0C REMEDIATION REQUIRED",
-  "verdictScope": "Independent review of 6f903c273eedc135123e3a7968d3c00887e8cc70. Successful native workloads on the installed 8c82212 qualification build remain credited. G09 FAIL (C-02 startup admission); G08/G15/G16 BLOCKED (missing native preconditions/VoiceOver); G17 BLOCKED. No merge or M1 authorization.",
-  "generatedAt": "2026-10-06T21:53:52Z",
+  "verdict": "M0C REMEDIATION COMPLETE — candidate pending independent re-review",
+  "verdictScope": "Remediation of the independent review at 24035492eed28c342d09c36b52aed61c2bc17a53. C-02, H-10, H-11 and H-12 are closed with automated native evidence on the repaired application build 89fce79 (sources as at c3f6de1); C-11, found during H-10, is fixed. G08, G09, G15 and G16 PASS under their accepted scopes; G17 awaits independent re-review. No merge or M1 authorization.",
+  "generatedAt": "2026-10-07T02:44:21Z",
   "baseCommit": "8558854fad5162c0182dd36d76f8f8ae5d282529",
   "branch": "m0c",
-  "applicationCommit": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb",
-  "harnessCommit": "df4c75ee0b16c5ecbdcb445e82f30329c3216d87",
-  "applicationSourcesUnchangedSince": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb; later candidate and independent-review changes do not modify apps/, packages/ or crates/",
-  "evidenceCommit": "6f903c273eedc135123e3a7968d3c00887e8cc70",
+  "applicationCommit": "89fce79d52a9cb5805ad1fa99c3e50648a3629cf",
+  "harnessCommit": "1ac8b9cda7c779e82d30d462192c780c3117d399",
+  "applicationSourcesUnchangedSince": "c3f6de135c925cefbad5e7cba2d5b771d4feca77; 89fce79 and later remediation commits change tests/native and evidence only",
+  "evidenceCommit": "the commit on m0c that adds evidence/M0C/remediation/README.md",
   "target": {
     "os": "macOS 27.2 (26B5091g)",
     "machine": "Apple M5 Pro, built-in Retina panel only",
@@ -20,15 +20,18 @@
     "tauri": "3.0.0-alpha.4",
     "three": "r186"
   },
-  "install": "evidence/M0C/install/20261006T140713Z-8c82212/",
-  "tests": "Recorded native build/tests.txt: Rust 156 passed / 0 failed; application TypeScript 33 passed. Separate Claude engine-kit suite: 33 passed and 11 mutation checks. Independent review did not rerun macOS or Rust execution.",
+  "install": "evidence/M0C/install/20261007T005438Z-89fce79/",
+  "tests": "Remediation suites (evidence/M0C/remediation/tests.txt): contracts 99 (release, incl. barrier absence) / 97 (qualification), companion core 7 (both feature sets), journal 33, relay 10, surfaces 22, desktop 17, frontend 13 + scene 24, typecheck clean; clippy clean for companion and shell in release and qualification builds. Earlier recorded native suite: build/tests.txt.",
   "gates": {
     "G01": {
       "result": "PASS",
       "evidence": [
         "evidence/M0C/install/20261006T140713Z-8c82212/",
-        "evidence/M0C/build/tests.txt"
-      ]
+        "evidence/M0C/build/tests.txt",
+        "evidence/M0C/install/20261007T005438Z-89fce79/",
+        "evidence/M0C/remediation/tests.txt"
+      ],
+      "scope": "Both identities built clean and signed from 8c82212, and again from 89fce79 for the remediation; no lockfile or toolchain change."
     },
     "G02": {
       "result": "PASS",
@@ -50,7 +53,7 @@
         "evidence/M0C/g04-stream/20261006T141347Z-prod/",
         "evidence/M0C/view-recovery/20261006T144300Z-prod/"
       ],
-      "scope": "10,000 committed/applied patches over 59,996 ms and final projection equality; 14 recovery-case assertion sets pass. Actual pending-request overlap is not established by request-then-reload and remains G15 work. C-04 finite-run shell risk accepted under D-0006, mandatory M1 exit."
+      "scope": "10,000 committed/applied patches over 59,996 ms and final projection equality; 14 recovery-case assertion sets pass. The pending-request overlap request-then-reload lacked is supplied by H-11's held tauri:// request (remediation/h11-graphics/20261007T015658Z-prod/). C-04 finite-run shell risk accepted under D-0006, mandatory M1 exit."
     },
     "G05": {
       "result": "PASS",
@@ -61,9 +64,10 @@
     "G06": {
       "result": "PASS",
       "evidence": [
-        "evidence/M0C/g06-notifications/20261006T140836Z-prod/"
+        "evidence/M0C/g06-notifications/20261006T140836Z-prod/",
+        "evidence/M0C/g06-notifications/20261007T020240Z-prod/"
       ],
-      "scope": "Ten native notification interactions plus one verified stopped-observation-to-enable handoff. Persisted-enabled unsupervised startup is a separate G09 defect, not qualified by these interactions."
+      "scope": "Ten native notification interactions plus one verified stopped-observation-to-enable handoff. Rerun on 89fce79: 11/11, including the stopped-observation cold start and the enable hand-over; persisted-enabled unsupervised startup is qualified by C-02's closure."
     },
     "G07": {
       "result": "PASS",
@@ -75,28 +79,32 @@
       "scope": "Accepted revised M0C mechanism and read-only provider-probe scope under D-0004/D-0005. Supervision admission correctness is tracked at G09."
     },
     "G08": {
-      "result": "BLOCKED",
+      "result": "PASS",
       "evidence": [
+        "evidence/M0C/remediation/h10-terminal/20261007T015957Z-prod/",
         "evidence/M0C/g08-terminal/20261006T144151Z-prod/"
       ],
       "blocked": "C-08 full Terminal.app restart: native BLOCKED/not executed here; formally deferred to isolated M15 qualification by D-0006. This does not close H-10.",
-      "requiredRemediation": "H-10: establish native fullscreen/Spaces entry and exit, and actual target-close/route overlap; repair permissive harness predicates and rerun these disposable cases."
+      "scope": "Under D-0006. H-10 closed on 89fce79: owned window by number; fullscreen entry (AX, frame, own Space), leaving its Space, an exact route back, exit and an exact route after; target closed while a route was held before focus and before readback, ordered timestamps, typed TARGET_GONE / READBACK_FAILED, focus only on the target; 0 wrong targets. C-11 fixed in 88817eb. Earlier G08 cases remain credited."
     },
     "G09": {
-      "result": "FAIL",
+      "result": "PASS",
       "evidence": [
+        "evidence/M0C/remediation/c02-supervision/20261007T020101Z-prod/",
+        "evidence/M0C/remediation/c02-supervision/negative-control-8c82212/",
+        "evidence/M0C/g09-companion/20261007T020340Z-prod/",
         "evidence/M0C/g09-companion/20261006T141203Z-prod/"
       ],
-      "requiredRemediation": "C-02 reopened: persisted observation_enabled is admitted at startup even on a recognized unsupervised LaunchServices instance. Require positive login-item ownership/service authorization at startup and enable; retain control-only notification handling and verify handoff, disabled/unavailable service and crash/notification race natively.",
-      "scope": "The six recorded UI-independence/companion-relaunch scenarios succeeded; they do not test or close the persisted-enabled startup bypass. Exclusive writer locking remains intact."
+      "scope": "C-02 closed (d0598a5): positive LOGIN_ITEM provenance, admission = preference and supervision and no maintenance and awake, control-only unsupervised writers, YieldWriter claim by the login item's companion. Cases A-F pass on 89fce79; negative controls on 8c82212 reproduce the defect; the six independence/crash-relaunch scenarios pass again on 89fce79."
     },
     "G10": {
       "result": "PASS",
       "evidence": [
         "evidence/M0C/g10-sqlite-live/20261006T140951Z-prod/",
-        "evidence/M0C/sqlite/"
+        "evidence/M0C/sqlite/",
+        "evidence/M0C/g10-sqlite-live/20261007T020446Z-prod/"
       ],
-      "scope": "57,799 acknowledged receipts rechecked with zero missing across five live process-crash rounds; total may include post-relaunch admissions. Separate deterministic commit/ACK crash suite supplies boundary proof. No power-loss claim."
+      "scope": "57,799 acknowledged receipts rechecked with zero missing across five live process-crash rounds; total may include post-relaunch admissions. Separate deterministic commit/ACK crash suite supplies boundary proof. No power-loss claim. Rerun on 89fce79: 58,895 acknowledged, 0 lost over five rounds; second writer refused (75); idempotent retry ALREADY_COMMITTED at its cursor."
     },
     "G11": {
       "result": "PASS",
@@ -128,29 +136,30 @@
       ]
     },
     "G15": {
-      "result": "BLOCKED",
+      "result": "PASS",
       "evidence": [
-        "evidence/M0C/g15-graphics/20261006T144536Z-prod/"
+        "evidence/M0C/g15-graphics/20261006T144536Z-prod/",
+        "evidence/M0C/remediation/h11-graphics/20261007T015658Z-prod/"
       ],
-      "scope": "906.054 seconds packaged graphics; 111/123 live canvas pairs exceed threshold and all 123 differ; all nine sampled minute checks (minutes 7–15) match the journal. Normal hide/rebuild, injected loss and reload/recreation evidence stands.",
-      "requiredRemediation": "H-11: native hide happened 544 ms after renderer initialization; no outstanding resource witness exists at reload. Add targeted real-init and owned-request pending barriers, native retirement, release and safe late-result/disposal/pixel assertions. Preserve native/GPU versus synthetic/injected labels."
+      "scope": "906.054 s packaged run credited (111/123 live canvas pairs above threshold, all 123 differ, minutes 7-15 match the journal). H-11 closed on 89fce79 with qualification-only barriers: renderer retired while its WebGPU init was pending, late init discarded, no hidden scheduling, fresh attested WebGPU and changing pixels; view retired by reload while its tauri:// request was outstanding, late response to a retired incarnation, new view hydrated, nothing consumed late. Native/GPU work is held, not injected."
     },
     "G16": {
-      "result": "BLOCKED",
+      "result": "PASS",
       "evidence": [
-        "evidence/M0C/g16-window/20261006T140724Z-prod/"
+        "evidence/M0C/g16-window/20261006T140724Z-prod/",
+        "evidence/M0C/remediation/h12-voiceover/20261007T023154Z-prod/"
       ],
       "manualExternalRequired": "C-09 physical external-monitor unplug/reconnect: MANUAL_EXTERNAL_REQUIRED/not executed; formally deferred to M15 hardware qualification by D-0006. This does not close H-12.",
-      "scope": "Native window, DPR/drawing-buffer, keyboard, AX labels and Reduce Motion checks pass on the built-in display. AX inspection is not actual VoiceOver operation.",
-      "requiredRemediation": "H-12: automated native VoiceOver activation, cursor navigation to labelled controls, safe activation and navigation after a window transition; restore prior system state."
+      "scope": "Under D-0006. H-12 closed on 89fce79: VoiceOver navigated its cursor to the labelled 2D view toggle (VoiceOver's own text) and activated it (3D to 2D), then after fullscreen enter/exit again (2D to 3D); VoiceOver, its scripting and welcome settings and output mute restored. Built-in-display window, DPR, keyboard, AX and Reduce Motion checks remain credited."
     },
     "G17": {
-      "result": "BLOCKED",
+      "result": "PENDING_INDEPENDENT_REVIEW",
       "evidence": [
         "evidence/M0C/gate-checklist.md",
-        "evidence/M0C/failure-ledger.md"
+        "evidence/M0C/failure-ledger.md",
+        "evidence/M0C/remediation/README.md"
       ],
-      "scope": "M0C REMEDIATION REQUIRED; DO NOT MERGE; do not start M1. Resolve C-02 and H-10/H-11/H-12, record affected native regressions on the repaired exact build, then obtain independent review."
+      "scope": "Candidate pending independent re-review: the four required closures and affected regressions pass on 89fce79. Not a PASS until re-review; does not authorize merge or M1."
     }
   },
   "maintenanceOrdering": {
@@ -165,7 +174,9 @@
   },
   "defectsFixed": [
     "C-01 device pixel ratio (7e8043d): accepted",
-    "C-03 keyboard focus after fullscreen/zoom (8c82212): accepted"
+    "C-03 keyboard focus after fullscreen/zoom (8c82212): accepted",
+    "C-02 persisted-enabled unsupervised admission (d0598a5): closed by remediation/c02-supervision/20261007T020101Z-prod/",
+    "C-11 Return readback during a Space switch (88817eb): found by H-10, verified by remediation/h10-terminal/20261007T015957Z-prod/"
   ],
   "risks": [
     "C-04: one retired native shell per recovery; 18 to 28 across ten repeated recoveries; reproduction note reports about 33 KB/recovery and bounded WebContent. Lifetime shell count is not bounded. D-0006 accepts this only with mandatory M1 exit closure: nativeWindowShells.after == nativeWindowShells.before after destruction/quiescence, stable content/cache resources and preserved recovery invariants.",
@@ -176,7 +187,7 @@
     "C-09 display disconnect": "MANUAL_EXTERNAL_REQUIRED/not executed; accepted D-0006 deferral to M15 hardware qualification",
     "C-10 G12 sleep/wake": "Final five cycles independently accepted. Earlier runs are superseded harness evidence, not passes; the first attempt's short-cycle cause is not proven."
   },
-  "harness": "tests/native/README.md (threadspace-m0c runners, ts-native helper)",
+  "harness": "tests/native/README.md (threadspace-m0c runners incl. c02-supervision, h10-terminal, h11-graphics, h12-voiceover; ts-native helper)",
   "commits": [
     "8ac3405 Add M0C qualification crate skeletons for the Codex probe and SQLite crash runner",
     "3284077 Add M0C recovery paths: bounded views, maintenance gates, view recreation",
@@ -212,14 +223,28 @@
     "89d8572 Capture the on-screen office window; measure retired window shells",
     "0c24b4f Record M0C native qualification evidence on 8c82212",
     "df4c75e Hold the Mac awake until each G12 sleep and tie each wake to its scheduled time",
-    "6f903c2 Record G12 sleep/wake qualification on 8c82212"
+    "6f903c2 Record G12 sleep/wake qualification on 8c82212",
+    "2403549 Record independent M0C review and required remediation",
+    "d0598a5 Require positive login-item supervision before capture admission",
+    "a6da2f1 Add qualification-only route, renderer-init and resource barriers",
+    "4c1d1c9 Add the C-02 supervision runner with a labelled negative-control mode",
+    "88817eb Let Return's readback settle while macOS shows another Space",
+    "d23ae65 Add the H-10 Terminal runner with window-number witnesses",
+    "c3f6de1 Gate renderer init on GPU.prototype and count the calls it sees",
+    "89fce79 Add the H-11 graphics overlap runner",
+    "2861825 Add a keystroke-driven VoiceOver smoke runner (superseded attempts)",
+    "0880017 Measure H-11 pending work as a delta and detect outside interference",
+    "2df7316 Match a fullscreen frame to the camera-housing band, as measured",
+    "0ac5c2e Write the C-02 runner's companion log copy without private paths",
+    "ec8fd26 Drive the H-12 VoiceOver smoke through VoiceOver's scripting interface",
+    "1ac8b9c Name the C-02 sampler's sample type"
   ],
   "nextMilestoneStarted": false,
   "captures": "Committed: a curated set (official G15 first/last per phase and every tenth sustained frame, first/last G02 launch per context, every image an ATTEMPT-NOTE names, all other official captures). The full 612 captures (327 MB) stay on disk under evidence/M0C/captures-full/ (git-ignored). Every capture's pixel statistics and diffs are in the committed timelines.",
   "originalManifestGeneratedAt": "2026-10-06T15:10:00Z",
   "reviewedCandidateCommit": "6f903c273eedc135123e3a7968d3c00887e8cc70",
   "defectsReopened": [
-    "C-02: d602c6b repairs the recorded stopped-observation enable handoff, but startup bypasses supervision when the persisted preference is enabled; G09 FAIL"
+    "C-02: reopened by independent review of 6f903c2; closed by the remediation (d0598a5)"
   ],
   "acceptedDecisions": [
     "D-0001",
@@ -263,5 +288,51 @@
       "status": "INVALID_JSONL",
       "qualificationUse": "Excluded: only physical lines 1–45 parse; lines 46–119 are 37 malformed object/null sample groups, and changed geometry has no live window witness. Preserve raw bytes. The owned final 20261006T140724Z-prod/checks.jsonl supplies DPR/window evidence."
     }
-  ]
+  ],
+  "remediationBase": "24035492eed28c342d09c36b52aed61c2bc17a53",
+  "applicationSourcesCommit": "c3f6de135c925cefbad5e7cba2d5b771d4feca77",
+  "previousInstall": "evidence/M0C/install/20261006T140713Z-8c82212/",
+  "observations": [
+    "C-12: an asset received before its generation's scene exists is disposed at retirement without moving an asset counter (diagnostic accounting only)"
+  ],
+  "remediation": {
+    "readme": "evidence/M0C/remediation/README.md",
+    "builds": {
+      "intermediate": "a6da2f144308a31dde5d009d1681cf8a147c9840 (evidence/M0C/install/20261007T003651Z-a6da2f1/, superseded runs only)",
+      "candidate": "89fce79d52a9cb5805ad1fa99c3e50648a3629cf (sources c3f6de135c925cefbad5e7cba2d5b771d4feca77)"
+    },
+    "citedRuns": {
+      "C-02": "evidence/M0C/remediation/c02-supervision/20261007T020101Z-prod/",
+      "H-10": "evidence/M0C/remediation/h10-terminal/20261007T015957Z-prod/",
+      "H-11": "evidence/M0C/remediation/h11-graphics/20261007T015658Z-prod/",
+      "H-12": "evidence/M0C/remediation/h12-voiceover/20261007T023154Z-prod/"
+    },
+    "negativeControls": "evidence/M0C/remediation/c02-supervision/negative-control-8c82212/ (cases A and E on the pre-repair build reproduce C-02)",
+    "regressions": {
+      "G06": "evidence/M0C/g06-notifications/20261007T020240Z-prod/ (11/11)",
+      "G09": "evidence/M0C/g09-companion/20261007T020340Z-prod/ (6/6)",
+      "G10": "evidence/M0C/g10-sqlite-live/20261007T020446Z-prod/ (0 lost)",
+      "suites": "evidence/M0C/remediation/tests.txt"
+    },
+    "notRerun": "G12 sleep/wake, the 15-minute G15 workload and the full M0B routing matrix: unaffected by the changed code",
+    "supersededRuns": "evidence/M0C/remediation/attempts/ (each with ATTEMPT-NOTE.md)",
+    "ownerInteraction": "One administrator authentication to enable VoiceOver's AppleScript control and one to disable it again, and a one-time Automation consent; all else automated",
+    "ownerEnvironmentSideEffects": "H-14: while VoiceOver ran, Unreal Engine's crash reporter agent crashed twice and VoiceOver's Tutorial once consumed injected keystrokes; alerts dismissed, Tutorial closed, owner settings restored and recorded. A forge process aborted during the cited H-12 run; no causal link established.",
+    "publicEvidencePrivacy": "All evidence/M0C files rescanned before publication; eight logout-menu AX labels pseudonymized to [account]; remediation companion logs and VoiceOver traces carry no home paths or session titles; window captures showing session titles kept in git-ignored captures-full; originals kept outside the repository",
+    "commits": [
+      "d0598a5 Require positive login-item supervision before capture admission",
+      "a6da2f1 Add qualification-only route, renderer-init and resource barriers",
+      "4c1d1c9 Add the C-02 supervision runner with a labelled negative-control mode",
+      "88817eb Let Return's readback settle while macOS shows another Space",
+      "d23ae65 Add the H-10 Terminal runner with window-number witnesses",
+      "c3f6de1 Gate renderer init on GPU.prototype and count the calls it sees",
+      "89fce79 Add the H-11 graphics overlap runner",
+      "2861825 Add a keystroke-driven VoiceOver smoke runner (superseded attempts)",
+      "0880017 Measure H-11 pending work as a delta and detect outside interference",
+      "2df7316 Match a fullscreen frame to the camera-housing band, as measured",
+      "0ac5c2e Write the C-02 runner's companion log copy without private paths",
+      "ec8fd26 Drive the H-12 VoiceOver smoke through VoiceOver's scripting interface",
+      "1ac8b9c Name the C-02 sampler's sample type"
+    ]
+  }
 }
