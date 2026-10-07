@@ -8,7 +8,8 @@
 //   ts-native ax-window <pid> [title]
 //   ts-native window-state <pid> <window-number>       (CoreGraphics facts plus the AX window with exactly that frame)
 //   ts-native ax-action-number <pid> <window-number> <fullscreen|exit-fullscreen|raise>
-//   ts-native voiceover                                (VoiceOver on/off and the text of its windows, e.g. the caption panel)
+//   ts-native voiceover                                (VoiceOver on/off, its on-screen windows such as its cursor, and their AX text)
+//   ts-native ax-find <pid> <label>                    (frame of the first element whose label contains <label>)
 //   ts-native ax-action <pid> <minimize|unminimize|fullscreen|exit-fullscreen|raise|press-close|press-minimize|press-zoom|press-fullscreen|set-frame x y w h> [title]
 //   ts-native ax-tree <pid> [max-depth]
 //   ts-native notification <find|press> <needle> [timeout-seconds]
@@ -206,20 +207,25 @@ func ownLabel(_ element: AXUIElement) -> String {
 }
 
 /// A switch labelled `needle`: by its own title/description, or (a System
-/// Settings row) an unlabelled switch directly after a static text that
-/// reads exactly `needle`.
+/// Settings row) an unlabelled switch after a run of static texts, one of
+/// which reads exactly `needle` (a row's title can be followed by its
+/// description and hint before the switch).
 func findLabelled(_ element: AXUIElement, _ needle: String, depth: Int = 0) -> AXUIElement? {
     guard depth < 30 else { return nil }
     if isSwitch(element) && ownLabel(element).localizedCaseInsensitiveContains(needle) { return element }
     let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
-    var rowLabel: String?
+    var rowTexts: [String] = []
     for child in children {
         if isSwitch(child), ownLabel(child).trimmingCharacters(in: .whitespaces).isEmpty,
-           rowLabel?.caseInsensitiveCompare(needle) == .orderedSame {
+           rowTexts.contains(where: { $0.caseInsensitiveCompare(needle) == .orderedSame }) {
             return child
         }
         let role: String = attribute(child, kAXRoleAttribute) ?? ""
-        rowLabel = role == "AXStaticText" ? attribute(child, kAXValueAttribute) : nil
+        if role == "AXStaticText" {
+            if let text: String = attribute(child, kAXValueAttribute) { rowTexts.append(text) }
+        } else {
+            rowTexts = []
+        }
         if let hit = findLabelled(child, needle, depth: depth + 1) { return hit }
     }
     return nil
@@ -392,7 +398,28 @@ case "voiceover":
         }
     }
     report["windows"] = windows
+    // VoiceOver draws its cursor (and caption panel) as its own windows.
+    let list = (CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]]) ?? []
+    let pids = Set(running.map { Int($0.processIdentifier) })
+    report["screenWindows"] = list.compactMap { info -> [String: Any]? in
+        guard let owner = info[kCGWindowOwnerPID as String] as? Int, pids.contains(owner) else { return nil }
+        return ["layer": info[kCGWindowLayer as String] as? Int ?? 0, "bounds": rect(cgBounds(info)), "name": info[kCGWindowName as String] as? String ?? ""]
+    }
     emit(report)
+
+case "ax-find":
+    guard args.count >= 3, let pid = pid_t(args[1]), AXIsProcessTrusted() else { usage() }
+    func search(_ element: AXUIElement, depth: Int) -> AXUIElement? {
+        guard depth < 40 else { return nil }
+        let label = [kAXTitleAttribute, kAXDescriptionAttribute, "AXLabel"].compactMap { attribute(element, $0) as String? }.joined(separator: " ")
+        if label.contains(args[2]) { return element }
+        let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
+        for child in children { if let hit = search(child, depth: depth + 1) { return hit } }
+        return nil
+    }
+    guard let hit = search(AXUIElementCreateApplication(pid), depth: 0) else { emit(["pid": pid, "label": args[2], "found": false], ok: false) }
+    emit(["pid": pid, "label": args[2], "found": true, "role": (attribute(hit, kAXRoleAttribute) as String?) ?? "", "frame": rect(frame(hit)),
+          "pressed": (attribute(hit, kAXValueAttribute) as NSNumber?)?.intValue ?? -1])
 
 case "ax-tree":
     guard args.count >= 2, let pid = pid_t(args[1]), AXIsProcessTrusted() else { usage() }

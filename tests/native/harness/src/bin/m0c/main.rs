@@ -30,6 +30,7 @@
 //!   threadspace-m0c c02-supervision <prod|dev> [all|A,B,C,D,E]
 //!   threadspace-m0c h10-terminal <prod|dev>
 //!   threadspace-m0c h11-graphics prod
+//!   threadspace-m0c h12-voiceover prod
 
 mod bridge_gates;
 mod cleanup;
@@ -43,6 +44,7 @@ mod power;
 mod service_gates;
 mod supervision;
 mod terminal_gates;
+mod voiceover;
 mod window_gates;
 
 use std::process::ExitCode;
@@ -83,6 +85,7 @@ fn main() -> ExitCode {
         "g08-terminal" => terminal_gates::negatives(&ctx),
         "h10-terminal" => terminal_gates::remediation(&ctx),
         "h11-graphics" => graphics_overlap::overlap(&ctx),
+        "h12-voiceover" => voiceover::smoke(&ctx),
         "g06-notifications" => notifications::lifecycle(&ctx),
         "g05-denied" => notifications::denied(&ctx),
         "g13-renderer" => graphics::renderer(&ctx),
