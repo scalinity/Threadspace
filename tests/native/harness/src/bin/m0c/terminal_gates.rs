@@ -526,10 +526,13 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
 }
 
 /// Every Terminal window's ID and selected-tab TTY, and the front window.
-const WINDOW_SELECTION: &str = r#"tell application "Terminal"
-  set out to "front" & tab & (id of front window) & linefeed
+/// The separator is defined outside the `tell`: inside it, `tab` names
+/// Terminal's tab class and would be written out as the word "tab".
+const WINDOW_SELECTION: &str = r#"set separator to character id 9
+tell application "Terminal"
+  set out to "front" & separator & (id of front window) & linefeed
   repeat with w in windows
-    set out to out & (id of w) & tab & (tty of selected tab of w) & linefeed
+    set out to out & (id of w) & separator & (tty of selected tab of w) & linefeed
   end repeat
   return out
 end tell"#;

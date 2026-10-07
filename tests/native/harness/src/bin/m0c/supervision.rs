@@ -256,11 +256,6 @@ fn session_journaled(ctx: &Ctx, native_session_id: &str) -> Value {
     }
 }
 
-pub(crate) fn press(ctx: &Ctx, label: &str) -> Value {
-    let _gui = ctx.gui("c02 notification press");
-    press_held(ctx, label)
-}
-
 /// Presses a banner while the caller already holds the shared GUI lock, so
 /// that waiting for the lock cannot outlast the banner.
 pub(crate) fn press_held(ctx: &Ctx, label: &str) -> Value {
@@ -668,6 +663,8 @@ fn case_a_b(
 
     // A1. An outstanding item whose banner is on screen.
     let label_a = format!("c02-a-{}", &uuid::Uuid::new_v4().to_string()[..6]);
+    // One GUI segment from the banner's submission to its press.
+    let gui = ctx.gui("c02 A banner");
     let (attention_a, request_a) = raise(ctx, &label_a)?;
     open_attention.push(attention_a.clone());
     let submitted = log.wait(
@@ -702,7 +699,8 @@ fn case_a_b(
 
     // A3. The click cold-starts the companion through LaunchServices.
     let since = threadspace_harness::now_ms();
-    let pressed = press(ctx, &label_a);
+    let pressed = press_held(ctx, &label_a);
+    drop(gui);
     let Some(cold) = wait_new_companion(ctx, &[supervised.pid], 30) else {
         return record(
             run_dir,
@@ -807,6 +805,7 @@ fn case_a_b(
     //     returns; it must reach the UI whichever companion delivers it.
     app.stop_all();
     let label_b = format!("c02-b-{}", &uuid::Uuid::new_v4().to_string()[..6]);
+    let gui = ctx.gui("c02 B banner");
     let (attention_b, _) = raise(ctx, &label_b)?;
     open_attention.push(attention_b.clone());
     let submitted_b = log.wait(
@@ -815,7 +814,8 @@ fn case_a_b(
         20,
     );
     let since_b = threadspace_harness::now_ms();
-    let pressed_b = press(ctx, &label_b);
+    let pressed_b = press_held(ctx, &label_b);
+    drop(gui);
     let queued_b = log.wait(
         "NOTIFICATION_INSPECTOR",
         &|l| l["pid"] == pid && l["attentionId"] == attention_b.as_str(),
