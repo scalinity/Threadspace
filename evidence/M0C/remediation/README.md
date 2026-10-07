@@ -1,6 +1,6 @@
 # M0C remediation: C-02, C-11, H-10, H-11, H-12
 
-Focused remediation of the independent review recorded at `24035492eed28c342d09c36b52aed61c2bc17a53`, independently re-reviewed at candidate `ccdfc8a38773aac01121601bde6121dd1760b6ea`, finally remediated from `02947d8dd3a627afef945a0d57497095cfbbae20`, and, after the final acceptance review of `46dae33d96809e6bfd3979bb3663952c6a627ec8`, repaired once more for durable ownership and the notification receipt deadline. **M0C DURABLE-OWNERSHIP / RECEIPT-DEADLINE REMEDIATION COMPLETE — candidate pending final independent acceptance:** H-10–H-12 were closed on `89fce79`; C-02 and C-11 are closed on application build `6cfac57` ([durable ownership and receipt deadline](#durable-ownership-and-receipt-deadline)). Valid native workloads remain credited. M0C stays unmerged; M1 has not started. D-0004–D-0006, C-04, C-12 and C-13 are unchanged.
+Focused remediation of the independent review recorded at `24035492eed28c342d09c36b52aed61c2bc17a53`, independently re-reviewed at candidate `ccdfc8a38773aac01121601bde6121dd1760b6ea`, finally remediated from `02947d8dd3a627afef945a0d57497095cfbbae20`, after the final acceptance review of `46dae33d96809e6bfd3979bb3663952c6a627ec8`, repaired once more for durable ownership and the notification receipt deadline, and, after the independent acceptance review of `eb5eb0d6343943f819173459e99e6010e76c70ab`, repaired for its one remaining blocker. **M0C C-02B CONSUMPTION RETRY REMEDIATION COMPLETE — candidate pending final independent acceptance:** H-10–H-12 were closed on `89fce79`; C-02 and C-11 on application build `6cfac57` ([durable ownership and receipt deadline](#durable-ownership-and-receipt-deadline)); C-02B's repeated consumption on application build `fd02d6a` ([consumption retry](#consumption-retry-c-02b)). Valid native workloads remain credited. M0C stays unmerged; M1 has not started. D-0004–D-0006, C-04, C-12 and C-13 are unchanged.
 
 ## Builds under test
 
@@ -10,11 +10,68 @@ Focused remediation of the independent review recorded at `24035492eed28c342d09c
 | `a6da2f1` | C-02 repair + qualification barriers | intermediate; superseded runs only | `../install/20261007T003651Z-a6da2f1/` |
 | `89fce79` | application sources as at `c3f6de1` (adds the Return readback settle and the `GPU.prototype` init gate); clean tree | every H-10–H-12 and first C-02 run | `../install/20261007T005438Z-89fce79/` |
 | `ab11b8a` | C-11 `fdee5ad`, C-02 `1270175`, SPEC `ab11b8a`; clean tree, no lockfile or toolchain change | first final remediation runs | `../install/20261007T041247Z-ab11b8a/` |
-| **`6cfac57`** | C-11 `75de6bb`, C-02/C-11 `81d72e3`, SPEC `6cfac57`; clean tree, no lockfile or toolchain change | **every durable-ownership / receipt-deadline run** | `../install/20261007T064228Z-6cfac57/` |
+| `6cfac57` | C-11 `75de6bb`, C-02/C-11 `81d72e3`, SPEC `6cfac57`; clean tree, no lockfile or toolchain change | every durable-ownership / receipt-deadline run | `../install/20261007T064228Z-6cfac57/` |
+| **`fd02d6a`** | C-02B `15ccc21`, SPEC `fd02d6a`; clean tree, no lockfile or toolchain change | **every consumption-retry run** | `../install/20261007T075507Z-fd02d6a/` |
 
 Candidate executables (sha256): prod outer `83508af5…`, prod companion `a384f366…`, dev outer `8fbf7de1…`, dev companion `0a24a986…` (full values, signatures with the certificate holder redacted, build info and the post-install supervision smoke of both identities are in the install record). No lockfile or toolchain changed since `8c82212`.
 
 Application commits: `d0598a5` (C-02 supervision), `a6da2f1` (qualification-only barriers), `88817eb` (C-11 Return readback settle), `c3f6de1` (init gate on `GPU.prototype`). Harness commits: `4c1d1c9`, `d23ae65`, `89fce79`, `2861825`, `0880017`, `2df7316`, `0ac5c2e`, `ec8fd26`, `1ac8b9c`.
+
+## Consumption retry (C-02B)
+
+The independent acceptance review of `eb5eb0d` accepted C-02A, C-02C, C-11, the internal route deadline, H-10–H-12, qualification isolation, privacy, G12 and D-0004–D-0006, and found one blocker: a repeated `IntentConsumed(X)` could answer `Done` while X's durable removal was still uncommitted (G06/G09 FAIL, G17 BLOCKED). It is repaired in application build `fd02d6a` (repair `15ccc21`, SPEC `fd02d6a`): prod outer `20fd6df5…`, prod companion `4d1d36e1…`, dev outer `3abf0e4d…`, dev companion `6fae3cf0…`. Full values, signatures with the certificate holder redacted, build info, lockfile hashes (unchanged since `6cfac57`) and both identities' supervision smoke are in `../install/20261007T075507Z-fd02d6a/`. Harness `f7661b6`.
+
+### Root cause
+
+`Writer::consume` removed X from memory, remembered it as consumed and committed the backlog without it. When that commit failed it answered `Unavailable` and set one flag, `backlog_stale`, meaning that some consumed intent was still on disk, not which. A repeated `IntentConsumed(X)` then found X absent from memory and took the missing-intent branch, which answered `Done` unconditionally: absent from memory was taken as removed from the committed backlog. A writer killed before any successful commit left X on disk for the next writer to reload, after `Done` had been reported. The shell sends `IntentConsumed` once per application and again for a re-delivered intent it already applied, without retrying on `Unavailable`; a repeat can come from any client, so the reply itself must be truthful.
+
+### Repair (`15ccc21`)
+
+The writer keeps `unrecorded`, the IDs of consumed intents the committed backlog still lists; an ID joins it when its removal commit fails. Every backlog commit is written from the current in-memory state, which excludes every consumed intent, so any successful commit (a consumption, an acceptance or Release) records all of them and empties the set; the set can never exceed the backlog's 256. `IntentConsumed(X)` is answered by the state of X:
+
+| State of X | Result |
+| --- | --- |
+| Pending in memory | Removed and remembered as consumed; the backlog commits without it: `Done` if that commit succeeds, otherwise `Unavailable` and X joins `unrecorded` |
+| Consumed, removal uncommitted (in `unrecorded`) | The backlog is committed again from the current state: `Done` only if it succeeds, otherwise `Unavailable` |
+| Consumed and recorded, or never held by this store | `Done` without a write (unchanged) |
+
+A retry writes the current pending intents and consumed IDs at the next revision; the writer is the store's only committer, so no older snapshot can be written over a newer revision. Release still retries the removal while the set is not empty. `INTENT_CONSUMED` and `CONSUMPTION_NOT_RECORDED` carry `retry`. The storage semantics are unchanged (failures before the rename keep the previous file; a failed directory sync is committed but power-loss-unconfirmed; power loss is not qualified). SPEC §18.9 states that a consumption is reported done only once its removal commits.
+
+### Writer tests (`c02-consumption-retry/unit/`)
+
+Five tests drive the writer's own `IntentConsumed` handler on a temporary store, inject backlog rename failures into the real intent store, and read the committed backlog (revision, pending IDs, consumed IDs) from disk after every reply; a restart is a new writer built from what the store holds, as a writer process starts. All pass on the candidate, with every agent suite in both feature sets and clippy clean (`unit/tests-candidate.txt`).
+
+| Test | Sequence and result |
+| --- | --- |
+| Exact counterexample | X committed (revision 1). Two rename failures: first consumption `Unavailable`, backlog `(1, [X])`; repeat under a new request ID, no successful commit in between: `Unavailable`, backlog `(1, [X])`. Storage works: repeat commits, `Done`, backlog `(2, [])`, X remembered as consumed; a restart loads nothing. |
+| Restart before commit | X committed; consumption and repeat both `Unavailable`, backlog `(1, [X])`; the writer is dropped with no Release; the claimant loads `[X]`; its consumption is `Done`, backlog `(2, [])`; the next restart loads nothing. |
+| Retry success | A hydrated view receives X once. One rename failure: consumption `Unavailable`; the repeat retries, commits and is `Done`, backlog `(2, [])`; the view was sent X exactly once; a restart loads nothing. |
+| Already recorded | X consumed (`Done`, revision 2). With a rename failure armed, a repeat is `Done` without a write (file bytes and revision unchanged), as is an ID the store never held. |
+| X/Y/Z | X, Y, Z committed (revision 3). X's removal fails: `(3, [X, Y, Z])`; its repeat commits from the current state: `(4, [Y, Z])`, consumed `[X]`. Y's removal fails; W is accepted after it at revision 5, written from the current state: `(5, [Z, W])`; Y's repeat is `Done` without writing an older snapshot: still `(5, [Z, W])`, consumed `[X, Y]`; a restart loads `[Z, W]` in order. |
+
+**Negative controls** (`unit/negative-control.sh 15ccc21 eb5eb0d <scratch>`, output `unit/negative-control.txt`), each in a disposable worktree: the candidate with the guard arm removed, and the base `eb5eb0d` consume with the same tests appended. Both fail the four counterexample tests: the repeat answers `Done` while the committed backlog is `(1, [X])`; the killed-writer case answers `[Unavailable, Done]` before the kill; the retry case and the X/Y/Z case leave X on disk. The already-recorded test passes on both, as it should.
+
+### Native closure (`c02-consumption-retry/20261007T075719Z-prod/`)
+
+`c02-consume-retry` on the installed prod identity: the login item was unregistered and a banner click cold-started an unsupervised writer (pid 39486), whose responses are inspector intents; the UI was held unhydrated (stopped before connecting), so the harness was the only consumer. It sent each `IntentConsumed` through the companion's control server on one connection (request IDs numbered from 1) and read the store after every reply. Intents: X `7284865b-126b-4c41-8fdb-b32b75cc6d8a`, Y `3df4a9a9-ff6a-4264-bc15-cb34c95d3b5a`, Z `bd3a87ef-11c4-4f23-bdf0-7cbf5379a670`, K `ea31a4c5-f33e-43c2-a7b6-65064ff5f5d8`. Initial committed backlog: revision 182, `[X, Y, Z, K]`, sha256 `179c1024…`.
+
+| Step | Request | Reply | Committed backlog after |
+| --- | --- | --- | --- |
+| Arm backlog `RENAME` ×2; consume X | 1 | `Unavailable` (`CONSUMPTION_NOT_RECORDED`, retry false) | 182, `[X, Y, Z, K]`, `179c1024…` |
+| Repeat X, no successful commit in between | 2 | `Unavailable` (`CONSUMPTION_NOT_RECORDED`, retry true) | 182, unchanged, `179c1024…` |
+| Repeat X, storage works | 3 | `Done` (`INTENT_CONSUMED`, retry true, revision 183) | 183, `[Y, Z, K]`, `ac96e305…` |
+| Repeat X again | 4 | `Done`, no write | 183, unchanged, `ac96e305…` |
+| Arm backlog `RENAME` ×2; consume K | 5 | `Unavailable` (retry false) | 183, `[Y, Z, K]` |
+| Repeat K | 6 | `Unavailable` (retry true) | 183, `[Y, Z, K]` |
+| SIGKILL the writer (exited in 53 ms); register the login item | | claimant pid 43552 loaded `[Y, Z, K]` at revision 183 | |
+| Claimant: consume K, Y, Z | 1, 2, 3 (new connection) | `Done` each | 184 `[Y, Z]`; 185 `[Z]`; 186 `[]` |
+| SIGKILL the login item; launchd relaunched pid 48753 | | loaded `[]` at revision 186 | |
+
+The UI then resumed and hydrated on the relaunched writer: none of X, Y, Z or K was delivered again and none was applied. No temporary file remained; one writer and one effective observer throughout. Traces: `traces.jsonl` (with each line's `retry`).
+
+### Regressions on `fd02d6a`
+
+`c02-durable` A and B (`c02-durable-ownership/20261007T075854Z-prod/`): 40 responses accepted, 0 refused, loaded in order and applied exactly once in acceptance order through a 32-intent window; B1–B3 and B5 pass; B4 (consumption failure, Release, claimant) passes on the set-based stale check: its Release retried and reported the backlog stale, the claimant loaded the intent, the shell skipped it and the removal converged; applied once. G06 11/11 native banner interactions pass (`../g06-notifications/20261007T080003Z-prod/`). G09 6/6 pass, including the companion crash relaunched by the system with one writer (`../g09-companion/20261007T080102Z-prod/`). Not rerun, as unaffected: G10 (the journal and the intent store are unchanged), `c02-durable` C and the handoff suite (no consumption or Release ordering change beyond B4/B5), supervision, G12, C-11, H-10–H-12, VoiceOver, the sustained G15 workload and the M0B 30-route matrix. No owner action was needed; Terminal was not restarted. Privacy: all 876 M0C files rescanned; only milestone names match; no home path, account name, email or credential pattern; no redaction was needed.
 
 ## Durable ownership and receipt deadline
 

@@ -1,7 +1,7 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** M0A/M0B accepted on `8558854`; the M0C candidate on application build `6cfac57` closes C-02 (accepted notification work durably owned until its lifecycle completes) and C-11 (the complete Return deadline, from receipt) and awaits final independent acceptance before merge or M1. H-10–H-12 are closed. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
+**Status:** M0A/M0B accepted on `8558854`; the M0C candidate on application build `fd02d6a` closes C-02 (accepted notification work durably owned until its lifecycle completes, a consumption done only once its removal commits) and C-11 (the complete Return deadline, from receipt) and awaits final independent acceptance before merge or M1. H-10–H-12 are closed. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
 
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.

@@ -1,0 +1,38 @@
+# C-02B negative controls (2026-10-07T07:58:20Z): evidence/M0C/remediation/c02-consumption-retry/unit/negative-control.sh 15ccc21 eb5eb0d <scratch>
+
+Preparing worktree (detached HEAD 15ccc21)
+## guard-removed: apps/agent-macos/core/src/writer.rs at 15ccc21, changed as follows
+-            None if self.unrecorded.iter().any(|id| id == intent_id) => true,
+## cargo test -p threadspace-agent writer::tests
+test writer::tests::a_repeated_consumption_is_done_once_its_retry_commits_the_removal ... FAILED
+test writer::tests::a_writer_killed_before_the_removal_commits_leaves_the_intent_to_its_claimant ... FAILED
+test writer::tests::a_repeated_consumption_is_not_done_while_the_backlog_still_lists_the_intent ... FAILED
+test writer::tests::consuming_an_intent_whose_removal_committed_is_done_without_a_write ... ok
+test writer::tests::retrying_one_removal_keeps_every_other_intent_and_the_current_revision ... FAILED
+  left: (1, ["8c896c75-99cd-49bd-8cb4-4f736201832b"])
+ right: (2, [])
+[Err(ControlError { code: Unavailable, detail: "consumption not recorded durably; the next store write retries it" }), Ok(Done)]
+second: Ok(Done)
+  left: (3, ["9c0c6009-b27d-49d7-9b73-df253ed46f5d", "6676a370-6c3d-4911-ab23-6205ca69245f", "fc758fae-7b20-42cb-8005-4d591b9feabf"])
+ right: (4, ["6676a370-6c3d-4911-ab23-6205ca69245f", "fc758fae-7b20-42cb-8005-4d591b9feabf"])
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.14s
+
+Preparing worktree (detached HEAD eb5eb0d)
+## pre-fix: apps/agent-macos/core/src/writer.rs at eb5eb0d, changed as follows
++/// C-02B: `Done` for `IntentConsumed` means the committed backlog no longer
++/// lists the intent. Each test drives the writer's own command handler on a
++/// store of its own, injects failures into the real intent store, and reads
+## cargo test -p threadspace-agent writer::tests
+test writer::tests::a_writer_killed_before_the_removal_commits_leaves_the_intent_to_its_claimant ... FAILED
+test writer::tests::a_repeated_consumption_is_not_done_while_the_backlog_still_lists_the_intent ... FAILED
+test writer::tests::a_repeated_consumption_is_done_once_its_retry_commits_the_removal ... FAILED
+test writer::tests::retrying_one_removal_keeps_every_other_intent_and_the_current_revision ... FAILED
+test writer::tests::consuming_an_intent_whose_removal_committed_is_done_without_a_write ... ok
+[Err(ControlError { code: Unavailable, detail: "consumption not recorded durably; the next store write retries it" }), Ok(Done)]
+second: Ok(Done)
+  left: (1, ["da7c2336-f72f-4a97-96de-567639fad52a"])
+ right: (2, [])
+  left: (3, ["ea5ef408-aa8e-49f1-80a4-0e50c9e08e50", "b4363d0e-9261-4c62-bec2-b4e916792d2d", "b503323c-56d3-4033-b742-85f203e18e12"])
+ right: (4, ["b4363d0e-9261-4c62-bec2-b4e916792d2d", "b503323c-56d3-4033-b742-85f203e18e12"])
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.15s
+

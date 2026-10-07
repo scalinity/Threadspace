@@ -1,0 +1,22 @@
+# C-02B writer tests and lints on the candidate (application source 15ccc21, build fd02d6a; 2026-10-07)
+## cargo test -p threadspace-agent writer::tests
+test writer::tests::a_repeated_consumption_is_done_once_its_retry_commits_the_removal ... ok
+test writer::tests::consuming_an_intent_whose_removal_committed_is_done_without_a_write ... ok
+test writer::tests::a_repeated_consumption_is_not_done_while_the_backlog_still_lists_the_intent ... ok
+test writer::tests::a_writer_killed_before_the_removal_commits_leaves_the_intent_to_its_claimant ... ok
+test writer::tests::retrying_one_removal_keeps_every_other_intent_and_the_current_revision ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.18s
+
+## cargo test -p threadspace-agent 
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.97s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo clippy -p threadspace-agent --all-targets  -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.65s
+## cargo test -p threadspace-agent --features qualification
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo clippy -p threadspace-agent --all-targets --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.58s
+
+## rustfmt --edition 2024 --check apps/agent-macos/core/src/writer.rs
+clean

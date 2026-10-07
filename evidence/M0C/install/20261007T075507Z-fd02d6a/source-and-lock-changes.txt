@@ -1,0 +1,12 @@
+# Lockfile and toolchain changes since build 6cfac57 (git diff --stat 6cfac57 fd02d6a -- Cargo.lock package-lock.json rust-toolchain.toml)
+(empty above means no lockfile or toolchain change since 6cfac57)
+
+# Lockfile and toolchain hashes (sha256 of the committed blob)
+Cargo.lock fd02d6a=ae9fe9069d540b3fcb8ec23829d1cc934ced5311fce823eaa0edf88893e3409f 6cfac57=ae9fe9069d540b3fcb8ec23829d1cc934ced5311fce823eaa0edf88893e3409f worktree=ae9fe9069d540b3fcb8ec23829d1cc934ced5311fce823eaa0edf88893e3409f unchanged
+package-lock.json fd02d6a=ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025 6cfac57=ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025 worktree=ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025 unchanged
+rust-toolchain.toml fd02d6a=3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd 6cfac57=3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd worktree=3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd unchanged
+
+Application source changes since 6cfac57 (apps/, packages/, crates/):
+15ccc21 Report a repeated consumption done only once its removal commits (C-02B)
+
+Toolchain: rustc 1.99.0 (b940084d7 2026-09-28), cargo 1.99.0 (5f94df478 2026-08-27), node v26.10.0
