@@ -7,7 +7,7 @@
 //! The login item's own companion first tries to claim the store: an
 //! unsupervised incumbent yields it and exits once its writer has finished
 //! what it accepted; its pending intents are already in the store
-//! (SPEC §18.9). A forwarded response is spooled first, so a failed hand-off
+//! (SPEC §18.9). A forwarded response is recorded first, so a failed hand-off
 //! leaves it for the next writer.
 
 use std::path::{Path, PathBuf};
@@ -100,11 +100,13 @@ pub fn enter(locator: PathBuf, store_dir: PathBuf) {
         });
 }
 
-pub fn notification_response(request_id: &str, attention_id: &str) {
+/// Forwards a response this instance received at `received`, with how long
+/// ago that was, so the incumbent's Return keeps the original budget.
+pub fn notification_response(request_id: &str, attention_id: &str, received: Instant) {
     let Some((locator, store_dir)) = FORWARDING.get() else {
         return;
     };
-    intent_store::spool_for_forwarding(store_dir, request_id, attention_id);
+    intent_store::record_for_forwarding(store_dir, request_id, attention_id);
     let outcome = connect(locator, ClientRole::Ui, Duration::from_secs(2))
         .map_err(|error| error.to_string())
         .and_then(|connection| {
@@ -113,6 +115,7 @@ pub fn notification_response(request_id: &str, attention_id: &str) {
                 .request(ControlRequestBody::ForwardNotificationResponse {
                     notification_request_id: request_id.to_owned(),
                     attention_id: attention_id.to_owned(),
+                    received_ago_ms: Some(received.elapsed().as_millis() as u64),
                 })
                 .map_err(|error| error.to_string())
         });

@@ -105,10 +105,14 @@ pub enum ControlRequestBody {
         enabled: bool,
     },
     /// Sent by a second companion instance that lost the writer lock: it
-    /// forwards a notification response it received to the verified incumbent.
+    /// forwards a notification response it received to the verified
+    /// incumbent, with how long ago it received it, so a Return keeps the
+    /// response's original two-second budget.
     ForwardNotificationResponse {
         notification_request_id: String,
         attention_id: String,
+        #[serde(default)]
+        received_ago_ms: Option<u64>,
     },
     /// Sent by the login item's own companion when it finds the writer lock
     /// held: an unsupervised incumbent hands over its undelivered intents and
@@ -169,6 +173,15 @@ pub enum ControlRequestBody {
     /// none is held.
     #[cfg(feature = "qualification")]
     QualifyReleaseHandoffBarrier,
+    /// Qualification only: the next `count` attempts of one intent-store
+    /// storage step fail, so ownership transitions can be tested against
+    /// real storage failures.
+    #[cfg(feature = "qualification")]
+    QualifyArmStorageFault {
+        store: StorageFaultStore,
+        step: StorageFaultStep,
+        count: u32,
+    },
     /// Qualification only: accept a notification response exactly as a
     /// banner click delivered to this companion, so a test can place one at
     /// a chosen handoff phase.
@@ -337,6 +350,33 @@ pub enum QualificationFault {
     HoldNextYieldBeforeExit,
     /// The next `YieldWriter` is carried out but its reply is never sent.
     DropNextYieldReply,
+    /// The next pending-intent backlog commit holds after its file is
+    /// written and synced, before its rename.
+    HoldNextBacklogCommit,
+}
+
+/// The intent-store file a qualification storage fault targets.
+#[cfg(feature = "qualification")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum StorageFaultStore {
+    /// The pending-intent backlog.
+    Backlog,
+    /// Response records.
+    Record,
+}
+
+/// The storage step a qualification storage fault fails.
+#[cfg(feature = "qualification")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum StorageFaultStep {
+    CreateTemporary,
+    Write,
+    SyncFile,
+    Rename,
+    SyncDirectory,
+    Remove,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -471,6 +511,8 @@ mod release_build_tests {
             r#"{"kind":"QualifyArmFault","fault":"DROP_NEXT_YIELD_REPLY"}"#,
             r#"{"kind":"QualifyReleaseHandoffBarrier"}"#,
             r#"{"kind":"QualifyNotificationResponse","notificationRequestId":"x","attentionId":"y"}"#,
+            r#"{"kind":"QualifyArmStorageFault","store":"BACKLOG","step":"WRITE","count":1}"#,
+            r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_BACKLOG_COMMIT"}"#,
             r#"{"kind":"QualifyAdmit","observationId":"x","capturedWallMs":1}"#,
         ] {
             assert!(

@@ -32,6 +32,7 @@ use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, SyncSender};
 use std::sync::{Arc, Mutex, OnceLock};
+use std::time::Instant;
 
 use serde::Deserialize;
 use serde_json::json;
@@ -75,10 +76,14 @@ struct Running {
     _lock: WriterLock,
 }
 
-/// Accepts a notification response for this process's writer (SPEC §7.5):
-/// it takes the response while it accepts, otherwise the response is
-/// spooled for the next writer. Never dropped.
-pub(crate) fn accept_response(notification_request_id: String, attention_id: String) -> bool {
+/// Accepts a live notification response received at `received` (SPEC §7.5):
+/// its record is committed first, then the writer takes it while it
+/// accepts; a recorded response the writer cannot take stays for the next.
+pub(crate) fn accept_response(
+    notification_request_id: String,
+    attention_id: String,
+    received: Instant,
+) -> bool {
     let Some(running) = RUNNING.get() else {
         return false;
     };
@@ -87,8 +92,15 @@ pub(crate) fn accept_response(notification_request_id: String, attention_id: Str
         &running.writer,
         notification_request_id,
         attention_id,
+        received,
     );
     true
+}
+
+/// The store this process's writer owns.
+#[cfg(feature = "qualification")]
+pub(crate) fn store_dir() -> Option<PathBuf> {
+    RUNNING.get().map(|running| running.store_dir.clone())
 }
 
 /// Exits through the writer, which finishes what it accepted first.
@@ -102,7 +114,8 @@ pub(crate) fn release(code: i32) {
 }
 
 static RUNNING: OnceLock<Running> = OnceLock::new();
-static PRESTART: Mutex<VecDeque<BridgeEvent>> = Mutex::new(VecDeque::new());
+/// Events received before the writer exists, with their receipt instants.
+static PRESTART: Mutex<VecDeque<(BridgeEvent, Instant)>> = Mutex::new(VecDeque::new());
 
 fn own_identity() -> Result<ProcessIdentity, String> {
     let pid = std::process::id() as i32;
@@ -144,9 +157,9 @@ fn private_dir(path: &Path) -> std::io::Result<()> {
     fs::set_permissions(path, fs::Permissions::from_mode(0o700))
 }
 
-/// Validated, ID-only handling of notification responses; queued until the
-/// writer exists (SPEC §7.5).
-fn handle_event(event: BridgeEvent) {
+/// Validated, ID-only handling of notification responses received at
+/// `received`; queued until the writer exists (SPEC §7.5).
+fn handle_event(event: BridgeEvent, received: Instant) {
     if let BridgeEvent::Power { phase } = &event {
         power_transition(phase);
         return;
@@ -169,25 +182,28 @@ fn handle_event(event: BridgeEvent) {
         return;
     }
     if forward::active() {
-        forward::notification_response(&request_id, &attention_id);
+        forward::notification_response(&request_id, &attention_id, received);
         return;
     }
     match RUNNING.get() {
         Some(_) => {
-            accept_response(request_id, attention_id);
+            accept_response(request_id, attention_id, received);
         }
         None => {
             if let Ok(mut queue) = PRESTART.lock() {
                 if queue.len() >= MAX_PRESTART_EVENTS {
                     queue.pop_front();
                 }
-                queue.push_back(BridgeEvent::NotificationResponse {
-                    schema,
-                    request_id,
-                    action_identifier,
-                    attention_id,
-                    session_id: String::new(),
-                });
+                queue.push_back((
+                    BridgeEvent::NotificationResponse {
+                        schema,
+                        request_id,
+                        action_identifier,
+                        attention_id,
+                        session_id: String::new(),
+                    },
+                    received,
+                ));
             }
         }
     }
@@ -248,12 +264,12 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
             // exits; it never becomes a second writer (SPEC §7.5).
             log::warn("WRITER_LOCK_HELD", json!({ "mode": "forwarder" }));
             forward::enter(paths.locator.clone(), paths.store_dir.clone());
-            let queued: Vec<BridgeEvent> = PRESTART
+            let queued: Vec<(BridgeEvent, Instant)> = PRESTART
                 .lock()
                 .map(|mut queue| queue.drain(..).collect())
                 .unwrap_or_default();
-            for event in queued {
-                handle_event(event);
+            for (event, received) in queued {
+                handle_event(event, received);
             }
             return EXIT_RUNNING;
         }
@@ -358,6 +374,19 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         home,
         resources_dir: PathBuf::from(&config.resources_path),
     };
+    let (backlog, found) = intent_store::load_backlog(&paths.store_dir);
+    let backlog_unavailable = matches!(found, intent_store::Found::Unreadable { .. });
+    match &found {
+        intent_store::Found::Quarantined { kept_as, error } => log::error(
+            "PENDING_INTENTS_QUARANTINED",
+            json!({ "keptAs": kept_as, "error": error }),
+        ),
+        intent_store::Found::Unreadable { error } => log::error(
+            "PENDING_INTENTS_UNREADABLE",
+            json!({ "error": error, "commits": "refused until the file can be read" }),
+        ),
+        intent_store::Found::Absent | intent_store::Found::Loaded => {}
+    }
     let mut discovery_trigger = None;
     let spawned = writer::spawn(WriterSetup {
         journal,
@@ -367,7 +396,8 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         responder: respond_tx,
         identity: identity.clone(),
         store_dir: paths.store_dir.clone(),
-        intents: intent_store::load(&paths.store_dir),
+        backlog,
+        backlog_unavailable,
     })
     .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
     .and_then(|_| discovery::spawn(claude.clone()))
@@ -440,12 +470,12 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
             "controlSocket": runtime_locator.control_socket,
         }),
     );
-    let queued: Vec<BridgeEvent> = PRESTART
+    let queued: Vec<(BridgeEvent, Instant)> = PRESTART
         .lock()
         .map(|mut queue| queue.drain(..).collect())
         .unwrap_or_default();
-    for event in queued {
-        handle_event(event);
+    for (event, received) in queued {
+        handle_event(event, received);
     }
     // A stopped or unsupervised companion has a bounded lifetime: only the
     // login item's enabled companion stays in its run loop (SPEC §18.9).
@@ -538,6 +568,8 @@ pub unsafe extern "C" fn ts_core_start(
 /// `event_json` must be a valid NUL-terminated string for the duration of the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_core_deliver(event_json: *const c_char) {
+    // A notification Return's two-second budget starts here (SPEC §13.2).
+    let received = Instant::now();
     if event_json.is_null() {
         return;
     }
@@ -550,7 +582,7 @@ pub unsafe extern "C" fn ts_core_deliver(event_json: *const c_char) {
     match serde_json::from_slice::<BridgeEvent>(bytes) {
         Ok(event) => {
             if let Some(uncorrelated) = bridge::route(event) {
-                handle_event(uncorrelated);
+                handle_event(uncorrelated, received);
             }
         }
         Err(error) => log::warn(

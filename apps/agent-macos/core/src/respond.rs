@@ -3,6 +3,11 @@
 //! views as an inspector intent; the containing application is brought
 //! forward only when the route did not reach an exact current surface, so a
 //! successful Return is not undone by activating Threadspace.
+//!
+//! A job carries the instant the response was received, before it waited in
+//! this queue: the Return's two-second budget runs from there, so queueing
+//! spends it rather than renewing it (SPEC §13.2). The response's record
+//! stays in the store until the resulting intent commits.
 
 use std::sync::mpsc::{Receiver, SyncSender};
 use std::thread;
@@ -19,12 +24,14 @@ use crate::discovery::{DiscoveryContext, Trigger};
 use crate::log;
 use crate::route;
 use crate::writer::WriterCommand;
+use threadspace_surfaces::RouteDeadline;
 
 pub enum ResponseJob {
     Return {
         notification_request_id: String,
         attention_id: String,
         session_id: String,
+        received: Instant,
     },
 }
 
@@ -42,8 +49,16 @@ pub fn spawn(
                     notification_request_id,
                     attention_id,
                     session_id,
+                    received,
                 } = job;
-                let received = Instant::now();
+                log::info(
+                    "NOTIFICATION_RETURN_STARTED",
+                    json!({
+                        "notificationRequestId": notification_request_id,
+                        "queuedMs": received.elapsed().as_millis() as u64,
+                        "remainingMs": RouteDeadline::for_request(received).remaining().as_millis() as u64,
+                    }),
+                );
                 let request = RouteRequest {
                     request_id: Uuid::new_v4().to_string(),
                     session_id: session_id.clone(),
@@ -103,6 +118,7 @@ pub fn spawn(
                     .send(WriterCommand::PushIntent {
                         intent,
                         open_app: !exact,
+                        response_id: notification_request_id,
                     })
                     .is_err()
                 {

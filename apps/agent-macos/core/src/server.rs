@@ -449,7 +449,14 @@ fn dispatch(
         ControlRequestBody::ForwardNotificationResponse {
             notification_request_id,
             attention_id,
+            received_ago_ms,
         } => {
+            // The forwarding instance received it this long ago; a Return
+            // keeps that original budget (SPEC §13.2).
+            let now = Instant::now();
+            let received = received_ago_ms
+                .and_then(|ago| now.checked_sub(Duration::from_millis(ago)))
+                .unwrap_or(now);
             // Only another instance of this exact companion executable may
             // forward a response it received (SPEC §7.5).
             if !peer_is_companion {
@@ -463,11 +470,18 @@ fn dispatch(
             }
             log::info(
                 "NOTIFICATION_RESPONSE_RECEIVED_FORWARDED",
-                json!({ "requestId": notification_request_id, "attentionId": attention_id }),
+                json!({ "requestId": notification_request_id, "attentionId": attention_id, "receivedAgoMs": received_ago_ms }),
             );
-            // Taken by the writer or spooled for the next one; never dropped.
-            crate::accept_response(notification_request_id, attention_id);
-            respond(outbound, request_id, Ok(ControlResponseBody::Done));
+            if crate::accept_response(notification_request_id, attention_id, received) {
+                respond(outbound, request_id, Ok(ControlResponseBody::Done));
+            } else {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::Unavailable,
+                    "the writer is not running yet",
+                );
+            }
         }
         ControlRequestBody::IntentConsumed { intent_id } => to_writer(
             context,
@@ -506,6 +520,7 @@ fn dispatch(
         | ControlRequestBody::QualifyReleaseRouteBarrier
         | ControlRequestBody::QualifyReleaseHandoffBarrier
         | ControlRequestBody::QualifyNotificationResponse { .. }
+        | ControlRequestBody::QualifyArmStorageFault { .. }
             if role != ClientRole::Qualification =>
         {
             refuse(
@@ -625,6 +640,9 @@ fn dispatch(
                 threadspace_contracts::control::QualificationFault::DropNextYieldReply => {
                     crate::writer::handoff::arm_dropped_reply()
                 }
+                threadspace_contracts::control::QualificationFault::HoldNextBacklogCommit => {
+                    crate::writer::handoff::arm(crate::writer::handoff::Point::BeforeBacklogCommit)
+                }
             }
             log::info("QUALIFICATION_FAULT_ARMED", json!({ "fault": fault }));
             respond(outbound, request_id, Ok(ControlResponseBody::Done));
@@ -647,11 +665,57 @@ fn dispatch(
             notification_request_id,
             attention_id,
         } => {
+            let received = Instant::now();
             log::info(
                 "QUALIFY_NOTIFICATION_RESPONSE",
-                json!({ "requestId": notification_request_id, "attentionId": attention_id }),
+                json!({ "requestId": notification_request_id, "attentionId": attention_id, "receivedAtMs": log::now_ms() }),
             );
-            crate::accept_response(notification_request_id, attention_id);
+            if crate::accept_response(notification_request_id, attention_id, received) {
+                respond(outbound, request_id, Ok(ControlResponseBody::Done));
+            } else {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::Unavailable,
+                    "the writer is not running yet",
+                );
+            }
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyArmStorageFault { store, step, count } => {
+            use crate::intent_store::faults::{Op, Target};
+            use threadspace_contracts::control::{StorageFaultStep, StorageFaultStore};
+            let Some(dir) = crate::store_dir() else {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::Unavailable,
+                    "no writer store",
+                );
+                return;
+            };
+            let target = match store {
+                StorageFaultStore::Backlog => Target::Backlog,
+                StorageFaultStore::Record => Target::Record,
+            };
+            let op = match step {
+                StorageFaultStep::CreateTemporary => Op::CreateTemporary,
+                StorageFaultStep::Write => Op::Write,
+                StorageFaultStep::SyncFile => Op::SyncFile,
+                StorageFaultStep::Rename => Op::Rename,
+                StorageFaultStep::SyncDirectory => Op::SyncDirectory,
+                StorageFaultStep::Remove => Op::Remove,
+            };
+            crate::intent_store::faults::arm(
+                &crate::intent_store::fault_dir(&dir, target),
+                target,
+                op,
+                count,
+            );
+            log::info(
+                "QUALIFICATION_STORAGE_FAULT_ARMED",
+                json!({ "store": store, "step": step, "count": count }),
+            );
             respond(outbound, request_id, Ok(ControlResponseBody::Done));
         }
         #[cfg(feature = "qualification")]

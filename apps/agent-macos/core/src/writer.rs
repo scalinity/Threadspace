@@ -7,6 +7,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use std::sync::mpsc::{Receiver, Sender, SyncSender, TrySendError};
 use std::thread;
+use std::time::Instant;
 
 use serde_json::json;
 use threadspace_contracts::control::{
@@ -28,14 +29,20 @@ use threadspace_journal::{
 use uuid::Uuid;
 
 use crate::bridge::{self, BridgeRequest};
-use crate::intent_store;
+use crate::intent_store::{self, Step, StorageFailure};
 use crate::log;
 use crate::respond::ResponseJob;
 use crate::state::RUNTIME;
 
 pub type Outbound = SyncSender<ControlMessage>;
 
-const MAX_PENDING_INTENTS: usize = 32;
+/// Unconsumed intents sent to one view at a time; the rest wait in the
+/// store-backed backlog and follow as the view consumes.
+const DELIVERY_WINDOW: usize = 32;
+/// Qualification commands queued at once; the oldest gives way. They are
+/// harness commands, not accepted owner work.
+#[cfg(feature = "qualification")]
+const TRANSIENT_LIMIT: usize = 32;
 /// A patch larger than this is sent as page invalidations plus counts, so
 /// one change can never exceed the 64 KiB frame bound (SPEC §18.4).
 const PATCH_UPSERT_BUDGET: usize = FRAME_MAX_BYTES - 4096;
@@ -114,11 +121,13 @@ pub enum WriterCommand {
     Release {
         code: i32,
     },
-    /// Queue a validated intent for hydrated views, optionally bringing the
-    /// containing application forward.
+    /// The result of a notification Return, replacing the response's
+    /// record once committed; optionally brings the containing application
+    /// forward.
     PushIntent {
         intent: NativeIntent,
         open_app: bool,
+        response_id: String,
     },
     /// A sleep/wake transition (SPEC §19.5), journaled as a lifecycle fact.
     RecordLifecycle {
@@ -133,9 +142,13 @@ pub enum WriterCommand {
         state: NotificationState,
         detail: String,
     },
+    /// A live response, received at `received`; `recorded` when its
+    /// response record committed.
     NotificationResponse {
         notification_request_id: String,
         attention_id: String,
+        received: Instant,
+        recorded: bool,
     },
     LiveExecutions {
         provider: &'static str,
@@ -214,6 +227,20 @@ struct Writer {
     intents: VecDeque<NativeIntent>,
     last_cursor: i64,
     responder: SyncSender<ResponseJob>,
+    /// Committed backlog revision and the consumed intent IDs it remembers.
+    revision: u64,
+    consumed: VecDeque<String>,
+    /// The committed backlog still lists an intent a view consumed, because
+    /// recording the consumption failed; the next commit retries it.
+    backlog_stale: bool,
+    /// The backlog could not be read at start, so it is never overwritten.
+    backlog_unavailable: bool,
+    /// Responses whose Return is in flight; their records stay until the
+    /// resulting intent commits.
+    returning: HashSet<String>,
+    /// Recorded responses not yet in the backlog (its commit failed or it
+    /// was full); retried when a view hydrates or consumes.
+    unpromoted: Vec<String>,
     /// This writer's own queue, for releasing it after a yield.
     commands: SyncSender<WriterCommand>,
     identity: ProcessIdentity,
@@ -349,7 +376,8 @@ impl Writer {
         );
     }
 
-    /// Sends a hydrated view each pending intent it has not had yet.
+    /// Sends a hydrated view the oldest pending intents it has not had, at
+    /// most `DELIVERY_WINDOW` unconsumed at a time.
     fn push_intents(&mut self, subscription_id: &str) {
         let Some(view) = self.views.get_mut(subscription_id) else {
             return;
@@ -357,7 +385,15 @@ impl Writer {
         if !view.hydrated {
             return;
         }
+        let mut in_flight = self
+            .intents
+            .iter()
+            .filter(|intent| view.delivered.contains(&intent.intent_id))
+            .count();
         for intent in &self.intents {
+            if in_flight >= DELIVERY_WINDOW {
+                break;
+            }
             if view.delivered.contains(&intent.intent_id) {
                 continue;
             }
@@ -366,24 +402,164 @@ impl Writer {
                 cursor: format_cursor(self.last_cursor),
                 intent: intent.clone(),
             };
-            if view.outbound.try_send(message).is_ok() {
-                view.delivered.insert(intent.intent_id.clone());
-                log::info(
-                    "INTENT_DELIVERED",
-                    json!({ "intentId": intent.intent_id, "subscriptionId": subscription_id }),
-                );
+            if view.outbound.try_send(message).is_err() {
+                break;
             }
+            view.delivered.insert(intent.intent_id.clone());
+            in_flight += 1;
+            log::info(
+                "INTENT_DELIVERED",
+                json!({ "intentId": intent.intent_id, "subscriptionId": subscription_id, "inFlight": in_flight }),
+            );
         }
     }
 
-    /// Writes the pending notification and inspector intents to the store.
-    fn persist_intents(&self) {
-        if let Err(error) = intent_store::save(&self.store_dir, self.intents.iter()) {
-            log::error(
-                "PENDING_INTENTS_PERSIST_FAILED",
-                json!({ "error": error.to_string() }),
+    fn deliver_all(&mut self) {
+        let hydrated: Vec<String> = self
+            .views
+            .iter()
+            .filter(|(_, view)| view.hydrated)
+            .map(|(id, _)| id.clone())
+            .collect();
+        for subscription_id in hydrated {
+            self.push_intents(&subscription_id);
+        }
+    }
+
+    fn durable_pending(&self) -> Vec<&NativeIntent> {
+        self.intents
+            .iter()
+            .filter(|intent| intent_store::durable(intent))
+            .collect()
+    }
+
+    /// Commits the backlog as `pending` and `consumed`; the caller changes
+    /// its in-memory state only on success.
+    fn commit(
+        &self,
+        pending: &[&NativeIntent],
+        consumed: &VecDeque<String>,
+    ) -> Result<intent_store::Commit, StorageFailure> {
+        if self.backlog_unavailable {
+            return Err(StorageFailure::new(
+                Step::Unavailable,
+                "the backlog could not be read at start",
+            ));
+        }
+        intent_store::commit_backlog(&self.store_dir, self.revision + 1, pending, consumed)
+    }
+
+    /// Accepts a notification or inspector intent: it joins the backlog only
+    /// if the backlog with it commits. Accepted work is never evicted; at
+    /// the bound an intent is refused before it is accepted.
+    fn accept_durable(&mut self, intent: NativeIntent) -> Result<(), StorageFailure> {
+        let mut pending = self.durable_pending();
+        if pending.len() >= intent_store::BACKLOG_LIMIT {
+            return Err(StorageFailure::new(
+                Step::Full,
+                format!("{} accepted intents pending", intent_store::BACKLOG_LIMIT),
+            ));
+        }
+        pending.push(&intent);
+        let commit = self.commit(&pending, &self.consumed)?;
+        let count = pending.len();
+        self.revision += 1;
+        self.backlog_stale = false;
+        log::info(
+            "INTENT_ACCEPTED",
+            json!({
+                "intentId": intent.intent_id,
+                "revision": self.revision,
+                "pending": count,
+                "powerLossConfirmed": commit.power_loss_confirmed,
+            }),
+        );
+        self.intents.push_back(intent);
+        self.deliver_all();
+        Ok(())
+    }
+
+    /// Queues a qualification command for hydrated views; at the bound the
+    /// oldest such command gives way.
+    #[cfg(feature = "qualification")]
+    fn queue_transient(&mut self, intent: NativeIntent) {
+        let transient = self
+            .intents
+            .iter()
+            .filter(|queued| !intent_store::durable(queued))
+            .count();
+        if transient >= TRANSIENT_LIMIT
+            && let Some(position) = self
+                .intents
+                .iter()
+                .position(|queued| !intent_store::durable(queued))
+            && let Some(dropped) = self.intents.remove(position)
+        {
+            log::warn(
+                "TRANSIENT_INTENT_DROPPED",
+                json!({ "intentId": dropped.intent_id, "limit": TRANSIENT_LIMIT }),
             );
         }
+        self.intents.push_back(intent);
+        self.deliver_all();
+    }
+
+    /// A view consumed an intent. Its durable removal is complete only when
+    /// the backlog without it commits; otherwise the caller is told so, the
+    /// intent is not delivered again by this process, and every later commit
+    /// retries the removal. If no commit succeeds before a restart, the next
+    /// writer delivers it once more and the shell, which remembers what its
+    /// views applied, does not apply it again.
+    fn consume(&mut self, intent_id: &str) -> Result<ControlResponseBody, ControlError> {
+        for view in self.views.values_mut() {
+            view.delivered.remove(intent_id);
+        }
+        let Some(position) = self
+            .intents
+            .iter()
+            .position(|intent| intent.intent_id == intent_id)
+        else {
+            return Ok(ControlResponseBody::Done);
+        };
+        let Some(intent) = self.intents.remove(position) else {
+            return Ok(ControlResponseBody::Done);
+        };
+        let mut outcome = Ok(ControlResponseBody::Done);
+        if intent_store::durable(&intent) {
+            self.consumed.push_back(intent_id.to_owned());
+            while self.consumed.len() > intent_store::CONSUMED_MEMORY {
+                self.consumed.pop_front();
+            }
+            match self.commit(&self.durable_pending(), &self.consumed) {
+                Ok(_) => {
+                    self.revision += 1;
+                    self.backlog_stale = false;
+                    log::info(
+                        "INTENT_CONSUMED",
+                        json!({ "intentId": intent_id, "revision": self.revision, "pending": self.intents.len() }),
+                    );
+                }
+                Err(failure) => {
+                    self.backlog_stale = true;
+                    log::error(
+                        "CONSUMPTION_NOT_RECORDED",
+                        json!({ "intentId": intent_id, "failure": failure.json() }),
+                    );
+                    outcome = Err(ControlError::new(
+                        ControlErrorCode::Unavailable,
+                        "consumption not recorded durably; the next store write retries it",
+                    ));
+                }
+            }
+        } else {
+            log::info(
+                "INTENT_CONSUMED",
+                json!({ "intentId": intent_id, "transient": true }),
+            );
+        }
+        self.retry_unpromoted();
+        self.deliver_all();
+        outcome
     }
 
     fn handle(&mut self, command: WriterCommand) {
@@ -462,28 +638,15 @@ impl Writer {
                     json!({ "subscriptionId": subscription_id, "pendingIntents": self.intents.len() }),
                 );
                 self.push_intents(&subscription_id);
+                self.retry_unpromoted();
             }
             WriterCommand::IntentConsumed {
                 request_id,
                 intent_id,
                 outbound,
             } => {
-                let durable = self
-                    .intents
-                    .iter()
-                    .any(|intent| intent.intent_id == intent_id && intent_store::durable(intent));
-                let before = self.intents.len();
-                self.intents.retain(|intent| intent.intent_id != intent_id);
-                if self.intents.len() < before {
-                    if durable {
-                        self.persist_intents();
-                    }
-                    log::info(
-                        "INTENT_CONSUMED",
-                        json!({ "intentId": intent_id, "pending": self.intents.len() }),
-                    );
-                }
-                respond(&outbound, request_id, Ok(ControlResponseBody::Done));
+                let outcome = self.consume(&intent_id);
+                respond(&outbound, request_id, outcome);
             }
             WriterCommand::ConnectionClosed { connection_id } => {
                 self.views
@@ -769,8 +932,13 @@ impl Writer {
                     Err(error) => respond(&outbound, request_id, Err(journal_error(&error))),
                 }
             }
-            WriterCommand::PushIntent { intent, open_app } => {
-                self.queue_intent(intent);
+            WriterCommand::PushIntent {
+                intent,
+                open_app,
+                response_id,
+            } => {
+                self.returning.remove(&response_id);
+                self.promote(intent, &response_id, true);
                 if open_app {
                     bridge::notify(&BridgeRequest::OpenContainingApp);
                 }
@@ -828,8 +996,14 @@ impl Writer {
             WriterCommand::NotificationResponse {
                 notification_request_id,
                 attention_id,
+                received,
+                recorded,
             } => {
-                self.notification_response(&notification_request_id, &attention_id, false);
+                self.take_response(
+                    &notification_request_id,
+                    &attention_id,
+                    Some((received, recorded)),
+                );
             }
             WriterCommand::LiveExecutions { provider, reply } => {
                 let _ = reply.send(
@@ -1071,7 +1245,7 @@ impl Writer {
                 };
                 let intent_id = intent.intent_id.clone();
                 let hydrated = self.views.values().filter(|view| view.hydrated).count() as u32;
-                self.queue_intent(intent);
+                self.queue_transient(intent);
                 log::info(
                     "QUALIFICATION_VIEW_COMMAND",
                     json!({ "command": command, "intentId": intent_id, "hydratedViews": hydrated }),
@@ -1088,81 +1262,49 @@ impl Writer {
         }
     }
 
-    /// Queues an intent until a view has consumed it and delivers it to every
-    /// hydrated view. A notification or inspector intent is persisted before
-    /// any view sees it, so no exit of this process can lose it; an intent
-    /// already pending (one response recovered twice) is kept once.
-    fn queue_intent(&mut self, intent: NativeIntent) {
-        if self
-            .intents
-            .iter()
-            .any(|pending| pending.intent_id == intent.intent_id)
-        {
+    /// Takes one accepted response (SPEC §7.5). `live` carries a live
+    /// response's receipt instant and whether its record committed; `None`
+    /// is a recorded response this writer found rather than received, which
+    /// only ever opens the inspector: a Return planned that late would move
+    /// focus long after the click. A Return is planned only for a recorded
+    /// response, so a Return in flight always has a durable owner. Nothing
+    /// here acknowledges, resolves or starts capture. The intent is named by
+    /// its notification request, so one response is one intent however
+    /// often it is found.
+    fn take_response(
+        &mut self,
+        notification_request_id: &str,
+        attention_id: &str,
+        live: Option<(Instant, bool)>,
+    ) {
+        let recorded = live.is_none_or(|(_, recorded)| recorded);
+        if self.returning.contains(notification_request_id) {
             log::info(
-                "INTENT_ALREADY_PENDING",
-                json!({ "intentId": intent.intent_id }),
+                "RESPONSE_ALREADY_TAKEN",
+                json!({ "requestId": notification_request_id, "reason": "RETURN_IN_FLIGHT" }),
             );
             return;
         }
-        if self.intents.len() >= MAX_PENDING_INTENTS
-            && let Some(evicted) = self.intents.pop_front()
-        {
-            log::warn(
-                "INTENT_EVICTED",
-                json!({ "intentId": evicted.intent_id, "limit": MAX_PENDING_INTENTS }),
-            );
-        }
-        let durable = intent_store::durable(&intent);
-        let intent_id = intent.intent_id.clone();
-        self.intents.push_back(intent);
-        if durable {
-            self.persist_intents();
-        }
-        log::info(
-            "INTENT_QUEUED",
-            json!({ "intentId": intent_id, "persisted": durable, "pending": self.intents.len() }),
-        );
-        let hydrated: Vec<String> = self
-            .views
+        let intent_id = response_intent_id(notification_request_id);
+        if self
+            .intents
             .iter()
-            .filter(|(_, view)| view.hydrated)
-            .map(|(id, _)| id.clone())
-            .collect();
-        for subscription_id in hydrated {
-            self.push_intents(&subscription_id);
+            .any(|intent| intent.intent_id == intent_id)
+            || self.consumed.contains(&intent_id)
+        {
+            log::info(
+                "RESPONSE_ALREADY_TAKEN",
+                json!({ "requestId": notification_request_id, "reason": "INTENT_ACCEPTED" }),
+            );
+            self.retire_record(notification_request_id);
+            return;
         }
-    }
-
-    /// Takes one accepted response; a spooled copy is removed only once its
-    /// intent is persisted or its Return is planned.
-    fn notification_response(
-        &mut self,
-        notification_request_id: &str,
-        attention_id: &str,
-        recovered: bool,
-    ) {
-        self.plan_response(notification_request_id, attention_id, recovered);
-        intent_store::unspool(&self.store_dir, notification_request_id);
-    }
-
-    /// Re-reads the item on every click (SPEC §7.5). An outstanding item with
-    /// observation enabled gets the verified current-session Return (planned
-    /// off this thread); anything else opens the inspector, as does a
-    /// response recovered from a previous writer, because a Return planned
-    /// now would move focus long after the click. Nothing here acknowledges,
-    /// resolves or starts capture. The intent is named by its notification
-    /// request, so one response is one intent however often it is recovered.
-    fn plan_response(
-        &mut self,
-        notification_request_id: &str,
-        attention_id: &str,
-        recovered: bool,
-    ) {
         if !valid_uuid(attention_id) {
             log::warn(
                 "NOTIFICATION_RESPONSE_REJECTED",
-                json!({ "reason": "attention ID is not a UUID" }),
+                json!({ "requestId": notification_request_id, "reason": "attention ID is not a UUID" }),
             );
+            self.retire_record(notification_request_id);
             return;
         }
         let target = match self.journal.attention_target(attention_id) {
@@ -1173,11 +1315,12 @@ impl Writer {
                     json!({ "attentionId": attention_id, "error": error.to_string() }),
                 );
                 bridge::notify(&BridgeRequest::OpenContainingApp);
+                self.retire_record(notification_request_id);
                 return;
             }
         };
         let observing = RUNTIME.admission_open();
-        let plan = if target.outstanding && observing && !recovered {
+        let plan = if target.outstanding && observing && live.is_some() && recorded {
             "RETURN"
         } else {
             "INSPECTOR"
@@ -1194,17 +1337,23 @@ impl Writer {
                 "admissionOpen": observing,
                 "maintenance": RUNTIME.maintenance(),
                 "plan": plan,
-                "recovered": recovered,
+                "recovered": live.is_none(),
+                "recorded": recorded,
+                "receivedAgoMs": live.map(|(received, _)| received.elapsed().as_millis() as u64),
                 "hydratedViews": self.views.values().filter(|view| view.hydrated).count(),
             }),
         );
-        if plan == "RETURN" {
+        if plan == "RETURN"
+            && let Some((received, _)) = live
+        {
             let job = ResponseJob::Return {
                 notification_request_id: notification_request_id.to_owned(),
                 attention_id: target.attention_id.clone(),
                 session_id: target.session_id.clone(),
+                received,
             };
             if self.responder.try_send(job).is_ok() {
+                self.returning.insert(notification_request_id.to_owned());
                 return;
             }
             log::warn(
@@ -1213,7 +1362,7 @@ impl Writer {
             );
         }
         let intent = NativeIntent {
-            intent_id: response_intent_id(notification_request_id),
+            intent_id,
             action: IntentAction::OpenAttention {
                 attention_id: target.attention_id,
                 session_id: target.session_id,
@@ -1227,7 +1376,7 @@ impl Writer {
             "NOTIFICATION_INSPECTOR",
             json!({ "attentionId": attention_id, "intentId": intent.intent_id }),
         );
-        self.queue_intent(intent);
+        self.promote(intent, notification_request_id, recorded);
         bridge::notify(&BridgeRequest::OpenContainingApp);
         log::info(
             "CONTAINING_APP_OPEN_REQUESTED",
@@ -1235,42 +1384,128 @@ impl Writer {
         );
     }
 
+    /// Moves a response's ownership from its record to the backlog: the
+    /// record is retired only after the intent is committed. If the commit
+    /// fails or the backlog is full, the record stays authoritative and the
+    /// promotion is retried later; a response with no record is then
+    /// reported as not accepted.
+    fn promote(&mut self, intent: NativeIntent, response_id: &str, recorded: bool) {
+        let intent_id = intent.intent_id.clone();
+        match self.accept_durable(intent) {
+            Ok(()) => self.retire_record(response_id),
+            Err(failure) => {
+                if recorded && intent_store::record_exists(&self.store_dir, response_id) {
+                    if !self.unpromoted.iter().any(|id| id == response_id) {
+                        self.unpromoted.push(response_id.to_owned());
+                    }
+                    log::error(
+                        "INTENT_NOT_ACCEPTED",
+                        json!({ "intentId": intent_id, "requestId": response_id, "failure": failure.json(), "owner": "RESPONSE_RECORD" }),
+                    );
+                } else {
+                    log::error(
+                        "NOTIFICATION_RESPONSE_NOT_ACCEPTED",
+                        json!({ "requestId": response_id, "failure": failure.json(), "owner": null }),
+                    );
+                }
+            }
+        }
+    }
+
+    /// Retires a response record whose intent is committed, or that has
+    /// nothing left to own. A record that cannot be removed lingers; the
+    /// writer that next finds it sees its intent accepted and retires it.
+    fn retire_record(&mut self, response_id: &str) {
+        if !intent_store::record_exists(&self.store_dir, response_id) {
+            return;
+        }
+        match intent_store::remove_record(&self.store_dir, response_id) {
+            Ok(()) => log::info(
+                "RESPONSE_RECORD_RETIRED",
+                json!({ "requestId": response_id, "revision": self.revision }),
+            ),
+            Err(failure) => log::error(
+                "RESPONSE_RECORD_RETIRE_FAILED",
+                json!({ "requestId": response_id, "failure": failure.json() }),
+            ),
+        }
+    }
+
+    /// Retries recorded responses this writer could not promote, and
+    /// recorded responses it was never handed; each opens the inspector.
+    fn retry_unpromoted(&mut self) {
+        let mut ids = std::mem::take(&mut self.unpromoted);
+        ids.extend(intent_store::take_unqueued());
+        if ids.is_empty() {
+            return;
+        }
+        log::info("RESPONSE_RETRY", json!({ "requestIds": ids }));
+        for record in intent_store::records(&self.store_dir) {
+            if ids.contains(&record.notification_request_id) {
+                self.take_response(&record.notification_request_id, &record.attention_id, None);
+            }
+        }
+    }
+
     /// Takes over what previous writers left (C-02): their pending intents
-    /// came with the store; responses they could only spool are taken now.
+    /// came with the backlog; their unresolved response records open the
+    /// inspector now, and none replays a Return.
     fn recover(&mut self) {
-        let spooled = intent_store::spooled(&self.store_dir);
+        let records = intent_store::records(&self.store_dir);
         log::info(
             "PENDING_INTENTS_LOADED",
             json!({
                 "intents": self.intents.iter().map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
-                "spooledResponses": spooled.iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
+                "revision": self.revision,
+                "consumedRemembered": self.consumed.len(),
+                "backlogUnavailable": self.backlog_unavailable,
+                "records": records.iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
             }),
         );
-        for record in spooled {
-            self.notification_response(&record.notification_request_id, &record.attention_id, true);
+        for record in records {
+            self.take_response(&record.notification_request_id, &record.attention_id, None);
         }
     }
 
     /// The only voluntary exit of a writer process (SPEC §18.9, C-02). It
-    /// stops accepting responses, so later ones are spooled; finishes every
-    /// command already accepted, persisting each intent as it is queued; and
-    /// waits for any response still being spooled. Only then does it exit:
-    /// nothing it accepted depends on a reply or a timer having reached
-    /// anyone.
+    /// stops accepting responses, so later ones stay recorded; finishes
+    /// every command already accepted; and waits for any response still
+    /// being recorded. Every accepted response is then in the committed
+    /// backlog or still owned by its record (a Return in flight keeps its
+    /// record), so the exit leaves no accepted work only in this process. A
+    /// consumption the backlog could not record is retried once more; if it
+    /// still fails, the backlog lists an intent a view already consumed,
+    /// which the next writer delivers again and the shell does not apply.
     fn release(&mut self, code: i32, commands: &Receiver<WriterCommand>) -> ! {
         intent_store::close();
         let mut drained = self.drain(commands);
         #[cfg(feature = "qualification")]
         handoff::pass(handoff::Point::BeforeExit);
         drained += self.drain(commands);
+        if self.backlog_stale {
+            match self.commit(&self.durable_pending(), &self.consumed) {
+                Ok(_) => {
+                    self.revision += 1;
+                    self.backlog_stale = false;
+                }
+                Err(failure) => log::error(
+                    "RELEASE_BACKLOG_STALE",
+                    json!({ "failure": failure.json() }),
+                ),
+            }
+        }
         let _sealed = intent_store::seal();
         log::info(
             "WRITER_RELEASED",
             json!({
                 "code": code,
                 "drainedCommands": drained,
-                "pendingIntents": self.intents.iter().filter(|intent| intent_store::durable(intent)).map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
-                "spooledResponses": intent_store::spooled(&self.store_dir).iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
+                "revision": self.revision,
+                "pendingIntents": self.durable_pending().iter().map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
+                "records": intent_store::records(&self.store_dir).iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
+                "unpromoted": self.unpromoted,
+                "returning": self.returning.iter().collect::<Vec<_>>(),
+                "backlogStale": self.backlog_stale,
             }),
         );
         std::process::exit(code);
@@ -1375,8 +1610,10 @@ pub struct WriterSetup {
     pub responder: SyncSender<ResponseJob>,
     pub identity: ProcessIdentity,
     pub store_dir: PathBuf,
-    /// Pending intents a previous writer left in the store.
-    pub intents: Vec<NativeIntent>,
+    /// The backlog previous writers committed.
+    pub backlog: intent_store::Backlog,
+    /// The backlog could not be read; it is never overwritten.
+    pub backlog_unavailable: bool,
 }
 
 pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
@@ -1388,7 +1625,8 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
         responder,
         identity,
         store_dir,
-        intents,
+        backlog,
+        backlog_unavailable,
     } = setup;
     thread::Builder::new()
         .name("journal-writer".into())
@@ -1397,9 +1635,15 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
             let mut writer = Writer {
                 journal,
                 views: HashMap::new(),
-                intents: VecDeque::from(intents),
+                intents: VecDeque::from(backlog.pending),
                 last_cursor,
                 responder,
+                revision: backlog.revision,
+                consumed: backlog.consumed,
+                backlog_stale: false,
+                backlog_unavailable,
+                returning: HashSet::new(),
+                unpromoted: Vec::new(),
                 commands: sender,
                 identity,
                 store_dir,
@@ -1439,6 +1683,8 @@ pub mod handoff {
         AfterReply,
         /// The writer stopped accepting and drained; the process exits next.
         BeforeExit,
+        /// A backlog commit is written and synced; its rename has not run.
+        BeforeBacklogCommit,
     }
 
     impl Point {
@@ -1446,6 +1692,7 @@ pub mod handoff {
             match self {
                 Self::AfterReply => "AFTER_REPLY",
                 Self::BeforeExit => "BEFORE_EXIT",
+                Self::BeforeBacklogCommit => "BEFORE_BACKLOG_COMMIT",
             }
         }
     }
