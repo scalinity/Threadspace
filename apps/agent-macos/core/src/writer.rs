@@ -100,6 +100,12 @@ pub enum WriterCommand {
         request_id: u64,
         outbound: Outbound,
     },
+    /// An unsupervised incumbent hands the store to the login item's
+    /// companion: answer with the undelivered intents, then exit (SPEC §18.9).
+    Yield {
+        request_id: u64,
+        outbound: Outbound,
+    },
     /// Queue a validated intent for hydrated views, optionally bringing the
     /// containing application forward.
     PushIntent {
@@ -225,6 +231,21 @@ fn gated() -> ControlError {
         ControlErrorCode::MaintenanceGated,
         "maintenance holds the store; admission is closed",
     )
+}
+
+#[cfg(feature = "qualification")]
+fn capture_closed() -> ControlError {
+    if RUNTIME.supervised() {
+        ControlError::new(
+            ControlErrorCode::ObservationDisabled,
+            "observation is disabled; admission is closed",
+        )
+    } else {
+        ControlError::new(
+            ControlErrorCode::NotSupervised,
+            "not started by the login item; admission is closed",
+        )
+    }
 }
 
 /// Replaces entity upserts with page invalidations when the patch would not
@@ -592,8 +613,8 @@ impl Writer {
                 outbound,
             } if !RUNTIME.supervised() => {
                 // Only the companion its login item started opens observation
-                // (SPEC §19.5). This notification cold start answers, then
-                // exits with observation still disabled (a permitted
+                // (SPEC §18.9, §19.5). This unsupervised instance answers,
+                // then exits with its preference unchanged (a permitted
                 // deliberate exit), releasing the writer lock to it.
                 log::info("UNSUPERVISED_HANDOVER", json!({}));
                 respond(
@@ -604,10 +625,12 @@ impl Writer {
                         "not started by the login item; handing the store to its companion",
                     )),
                 );
-                let _ = thread::Builder::new().name("handover-exit".into()).spawn(|| {
-                    thread::sleep(std::time::Duration::from_millis(500));
-                    std::process::exit(crate::EXIT_RUNNING);
-                });
+                let _ = thread::Builder::new()
+                    .name("handover-exit".into())
+                    .spawn(|| {
+                        thread::sleep(std::time::Duration::from_millis(500));
+                        std::process::exit(crate::EXIT_RUNNING);
+                    });
             }
             WriterCommand::SetObservationEnabled {
                 request_id,
@@ -624,6 +647,28 @@ impl Writer {
                 }
                 Err(error) => respond(&outbound, request_id, Err(journal_error(&error))),
             },
+            WriterCommand::Yield {
+                request_id,
+                outbound,
+            } => {
+                let intents: Vec<NativeIntent> = self.intents.drain(..).collect();
+                log::info(
+                    "UNSUPERVISED_YIELD",
+                    json!({
+                        "intents": intents.iter().map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
+                        "observationEnabled": RUNTIME.observation_enabled(),
+                    }),
+                );
+                respond(
+                    &outbound,
+                    request_id,
+                    Ok(ControlResponseBody::WriterYielded { intents }),
+                );
+                let _ = thread::Builder::new().name("yield-exit".into()).spawn(|| {
+                    thread::sleep(std::time::Duration::from_millis(500));
+                    std::process::exit(crate::EXIT_RUNNING);
+                });
+            }
             WriterCommand::PrepareMaintenance {
                 request_id,
                 purpose,
@@ -903,6 +948,13 @@ impl Writer {
                     respond(&outbound, request_id, Err(gated()));
                     return;
                 }
+                // The durability fixture stands in for capture, so it is
+                // admitted only where capture is: an enabled, supervised
+                // companion (SPEC §18.9, §19.5).
+                if !RUNTIME.observation_enabled() || !RUNTIME.supervised() {
+                    respond(&outbound, request_id, Err(capture_closed()));
+                    return;
+                }
                 let payload = json!({ "fixture": "durability" });
                 let epoch = self.journal.store_generation().to_owned();
                 let admitted = self.journal.admit_observation(
@@ -1017,6 +1069,8 @@ impl Writer {
                 "sessionId": target.session_id,
                 "outstanding": target.outstanding,
                 "observationEnabled": RUNTIME.observation_enabled(),
+                "supervised": RUNTIME.supervised(),
+                "admissionOpen": observing,
                 "maintenance": RUNTIME.maintenance(),
                 "plan": plan,
                 "hydratedViews": self.views.values().filter(|view| view.hydrated).count(),
@@ -1145,6 +1199,8 @@ pub struct WriterSetup {
     pub responder: SyncSender<ResponseJob>,
     pub identity: ProcessIdentity,
     pub store_dir: PathBuf,
+    /// Intents inherited from an unsupervised incumbent that yielded the store.
+    pub intents: Vec<NativeIntent>,
 }
 
 pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
@@ -1155,6 +1211,7 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
         responder,
         identity,
         store_dir,
+        intents,
     } = setup;
     thread::Builder::new()
         .name("journal-writer".into())
@@ -1163,7 +1220,7 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
             let mut writer = Writer {
                 journal,
                 views: HashMap::new(),
-                intents: VecDeque::new(),
+                intents: VecDeque::from(intents),
                 last_cursor,
                 responder,
                 identity,

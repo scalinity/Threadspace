@@ -50,9 +50,9 @@ pub struct CoreContext {
 static NEXT_CONNECTION: AtomicU64 = AtomicU64::new(1);
 /// Connections that completed Hello and are still open.
 static OPEN_CONNECTIONS: AtomicUsize = AtomicUsize::new(0);
-/// With observation disabled, the companion exits after this long without a
-/// connected client: there is nothing to observe, and a deliberate successful
-/// exit is permitted after observation stop (SPEC §18.9).
+/// A stopped or unsupervised companion exits after this long without a
+/// connected client: there is nothing it may observe, and a deliberate
+/// successful exit is permitted after observation stop (SPEC §18.9).
 const DISABLED_IDLE_EXIT: Duration = Duration::from_secs(120);
 
 pub fn spawn_idle_exit() {
@@ -62,7 +62,8 @@ pub fn spawn_idle_exit() {
             let mut idle_since = Instant::now();
             loop {
                 thread::sleep(Duration::from_secs(5));
-                if RUNTIME.observation_enabled() {
+                // Only the login item's enabled companion stays alive.
+                if RUNTIME.supervised() && RUNTIME.observation_enabled() {
                     return;
                 }
                 if OPEN_CONNECTIONS.load(Ordering::Acquire) > 0 {
@@ -414,6 +415,35 @@ fn dispatch(
                 outbound: outbound_clone,
             },
         ),
+        ControlRequestBody::YieldWriter => {
+            // Only the companion executable may claim the store, and only an
+            // unsupervised incumbent gives it up (SPEC §18.9).
+            if !peer_is_companion {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::RoleNotPermitted,
+                    "only the companion executable may claim the store",
+                );
+            } else if RUNTIME.supervised() {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::Conflict,
+                    "the login item's companion holds the store",
+                );
+            } else {
+                to_writer(
+                    context,
+                    outbound,
+                    request_id,
+                    WriterCommand::Yield {
+                        request_id,
+                        outbound: outbound_clone,
+                    },
+                );
+            }
+        }
         ControlRequestBody::ForwardNotificationResponse {
             notification_request_id,
             attention_id,
@@ -682,6 +712,11 @@ fn dispatch(
                 (
                     ControlErrorCode::ObservationDisabled,
                     "observation is disabled",
+                )
+            } else if !RUNTIME.supervised() {
+                (
+                    ControlErrorCode::NotSupervised,
+                    "observation is unavailable: not started by the login item",
                 )
             } else if !RUNTIME.writes_open() {
                 (

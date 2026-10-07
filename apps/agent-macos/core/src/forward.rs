@@ -3,21 +3,73 @@
 //! runs or restarts; that instance never writes. It forwards the response to
 //! the verified incumbent over the control socket and exits, or exits after a
 //! bounded wait when nothing arrives.
+//!
+//! The login item's own companion first tries to claim the store: an
+//! unsupervised incumbent hands over its undelivered intents and exits
+//! (SPEC §18.9).
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde_json::json;
-use threadspace_contracts::control::{ClientRole, ControlRequestBody};
-use threadspace_relay::client::connect;
+use threadspace_contracts::control::{ClientRole, ControlRequestBody, ControlResponseBody};
+use threadspace_contracts::projection::NativeIntent;
+use threadspace_journal::{LockError, WriterLock};
+use threadspace_relay::client::{BlockingClient, connect};
 
-use crate::log;
 use crate::EXIT_WRITER_LOCK_HELD;
+use crate::log;
 
 /// Long enough for a launch-time notification response to arrive.
 const FORWARD_WINDOW: Duration = Duration::from_secs(15);
+/// How long a claimant waits for a yielding incumbent to release the lock.
+const CLAIM_WAIT: Duration = Duration::from_secs(10);
+
+/// Asks the incumbent to yield the store, then takes the writer lock it
+/// releases. `None` when the incumbent refuses (it is the supervised
+/// companion), cannot be reached, or the lock does not come free in time; the
+/// caller then forwards and exits nonzero, so launchd tries again.
+pub fn claim(locator: &Path, store_dir: &Path) -> Option<(WriterLock, Vec<NativeIntent>)> {
+    let reply = connect(locator, ClientRole::Ui, Duration::from_secs(2))
+        .map_err(|error| error.to_string())
+        .and_then(|connection| {
+            BlockingClient::new(connection)
+                .request(ControlRequestBody::YieldWriter)
+                .map_err(|error| error.to_string())
+        });
+    let intents = match reply {
+        Ok(ControlResponseBody::WriterYielded { intents }) => intents,
+        other => {
+            let detail: String = format!("{other:?}").chars().take(200).collect();
+            log::info("WRITER_CLAIM_REFUSED", json!({ "reply": detail }));
+            return None;
+        }
+    };
+    let deadline = Instant::now() + CLAIM_WAIT;
+    loop {
+        match WriterLock::acquire(store_dir) {
+            Ok(lock) => {
+                log::info(
+                    "WRITER_CLAIMED",
+                    json!({ "inheritedIntents": intents.len() }),
+                );
+                return Some((lock, intents));
+            }
+            Err(LockError::Held { .. }) if Instant::now() < deadline => {
+                thread::sleep(Duration::from_millis(100));
+            }
+            Err(error) => {
+                log::warn(
+                    "WRITER_CLAIM_LOCK_FAILED",
+                    json!({ "error": error.to_string(), "droppedIntents": intents.len() }),
+                );
+                return None;
+            }
+        }
+    }
+}
 
 static LOCATOR: OnceLock<PathBuf> = OnceLock::new();
 

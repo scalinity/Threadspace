@@ -63,7 +63,7 @@ export function Inspector({ state, client }: { state: ViewState; client: BridgeC
       {inspector.source === "NOTIFICATION_RESPONSE" ? (
         <p className="callout" role="status">
           Opened from a native notification{inspector.outstandingAtOpen === false ? " — this item was already handled." : "."}
-          {inspector.observationEnabled === false ? " Observation is stopped or under maintenance, so nothing was routed." : ""}
+          {inspector.observationEnabled === false ? " Observation is stopped, unavailable or under maintenance, so nothing was routed." : ""}
           {inspector.route ? ` Return: ${inspector.route.surfaceResult} · ${inspector.route.sessionVerification} · ${inspector.route.reasonCode}.` : ""}
         </p>
       ) : null}

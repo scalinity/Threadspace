@@ -74,12 +74,34 @@ pub struct CompanionDiagnostics {
     pub notification_settings: Option<NotificationSettings>,
     pub accessibility_preferences: Option<AccessibilityPreferences>,
     pub qualification_build: bool,
-    /// The persisted owner preference (SPEC §19.5).
+    /// The persisted owner preference (SPEC §19.5). It never authorizes
+    /// capture by itself: see `admission_open`.
     pub observation_enabled: bool,
+    /// How this process was started (SPEC §18.9); only `LOGIN_ITEM` is
+    /// supervised.
+    pub launch_provenance: LaunchProvenance,
+    /// Effective capture admission: the preference, positive supervision, no
+    /// maintenance phase and an awake machine, together.
+    pub admission_open: bool,
     /// `NONE`, `PREPARING` or `PREPARED`.
     pub maintenance_phase: String,
     /// Sleep/wake transitions observed by this core process (SPEC §19.5).
     pub power: PowerHistory,
+}
+
+/// The companion's launch provenance (SPEC §18.9). Supervision is positive:
+/// a process is the login item's companion only when launchd is its parent
+/// and its launchd job label is the companion's bundle identifier.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
+pub enum LaunchProvenance {
+    /// launchd's login-item job, which relaunches it after a crash.
+    LoginItem,
+    /// A LaunchServices application launch, such as a notification cold start.
+    LaunchServices,
+    /// Absent, unrecognized or malformed launch evidence.
+    Unknown,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, Default)]

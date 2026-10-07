@@ -1,19 +1,20 @@
 //! In-memory gates shared by the companion's threads. The single writer owns
 //! the persisted values (observation preference, maintenance phase); this is
 //! their mirror, read by discovery and the control server to decide whether
-//! capture admission is open (SPEC §19.5).
+//! capture admission is open (SPEC §18.9, §19.5).
 
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use threadspace_contracts::control::MaintenancePhase;
-use threadspace_contracts::diagnostics::PowerHistory;
+use threadspace_contracts::diagnostics::{LaunchProvenance, PowerHistory};
 
 pub struct Runtime {
+    /// The owner's persisted preference; never an authorization by itself.
     observation_enabled: AtomicBool,
-    /// False only for a companion its login item did not start (a
-    /// notification cold start), which never becomes the enabled writer.
-    supervised: AtomicBool,
+    /// Unknown until classified at startup, so nothing is supervised by
+    /// default (SPEC §18.9).
+    provenance: Mutex<LaunchProvenance>,
     maintenance: Mutex<MaintenancePhase>,
     asleep: AtomicBool,
     power: Mutex<PowerHistory>,
@@ -21,24 +22,28 @@ pub struct Runtime {
     fail_next_backup: AtomicBool,
 }
 
-pub static RUNTIME: Runtime = Runtime {
-    observation_enabled: AtomicBool::new(true),
-    supervised: AtomicBool::new(true),
-    maintenance: Mutex::new(MaintenancePhase::None),
-    asleep: AtomicBool::new(false),
-    power: Mutex::new(PowerHistory {
-        sleeps: 0,
-        wakes: 0,
-        last_sleep_wall_ms: None,
-        last_wake_wall_ms: None,
-        boot_id_at_last_wake: None,
-        wake_revalidations: 0,
-    }),
-    #[cfg(feature = "qualification")]
-    fail_next_backup: AtomicBool::new(false),
-};
+pub static RUNTIME: Runtime = Runtime::new();
 
 impl Runtime {
+    const fn new() -> Self {
+        Self {
+            observation_enabled: AtomicBool::new(true),
+            provenance: Mutex::new(LaunchProvenance::Unknown),
+            maintenance: Mutex::new(MaintenancePhase::None),
+            asleep: AtomicBool::new(false),
+            power: Mutex::new(PowerHistory {
+                sleeps: 0,
+                wakes: 0,
+                last_sleep_wall_ms: None,
+                last_wake_wall_ms: None,
+                boot_id_at_last_wake: None,
+                wake_revalidations: 0,
+            }),
+            #[cfg(feature = "qualification")]
+            fail_next_backup: AtomicBool::new(false),
+        }
+    }
+
     pub fn observation_enabled(&self) -> bool {
         self.observation_enabled.load(Ordering::Acquire)
     }
@@ -47,12 +52,23 @@ impl Runtime {
         self.observation_enabled.store(enabled, Ordering::Release);
     }
 
-    pub fn supervised(&self) -> bool {
-        self.supervised.load(Ordering::Acquire)
+    pub fn provenance(&self) -> LaunchProvenance {
+        self.provenance
+            .lock()
+            .map(|provenance| *provenance)
+            .unwrap_or(LaunchProvenance::Unknown)
     }
 
-    pub fn set_supervised(&self, supervised: bool) {
-        self.supervised.store(supervised, Ordering::Release);
+    pub fn set_provenance(&self, provenance: LaunchProvenance) {
+        if let Ok(mut current) = self.provenance.lock() {
+            *current = provenance;
+        }
+    }
+
+    /// Only the login item's own companion is supervised: a notification
+    /// cold start or an unknown launch never becomes the observer.
+    pub fn supervised(&self) -> bool {
+        self.provenance() == LaunchProvenance::LoginItem
     }
 
     pub fn maintenance(&self) -> MaintenancePhase {
@@ -72,10 +88,14 @@ impl Runtime {
         self.asleep.load(Ordering::Acquire)
     }
 
-    /// Provider polling and capture admission run only while observation is
-    /// enabled, no maintenance phase is active and the machine is awake.
+    /// Provider polling and capture admission run only in the supervised
+    /// companion, while observation is enabled, no maintenance phase is active
+    /// and the machine is awake.
     pub fn admission_open(&self) -> bool {
-        self.observation_enabled() && self.maintenance() == MaintenancePhase::None && !self.asleep()
+        self.observation_enabled()
+            && self.supervised()
+            && self.maintenance() == MaintenancePhase::None
+            && !self.asleep()
     }
 
     /// Owner mutations are refused only while maintenance holds the store.
@@ -128,5 +148,48 @@ impl Runtime {
         {
             false
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nothing_is_supervised_before_classification() {
+        let runtime = Runtime::new();
+        assert!(runtime.observation_enabled());
+        assert_eq!(runtime.provenance(), LaunchProvenance::Unknown);
+        assert!(!runtime.supervised());
+        assert!(!runtime.admission_open());
+    }
+
+    #[test]
+    fn the_enabled_preference_alone_never_opens_admission() {
+        for provenance in [LaunchProvenance::LaunchServices, LaunchProvenance::Unknown] {
+            let runtime = Runtime::new();
+            runtime.set_observation_enabled(true);
+            runtime.set_provenance(provenance);
+            assert!(!runtime.admission_open(), "{provenance:?} must not admit");
+            // Owner mutations are a separate gate (control-only behavior).
+            assert!(runtime.writes_open());
+        }
+    }
+
+    #[test]
+    fn admission_needs_preference_supervision_no_maintenance_and_awake() {
+        let runtime = Runtime::new();
+        runtime.set_provenance(LaunchProvenance::LoginItem);
+        assert!(runtime.admission_open());
+        runtime.set_observation_enabled(false);
+        assert!(!runtime.admission_open());
+        runtime.set_observation_enabled(true);
+        runtime.set_maintenance(MaintenancePhase::Prepared);
+        assert!(!runtime.admission_open());
+        runtime.set_maintenance(MaintenancePhase::None);
+        runtime.note_sleep(1);
+        assert!(!runtime.admission_open());
+        runtime.note_wake(2, None);
+        assert!(runtime.admission_open());
     }
 }

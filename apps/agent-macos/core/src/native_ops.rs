@@ -123,6 +123,8 @@ fn diagnostics(
             accessibility_preferences: bridge::accessibility_preferences(QUICK),
             qualification_build: cfg!(feature = "qualification"),
             observation_enabled: RUNTIME.observation_enabled(),
+            launch_provenance: RUNTIME.provenance(),
+            admission_open: RUNTIME.admission_open(),
             maintenance_phase: serde_json::to_value(RUNTIME.maintenance())
                 .ok()
                 .and_then(|value| value.as_str().map(str::to_owned))

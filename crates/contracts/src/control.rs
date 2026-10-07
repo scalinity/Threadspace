@@ -110,6 +110,10 @@ pub enum ControlRequestBody {
         notification_request_id: String,
         attention_id: String,
     },
+    /// Sent by the login item's own companion when it finds the writer lock
+    /// held: an unsupervised incumbent hands over its undelivered intents and
+    /// exits, releasing the store (SPEC §18.9). A supervised incumbent refuses.
+    YieldWriter,
     /// Qualification only: commit a synthetic fixture turn plus a completed-turn
     /// attention item and its notification intent.
     #[cfg(feature = "qualification")]
@@ -219,6 +223,11 @@ pub enum ControlResponseBody {
     MaintenancePrepared {
         report: Box<MaintenanceReport>,
     },
+    /// The unsupervised incumbent's answer to `YieldWriter`: intents no view
+    /// has consumed yet. It exits right after, releasing the writer lock.
+    WriterYielded {
+        intents: Vec<NativeIntent>,
+    },
     #[cfg(feature = "qualification")]
     SyntheticChangesStarted {
         run_id: String,
@@ -310,8 +319,9 @@ pub enum ControlErrorCode {
     MaintenanceGated,
     /// Observation is disabled; only control/inspection operations run.
     ObservationDisabled,
-    /// This companion was not started by its login item (a notification
-    /// cold start); it hands the store to the login item's companion.
+    /// This companion was not started by its login item (a notification cold
+    /// start, or unknown launch provenance): capture admission stays closed
+    /// and it hands the store to the login item's companion.
     NotSupervised,
     Internal,
 }

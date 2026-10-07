@@ -34,7 +34,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 
 use serde::Deserialize;
 use serde_json::json;
-use threadspace_contracts::diagnostics::ProcessIdentity;
+use threadspace_contracts::diagnostics::{LaunchProvenance, ProcessIdentity};
 use threadspace_journal::{Journal, LockError, WriterLock};
 use threadspace_relay::locator::{self, LOCATOR_SCHEMA, RuntimeLocator};
 use threadspace_relay::paths::AgentPaths;
@@ -89,6 +89,26 @@ fn own_identity() -> Result<ProcessIdentity, String> {
             .display()
             .to_string(),
     })
+}
+
+/// Positive supervision evidence (SPEC §18.9). launchd names a login-item
+/// job after its bundle identifier and is its parent; LaunchServices names an
+/// application it starts (a notification cold start)
+/// `application.<identifier>.<n>.<n>`. Anything else — no job label, a
+/// shell's `0`, a foreign label, or the login item's label without launchd as
+/// parent — is unknown, and unknown is never supervised.
+fn classify_launch(
+    service_name: Option<&str>,
+    parent_pid: i32,
+    bundle_identifier: &str,
+) -> LaunchProvenance {
+    match service_name {
+        Some(name) if name == bundle_identifier && parent_pid == 1 => LaunchProvenance::LoginItem,
+        Some(name) if name.starts_with(&format!("application.{bundle_identifier}.")) => {
+            LaunchProvenance::LaunchServices
+        }
+        _ => LaunchProvenance::Unknown,
+    }
 }
 
 fn private_dir(path: &Path) -> std::io::Result<()> {
@@ -163,18 +183,23 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         return EXIT_CONFIG;
     };
     log::init(&paths.log_dir);
-    // launchd names a login-item job after its bundle identifier, and an
-    // application LaunchServices started (a notification cold start)
-    // `application.<identifier>.<n>.<n>`.
-    let supervised = std::env::var("XPC_SERVICE_NAME").map_or(true, |name| {
-        !name.starts_with(&format!("application.{}.", config.bundle_identifier))
-    });
-    RUNTIME.set_supervised(supervised);
+    let service_name = std::env::var("XPC_SERVICE_NAME").ok();
+    // SAFETY: getppid has no preconditions.
+    let parent_pid = unsafe { libc::getppid() };
+    let provenance = classify_launch(
+        service_name.as_deref(),
+        parent_pid,
+        &config.bundle_identifier,
+    );
+    RUNTIME.set_provenance(provenance);
     log::info(
         "CORE_START",
         json!({
             "bundleIdentifier": config.bundle_identifier,
-            "supervised": supervised,
+            "supervised": RUNTIME.supervised(),
+            "launchProvenance": provenance,
+            "serviceName": service_name.map(|name| name.chars().take(128).collect::<String>()),
+            "parentPid": parent_pid,
             "bundlePath": threadspace_relay::paths::redact_home(&config.bundle_path),
             "qualificationBuild": cfg!(feature = "qualification"),
         }),
@@ -190,7 +215,18 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         log::error("STORE_DIR_FAILED", json!({ "error": error.to_string() }));
         return EXIT_FATAL;
     }
-    let lock = match WriterLock::acquire(&paths.store_dir) {
+    let mut inherited_intents = Vec::new();
+    let mut acquired = WriterLock::acquire(&paths.store_dir);
+    if matches!(acquired, Err(LockError::Held { .. }))
+        && RUNTIME.supervised()
+        && let Some((lock, intents)) = forward::claim(&paths.locator, &paths.store_dir)
+    {
+        // The login item's companion took the store from an unsupervised
+        // incumbent, with the intents no view had consumed (SPEC §18.9).
+        inherited_intents = intents;
+        acquired = Ok(lock);
+    }
+    let lock = match acquired {
         Ok(lock) => lock,
         Err(LockError::Held { .. }) => {
             // Another instance owns the store. This one only forwards a
@@ -266,7 +302,13 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     RUNTIME.set_maintenance(maintenance);
     log::info(
         "OBSERVATION_STATE",
-        json!({ "observationEnabled": observation_enabled, "maintenance": maintenance }),
+        json!({
+            "observationEnabled": observation_enabled,
+            "supervised": RUNTIME.supervised(),
+            "launchProvenance": RUNTIME.provenance(),
+            "admissionOpen": RUNTIME.admission_open(),
+            "maintenance": maintenance,
+        }),
     );
     let identity = match own_identity() {
         Ok(identity) => identity,
@@ -310,6 +352,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         responder: respond_tx,
         identity: identity.clone(),
         store_dir: paths.store_dir.clone(),
+        intents: inherited_intents,
     })
     .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
     .and_then(|_| discovery::spawn(claude.clone()))
@@ -388,7 +431,9 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     for event in queued {
         handle_event(event);
     }
-    if !observation_enabled {
+    // A stopped or unsupervised companion has a bounded lifetime: only the
+    // login item's enabled companion stays in its run loop (SPEC §18.9).
+    if !observation_enabled || !RUNTIME.supervised() {
         server::spawn_idle_exit();
     }
     EXIT_RUNNING
@@ -496,5 +541,49 @@ pub unsafe extern "C" fn ts_core_deliver(event_json: *const c_char) {
             "BRIDGE_EVENT_REJECTED",
             json!({ "reason": error.to_string() }),
         ),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const ID: &str = "ai.scalinity.threadspace.agent";
+
+    #[test]
+    fn only_launchds_login_item_job_is_supervised() {
+        assert_eq!(
+            classify_launch(Some(ID), 1, ID),
+            LaunchProvenance::LoginItem
+        );
+    }
+
+    #[test]
+    fn a_notification_cold_start_is_launch_services() {
+        let name = format!("application.{ID}.12345.67890");
+        assert_eq!(
+            classify_launch(Some(&name), 1, ID),
+            LaunchProvenance::LaunchServices
+        );
+    }
+
+    #[test]
+    fn missing_or_malformed_provenance_is_unknown_not_supervised() {
+        for (name, parent) in [
+            (None, 1),
+            (Some("0"), 1),
+            (Some(""), 1),
+            (Some("ai.scalinity.threadspace.dev.agent"), 1),
+            (Some("ai.scalinity.threadspace.agent.extra"), 1),
+            (Some("application.ai.scalinity.threadspace.agentX.1.2"), 1),
+            // The login item's label without launchd as the parent.
+            (Some(ID), 4242),
+        ] {
+            assert_eq!(
+                classify_launch(name, parent, ID),
+                LaunchProvenance::Unknown,
+                "{name:?} with parent {parent}"
+            );
+        }
     }
 }

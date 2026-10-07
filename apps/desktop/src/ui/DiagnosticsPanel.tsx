@@ -1,4 +1,12 @@
 import type { BridgeClient, ViewState } from "../bridge/client";
+import type { CompanionDiagnostics } from "../contracts/generated/CompanionDiagnostics";
+
+/** The saved preference and whether this companion may act on it are separate facts (SPEC §18.9). */
+function observationText(companion: CompanionDiagnostics): string {
+  if (!companion.observationEnabled) return "stopped";
+  if (companion.launchProvenance !== "LOGIN_ITEM") return "enabled · unavailable (not started by the login item)";
+  return companion.admissionOpen ? "enabled" : "enabled · paused (maintenance or sleep)";
+}
 
 function Row({ label, value }: { label: string; value: string | number | boolean | null | undefined }) {
   return (
@@ -59,7 +67,7 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
         <Row label="SQLite" value={companion ? `${companion.sqlite.version} · ${companion.sqlite.journalMode} · sync ${companion.sqlite.synchronous}` : null} />
         <Row label="Notifications" value={notifications ? `${notifications.authorizationStatus} · alert ${notifications.alertSetting}` : null} />
         <Row label="Reduce motion" value={companion?.accessibilityPreferences?.reduceMotion} />
-        <Row label="Observation" value={companion ? (companion.observationEnabled ? "enabled" : "stopped") : null} />
+        <Row label="Observation" value={companion ? observationText(companion) : null} />
         <Row label="Maintenance" value={companion?.maintenancePhase} />
         <Row label="Sleep / wake" value={companion ? `${companion.power.sleeps} / ${companion.power.wakes}` : null} />
         <Row label="Login item" value={state.integration?.service.status} />
