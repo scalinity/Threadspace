@@ -294,10 +294,13 @@ fn wait_login_item_owner(ctx: &Ctx, timeout_s: u64) -> Option<u64> {
     None
 }
 
+/// When it was taken and the companion PIDs alive then.
+type Sample = (i64, Vec<i32>);
+
 /// Samples the live companion processes every `SAMPLE_MS` until stopped.
 struct Sampler {
     stop: Arc<AtomicBool>,
-    samples: Arc<Mutex<Vec<(i64, Vec<i32>)>>>,
+    samples: Arc<Mutex<Vec<Sample>>>,
     handle: Option<std::thread::JoinHandle<()>>,
 }
 
