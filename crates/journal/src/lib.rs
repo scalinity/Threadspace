@@ -208,16 +208,19 @@ impl Journal {
     /// Opens (creating if needed) the journal at `path`. The caller must hold
     /// the `WriterLock` for the containing store directory.
     pub fn open(path: &Path, source_epoch: &str, now_ms: i64) -> Result<Self, JournalError> {
-        Self::open_with(path, source_epoch, now_ms, Box::new(RandomAllocator))
+        Self::open_with(path, source_epoch, now_ms, Box::new(RandomAllocator), true)
     }
 
     /// Opens with an explicit identity allocator (seeded in reproducible
-    /// synthetic runs; random in the companion).
+    /// synthetic runs; random in the companion). `seed_fixture` is false
+    /// only for bare synthetic stores that must hold nothing but their
+    /// scenario.
     pub fn open_with(
         path: &Path,
         source_epoch: &str,
         now_ms: i64,
         mut allocator: Box<dyn Allocator + Send>,
+        seed_fixture: bool,
     ) -> Result<Self, JournalError> {
         #[cfg(feature = "qualification")]
         let crash = crash::CrashState::from_env()?;
@@ -276,7 +279,9 @@ impl Journal {
             #[cfg(feature = "qualification")]
             crash,
         };
-        journal.ensure_fixture(now_ms)?;
+        if seed_fixture {
+            journal.ensure_fixture(now_ms)?;
+        }
         Ok(journal)
     }
 

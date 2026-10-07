@@ -9,6 +9,7 @@ pub mod permute;
 pub mod rng;
 pub mod runner;
 pub mod scenarios;
+pub mod sqlite;
 pub mod view;
 
 /// Sensitive bodies planted in fixtures; no persisted record may contain them.
