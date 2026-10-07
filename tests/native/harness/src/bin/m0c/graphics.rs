@@ -16,14 +16,14 @@ use threadspace_harness::procs::Incarnation;
 use crate::bridge_gates::{compare_projection, ensure_ui};
 use crate::ctx::Ctx;
 
-fn state(ctx: &Ctx) -> Value {
+pub(crate) fn state(ctx: &Ctx) -> Value {
     ctx.app()
         .view_command("renderer:report-state", json!({}), Duration::from_secs(30))
         .map(|r| r["result"].clone())
         .unwrap_or_else(|e| json!({ "error": e }))
 }
 
-fn command(ctx: &Ctx, name: &str) -> Value {
+pub(crate) fn command(ctx: &Ctx, name: &str) -> Value {
     ctx.app()
         .view_command(&format!("renderer:{name}"), json!({}), Duration::from_secs(60))
         .map(|r| json!({ "ok": r["ok"], "result": r["result"], "error": r["error"] }))
@@ -97,20 +97,20 @@ pub fn renderer(ctx: &Ctx) -> Result<Value, String> {
     Ok(json!({ "summary": summary, "dir": run_dir.dir }))
 }
 
-struct Captures<'a> {
-    ctx: &'a Ctx,
-    run: &'a Run,
-    pid: u32,
-    previous: Option<(String, Option<(f64, f64)>)>,
-    index: u32,
+pub(crate) struct Captures<'a> {
+    pub(crate) ctx: &'a Ctx,
+    pub(crate) run: &'a Run,
+    pub(crate) pid: u32,
+    pub(crate) previous: Option<(String, Option<(f64, f64)>)>,
+    pub(crate) index: u32,
     /// The canvas rectangle in capture pixels: comparisons measure the
     /// scene's own pixels, never DOM text elsewhere in the window.
-    crop: Option<[String; 4]>,
+    pub(crate) crop: Option<[String; 4]>,
 }
 
 impl Captures<'_> {
     /// Captures the window; compares with the previous capture of the same size.
-    fn take(&mut self, phase: &str) -> Value {
+    pub(crate) fn take(&mut self, phase: &str) -> Value {
         self.index += 1;
         let Some(window) = self.ctx.native.main_window_id(self.pid) else {
             return json!({ "phase": phase, "captured": false });
@@ -198,7 +198,7 @@ pub fn keep_centre_animated(ctx: &Ctx, raised: &mut Vec<Value>) -> Value {
     json!({ "workers": list.len(), "centre": centre.iter().map(|&i| list[i].clone()).collect::<Vec<_>>(), "raised": added })
 }
 
-fn changed(capture: &Value) -> bool {
+pub(crate) fn changed(capture: &Value) -> bool {
     capture["diffFromPrevious"]["changedFraction"].as_f64().is_some_and(|f| f > 0.0005)
         || capture["diffFromPrevious"]["meanAbsDiff"].as_f64().is_some_and(|d| d > 0.02)
 }

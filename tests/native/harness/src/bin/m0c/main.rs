@@ -29,11 +29,13 @@
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
 //!   threadspace-m0c c02-supervision <prod|dev> [all|A,B,C,D,E]
 //!   threadspace-m0c h10-terminal <prod|dev>
+//!   threadspace-m0c h11-graphics prod
 
 mod bridge_gates;
 mod cleanup;
 mod ctx;
 mod graphics;
+mod graphics_overlap;
 mod install;
 mod launches;
 mod notifications;
@@ -80,6 +82,7 @@ fn main() -> ExitCode {
         }
         "g08-terminal" => terminal_gates::negatives(&ctx),
         "h10-terminal" => terminal_gates::remediation(&ctx),
+        "h11-graphics" => graphics_overlap::overlap(&ctx),
         "g06-notifications" => notifications::lifecycle(&ctx),
         "g05-denied" => notifications::denied(&ctx),
         "g13-renderer" => graphics::renderer(&ctx),
