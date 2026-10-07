@@ -72,7 +72,7 @@ impl DiscoveryContext {
     /// Provider namespace: the default CLI profile on this endpoint, keyed by
     /// its canonical config directory (SPEC §4.1).
     pub fn profile_ref(&self) -> String {
-        format!("claude-cli:{}", self.home.join(".claude").display())
+        threadspace_relay::paths::claude_profile_ref(&self.home)
     }
 
     pub fn cli(&self, install: &ClaudeInstall, timeout: Duration) -> ClaudeCli {

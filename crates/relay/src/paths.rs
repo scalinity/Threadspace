@@ -72,6 +72,12 @@ impl AgentPaths {
     }
 }
 
+/// The Claude namespace profile reference for a home directory: the same
+/// string discovery and hook capture use, so both land in one namespace.
+pub fn claude_profile_ref(home: &std::path::Path) -> String {
+    format!("claude-cli:{}", home.join(".claude").display())
+}
+
 /// Replaces the home directory prefix with `~` for diagnostics and evidence.
 pub fn redact_home(path: &str) -> String {
     match home_dir() {

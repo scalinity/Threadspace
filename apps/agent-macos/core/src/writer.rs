@@ -28,6 +28,12 @@ use threadspace_journal::{
 };
 use uuid::Uuid;
 
+use threadspace_contracts::canonical::capture::{CaptureRefusal, RecordReceipt};
+use threadspace_contracts::canonical::envelope::ObservationEnvelope;
+use threadspace_contracts::canonical::fact::Delivery;
+use threadspace_journal::EnvelopeAdmission;
+
+use crate::adapters;
 use crate::bridge::{self, BridgeRequest};
 use crate::intent_store::{self, Step, StorageFailure};
 use crate::log;
@@ -128,6 +134,19 @@ pub enum WriterCommand {
         intent: NativeIntent,
         open_app: bool,
         response_id: String,
+    },
+    /// Captured observations (event socket or spool drain), admitted in one
+    /// canonical transaction; receipts are sent only after commit.
+    AdmitCaptured {
+        envelopes: Vec<ObservationEnvelope>,
+        delivery: Delivery,
+        reply: SyncSender<Result<Vec<RecordReceipt>, CaptureRefusal>>,
+    },
+    /// Records a capture coverage loss: spool saturation markers and
+    /// expired spool records (SPEC §8.4).
+    RecordCaptureLoss {
+        dropped: Vec<String>,
+        expired: usize,
     },
     /// A sleep/wake transition (SPEC §19.5), journaled as a lifecycle fact.
     RecordLifecycle {
@@ -950,6 +969,64 @@ impl Writer {
                 self.promote(intent, &response_id, true);
                 if open_app {
                     bridge::notify(&BridgeRequest::OpenContainingApp);
+                }
+            }
+            WriterCommand::AdmitCaptured {
+                envelopes,
+                delivery,
+                reply,
+            } => {
+                if !RUNTIME.admission_open() {
+                    let _ = reply.send(Err(CaptureRefusal::AdmissionClosed));
+                    return;
+                }
+                let admissions: Vec<EnvelopeAdmission<'_>> = envelopes
+                    .iter()
+                    .map(|envelope| EnvelopeAdmission {
+                        envelope,
+                        normalized: adapters::normalize(envelope),
+                    })
+                    .collect();
+                match self.journal.admit_batch(&admissions, delivery, log::now_ms()) {
+                    Ok(outcome) => {
+                        if let Some(change) = &outcome.change {
+                            self.broadcast(change);
+                        }
+                        if !outcome.notifications.is_empty() {
+                            // Delivery of canonical attention intents belongs to
+                            // the notification product (M5); the intents are durable.
+                            log::info(
+                                "OUTBOX_INTENTS_RECORDED",
+                                json!({ "count": outcome.notifications.len() }),
+                            );
+                        }
+                        let receipts = outcome
+                            .records
+                            .into_iter()
+                            .map(|record| RecordReceipt {
+                                observation_id: record.observation_id,
+                                status: record.status,
+                                reason: record.reason,
+                            })
+                            .collect();
+                        let _ = reply.send(Ok(receipts));
+                    }
+                    Err(error) => {
+                        log::error("CAPTURE_ADMISSION_FAILED", json!({ "error": error.to_string() }));
+                        let _ = reply.send(Err(CaptureRefusal::Busy));
+                    }
+                }
+            }
+            WriterCommand::RecordCaptureLoss { dropped, expired } => {
+                if !RUNTIME.writes_open() {
+                    return;
+                }
+                match self.journal.record_capture_loss(&dropped, expired, log::now_ms()) {
+                    Ok(change) => self.broadcast(&change),
+                    Err(error) => log::warn(
+                        "CAPTURE_LOSS_UNRECORDED",
+                        json!({ "error": error.to_string() }),
+                    ),
                 }
             }
             WriterCommand::RecordLifecycle {

@@ -842,15 +842,15 @@ impl Journal {
                 id: command_in.attention_id.clone(),
             });
         };
-        if let Some(expected) = command_in.expected_revision.as_deref() {
-            if parse_cursor(expected) != Some(item.revision) {
-                return Err(JournalError::Conflict {
-                    detail: format!(
-                        "attention {} is at revision {}, not {expected}",
-                        item.id, item.revision
-                    ),
-                });
-            }
+        if let Some(expected) = command_in.expected_revision.as_deref()
+            && parse_cursor(expected) != Some(item.revision)
+        {
+            return Err(JournalError::Conflict {
+                detail: format!(
+                    "attention {} is at revision {}, not {expected}",
+                    item.id, item.revision
+                ),
+            });
         }
         let session_id = item.session_id.clone();
         let observation_id = self.allocate_id();
@@ -911,6 +911,56 @@ impl Journal {
                 session_ids,
                 attention_ids: vec![command_in.attention_id.clone()],
             }),
+        })
+    }
+
+    /// Records a capture coverage loss as a canonical gap fact: records the
+    /// spool could not hold (one marker each) and spool records that expired
+    /// unadmitted. A loss is a known gap, never a provider outcome.
+    pub fn record_capture_loss(
+        &mut self,
+        dropped: &[String],
+        expired: usize,
+        now_ms: i64,
+    ) -> Result<Change, JournalError> {
+        use threadspace_contracts::canonical::fact::{EvidenceClass, FactPayload, NativeRefs};
+        let mut reasons: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+        for marker in dropped {
+            let reason = marker.split_once('.').map_or("unknown", |(_, r)| r);
+            *reasons.entry(reason.to_owned()).or_default() += 1;
+        }
+        let summary: Vec<String> = reasons.iter().map(|(r, n)| format!("{r}={n}")).collect();
+        let detail: String = format!("dropped {} [{}]; expired {expired}", dropped.len(), summary.join(","))
+            .chars()
+            .take(240)
+            .collect();
+        let draft = NativeFactDraft {
+            refs: NativeRefs::default(),
+            provenance: EvidenceClass::Derived,
+            causal: None,
+            payload: FactPayload::ObservationGapDetected {
+                domain: "capture-spool".into(),
+                detail: detail.clone(),
+            },
+        };
+        let observation_id = self.allocate_id();
+        let payload = serde_json::json!({ "dropped": dropped.len(), "expired": expired, "detail": detail });
+        let (cursor, output) = self.admit_internal(
+            observation_id,
+            "capture.spool",
+            "CAPTURE_LOSS_RECORDED",
+            &payload,
+            &[draft],
+            Vec::new(),
+            Delivery::Live,
+            now_ms,
+            now_ms,
+            |_, _, _| Ok(()),
+        )?;
+        Ok(Change {
+            cursor,
+            session_ids: output.changed.sessions.into_iter().collect(),
+            attention_ids: Vec::new(),
         })
     }
 

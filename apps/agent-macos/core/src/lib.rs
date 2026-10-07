@@ -11,8 +11,12 @@
 //! - `ts_core_deliver(event_json)` carries Apple-layer answers and notification
 //!   responses into the core.
 
+mod adapters;
 mod bridge;
 mod discovery;
+mod events;
+#[cfg(feature = "qualification")]
+pub mod fixture;
 mod forward;
 mod intent_store;
 mod log;
@@ -22,6 +26,7 @@ mod notify;
 mod respond;
 mod route;
 mod server;
+mod spool_drain;
 mod state;
 mod writer;
 
@@ -361,6 +366,13 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         }
     };
 
+    let (events_listener, events_path) = match bind_private_socket(&runtime_dir, "events.sock") {
+        Ok(bound) => bound,
+        Err(error) => {
+            log::error("EVENTS_SOCKET_BIND_FAILED", json!({ "error": error.to_string() }));
+            return EXIT_FATAL;
+        }
+    };
     let (writer_tx, writer_rx) = mpsc::sync_channel(256);
     let (notify_tx, notify_rx) = mpsc::sync_channel(64);
     let (respond_tx, respond_rx) = mpsc::sync_channel(16);
@@ -424,7 +436,9 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
             discovery,
         });
         server::spawn(listener, context)
-    });
+    })
+    .and_then(|_| events::spawn(events_listener, writer_tx.clone()))
+    .and_then(|_| spool_drain::spawn(paths.store_dir.clone(), writer_tx.clone()));
     if let Err(error) = spawned {
         log::error("THREAD_SPAWN_FAILED", json!({ "error": error.to_string() }));
         return EXIT_FATAL;
@@ -435,6 +449,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         bundle_identifier: config.bundle_identifier,
         runtime_dir: runtime_dir.display().to_string(),
         control_socket: socket_path.display().to_string(),
+        events_socket: Some(events_path.display().to_string()),
         core_generation: core_generation.clone(),
         store_generation: store_generation.clone(),
         companion: identity.clone(),

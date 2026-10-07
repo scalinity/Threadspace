@@ -5,5 +5,6 @@
 //! starts, resumes or prompts a provider session.
 
 pub mod discovery;
+pub mod hooks;
 pub mod inventory;
 pub mod reconcile;

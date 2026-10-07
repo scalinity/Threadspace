@@ -14,7 +14,11 @@ crate-type = ["staticlib", "rlib"]
 [features]
 # Qualification builds accept the qualification client role and synthetic
 # attention. Release builds (M15) are built without it.
-qualification = ["threadspace-contracts/qualification", "threadspace-journal/qualification"]
+qualification = [
+  "threadspace-contracts/qualification",
+  "threadspace-journal/qualification",
+  "threadspace-state-engine/synthetic",
+]
 
 [dependencies]
 threadspace-contracts.workspace = true
@@ -23,6 +27,7 @@ threadspace-relay.workspace = true
 threadspace-surfaces-macos.workspace = true
 threadspace-surfaces.workspace = true
 threadspace-provider-claude.workspace = true
+threadspace-state-engine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true

@@ -22,6 +22,9 @@ pub struct RuntimeLocator {
     pub bundle_identifier: String,
     pub runtime_dir: String,
     pub control_socket: String,
+    /// The capture event socket (M1). Absent in a locator written before it.
+    #[serde(default)]
+    pub events_socket: Option<String>,
     pub core_generation: String,
     pub store_generation: String,
     pub companion: ProcessIdentity,
@@ -118,6 +121,7 @@ mod tests {
             bundle_identifier: "ai.scalinity.threadspace.dev.agent".into(),
             runtime_dir: "/tmp/ts.501.0".into(),
             control_socket: "/tmp/ts.501.0/control.sock".into(),
+            events_socket: Some("/tmp/ts.501.0/events.sock".into()),
             core_generation: "core".into(),
             store_generation: "store".into(),
             companion: ProcessIdentity {
