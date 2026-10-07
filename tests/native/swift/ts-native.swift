@@ -156,12 +156,16 @@ func windowState(pid: pid_t, number: Int) -> [String: Any] {
     report["onScreen"] = info[kCGWindowIsOnscreen as String] as? Bool ?? false
     report["layer"] = info[kCGWindowLayer as String] as? Int ?? 0
     report["coversMainDisplay"] = bounds.equalTo(main)
-    // A fullscreen window on a panel with a camera housing sits below the
-    // screen's top safe-area inset.
+    // A fullscreen window on a panel with a camera housing sits just below
+    // it (measured: a 26 pt inset under a 21.5 pt housing band): full width,
+    // down to the bottom edge, top inset within the band plus 8 pt. AX
+    // fullScreen and the Space witness, not this frame, tell it from zoom.
     let safeTop = Double(NSScreen.screens.first?.safeAreaInsets.top ?? 0)
+    let inset = Double(bounds.origin.y - main.origin.y)
     report["safeAreaTop"] = safeTop
-    report["fullscreenFrame"] = bounds.equalTo(main)
-        || bounds.equalTo(CGRect(x: main.origin.x, y: main.origin.y + safeTop, width: main.width, height: main.height - safeTop))
+    report["topInset"] = inset
+    report["fullscreenFrame"] = bounds.origin.x == main.origin.x && bounds.width == main.width
+        && bounds.maxY == main.maxY && inset >= 0 && inset <= safeTop + 8.5
     let matches = axWindows(pid: pid, matching: bounds)
     report["axMatches"] = matches.count
     if matches.count == 1 { report["ax"] = describe(matches[0]) }
