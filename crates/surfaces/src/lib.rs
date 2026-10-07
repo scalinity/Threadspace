@@ -373,6 +373,19 @@ pub fn route<N: RouteNative>(
         focus_performed: false,
     };
 
+    // Work queued past its budget, such as a notification Return that waited
+    // behind another, does nothing native at all.
+    if deadline.expired() {
+        let (surface, verification, readiness, reason) = Run::<N>::timed_out();
+        return run.finish(
+            request,
+            (surface, verification, readiness),
+            reason,
+            None,
+            vec![],
+        );
+    }
+
     let (native_session_id, bindings) = match target {
         SessionTarget::NotFound => {
             return run.finish(

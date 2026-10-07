@@ -842,3 +842,51 @@ fn a_late_decision_with_valid_proof_is_not_exact() {
     assert_eq!(result.reason_code, "OK", "{result:#?}");
     assert_eq!(result.surface_result, SurfaceResult::ExactNativeSurface);
 }
+
+#[test]
+fn a_request_whose_budget_is_spent_before_it_starts_does_nothing_native() {
+    // A notification Return that waited behind another past its own budget.
+    let mock = Mock::healthy();
+    let received = Instant::now()
+        .checked_sub(Duration::from_millis(2500))
+        .expect("uptime");
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        RouteDeadline::for_request(received),
+    );
+    timed_out(&result);
+    assert!(!result.focus_performed);
+    assert!(
+        mock.budgets.lock().expect("lock").is_empty(),
+        "no native call"
+    );
+    assert_eq!(mock.focus_count(), 0);
+    assert!(
+        result.evidence.process_key.is_none(),
+        "not even the binding is read"
+    );
+}
+
+#[test]
+fn a_request_that_waited_gets_only_what_remains_of_its_budget() {
+    let mock = Mock::healthy();
+    let received = Instant::now()
+        .checked_sub(Duration::from_millis(1200))
+        .expect("uptime");
+    let result = route(
+        &mock,
+        &request(),
+        &target(vec![bound(PID, "b1")]),
+        RouteDeadline::for_request(received),
+    );
+    assert_eq!(result.reason_code, "OK", "{result:#?}");
+    let budgets = mock.budgets.lock().expect("lock").clone();
+    assert!(
+        budgets
+            .iter()
+            .all(|(_, budget)| *budget <= Duration::from_millis(800)),
+        "{budgets:?}"
+    );
+}

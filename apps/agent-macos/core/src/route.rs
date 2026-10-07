@@ -221,12 +221,18 @@ pub fn return_to_session(
     let _serialized = ROUTES
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner());
-    let Some(Ok(row)) = writer_call(&context.writer, deadline.remaining(), |reply| {
-        WriterCommand::RouteTarget {
-            session_id: request.session_id.clone(),
-            reply,
-        }
-    }) else {
+    // An already spent budget reads nothing; `route` records the timeout.
+    let row = if deadline.expired() {
+        Some(Ok(RouteTargetRow::NotFound))
+    } else {
+        writer_call(&context.writer, deadline.remaining(), |reply| {
+            WriterCommand::RouteTarget {
+                session_id: request.session_id.clone(),
+                reply,
+            }
+        })
+    };
+    let Some(Ok(row)) = row else {
         return Err(ControlError::new(
             ControlErrorCode::Unavailable,
             "writer unavailable",
