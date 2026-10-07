@@ -2,7 +2,7 @@
 
 **Architecture date:** October 5, 2026, America/New_York  
 **Normative architecture:** [SPEC.md](SPEC.md)  
-**Status:** M0A/M0B accepted on `8558854`. Independent review of M0C `6f903c2` required remediation; the remediation closed C-02 and H-10–H-12 on application build `89fce79` (G08/G09/G15/G16 PASS under their accepted scopes) and the candidate awaits independent re-review. M0C is unmerged and M1 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the evidence.
+**Status:** M0A/M0B accepted on `8558854`. Independent re-review of M0C `ccdfc8a`, qualified on application build `89fce79`, closes H-10–H-12 but requires two code repairs: C-02 handoff intent preservation (G06/G09 FAIL) and C-11 whole-route deadline enforcement (G08 FAIL). G15/G16 PASS under their accepted scopes; G17 remains BLOCKED. M0C is unmerged and M1 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the evidence.
 
 **Target:** Daniel's Apple Silicon Mac, macOS 26 or later; Tauri 3, Rust, React/TypeScript, Three.js WebGPU/TSL, independently supervised native companion and SQLite.
 
@@ -181,7 +181,7 @@ Validate an app-owned native incarnation marker from each incoming WebView's pub
 
 **Non-goals.** Complete M1 domain logic, final office art, every terminal, consumer ChatGPT or public notarization.
 
-**Evidence and final platform exit.** Consolidated seventeen-row checklist with each A/B/C evidence reference; exact versions/declarations/dictionaries; native failure reproducers, signature tree, notification/route/readback recordings, actual backend/pixel and resource measurements. All portions required by the accepted scope must PASS and no unresolved alpha/native defect may invalidate the architecture. Accepted deferrals retain their own non-PASS native facet status. M0C PASS authorizes M1. The remediation closed C-02 startup supervision, the G08/G15 native preconditions and G16 VoiceOver operation with native evidence on the repaired build; G17 awaits independent re-review.
+**Evidence and final platform exit.** Consolidated seventeen-row checklist with each A/B/C evidence reference; exact versions/declarations/dictionaries; native failure reproducers, signature tree, notification/route/readback recordings, actual backend/pixel and resource measurements. All portions required by the accepted scope must PASS and no unresolved alpha/native defect may invalidate the architecture. Accepted deferrals retain their own non-PASS native facet status. M0C PASS authorizes M1. Re-review accepts the startup-admission repair and H-10–H-12 native proofs, but C-02 handoff intent loss and C-11's unenforced aggregate deadline keep G17 BLOCKED. Only their focused repairs and affected regressions remain required; see the [remediation review](../evidence/M0C/remediation/README.md#independent-re-review).
 
 ## M1 — Journal, contracts and deterministic synthetic harness
 
@@ -205,7 +205,7 @@ Synthetic scenarios cover every canonical transition and all requested failures:
 
 **Required evidence/artifacts.** Versioned schemas/migrations; generated types; fixtures and seeds; reducer invariant catalog; journal/receipt crash matrix; sanitized-record snapshots; replay hashes; saturation and capture timings.
 
-**Exit gate.** All canonical states and owner commands reconstruct deterministically, ingress remains bounded/fail-open, and no known invariant failure remains. C-04 is mandatory M1 exit work, either a local destruction-path repair or a requalified dependency update: repeated retired-view destruction must yield `nativeWindowShells.after == nativeWindowShells.before` after quiescence, bounded WebContent/cache resources and preserved projection, intents and incarnation rejection (D-0006).
+**Exit gate.** All canonical states and owner commands reconstruct deterministically, ingress remains bounded/fail-open, and no known invariant failure remains. C-04 is mandatory M1 exit work, either a local destruction-path repair or a requalified dependency update: repeated retired-view destruction must yield `nativeWindowShells.after == nativeWindowShells.before` after quiescence, bounded WebContent/cache resources and preserved projection, intents and incarnation rejection (D-0006). M1 also owns C-12 renderer diagnostics: account for assets retired before scene application, with complete outcome accounting after quiescence and exactly-once texture/bitmap disposal.
 
 ## M2 — Manually launched Claude vertical slice
 

@@ -2,10 +2,14 @@
 
 Reusable automation for native macOS qualification (M0C onward). It drives the
 installed bundles, the system-started companion and real macOS surfaces, and
-writes evidence under `evidence/<milestone>/`. Nothing here ships: every
-control it uses exists only in qualification builds (`--features
-qualification` on the companion and desktop; the `QUALIFICATION` client role;
-`launch.qualificationBuild` in the renderer).
+writes evidence under `evidence/<milestone>/`. Native fault handlers and resource
+holds compile only with `--features qualification`; release companions refuse
+the `QUALIFICATION` client role. Frontend qualification helpers are currently
+bundled but inactive behind the native, immutable `launch.qualificationBuild`
+flag. The known resource-hold UI envelope parses in release but returns
+`NOT_IMPLEMENTED`; route fault requests do not parse. No supported release
+interface executes these controls. M15's production-artifact exclusion of
+test/debug controls remains required; this is not a claim of JavaScript stripping.
 
 ## Components
 
@@ -18,7 +22,7 @@ qualification` on the companion and desktop; the `QUALIFICATION` client role;
 | `harness/src/procs.rs` | Process incarnations by kernel executable path (PID + birth), exits, working directories |
 | `harness/src/companion.rs` | The companion's verified qualification client, incarnation, relaunch waits and its JSON-lines log |
 | `harness/src/app.rs` | Packaged launch without activation (`open -g`), `tauri dev` in its own process group, hydration from the companion log, qualification reports and view commands |
-| `harness/src/service.rs` | The outer app's native bootstrap (`--service status|register|unregister|prepare|cancel|stop|enable`) |
+| `harness/src/service.rs` | The outer app's native bootstrap (`--service status\|register\|unregister\|prepare\|cancel\|stop\|enable`) |
 | `harness/src/terminal.rs` | Disposable Terminal windows the harness creates, marks and proves it owns before touching |
 | `harness/src/idle.rs` | Owner-idle gate and the machine-wide GUI automation lock |
 | `harness/src/bin/m0c/` | The M0C runners (one subcommand per gate area) |
