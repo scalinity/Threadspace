@@ -44,6 +44,14 @@ on run argv
 		set selected of targetTab to true
 		set index of targetWindow to 1
 		activate
+		-- Showing a window that lives in another Space, such as its own
+		-- fullscreen Space, completes asynchronously: read back once the
+		-- target leads Terminal's window order, waiting at most one second.
+		-- The readback below is unchanged and must still match.
+		repeat 20 times
+			if (id of front window) is matchWindowId then exit repeat
+			delay 0.05
+		end repeat
 		set frontWindow to front window
 		return "FOCUSED" & separator & matchWindowId & separator & matchTabIndex & separator & (id of frontWindow) & separator & (tty of selected tab of frontWindow) & separator & (frontmost of targetWindow) & separator & (selected of targetTab)
 	end tell
