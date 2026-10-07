@@ -5,7 +5,7 @@
 
 use std::io::{Read, Write};
 use std::net::TcpListener;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -16,6 +16,10 @@ use threadspace_harness::evidence::{Run, sha256_text};
 use threadspace_harness::procs;
 
 use crate::ctx::Ctx;
+
+/// A window count is settled once it has not changed for this long.
+const SHELLS_STABLE: Duration = Duration::from_secs(5);
+const SHELLS_SETTLE_CAP: Duration = Duration::from_secs(60);
 
 /// Makes sure exactly one hydrated UI is running; returns its incarnation.
 pub fn ensure_ui(ctx: &Ctx) -> Result<procs::Incarnation, String> {
@@ -508,6 +512,42 @@ fn stream_faults(ctx: &Ctx, run: &Run) -> Result<Vec<Value>, String> {
     Ok(results)
 }
 
+/// The UI's layer-0 window count once it has held still for five seconds
+/// (at most a minute), with every change seen on the way.
+fn settle_shells(ctx: &Ctx, pid: u32) -> Value {
+    let started = Instant::now();
+    let mut count = ctx.native.window_count(pid);
+    let mut seen = vec![count];
+    let mut stable_since = Instant::now();
+    while stable_since.elapsed() < SHELLS_STABLE && started.elapsed() < SHELLS_SETTLE_CAP {
+        threadspace_harness::pause_ms(500);
+        let now = ctx.native.window_count(pid);
+        if now != count {
+            count = now;
+            seen.push(now);
+            stable_since = Instant::now();
+        }
+    }
+    json!({
+        "count": count,
+        "settled": stable_since.elapsed() >= SHELLS_STABLE,
+        "waitedMs": started.elapsed().as_millis() as u64,
+        "seen": seen,
+    })
+}
+
+/// One sample of the UI's native resources: window shells, the WebContent
+/// processes serving it and its physical footprint.
+fn ui_resources(ctx: &Ctx, pid: u32) -> Value {
+    let web_content = procs::web_content_of(pid as i32);
+    json!({
+        "windowShells": ctx.native.window_count(pid),
+        "webContentProcesses": web_content.as_ref().map(Vec::len),
+        "webContentPids": web_content,
+        "footprintBytes": procs::phys_footprint(pid as i32),
+    })
+}
+
 /// SPEC §18.5 view recovery: document replacement, replacement with a native
 /// request in flight, retirement with unconsumed cached data, repeated
 /// recovery, and bootstrap with the companion unavailable.
@@ -516,6 +556,9 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         .map_err(|e| e.to_string())?;
     let app = ctx.app();
     ensure_ui(ctx)?;
+    let environment = ctx.environment();
+    run.write_json("environment.json", &environment)
+        .map_err(|e| e.to_string())?;
     let mut cases = Vec::new();
     let mut case = |name: &str,
                     trigger: &dyn Fn() -> Result<Value, String>,
@@ -552,6 +595,13 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             .iter()
             .filter(|l| l["event"] == "OFFICE_VIEW_CREATED")
             .count();
+        // The desktop's qualification-only account of retired native windows
+        // (absent from builds that predate it).
+        let native_windows = lines
+            .iter()
+            .rev()
+            .find(|l| l["event"] == "OFFICE_NATIVE_WINDOWS")
+            .map(|l| l["detail"].clone());
         let projection = compare_projection(ctx, name);
         let ok = recovered
             .as_ref()
@@ -569,6 +619,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             "staleViewRefusals": stale_refusals,
             "projectionEqual": projection["equal"],
             "uiProcesses": app.processes(),
+            "nativeWindows": native_windows,
         });
         run.append("cases.jsonl", &record)
             .map_err(|e| e.to_string())?;
@@ -600,19 +651,69 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         },
         "UNCONSUMED_DATA_ON_RETIREMENT",
     )?;
-    // Native window shells: each recovery's retired window is measured, not
-    // assumed gone (Tauri alpha.4 deregisters it; AppKit can keep it).
-    let ui_pid = app.processes().first().map(|ui| ui.pid as u32);
-    let windows_before = ui_pid.map(|pid| ctx.native.window_count(pid));
+    // Native window shells (C-04): each recovery's retired window is
+    // measured, not assumed gone (Tauri alpha.4 deregisters it; AppKit can
+    // keep it). `before` is taken once the recoveries above have settled, so
+    // one-time costs of a first recovery are not counted as growth; `after`
+    // is read at once and again once the count holds still.
+    let ui = app.processes().into_iter().next();
+    let ui_pid = ui.as_ref().map(|ui| ui.pid as u32);
+    let before = ui_pid.map(|pid| settle_shells(ctx, pid));
+    let resources_before = ui_pid.map(|pid| ui_resources(ctx, pid));
+    let mut growth = Vec::new();
     for index in 1..=repeats {
+        let name = format!("repeated-replacement-{index:02}");
         case(
-            &format!("repeated-replacement-{index:02}"),
+            &name,
             &|| app.view_command_nowait("reload", json!({})),
             "MAIN_DOCUMENT_REPLACED",
         )?;
+        if let Some(pid) = ui_pid {
+            let sample = ui_resources(ctx, pid);
+            run.append("resources.jsonl", &json!({ "case": name, "sample": sample }))
+                .map_err(|e| e.to_string())?;
+            growth.push(sample);
+        }
     }
-    let windows_after = ui_pid.map(|pid| ctx.native.window_count(pid));
-    let window_shells = json!({ "uiPid": ui_pid, "before": windows_before, "after": windows_after, "recoveries": repeats });
+    let immediate = ui_pid.map(|pid| ctx.native.window_count(pid));
+    let after = ui_pid.map(|pid| settle_shells(ctx, pid));
+    let resources_after = ui_pid.map(|pid| ui_resources(ctx, pid));
+    let same_ui = ui.as_ref().is_some_and(procs::Incarnation::alive);
+    let shells_pass = same_ui
+        && matches!((&before, &after), (Some(b), Some(a))
+            if b["settled"] == true && a["settled"] == true && a["count"] == b["count"]);
+    // The desktop's own account after the last recovery, when it gives one.
+    let retired_native = cases
+        .iter()
+        .rev()
+        .find_map(|c| c["nativeWindows"]["retired"].as_array())
+        .map(|retired| {
+            let alive = |key: &str| retired.iter().filter(|r| r[key] == true).count();
+            json!({
+                "retired": retired.len(),
+                "windowsAlive": alive("windowAlive"),
+                "delegatesAlive": alive("delegateAlive"),
+                "contentViewsAlive": alive("contentViewAlive"),
+                "webviewsAlive": alive("webviewAlive"),
+            })
+        });
+    let window_shells = json!({
+        "uiPid": ui_pid,
+        "retiredNative": retired_native,
+        "sameUiIncarnation": same_ui,
+        "recoveries": repeats,
+        "before": before.as_ref().map(|b| b["count"].clone()),
+        "afterImmediate": immediate,
+        "after": after.as_ref().map(|a| a["count"].clone()),
+        "beforeSettle": before,
+        "afterSettle": after,
+        "pass": shells_pass,
+    });
+    let resources = json!({
+        "before": resources_before,
+        "after": resources_after,
+        "perRecovery": growth,
+    });
     let delays: Vec<Value> = cases
         .iter()
         .filter_map(|c| {
@@ -627,7 +728,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let _gui = ctx.gui("view recovery: bootstrap with companion frozen")?;
     if std::env::var_os("THREADSPACE_HARNESS_ATTACHED_DEV_UI").is_some() {
         let passed = cases.iter().filter(|c| c["pass"] == true).count();
-        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len(), "passed": passed, "total": cases.len(), "recoveryDelays": delays, "nativeWindowShells": window_shells });
+        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len() && shells_pass, "passed": passed, "total": cases.len(), "recoveryDelays": delays, "nativeWindowShells": window_shells, "uiResources": resources });
         run.write_json("summary.json", &summary)
             .map_err(|e| e.to_string())?;
         return Ok(json!({ "summary": summary, "dir": run.dir }));
@@ -659,12 +760,15 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let passed = cases.iter().filter(|c| c["pass"] == true).count();
     let summary = json!({
         "area": "view-recovery",
-        "pass": passed == cases.len(),
+        "pass": passed == cases.len() && shells_pass,
         "passed": passed,
         "total": cases.len(),
         "recoveryDelays": delays,
         "nativeWindowShells": window_shells,
+        "uiResources": resources,
         "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
+        "executableSha256": environment["executableSha256"],
+        "companionSha256": environment["companionSha256"],
     });
     run.write_json("summary.json", &summary)
         .map_err(|e| e.to_string())?;
