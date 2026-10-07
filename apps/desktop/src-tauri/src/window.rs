@@ -16,6 +16,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use objc2::msg_send;
+use objc2::runtime::AnyObject;
 use serde_json::json;
 use tauri::webview::{NewWindowResponse, PageLoadEvent};
 use tauri::window::Color;
@@ -270,6 +272,7 @@ pub fn recover<R: Runtime>(
             if let Some(window) = app.get_webview_window(OFFICE_LABEL) {
                 #[cfg(feature = "qualification")]
                 shells::track(&window, incarnation);
+                free_window_device_on_close(&window);
                 let _ = window.destroy();
             }
             let removal = Instant::now();
@@ -320,6 +323,31 @@ pub fn recover<R: Runtime>(
             #[cfg(feature = "qualification")]
             shells::report(&app, incarnation);
         });
+}
+
+/// Marks the retiring office window one-shot, so closing it also frees its
+/// window-server window (C-04). tao 0.37 never releases one reference it
+/// takes when it creates a window, so a closed office window is never
+/// deallocated; without this, every recovery left that window's device
+/// behind as an off-screen shell. Only a documented `NSWindow` property
+/// changes, on a pointer borrowed for this main-thread call; nothing is
+/// retained or released.
+fn free_window_device_on_close<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    let (done, wait) = std::sync::mpsc::channel();
+    let sent = window.with_webview(move |platform| {
+        if let Some(webview) = platform.downcast_ref::<tauri_runtime_wry::Webview>() {
+            // SAFETY: the live view's window, borrowed on the main thread for
+            // this call only.
+            if let Some(ns_window) = unsafe { webview.ns_window().cast::<AnyObject>().as_ref() } {
+                // SAFETY: NSWindow's `oneShot` setter, on the main thread.
+                let () = unsafe { msg_send![ns_window, setOneShot: true] };
+            }
+        }
+        let _ = done.send(());
+    });
+    if sent.is_ok() {
+        let _ = wait.recv_timeout(REMOVAL_WAIT);
+    }
 }
 
 /// Qualification-only (C-04): weak references to each retired office
