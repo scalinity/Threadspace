@@ -62,6 +62,27 @@ pub fn spawn_claude_job(ctx: &Ctx, dir: PathBuf) -> Result<ClaudeTab, String> {
 }
 
 fn spawn(ctx: &Ctx, dir: PathBuf, exec: bool) -> Result<ClaudeTab, String> {
+    let started = start_claude(ctx, dir, exec)?;
+    match started.bound_session(ctx, Duration::from_secs(90)) {
+        Some(session_id) => Ok(started.into_bound(session_id)),
+        None => Err(format!(
+            "companion never bound session {} to {}",
+            started.native_session_id, started.tab.tty
+        )),
+    }
+}
+
+/// A direct interactive Claude session in its own disposable window, proven
+/// by Claude's own inventory, before any companion has necessarily seen it.
+pub struct StartedClaude {
+    pub tab: Tab,
+    pub native_session_id: String,
+    pub pid: i32,
+}
+
+/// Starts the session and accepts the folder-trust prompt in that window
+/// only; needs no companion.
+pub fn start_claude(ctx: &Ctx, dir: PathBuf, exec: bool) -> Result<StartedClaude, String> {
     let launcher = threadspace_relay::paths::home_dir()
         .ok_or("no home")?
         .join(".local/bin/claude");
@@ -82,7 +103,7 @@ fn spawn(ctx: &Ctx, dir: PathBuf, exec: bool) -> Result<ClaudeTab, String> {
     };
     let cli = cli().ok_or("claude not installed")?;
     let started = Instant::now();
-    let (native, pid) = loop {
+    loop {
         if started.elapsed() > Duration::from_secs(60) {
             return Err("the new Claude session never appeared in inventory".into());
         }
@@ -93,38 +114,48 @@ fn spawn(ctx: &Ctx, dir: PathBuf, exec: bool) -> Result<ClaudeTab, String> {
                     && row.full_session_id().is_some()
             })
         {
-            break (
-                row.full_session_id().unwrap_or_default().to_owned(),
-                row.live_pid().unwrap_or(0),
-            );
-        }
-        threadspace_harness::pause_ms(1000);
-    };
-    loop {
-        if started.elapsed() > Duration::from_secs(120) {
-            return Err(format!(
-                "companion never bound session {native} to {}",
-                tab.tty
-            ));
-        }
-        if let Ok((_, snapshot)) = companion_snapshot(ctx)
-            && let Some(session) = snapshot
-                .sessions
-                .iter()
-                .find(|s| s.native_session_id == native)
-            && session
-                .binding
-                .as_ref()
-                .is_some_and(|b| b.locator == tab.tty)
-        {
-            return Ok(ClaudeTab {
-                session_id: session.session_id.clone(),
-                native_session_id: native,
-                pid,
+            return Ok(StartedClaude {
+                native_session_id: row.full_session_id().unwrap_or_default().to_owned(),
+                pid: row.live_pid().unwrap_or(0),
                 tab,
             });
         }
         threadspace_harness::pause_ms(1000);
+    }
+}
+
+impl StartedClaude {
+    /// The Threadspace session the running companion bound to this window's
+    /// TTY, if it does so within `timeout`.
+    pub fn bound_session(&self, ctx: &Ctx, timeout: Duration) -> Option<String> {
+        let started = Instant::now();
+        loop {
+            if let Ok((_, snapshot)) = companion_snapshot(ctx)
+                && let Some(session) = snapshot
+                    .sessions
+                    .iter()
+                    .find(|s| s.native_session_id == self.native_session_id)
+                && session
+                    .binding
+                    .as_ref()
+                    .is_some_and(|b| b.locator == self.tab.tty)
+            {
+                return Some(session.session_id.clone());
+            }
+            if started.elapsed() >= timeout {
+                return None;
+            }
+            threadspace_harness::pause_ms(1000);
+        }
+    }
+
+    pub fn into_bound(self, session_id: String) -> ClaudeTab {
+        ClaudeTab {
+            session_id,
+            native_session_id: self.native_session_id,
+            pid: self.pid,
+            tab: self.tab,
+        }
     }
 }
 

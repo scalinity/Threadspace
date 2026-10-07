@@ -35,7 +35,7 @@ fn raise(ctx: &Ctx, label: &str) -> Result<(String, String), String> {
     }
 }
 
-fn writer_lock_free(ctx: &Ctx) -> Value {
+pub(crate) fn writer_lock_free(ctx: &Ctx) -> Value {
     // Same probe as the bootstrap: a shared non-blocking lock on a read-only
     // descriptor, released at once.
     let path = ctx.id.agent.store_dir.join("writer.lock");
@@ -86,7 +86,7 @@ fn durable_facts(ctx: &Ctx) -> Result<Value, String> {
     }))
 }
 
-fn kill_companion(ctx: &Ctx) -> Result<(Incarnation, Incarnation, u64), String> {
+pub(crate) fn kill_companion(ctx: &Ctx) -> Result<(Incarnation, Incarnation, u64), String> {
     let old = ctx
         .companion()
         .incarnation()

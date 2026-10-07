@@ -27,6 +27,7 @@
 //!   threadspace-m0c clear-notifications <prod|dev>
 //!   threadspace-m0c resolve-qualification <prod|dev> [reason]
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
+//!   threadspace-m0c c02-supervision <prod|dev> [all|A,B,C,D,E]
 
 mod bridge_gates;
 mod cleanup;
@@ -37,6 +38,7 @@ mod launches;
 mod notifications;
 mod power;
 mod service_gates;
+mod supervision;
 mod terminal_gates;
 mod window_gates;
 
@@ -72,6 +74,9 @@ fn main() -> ExitCode {
         "g10-live" => service_gates::sqlite_live(&ctx, number(&args, 2, 5)),
         "g11-restarts" => service_gates::restarts(&ctx, number(&args, 2, 10)),
         "maintenance" => service_gates::maintenance(&ctx),
+        "c02-supervision" => {
+            supervision::c02(&ctx, args.get(2).map(String::as_str).unwrap_or("all"))
+        }
         "g08-terminal" => terminal_gates::negatives(&ctx),
         "g06-notifications" => notifications::lifecycle(&ctx),
         "g05-denied" => notifications::denied(&ctx),
