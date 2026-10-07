@@ -6,6 +6,7 @@
 //! in `apps/desktop/src/contracts/generated/`; the frontend still validates
 //! every frame at runtime because a TypeScript type is not wire validation.
 
+pub mod canonical;
 pub mod control;
 pub mod cursor;
 pub mod diagnostics;

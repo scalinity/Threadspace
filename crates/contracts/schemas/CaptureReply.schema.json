@@ -1,0 +1,99 @@
+{
+  "$defs": {
+    "CaptureRefusal": {
+      "description": "Why the companion refused a whole batch without reading its records. The\nsender keeps every record and spools it.",
+      "enum": [
+        "ADMISSION_CLOSED",
+        "BUSY",
+        "PROTOCOL_MISMATCH",
+        "MALFORMED",
+        "TOO_LARGE"
+      ],
+      "type": "string"
+    },
+    "RecordReceipt": {
+      "properties": {
+        "observationId": {
+          "type": "string"
+        },
+        "reason": {
+          "description": "A bounded reason code for `NotAccepted`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/RecordStatus"
+        }
+      },
+      "required": [
+        "observationId",
+        "status"
+      ],
+      "type": "object"
+    },
+    "RecordStatus": {
+      "description": "One record's durability. `LocalSpooled` means published in the local\nspool's durability domain, not committed to the journal.",
+      "enum": [
+        "COMMITTED",
+        "ALREADY_COMMITTED",
+        "LOCAL_SPOOLED",
+        "NOT_ACCEPTED"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "description": "Sent only after the journal transaction committed.",
+      "properties": {
+        "kind": {
+          "const": "RECEIPTS",
+          "type": "string"
+        },
+        "protocolVersion": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "receipts": {
+          "items": {
+            "$ref": "#/$defs/RecordReceipt"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "protocolVersion",
+        "receipts"
+      ],
+      "type": "object"
+    },
+    {
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/CaptureRefusal"
+        },
+        "kind": {
+          "const": "REFUSED",
+          "type": "string"
+        },
+        "protocolVersion": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "protocolVersion",
+        "code"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "CaptureReply"
+}

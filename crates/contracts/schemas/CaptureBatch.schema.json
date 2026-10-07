@@ -1,0 +1,315 @@
+{
+  "$defs": {
+    "CaptureClock": {
+      "properties": {
+        "bootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "clockQuality": {
+          "$ref": "#/$defs/ClockQuality"
+        },
+        "endpointId": {
+          "description": "Empty for a local capture; admission fills in the local endpoint.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "monotonicNs": {
+          "description": "Decimal nanoseconds on the capturing boot's monotonic clock.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "wallTimeMs": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "wallTimeMs",
+        "clockQuality"
+      ],
+      "type": "object"
+    },
+    "ClockQuality": {
+      "enum": [
+        "LOCAL_MONOTONIC",
+        "REMOTE_REPORTED",
+        "RECEIPT_ONLY"
+      ],
+      "type": "string"
+    },
+    "NativeSessionRef": {
+      "description": "A provider conversation as the provider names it, within one profile on\nthe local endpoint. The namespace UUID is resolved at admission.",
+      "properties": {
+        "nativeSessionId": {
+          "description": "Opaque, even when it looks like a UUID.",
+          "type": "string"
+        },
+        "profileRef": {
+          "description": "The provider profile/store authority (for example a config home).",
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "profileRef",
+        "nativeSessionId"
+      ],
+      "type": "object"
+    },
+    "ObservationEnvelope": {
+      "properties": {
+        "activationRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actorNativeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "adapterId": {
+          "type": "string"
+        },
+        "adapterVersion": {
+          "type": "string"
+        },
+        "callbackEntrySequence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "callbackResultSequence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capturedAt": {
+          "$ref": "#/$defs/CaptureClock"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/ProcessSample"
+          },
+          "type": "array"
+        },
+        "nativeEvent": {
+          "type": "string"
+        },
+        "nativeOccurrenceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativePromptId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativeTurnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observationId": {
+          "description": "Generated once at capture and retained through every retry and spool.",
+          "type": "string"
+        },
+        "payload": {
+          "description": "Allowlisted, sanitized provider metadata. Never prompt or tool bodies."
+        },
+        "providerVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schemaVersion": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sequenceMeaning": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SequenceMeaning"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sessionKey": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceEpoch": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        },
+        "sourceSequence": {
+          "description": "Only when the source really supplies it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "observationId",
+        "sourceId",
+        "sourceEpoch",
+        "adapterId",
+        "adapterVersion",
+        "nativeEvent",
+        "capturedAt",
+        "evidence",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "ProcessKey": {
+      "description": "SPEC §3.2 `ProcessKey`: endpoint, boot, PID and kernel birth.",
+      "properties": {
+        "bootId": {
+          "type": "string"
+        },
+        "endpointId": {
+          "type": "string"
+        },
+        "pid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startMicroseconds": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startSeconds": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointId",
+        "bootId",
+        "pid",
+        "startSeconds",
+        "startMicroseconds"
+      ],
+      "type": "object"
+    },
+    "ProcessRole": {
+      "oneOf": [
+        {
+          "const": "CAPTURE",
+          "description": "The capturing helper itself.",
+          "type": "string"
+        },
+        {
+          "const": "ANCESTOR",
+          "description": "A validated ancestor edge (SPEC §4.5).",
+          "type": "string"
+        },
+        {
+          "const": "PROVIDER",
+          "description": "The qualified provider runtime selected by an adapter rule.",
+          "type": "string"
+        }
+      ]
+    },
+    "ProcessSample": {
+      "description": "One kernel process sample carried as capture evidence. A controlling\ndevice is a device number; a TTY path is never captured here.",
+      "properties": {
+        "controllingDevice": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "key": {
+          "$ref": "#/$defs/ProcessKey"
+        },
+        "parentPid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "role": {
+          "$ref": "#/$defs/ProcessRole"
+        }
+      },
+      "required": [
+        "role",
+        "key"
+      ],
+      "type": "object"
+    },
+    "SequenceMeaning": {
+      "description": "Whose counter `sourceSequence` is: the provider's own, or one qualified\nobserver's capture order. A capture helper never numbers provider order.",
+      "enum": [
+        "NATIVE",
+        "OBSERVER_CAPTURE"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "protocolVersion": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/ObservationEnvelope"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "protocolVersion",
+    "records"
+  ],
+  "title": "CaptureBatch",
+  "type": "object"
+}

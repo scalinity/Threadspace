@@ -1,0 +1,2015 @@
+{
+  "$defs": {
+    "AcceptanceProof": {
+      "description": "Allowlisted proof flags for provider acceptance (SPEC §7.3, §11.4); never\ntext or full traces.",
+      "properties": {
+        "coreSettled": {
+          "type": "boolean"
+        },
+        "dropped": {
+          "type": "boolean"
+        },
+        "engineDispatch": {
+          "type": "boolean"
+        },
+        "originalOriginProtected": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "engineDispatch",
+        "coreSettled",
+        "originalOriginProtected",
+        "dropped"
+      ],
+      "type": "object"
+    },
+    "ActivityRecord": {
+      "properties": {
+        "actorId": {
+          "type": "string"
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "finished": {
+          "items": {
+            "$ref": "#/$defs/ActivityResult"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "type": "string"
+        },
+        "nativeOccurrenceId": {
+          "type": "string"
+        },
+        "permissionChecked": {
+          "type": "boolean"
+        },
+        "proposed": {
+          "type": "boolean"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "started": {
+          "type": "boolean"
+        },
+        "toolCategories": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "actorId",
+        "nativeOccurrenceId",
+        "toolCategories",
+        "proposed",
+        "started",
+        "finished",
+        "permissionChecked",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "ActivityResult": {
+      "enum": [
+        "SUCCESS",
+        "FAILURE",
+        "INTERRUPTED"
+      ],
+      "type": "string"
+    },
+    "ActorRecord": {
+      "properties": {
+        "agentTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "native": {
+          "$ref": "#/$defs/NativeActorRef"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/ActorRole"
+        },
+        "runsEnded": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "native",
+        "role",
+        "agentTypes",
+        "runsEnded",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "ActorRelationKind": {
+      "enum": [
+        "IMMEDIATE_PARENT",
+        "TREE_ROOT",
+        "TEAMMATE",
+        "FORKED_FROM"
+      ],
+      "type": "string"
+    },
+    "ActorRelationRecord": {
+      "properties": {
+        "actorId": {
+          "type": "string"
+        },
+        "relatedActorId": {
+          "type": "string"
+        },
+        "relation": {
+          "$ref": "#/$defs/ActorRelationKind"
+        }
+      },
+      "required": [
+        "actorId",
+        "relatedActorId",
+        "relation"
+      ],
+      "type": "object"
+    },
+    "ActorRole": {
+      "enum": [
+        "PRINCIPAL",
+        "SUBORDINATE",
+        "TEAMMATE"
+      ],
+      "type": "string"
+    },
+    "AttachedPresence": {
+      "description": "What an attachment fact positively observed. ENDED comes only from an\nexplicit end or a qualified process exit, never from silence.",
+      "enum": [
+        "LIVE",
+        "DETACHED",
+        "PARKED"
+      ],
+      "type": "string"
+    },
+    "AttentionCategory": {
+      "enum": [
+        "INPUT_REQUIRED",
+        "APPROVAL_REQUIRED",
+        "TURN_COMPLETE",
+        "ERROR",
+        "BLOCKED",
+        "HANDOFF_READY",
+        "OWNER_DECISION_REQUIRED"
+      ],
+      "type": "string"
+    },
+    "AttentionRecord": {
+      "description": "A durable owner-action record (SPEC §7.1). Acknowledgement and resolution\nare separate; both are sets of causes so replay order cannot erase one.",
+      "properties": {
+        "acknowledgedAtMs": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "acknowledgements": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "actorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "$ref": "#/$defs/AttentionCategory"
+        },
+        "createdAtMs": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "createdByFact": {
+          "type": "string"
+        },
+        "createdByObservation": {
+          "type": "string"
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "notificationState": {
+          "$ref": "#/$defs/NotificationState"
+        },
+        "priority": {
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "resolutionReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resolutions": {
+          "items": {
+            "$ref": "#/$defs/ResolutionCause"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "resolvedAtMs": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/AttentionScope"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "snoozedUntilMs": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summaryAuthority": {
+          "$ref": "#/$defs/SummaryAuthority"
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "category",
+        "scope",
+        "priority",
+        "summaryAuthority",
+        "createdByFact",
+        "createdByObservation",
+        "createdAtMs",
+        "acknowledgements",
+        "resolutions",
+        "notificationState",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "AttentionScope": {
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "EXACT_REQUEST",
+              "type": "string"
+            },
+            "nativeRequestId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "nativeRequestId"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "episodeId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "SESSION_WAIT_CATEGORY",
+              "type": "string"
+            },
+            "waitKind": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "episodeId",
+            "waitKind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_OUTPUT",
+              "type": "string"
+            },
+            "turnId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "turnId"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "decisionId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "OWNER_DECISION",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "decisionId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "BindingMethod": {
+      "enum": [
+        "NATIVE_INVENTORY",
+        "HOOK_ANCESTRY",
+        "EXPLICIT_LAUNCH",
+        "USER_PAIRING",
+        "FIXTURE"
+      ],
+      "type": "string"
+    },
+    "CausalPoint": {
+      "properties": {
+        "nativeKey": {
+          "description": "This point's own native object key, when predecessor relations name it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativePredecessorKeys": {
+          "description": "Native keys this point is known to follow.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "orderDomain": {
+          "description": "The actual native or qualified observer counter scope.",
+          "type": "string"
+        },
+        "sequence": {
+          "description": "Validated nonnegative decimal; compared numerically, never lexically.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceEpoch": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceId",
+        "sourceEpoch",
+        "orderDomain",
+        "nativePredecessorKeys"
+      ],
+      "type": "object"
+    },
+    "CommandEffect": {
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/OwnerActionKind"
+        },
+        "attentionId": {
+          "type": "string"
+        },
+        "commandId": {
+          "type": "string"
+        },
+        "cursor": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "commandId",
+        "attentionId",
+        "action",
+        "cursor"
+      ],
+      "type": "object"
+    },
+    "ExactRequestRecord": {
+      "description": "A native exact request (SPEC §7.1), resolved only by its own native ID.",
+      "properties": {
+        "actorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attentionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WaitCategory"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "key": {
+          "type": "string"
+        },
+        "nativeRequestId": {
+          "type": "string"
+        },
+        "positive": {
+          "type": "boolean"
+        },
+        "resolved": {
+          "type": "boolean"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "sessionId",
+        "nativeRequestId",
+        "positive",
+        "resolved",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "ExecutionMode": {
+      "enum": [
+        "terminal_embedded",
+        "shared_daemon",
+        "supervised_background",
+        "desktop",
+        "remote",
+        "headless"
+      ],
+      "type": "string"
+    },
+    "ExecutionPresence": {
+      "enum": [
+        "LIVE",
+        "DETACHED",
+        "PARKED",
+        "ENDED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "ExecutionRecord": {
+      "description": "One logical activation of a Session/Actor in a runtime (SPEC §4.2).",
+      "properties": {
+        "activation": {
+          "description": "Per-session allocation order; presentation, not identity.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "activationRef": {
+          "type": "string"
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "attached": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttachedPresence"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "controllingDevice": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "endReasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "endedCursor": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "mode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeRuntimeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "presence": {
+          "$ref": "#/$defs/ExecutionPresence"
+        },
+        "processId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "startedCursor": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "surfaceStatus": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "actorId",
+        "activationRef",
+        "activation",
+        "endReasons",
+        "presence",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "HumanFrontier": {
+      "description": "The compact accepted-human causal frontier of one comparable scope\n(SPEC §7.3): retained through checkpoints so reverse delivery resolves\nthe same outputs.",
+      "properties": {
+        "actorId": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "maxSequence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "orderDomain": {
+          "type": "string"
+        },
+        "predecessorKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "sourceEpoch": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "sessionId",
+        "actorId",
+        "sourceId",
+        "sourceEpoch",
+        "orderDomain",
+        "predecessorKeys"
+      ],
+      "type": "object"
+    },
+    "InputOrigin": {
+      "description": "The original native origin of an input attempt (SPEC §7.3). Only the two\nhuman origins can ever qualify for follow-up resolution.",
+      "enum": [
+        "HUMAN_COMPOSER",
+        "HUMAN_BRIDGE",
+        "SCHEDULED",
+        "TASK_NOTIFICATION",
+        "PEER",
+        "SDK",
+        "PLUGIN",
+        "UNCLASSIFIED"
+      ],
+      "type": "string"
+    },
+    "InputReadiness": {
+      "enum": [
+        "FOREGROUND_COMPATIBLE",
+        "BACKGROUND_JOB",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "InputRecord": {
+      "description": "A submitted input and its provenance (SPEC §6.1, §7.3); distinct from the\nTurn it may start or steer.",
+      "properties": {
+        "acceptances": {
+          "items": {
+            "$ref": "#/$defs/AcceptanceProof"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "activeTurnId": {
+          "description": "The turn running at original submission, kept apart from any later turn.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "nativeKey": {
+          "type": "string"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InputOrigin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rejections": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "startedTurns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "submission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "actorId",
+        "nativeKey",
+        "acceptances",
+        "rejections",
+        "startedTurns",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "InventoryObservation": {
+      "properties": {
+        "interval": {
+          "$ref": "#/$defs/SnapshotInterval"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "row": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SnapshotRow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "present",
+        "interval"
+      ],
+      "type": "object"
+    },
+    "NamespaceRecord": {
+      "properties": {
+        "endpointId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "profileRef": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "endpointId",
+        "profileRef"
+      ],
+      "type": "object"
+    },
+    "NativeActorRef": {
+      "description": "An Actor within its owning Session: the principal worker, or a\nsubordinate named by its native agent ID. `agent_type` is never a key.",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "PRINCIPAL",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "AGENT",
+              "type": "string"
+            },
+            "nativeAgentId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "nativeAgentId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "NativeSurfaceRef": {
+      "description": "A native surface (terminal tab, pane, window). The locator (a TTY path)\nis not identity: the application generation and the adapter's surface\ngeneration are part of the key, so a reused path is a new surface.",
+      "properties": {
+        "appGeneration": {
+          "type": "string"
+        },
+        "deviceNumber": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "locator": {
+          "type": "string"
+        },
+        "surfaceGeneration": {
+          "type": "string"
+        },
+        "surfaceKind": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "surfaceKind",
+        "appGeneration",
+        "locator",
+        "surfaceGeneration"
+      ],
+      "type": "object"
+    },
+    "NotificationState": {
+      "enum": [
+        "NOT_REQUESTED",
+        "PENDING",
+        "SUBMITTED",
+        "CONFIRMED_PRESENT",
+        "UNCERTAIN",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "ObservationState": {
+      "enum": [
+        "CURRENT",
+        "STALE",
+        "DISCONNECTED",
+        "CONFLICT",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "OutboxRecord": {
+      "description": "A notification intent created in the same transaction as its attention.",
+      "properties": {
+        "attentionId": {
+          "type": "string"
+        },
+        "createdAtMs": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/OutboxState"
+        },
+        "updatedAtMs": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "requestId",
+        "attentionId",
+        "state",
+        "createdAtMs",
+        "updatedAtMs",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "OutboxState": {
+      "oneOf": [
+        {
+          "enum": [
+            "SUBMITTED",
+            "CONFIRMED_PRESENT",
+            "UNCERTAIN",
+            "FAILED"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "PENDING",
+          "description": "Live intent awaiting OS submission (after commit).",
+          "type": "string"
+        },
+        {
+          "const": "HELD",
+          "description": "Catch-up intent held until eligibility is reconciled (SPEC §7.6).",
+          "type": "string"
+        },
+        {
+          "const": "SUPPRESSED",
+          "description": "Resolved, acknowledged or otherwise ineligible before submission.",
+          "type": "string"
+        }
+      ]
+    },
+    "OwnerActionKind": {
+      "enum": [
+        "ACKNOWLEDGE",
+        "RESOLVE",
+        "SNOOZE"
+      ],
+      "type": "string"
+    },
+    "ProcessKey": {
+      "description": "SPEC §3.2 `ProcessKey`: endpoint, boot, PID and kernel birth.",
+      "properties": {
+        "bootId": {
+          "type": "string"
+        },
+        "endpointId": {
+          "type": "string"
+        },
+        "pid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startMicroseconds": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startSeconds": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointId",
+        "bootId",
+        "pid",
+        "startSeconds",
+        "startMicroseconds"
+      ],
+      "type": "object"
+    },
+    "ProcessRecord": {
+      "description": "A kernel process incarnation (SPEC §4.2). Distinct from its PID: a reused\nPID with a new birth is a different record.",
+      "properties": {
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "executables": {
+          "description": "More than one image means the executable was replaced in place.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "exited": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "key": {
+          "$ref": "#/$defs/ProcessKey"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "executables",
+        "exited",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "ResolutionCause": {
+      "properties": {
+        "detail": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ResolutionKind"
+        }
+      },
+      "required": [
+        "kind",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "ResolutionKind": {
+      "oneOf": [
+        {
+          "enum": [
+            "REQUEST_RESOLVED"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "OWNER",
+          "description": "Explicit owner resolution (\"Mark handled\") with its reason.",
+          "type": "string"
+        },
+        {
+          "const": "WAIT_ENDED",
+          "description": "A fresh native aggregate wait clear: \"wait ended\", not \"approved\".",
+          "type": "string"
+        },
+        {
+          "const": "HUMAN_FOLLOWUP",
+          "description": "Verified accepted human input causally after the output (SPEC §7.3).",
+          "type": "string"
+        }
+      ]
+    },
+    "RouteRecord": {
+      "properties": {
+        "focusPerformed": {
+          "type": "boolean"
+        },
+        "inputReadiness": {
+          "$ref": "#/$defs/InputReadiness"
+        },
+        "reasonCode": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "sessionVerification": {
+          "$ref": "#/$defs/SessionVerification"
+        },
+        "surfaceResult": {
+          "$ref": "#/$defs/SurfaceResult"
+        }
+      },
+      "required": [
+        "requestId",
+        "surfaceResult",
+        "sessionVerification",
+        "inputReadiness",
+        "reasonCode",
+        "focusPerformed"
+      ],
+      "type": "object"
+    },
+    "SequenceMeaning": {
+      "description": "Whose counter `sourceSequence` is: the provider's own, or one qualified\nobserver's capture order. A capture helper never numbers provider order.",
+      "enum": [
+        "NATIVE",
+        "OBSERVER_CAPTURE"
+      ],
+      "type": "string"
+    },
+    "SequenceRange": {
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "first",
+        "last"
+      ],
+      "type": "object"
+    },
+    "SessionRecord": {
+      "description": "A persistent provider conversation (SPEC §4.1): unique on namespace and\nnative session ID, independent of every activation, turn and surface.",
+      "properties": {
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executionPresence": {
+          "$ref": "#/$defs/ExecutionPresence"
+        },
+        "fixture": {
+          "description": "True only for the M0 fixture worker.",
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inventory": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InventoryObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lastRoute": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RouteRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "link": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObservationState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Last explicit observer link fact, if any."
+        },
+        "namespaceId": {
+          "type": "string"
+        },
+        "nativeSessionId": {
+          "type": "string"
+        },
+        "observation": {
+          "$ref": "#/$defs/ObservationState"
+        },
+        "recordState": {
+          "$ref": "#/$defs/SessionRecordState"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "startSources": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "turnState": {
+          "$ref": "#/$defs/TurnState"
+        }
+      },
+      "required": [
+        "id",
+        "namespaceId",
+        "nativeSessionId",
+        "recordState",
+        "startSources",
+        "fixture",
+        "executionPresence",
+        "observation",
+        "turnState",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "SessionRecordState": {
+      "enum": [
+        "KNOWN",
+        "ARCHIVED",
+        "PROVIDER_DELETED"
+      ],
+      "type": "string"
+    },
+    "SessionVerification": {
+      "enum": [
+        "CURRENT_NATIVE_REVALIDATED",
+        "NATIVE_BOUND_LAST_KNOWN",
+        "USER_ATTESTED",
+        "UNBOUND",
+        "CONFLICT"
+      ],
+      "type": "string"
+    },
+    "SnapshotInterval": {
+      "description": "A snapshot without a native revision is an interval observation (SPEC\n§4.15): it says what the source reported between these instants.",
+      "properties": {
+        "endMs": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "startMs": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "startMs",
+        "endMs"
+      ],
+      "type": "object"
+    },
+    "SnapshotRow": {
+      "properties": {
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "waitingFor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SourceCoverage": {
+      "description": "Sequence coverage of one source epoch. A missing sequence is a coverage\ngap of that source, not provider event loss or a completion (SPEC §5.4).",
+      "properties": {
+        "gaps": {
+          "items": {
+            "$ref": "#/$defs/SequenceRange"
+          },
+          "type": "array"
+        },
+        "key": {
+          "type": "string"
+        },
+        "meaning": {
+          "$ref": "#/$defs/SequenceMeaning"
+        },
+        "reportedGaps": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "seen": {
+          "items": {
+            "$ref": "#/$defs/SequenceRange"
+          },
+          "type": "array"
+        },
+        "sourceEpoch": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "sourceId",
+        "sourceEpoch",
+        "meaning",
+        "seen",
+        "gaps",
+        "reportedGaps",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "SourceSurfaceRecord": {
+      "description": "A native surface (SPEC §4.10, §4.12), distinct from any binding to it.",
+      "properties": {
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "endpointId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "native": {
+          "$ref": "#/$defs/NativeSurfaceRef"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "endpointId",
+        "native",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "SummaryAuthority": {
+      "enum": [
+        "NATIVE_METADATA",
+        "SELF_REPORTED",
+        "USER",
+        "NONE"
+      ],
+      "type": "string"
+    },
+    "SurfaceBindingRecord": {
+      "description": "A versioned relation between one activation and one surface. Invalidation\nis permanent: nothing revives a binding (SPEC §4.12, INV-03/04).",
+      "properties": {
+        "evidenceObservation": {
+          "type": "string"
+        },
+        "executableIdentity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executionId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "invalidatedCursor": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "invalidations": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "method": {
+          "$ref": "#/$defs/BindingMethod"
+        },
+        "proof": true,
+        "recordedCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "surfaceId": {
+          "type": "string"
+        },
+        "tabHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "windowHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "executionId",
+        "surfaceId",
+        "method",
+        "proof",
+        "evidenceObservation",
+        "invalidations",
+        "valid",
+        "recordedCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "SurfaceResult": {
+      "enum": [
+        "EXACT_NATIVE_SURFACE",
+        "EXACT_WINDOW",
+        "APP_ONLY",
+        "URL_DISPATCHED",
+        "PROJECT_ONLY",
+        "INSPECTOR_ONLY",
+        "AMBIGUOUS",
+        "UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "TurnIdentityKind": {
+      "enum": [
+        "NATIVE",
+        "LOCAL_PROVISIONAL"
+      ],
+      "type": "string"
+    },
+    "TurnOutcome": {
+      "enum": [
+        "COMPLETED",
+        "INTERRUPTED",
+        "FAILED",
+        "REFUSED"
+      ],
+      "type": "string"
+    },
+    "TurnRecord": {
+      "description": "A native model/agent turn (SPEC §6.1), scoped to Session and Actor.",
+      "properties": {
+        "activitySeen": {
+          "type": "boolean"
+        },
+        "actorId": {
+          "type": "string"
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "executionIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "type": "string"
+        },
+        "identityKind": {
+          "$ref": "#/$defs/TurnIdentityKind"
+        },
+        "nativeTurnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "outcomeConflict": {
+          "type": "boolean"
+        },
+        "outcomeReasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "outcomes": {
+          "items": {
+            "$ref": "#/$defs/TurnOutcome"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "outputPoints": {
+          "items": {
+            "$ref": "#/$defs/CausalPoint"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "outputReady": {
+          "type": "boolean"
+        },
+        "ownerFacing": {
+          "description": "From the originating actor's role when the turn was observed; a later\nrole change never promotes old parent-owned output (SPEC §7.1).",
+          "type": "boolean"
+        },
+        "queuedInputs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "started": {
+          "type": "boolean"
+        },
+        "startedByInputs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "state": {
+          "$ref": "#/$defs/TurnState"
+        },
+        "stepped": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "actorId",
+        "executionIds",
+        "identityKind",
+        "ownerFacing",
+        "started",
+        "stepped",
+        "activitySeen",
+        "queuedInputs",
+        "startedByInputs",
+        "outcomes",
+        "outcomeReasons",
+        "outputReady",
+        "outputPoints",
+        "state",
+        "outcomeConflict",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    },
+    "TurnState": {
+      "enum": [
+        "UNKNOWN",
+        "QUEUED",
+        "WORKING",
+        "WAITING",
+        "COMPLETED",
+        "INTERRUPTED",
+        "FAILED",
+        "REFUSED"
+      ],
+      "type": "string"
+    },
+    "WaitCategory": {
+      "description": "A native wait category. Each maps to one attention category.",
+      "enum": [
+        "APPROVAL",
+        "INPUT",
+        "JOB_BLOCKED"
+      ],
+      "type": "string"
+    },
+    "WaitEpisode": {
+      "description": "One state of an aggregate wait episode, derived from its scope's\npositive witnesses and clear barriers.",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "attentionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "episodeId": {
+          "type": "string"
+        },
+        "index": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "uncertain": {
+          "description": "A positive incomparable with a clear: never auto-cleared.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "index",
+        "episodeId",
+        "active",
+        "uncertain"
+      ],
+      "type": "object"
+    },
+    "WaitScopeRecord": {
+      "description": "An aggregate native wait scope (SPEC §7.1): namespace/Session, known\nactor or execution, category and native generation.",
+      "properties": {
+        "actorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "$ref": "#/$defs/WaitCategory"
+        },
+        "clears": {
+          "items": {
+            "$ref": "#/$defs/CausalPoint"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "createdCursor": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "episodes": {
+          "items": {
+            "$ref": "#/$defs/WaitEpisode"
+          },
+          "type": "array"
+        },
+        "executionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "generation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "key": {
+          "type": "string"
+        },
+        "positives": {
+          "items": {
+            "$ref": "#/$defs/CausalPoint"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "subtypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unorderedClears": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unorderedPositives": {
+          "description": "Positives without any causal point: active until a clear, uncertain after.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "key",
+        "sessionId",
+        "category",
+        "subtypes",
+        "positives",
+        "clears",
+        "unorderedPositives",
+        "unorderedClears",
+        "episodes",
+        "createdCursor",
+        "revision"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The whole canonical state at one applied cursor.",
+  "properties": {
+    "activities": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ActivityRecord"
+      },
+      "type": "object"
+    },
+    "actors": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ActorRecord"
+      },
+      "type": "object"
+    },
+    "attention": {
+      "additionalProperties": {
+        "$ref": "#/$defs/AttentionRecord"
+      },
+      "type": "object"
+    },
+    "attentionByScope": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Scope key to attention ID, so a migrated or derived item is found by\nscope and never duplicated.",
+      "type": "object"
+    },
+    "bindings": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SurfaceBindingRecord"
+      },
+      "type": "object"
+    },
+    "commands": {
+      "additionalProperties": {
+        "$ref": "#/$defs/CommandEffect"
+      },
+      "type": "object"
+    },
+    "coverage": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SourceCoverage"
+      },
+      "type": "object"
+    },
+    "executions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ExecutionRecord"
+      },
+      "type": "object"
+    },
+    "frontiers": {
+      "additionalProperties": {
+        "$ref": "#/$defs/HumanFrontier"
+      },
+      "type": "object"
+    },
+    "inputs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/InputRecord"
+      },
+      "type": "object"
+    },
+    "namespaces": {
+      "additionalProperties": {
+        "$ref": "#/$defs/NamespaceRecord"
+      },
+      "type": "object"
+    },
+    "outbox": {
+      "additionalProperties": {
+        "$ref": "#/$defs/OutboxRecord"
+      },
+      "type": "object"
+    },
+    "processes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ProcessRecord"
+      },
+      "type": "object"
+    },
+    "reducerVersion": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "relations": {
+      "items": {
+        "$ref": "#/$defs/ActorRelationRecord"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "requests": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ExactRequestRecord"
+      },
+      "type": "object"
+    },
+    "sessions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SessionRecord"
+      },
+      "type": "object"
+    },
+    "surfaces": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SourceSurfaceRecord"
+      },
+      "type": "object"
+    },
+    "throughCursor": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "turns": {
+      "additionalProperties": {
+        "$ref": "#/$defs/TurnRecord"
+      },
+      "type": "object"
+    },
+    "waits": {
+      "additionalProperties": {
+        "$ref": "#/$defs/WaitScopeRecord"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "reducerVersion",
+    "throughCursor",
+    "namespaces",
+    "sessions",
+    "actors",
+    "relations",
+    "processes",
+    "executions",
+    "turns",
+    "inputs",
+    "activities",
+    "surfaces",
+    "bindings",
+    "waits",
+    "requests",
+    "attention",
+    "attentionByScope",
+    "outbox",
+    "frontiers",
+    "coverage",
+    "commands"
+  ],
+  "title": "CanonicalState",
+  "type": "object"
+}

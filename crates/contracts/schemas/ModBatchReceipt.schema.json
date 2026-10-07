@@ -1,0 +1,57 @@
+{
+  "$defs": {
+    "RecordReceipt": {
+      "properties": {
+        "observationId": {
+          "type": "string"
+        },
+        "reason": {
+          "description": "A bounded reason code for `NotAccepted`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/RecordStatus"
+        }
+      },
+      "required": [
+        "observationId",
+        "status"
+      ],
+      "type": "object"
+    },
+    "RecordStatus": {
+      "description": "One record's durability. `LocalSpooled` means published in the local\nspool's durability domain, not committed to the journal.",
+      "enum": [
+        "COMMITTED",
+        "ALREADY_COMMITTED",
+        "LOCAL_SPOOLED",
+        "NOT_ACCEPTED"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The typed receipt `threadspace-hook mod-batch` prints for the calling mod.\nExit status, a missing receipt and a timeout are never acceptance.",
+  "properties": {
+    "receiptVersion": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "receipts": {
+      "items": {
+        "$ref": "#/$defs/RecordReceipt"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "receiptVersion",
+    "receipts"
+  ],
+  "title": "ModBatchReceipt",
+  "type": "object"
+}

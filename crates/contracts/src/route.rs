@@ -7,10 +7,13 @@
 //! never a result; every passing route carries the chain of samples, lookups
 //! and readbacks that produced it.
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, TS, JsonSchema,
+)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export)]
 pub enum SurfaceResult {
@@ -24,7 +27,9 @@ pub enum SurfaceResult {
     Unavailable,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, TS, JsonSchema,
+)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export)]
 pub enum SessionVerification {
@@ -35,7 +40,9 @@ pub enum SessionVerification {
     Conflict,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, TS, JsonSchema,
+)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[ts(export)]
 pub enum InputReadiness {
@@ -45,7 +52,9 @@ pub enum InputReadiness {
 }
 
 /// SPEC §3.2 `ProcessKey`: endpoint, boot, PID and kernel birth.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, TS, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct ProcessKey {

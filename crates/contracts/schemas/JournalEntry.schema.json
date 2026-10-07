@@ -1,0 +1,1219 @@
+{
+  "$defs": {
+    "AcceptanceProof": {
+      "description": "Allowlisted proof flags for provider acceptance (SPEC §7.3, §11.4); never\ntext or full traces.",
+      "properties": {
+        "coreSettled": {
+          "type": "boolean"
+        },
+        "dropped": {
+          "type": "boolean"
+        },
+        "engineDispatch": {
+          "type": "boolean"
+        },
+        "originalOriginProtected": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "engineDispatch",
+        "coreSettled",
+        "originalOriginProtected",
+        "dropped"
+      ],
+      "type": "object"
+    },
+    "ActivityResult": {
+      "enum": [
+        "SUCCESS",
+        "FAILURE",
+        "INTERRUPTED"
+      ],
+      "type": "string"
+    },
+    "ActorRelationKind": {
+      "enum": [
+        "IMMEDIATE_PARENT",
+        "TREE_ROOT",
+        "TEAMMATE",
+        "FORKED_FROM"
+      ],
+      "type": "string"
+    },
+    "ActorRole": {
+      "enum": [
+        "PRINCIPAL",
+        "SUBORDINATE",
+        "TEAMMATE"
+      ],
+      "type": "string"
+    },
+    "AttachedPresence": {
+      "description": "What an attachment fact positively observed. ENDED comes only from an\nexplicit end or a qualified process exit, never from silence.",
+      "enum": [
+        "LIVE",
+        "DETACHED",
+        "PARKED"
+      ],
+      "type": "string"
+    },
+    "BindingMethod": {
+      "enum": [
+        "NATIVE_INVENTORY",
+        "HOOK_ANCESTRY",
+        "EXPLICIT_LAUNCH",
+        "USER_PAIRING",
+        "FIXTURE"
+      ],
+      "type": "string"
+    },
+    "BindingProof": {
+      "properties": {
+        "evidence": {
+          "description": "Bounded, sanitized native evidence (readbacks, samples)."
+        },
+        "executableIdentity": {
+          "description": "The executable image the binding was proven with.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "$ref": "#/$defs/BindingMethod"
+        },
+        "tabHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "windowHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "CanonicalRefs": {
+      "description": "Canonical references of a resolved fact.",
+      "properties": {
+        "activityId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attentionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bindingId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inputId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "namespaceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "processId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relatedActorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "request": {
+          "description": "The native request ID itself; requests are not allocated records.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sessionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "surfaceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "CausalPoint": {
+      "properties": {
+        "nativeKey": {
+          "description": "This point's own native object key, when predecessor relations name it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativePredecessorKeys": {
+          "description": "Native keys this point is known to follow.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "orderDomain": {
+          "description": "The actual native or qualified observer counter scope.",
+          "type": "string"
+        },
+        "sequence": {
+          "description": "Validated nonnegative decimal; compared numerically, never lexically.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceEpoch": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceId",
+        "sourceEpoch",
+        "orderDomain",
+        "nativePredecessorKeys"
+      ],
+      "type": "object"
+    },
+    "Delivery": {
+      "description": "How an entry reached admission. Catch-up output intents are held for\neligibility reconciliation (SPEC §7.6); bootstrap seeds create none.",
+      "enum": [
+        "LIVE",
+        "CATCHUP",
+        "BOOTSTRAP"
+      ],
+      "type": "string"
+    },
+    "EvidenceClass": {
+      "description": "Provenance, not a confidence score (SPEC §5.1).",
+      "enum": [
+        "PROVIDER_EVENT",
+        "PROVIDER_SNAPSHOT",
+        "KERNEL",
+        "USER_ATTESTED",
+        "OWNER_COMMAND",
+        "DERIVED",
+        "SEMANTIC_SELF_REPORT",
+        "UI_INFERRED"
+      ],
+      "type": "string"
+    },
+    "ExecutionMode": {
+      "enum": [
+        "terminal_embedded",
+        "shared_daemon",
+        "supervised_background",
+        "desktop",
+        "remote",
+        "headless"
+      ],
+      "type": "string"
+    },
+    "FactPayload": {
+      "oneOf": [
+        {
+          "properties": {
+            "displayName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "SESSION_IDENTIFIED",
+              "type": "string"
+            },
+            "startSource": {
+              "description": "Native start source (startup, resume, clear, compact, fork).",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SESSION_RECORD_CHANGED",
+              "type": "string"
+            },
+            "recordState": {
+              "$ref": "#/$defs/SessionRecordState"
+            }
+          },
+          "required": [
+            "kind",
+            "recordState"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "controllingDevice": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "EXECUTION_ATTACHED",
+              "type": "string"
+            },
+            "mode": {
+              "$ref": "#/$defs/ExecutionMode"
+            },
+            "nativeRuntimeId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "presence": {
+              "$ref": "#/$defs/AttachedPresence"
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "presence"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "EXECUTION_ENDED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "executableIdentity": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "PROCESS_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "executableIdentity"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "PROCESS_EXIT_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "OBSERVATION_LINK_CHANGED",
+              "type": "string"
+            },
+            "link": {
+              "$ref": "#/$defs/ObservationState"
+            }
+          },
+          "required": [
+            "kind",
+            "link"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_SUBMITTED",
+              "type": "string"
+            },
+            "origin": {
+              "$ref": "#/$defs/InputOrigin"
+            },
+            "submission": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/CausalPoint"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The original submission point when it differs from the capture\npoint (upstream-delayed submission)."
+            }
+          },
+          "required": [
+            "kind",
+            "origin"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_ACCEPTED",
+              "type": "string"
+            },
+            "proof": {
+              "$ref": "#/$defs/AcceptanceProof"
+            }
+          },
+          "required": [
+            "kind",
+            "proof"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_REJECTED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_STARTED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_STEP_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Stop: a response boundary that may be continued or vetoed. It never\nends an execution and never certifies an outcome (INV-07).",
+          "properties": {
+            "kind": {
+              "const": "RESPONSE_BOUNDARY_OBSERVED",
+              "type": "string"
+            },
+            "stopHookActive": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "stopHookActive"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "OUTPUT_READY",
+              "type": "string"
+            },
+            "summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_OUTCOME_OBSERVED",
+              "type": "string"
+            },
+            "outcome": {
+              "$ref": "#/$defs/TurnOutcome"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "outcome"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_PROPOSED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_STARTED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_FINISHED",
+              "type": "string"
+            },
+            "result": {
+              "$ref": "#/$defs/ActivityResult"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory",
+            "result"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A permission preflight occurred; not proof that a human dialog is open.",
+          "properties": {
+            "kind": {
+              "const": "PERMISSION_CHECK_OBSERVED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "category": {
+              "$ref": "#/$defs/WaitCategory"
+            },
+            "generation": {
+              "description": "Native generation the wait belongs to, when the source names one.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "WAIT_STATE_OBSERVED",
+              "type": "string"
+            },
+            "signal": {
+              "$ref": "#/$defs/WaitSignal"
+            },
+            "subtype": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "category",
+            "signal"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "REQUEST_RESOLVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "agentType": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "ACTOR_IDENTIFIED",
+              "type": "string"
+            },
+            "role": {
+              "$ref": "#/$defs/ActorRole"
+            }
+          },
+          "required": [
+            "kind",
+            "role"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTOR_RELATION_OBSERVED",
+              "type": "string"
+            },
+            "relation": {
+              "$ref": "#/$defs/ActorRelationKind"
+            }
+          },
+          "required": [
+            "kind",
+            "relation"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTOR_RUN_ENDED",
+              "type": "string"
+            },
+            "outcome": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/TurnOutcome"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_RECORDED",
+              "type": "string"
+            },
+            "proof": {
+              "$ref": "#/$defs/BindingProof"
+            }
+          },
+          "required": [
+            "kind",
+            "proof"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_UNPROVEN",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_INVALIDATED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "interval": {
+              "$ref": "#/$defs/SnapshotInterval"
+            },
+            "kind": {
+              "const": "PROVIDER_SNAPSHOT_OBSERVED",
+              "type": "string"
+            },
+            "present": {
+              "type": "boolean"
+            },
+            "row": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SnapshotRow"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "present",
+            "interval"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "detail": {
+              "type": "string"
+            },
+            "domain": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "OBSERVATION_GAP_DETECTED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "domain",
+            "detail"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "focusPerformed": {
+              "type": "boolean"
+            },
+            "inputReadiness": {
+              "$ref": "#/$defs/InputReadiness"
+            },
+            "kind": {
+              "const": "ROUTE_RESULT_RECORDED",
+              "type": "string"
+            },
+            "reasonCode": {
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "sessionVerification": {
+              "$ref": "#/$defs/SessionVerification"
+            },
+            "surfaceResult": {
+              "$ref": "#/$defs/SurfaceResult"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "surfaceResult",
+            "sessionVerification",
+            "inputReadiness",
+            "reasonCode",
+            "focusPerformed"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_ACKNOWLEDGED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_RESOLVED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_SNOOZED",
+              "type": "string"
+            },
+            "untilMs": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs",
+            "untilMs"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "detail": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "NOTIFICATION_DELIVERY_RECORDED",
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "state": {
+              "$ref": "#/$defs/NotificationState"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "state",
+            "detail"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "InputOrigin": {
+      "description": "The original native origin of an input attempt (SPEC §7.3). Only the two\nhuman origins can ever qualify for follow-up resolution.",
+      "enum": [
+        "HUMAN_COMPOSER",
+        "HUMAN_BRIDGE",
+        "SCHEDULED",
+        "TASK_NOTIFICATION",
+        "PEER",
+        "SDK",
+        "PLUGIN",
+        "UNCLASSIFIED"
+      ],
+      "type": "string"
+    },
+    "InputReadiness": {
+      "enum": [
+        "FOREGROUND_COMPATIBLE",
+        "BACKGROUND_JOB",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "NotificationState": {
+      "enum": [
+        "NOT_REQUESTED",
+        "PENDING",
+        "SUBMITTED",
+        "CONFIRMED_PRESENT",
+        "UNCERTAIN",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "ObservationState": {
+      "enum": [
+        "CURRENT",
+        "STALE",
+        "DISCONNECTED",
+        "CONFLICT",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "ResolvedFact": {
+      "properties": {
+        "causal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "factId": {
+          "type": "string"
+        },
+        "factIndex": {
+          "description": "Position among the facts of one observation.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/FactPayload"
+        },
+        "payloadVersion": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceClass"
+        },
+        "refs": {
+          "$ref": "#/$defs/CanonicalRefs"
+        }
+      },
+      "required": [
+        "factId",
+        "observationId",
+        "factIndex",
+        "refs",
+        "provenance",
+        "payloadVersion",
+        "payload"
+      ],
+      "type": "object"
+    },
+    "SequenceMeaning": {
+      "description": "Whose counter `sourceSequence` is: the provider's own, or one qualified\nobserver's capture order. A capture helper never numbers provider order.",
+      "enum": [
+        "NATIVE",
+        "OBSERVER_CAPTURE"
+      ],
+      "type": "string"
+    },
+    "SessionRecordState": {
+      "enum": [
+        "KNOWN",
+        "ARCHIVED",
+        "PROVIDER_DELETED"
+      ],
+      "type": "string"
+    },
+    "SessionVerification": {
+      "enum": [
+        "CURRENT_NATIVE_REVALIDATED",
+        "NATIVE_BOUND_LAST_KNOWN",
+        "USER_ATTESTED",
+        "UNBOUND",
+        "CONFLICT"
+      ],
+      "type": "string"
+    },
+    "SnapshotInterval": {
+      "description": "A snapshot without a native revision is an interval observation (SPEC\n§4.15): it says what the source reported between these instants.",
+      "properties": {
+        "endMs": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "startMs": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "startMs",
+        "endMs"
+      ],
+      "type": "object"
+    },
+    "SnapshotRow": {
+      "properties": {
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "waitingFor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SurfaceResult": {
+      "enum": [
+        "EXACT_NATIVE_SURFACE",
+        "EXACT_WINDOW",
+        "APP_ONLY",
+        "URL_DISPATCHED",
+        "PROJECT_ONLY",
+        "INSPECTOR_ONLY",
+        "AMBIGUOUS",
+        "UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "TurnOutcome": {
+      "enum": [
+        "COMPLETED",
+        "INTERRUPTED",
+        "FAILED",
+        "REFUSED"
+      ],
+      "type": "string"
+    },
+    "WaitCategory": {
+      "description": "A native wait category. Each maps to one attention category.",
+      "enum": [
+        "APPROVAL",
+        "INPUT",
+        "JOB_BLOCKED"
+      ],
+      "type": "string"
+    },
+    "WaitSignal": {
+      "enum": [
+        "POSITIVE",
+        "CLEARED"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "What admission journals for one accepted observation or owner command:\nthe header the reducer may use, and its resolved facts in order. `cursor`\nis the observation's ingest position (a local commit cursor, SPEC §5.4).",
+  "properties": {
+    "capturedWallMs": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "cursor": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "delivery": {
+      "$ref": "#/$defs/Delivery"
+    },
+    "facts": {
+      "items": {
+        "$ref": "#/$defs/ResolvedFact"
+      },
+      "type": "array"
+    },
+    "observationId": {
+      "type": "string"
+    },
+    "sequenceMeaning": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SequenceMeaning"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sourceEpoch": {
+      "type": "string"
+    },
+    "sourceId": {
+      "type": "string"
+    },
+    "sourceSequence": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "cursor",
+    "observationId",
+    "sourceId",
+    "sourceEpoch",
+    "capturedWallMs",
+    "delivery",
+    "facts"
+  ],
+  "title": "JournalEntry",
+  "type": "object"
+}

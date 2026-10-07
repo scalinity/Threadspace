@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "OwnerAction": {
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "ACKNOWLEDGE",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "\"Mark handled\": explicit resolution, always with a reason.",
+          "properties": {
+            "kind": {
+              "const": "RESOLVE",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Presentation/notification eligibility only; never provider state.",
+          "properties": {
+            "kind": {
+              "const": "SNOOZE",
+              "type": "string"
+            },
+            "untilMs": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "untilMs"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "action": {
+      "$ref": "#/$defs/OwnerAction"
+    },
+    "attentionId": {
+      "type": "string"
+    },
+    "commandId": {
+      "type": "string"
+    },
+    "expectedRevision": {
+      "description": "The targeted item's revision when the owner acted; checked only for a\nnew command, never for a retry of a committed one.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "commandId",
+    "attentionId",
+    "action"
+  ],
+  "title": "OwnerCommand",
+  "type": "object"
+}
