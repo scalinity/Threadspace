@@ -2,38 +2,42 @@ import { describe, expect, it } from "vitest";
 
 import { createInitBarrier, type GpuLike } from "./initBarrier";
 
+/** A prototype whose instances answer `requestAdapter` with themselves as `this`. */
 function fakeGpu() {
   const calls: unknown[] = [];
   const adapter = { name: "adapter" };
-  const gpu: GpuLike = {
-    requestAdapter(options?: unknown) {
+  const prototype: GpuLike = {
+    requestAdapter(this: unknown, options?: unknown) {
       calls.push(options);
-      return Promise.resolve(adapter);
+      return Promise.resolve(this === instance ? adapter : null);
     },
   };
-  return { gpu, calls, adapter, original: gpu.requestAdapter };
+  const instance: GpuLike = Object.create(prototype) as GpuLike;
+  return { prototype, gpu: instance, calls, adapter, original: prototype.requestAdapter };
 }
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("renderer init barrier", () => {
   it("is never installed in a release build", () => {
-    const { gpu, original } = fakeGpu();
-    const barrier = createInitBarrier(gpu, false);
+    const { prototype, gpu, original } = fakeGpu();
+    const barrier = createInitBarrier(prototype, false);
+    expect(prototype.requestAdapter).toBe(original);
     expect(gpu.requestAdapter).toBe(original);
     expect(() => barrier.arm()).toThrow(/qualification builds/);
     expect(barrier.state().installed).toBe(false);
   });
 
   it("passes requests through until armed", async () => {
-    const { gpu, adapter } = fakeGpu();
-    createInitBarrier(gpu, true);
+    const { prototype, gpu, adapter } = fakeGpu();
+    const barrier = createInitBarrier(prototype, true);
     await expect(gpu.requestAdapter()).resolves.toBe(adapter);
+    expect(barrier.state().calls).toBe(1);
   });
 
   it("issues the armed request natively but withholds its result until release", async () => {
-    const { gpu, calls, adapter } = fakeGpu();
-    const barrier = createInitBarrier(gpu, true, () => 1000);
+    const { prototype, gpu, calls, adapter } = fakeGpu();
+    const barrier = createInitBarrier(prototype, true, () => 1000);
     barrier.arm();
     let delivered: unknown = null;
     void gpu.requestAdapter({ power: "high" }).then((value) => (delivered = value));
@@ -53,7 +57,7 @@ describe("renderer init barrier", () => {
   });
 
   it("refuses a release with nothing held", () => {
-    const { gpu } = fakeGpu();
-    expect(() => createInitBarrier(gpu, true).release()).toThrow(/no renderer init is held/);
+    const { prototype } = fakeGpu();
+    expect(() => createInitBarrier(prototype, true).release()).toThrow(/no renderer init is held/);
   });
 });

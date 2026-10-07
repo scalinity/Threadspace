@@ -11,10 +11,11 @@ import { type GpuLike, type InitBarrierState, createInitBarrier } from "./initBa
 let active: RendererLifecycle | null = null;
 
 /**
- * Installed when this module is first evaluated, before the scene mounts and
- * creates its first renderer; a release build never wraps the adapter request.
+ * Installed on `GPU.prototype` when this module is first evaluated, before the
+ * scene mounts and creates its first renderer; a release build never wraps
+ * the adapter request.
  */
-const initBarrier = createInitBarrier((navigator as unknown as { gpu?: GpuLike }).gpu, launch.qualificationBuild);
+const initBarrier = createInitBarrier((globalThis as unknown as { GPU?: { prototype: GpuLike } }).GPU?.prototype, launch.qualificationBuild);
 
 /** Registers the mounted lifecycle; the returned function unregisters it. */
 export function registerRendererLifecycle(lifecycle: RendererLifecycle): () => void {

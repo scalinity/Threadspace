@@ -20,6 +20,8 @@ export interface InitBarrierRelease {
 
 export interface InitBarrierState {
   installed: boolean;
+  /** Adapter requests that passed through the gate since it was installed. */
+  calls: number;
   armed: boolean;
   held: { heldAtMs: number } | null;
   releases: InitBarrierRelease[];
@@ -34,18 +36,25 @@ export interface InitBarrier {
 const MAX_HOLD_MS = 60_000;
 const MAX_RELEASES = 8;
 
-export function createInitBarrier(gpu: GpuLike | undefined, enabled: boolean, now: () => number = Date.now): InitBarrier {
+/**
+ * `target` is the object whose `requestAdapter` is wrapped: `GPU.prototype`
+ * in the app, so the gate sees the request on whichever `GPU` instance makes
+ * it, with `this` preserved.
+ */
+export function createInitBarrier(target: GpuLike | undefined, enabled: boolean, now: () => number = Date.now): InitBarrier {
   let armed = false;
+  let calls = 0;
   let held: { heldAtMs: number } | null = null;
   let finish: ((by: InitBarrierRelease["releasedBy"]) => void) | null = null;
   const releases: InitBarrierRelease[] = [];
-  const installed = enabled && gpu !== undefined;
-  const state = (): InitBarrierState => ({ installed, armed, held: held === null ? null : { ...held }, releases: releases.map((entry) => ({ ...entry })) });
+  const installed = enabled && target !== undefined;
+  const state = (): InitBarrierState => ({ installed, calls, armed, held: held === null ? null : { ...held }, releases: releases.map((entry) => ({ ...entry })) });
 
   if (installed) {
-    const original = gpu.requestAdapter.bind(gpu);
-    gpu.requestAdapter = (options?: unknown) => {
-      const request = original(options);
+    const original = target.requestAdapter;
+    target.requestAdapter = function (this: unknown, options?: unknown) {
+      calls += 1;
+      const request = original.call(this, options);
       if (!armed) return request;
       armed = false;
       const heldAtMs = now();
