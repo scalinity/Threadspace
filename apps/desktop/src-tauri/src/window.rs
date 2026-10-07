@@ -351,6 +351,7 @@ mod shells {
         /// `retainCount` just before destruction, while the runtime still
         /// holds the window.
         retain_count_live: usize,
+        balanced: bool,
         window: Weak<AnyObject>,
         delegate: Option<Weak<AnyObject>>,
         content_view: Option<Weak<AnyObject>>,
@@ -398,6 +399,7 @@ mod shells {
                 incarnation,
                 number,
                 retain_count_live,
+                balanced: false,
                 window: Weak::new(window),
                 delegate: delegate.as_deref().map(Weak::new),
                 content_view: content_view.as_deref().map(Weak::new),
@@ -410,12 +412,42 @@ mod shells {
     /// window has had time to be released.
     pub fn report<R: Runtime>(app: &AppHandle<R>, retired_incarnation: Uuid) {
         thread::sleep(SETTLE);
+        // EXPERIMENT (C-04 diagnosis only, reverted before the repair): once
+        // the window's delegate is gone, send the closed window one release
+        // to test whether the single remaining reference is all that keeps
+        // it alive.
+        let (done, wait) = mpsc::channel();
+        let _ = app.run_on_main_thread(move || {
+            let _ = done.send(balance());
+        });
+        let balanced = wait.recv_timeout(Duration::from_secs(5)).unwrap_or_default();
+        thread::sleep(SETTLE);
         let logged = app.clone();
         let _ = app.run_on_main_thread(move || {
             let mut detail = snapshot();
             detail["afterRecoveryOf"] = json!(retired_incarnation);
+            detail["experimentReleasedOnce"] = json!(balanced);
             crate::prefs::log(&logged, "OFFICE_NATIVE_WINDOWS", detail);
         });
+    }
+
+    fn balance() -> Vec<Uuid> {
+        RETIRED.with_borrow_mut(|retired| {
+            retired
+                .iter_mut()
+                .filter(|r| !r.balanced)
+                .filter(|r| r.delegate.as_ref().is_none_or(|d| d.load().is_none()))
+                .filter_map(|r| {
+                    let window = r.window.load()?;
+                    let pointer = Retained::as_ptr(&window);
+                    drop(window);
+                    // SAFETY: experiment only; see `report`.
+                    let () = unsafe { msg_send![pointer, release] };
+                    r.balanced = true;
+                    Some(r.incarnation)
+                })
+                .collect()
+        })
     }
 
     fn alive(weak: Option<&Weak<AnyObject>>) -> Value {
