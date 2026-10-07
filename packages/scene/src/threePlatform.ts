@@ -67,9 +67,13 @@ export function createThreeRendererPlatform(options: ThreePlatformOptions): Rend
       grain.wrapS = RepeatWrapping;
       grain.wrapT = RepeatWrapping;
       grain.needsUpdate = true;
+      // A repeated call is a no-op: the texture and bitmap are released once.
+      let disposed = false;
       return {
         texture: grain,
         dispose() {
+          if (disposed) return;
+          disposed = true;
           grain.dispose();
           bitmap.close();
         },

@@ -167,12 +167,23 @@ export interface LifecycleCounts {
   confirmationFailures: number;
 }
 
+/**
+ * Asset outcomes, for diagnostics only: no lifecycle decision reads them.
+ * Once no request is in flight and no generation is initializing, every
+ * started asset has exactly one outcome:
+ * `started === applied + aborted + discardedLate + failed + releasedBeforeScene`.
+ */
 export interface AssetCounts {
   started: number;
   applied: number;
   aborted: number;
   discardedLate: number;
+  /** The request failed, or the scene threw while applying the asset. */
   failed: number;
+  /** Received and held, then released on retirement before any scene applied it. */
+  releasedBeforeScene: number;
+  /** `dispose()` calls on received assets; each received asset is disposed once. */
+  disposed: number;
 }
 
 export interface RendererLifecycleSnapshot {
@@ -208,6 +219,8 @@ interface Generation<R, A extends SceneAsset> {
   readonly abort: AbortController;
   scene: LifecycleScene<A> | null;
   asset: A | null;
+  /** Whether the held asset already has its outcome (applied, or failed to apply). */
+  assetSettled: boolean;
   retired: boolean;
   initialized: boolean;
   injecting: boolean;
@@ -280,7 +293,15 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
     staleConfirmations: 0,
     confirmationFailures: 0,
   };
-  private readonly assetCounts: AssetCounts = { started: 0, applied: 0, aborted: 0, discardedLate: 0, failed: 0 };
+  private readonly assetCounts: AssetCounts = {
+    started: 0,
+    applied: 0,
+    aborted: 0,
+    discardedLate: 0,
+    failed: 0,
+    releasedBeforeScene: 0,
+    disposed: 0,
+  };
   private readonly lossCounts = { natural: 0, injected: 0 };
   private readonly losses: DeviceLossRecord[] = [];
   private readonly errors: RendererErrorRecord[] = [];
@@ -520,6 +541,7 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
       abort: new AbortController(),
       scene: null,
       asset: null,
+      assetSettled: false,
       retired: false,
       initialized: false,
       injecting: false,
@@ -555,10 +577,7 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
       const scene = platform.createScene(renderer, this.reducedMotion);
       entry.scene = scene;
       scene.update(this.model);
-      if (entry.asset !== null) {
-        scene.applyAsset(entry.asset);
-        this.assetCounts.applied += 1;
-      }
+      if (entry.asset !== null) this.applyAsset(entry, scene, entry.asset);
       this.lastAttestation = attestation;
       this.enter("live", recovery ? "recovered" : "live");
       this.options.onAttested?.(attestation);
@@ -580,8 +599,13 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
       }
     }
     if (entry.asset !== null) {
-      entry.asset.dispose();
+      const asset = entry.asset;
       entry.asset = null;
+      this.disposeAsset(asset);
+      if (!entry.assetSettled) {
+        this.assetCounts.releasedBeforeScene += 1;
+        this.emit("asset-released-before-scene", { generation: entry.id });
+      }
     }
     if (entry.initialized) {
       try {
@@ -707,17 +731,21 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
     request.then(
       (asset) => {
         if (entry.retired) {
-          asset.dispose();
+          this.disposeAsset(asset);
           this.assetCounts.discardedLate += 1;
           this.emit("late-asset-discarded", { generation: entry.id });
           return;
         }
+        // Held until retirement; `build()` applies it if no scene exists yet.
         entry.asset = asset;
-        if (entry.scene !== null) {
-          entry.scene.applyAsset(asset);
-          this.assetCounts.applied += 1;
-          this.emit("asset-applied", { generation: entry.id });
+        if (entry.scene === null) return;
+        try {
+          this.applyAsset(entry, entry.scene, asset);
+        } catch (error) {
+          this.emit("asset-failed", { generation: entry.id, message: boundedText(error) });
+          return;
         }
+        this.emit("asset-applied", { generation: entry.id });
       },
       (error: unknown) => {
         if (entry.abort.signal.aborted) {
@@ -729,6 +757,24 @@ export class RendererLifecycle<R extends LifecycleRenderer = LifecycleRenderer, 
         }
       },
     );
+  }
+
+  /** Records the held asset's outcome; a scene that throws records `failed` and the error propagates. */
+  private applyAsset(entry: Generation<R, A>, scene: LifecycleScene<A>, asset: A): void {
+    entry.assetSettled = true;
+    try {
+      scene.applyAsset(asset);
+    } catch (error) {
+      this.assetCounts.failed += 1;
+      throw error;
+    }
+    this.assetCounts.applied += 1;
+  }
+
+  /** The lifecycle's only call to an asset's `dispose()`: once at late arrival, or once at retirement. */
+  private disposeAsset(asset: A): void {
+    asset.dispose();
+    this.assetCounts.disposed += 1;
   }
 
   // ------------------------------------------------------------ diagnostics

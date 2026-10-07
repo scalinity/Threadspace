@@ -5,6 +5,7 @@ import type { SceneModel } from "./controller";
 import { installFrameCounter, type FrameTarget } from "./frameCounter";
 import {
   RendererLifecycle,
+  type AssetCounts,
   type ConfirmedVisibility,
   type LifecycleReport,
   type LifecycleScene,
@@ -72,9 +73,11 @@ class FakeMedia implements MediaQueryLike {
   }
 }
 
+/** Counts every `dispose()` call, so a second disposal by the lifecycle is visible. */
 interface FakeAsset {
   readonly generation: number;
   disposed: boolean;
+  disposeCalls: number;
   dispose(): void;
 }
 
@@ -82,8 +85,10 @@ function fakeAsset(generation: number): FakeAsset {
   return {
     generation,
     disposed: false,
+    disposeCalls: 0,
     dispose() {
       this.disposed = true;
+      this.disposeCalls += 1;
     },
   };
 }
@@ -149,6 +154,7 @@ class FakeScene implements LifecycleScene<FakeAsset> {
   readonly updates: SceneModel[] = [];
   readonly assets: FakeAsset[] = [];
   releaseGate: Deferred<void> | null = null;
+  failApply: Error | null = null;
   released = false;
 
   constructor(
@@ -167,6 +173,7 @@ class FakeScene implements LifecycleScene<FakeAsset> {
   }
 
   applyAsset(asset: FakeAsset): void {
+    if (this.failApply) throw this.failApply;
     this.assets.push(asset);
   }
 
@@ -207,6 +214,9 @@ class FakeEnv {
   surfacesDestroyed = 0;
   autoInit = true;
   failNextInit: Error | null = null;
+  failNextScene: Error | null = null;
+  /** Scenes created while this is set throw it from `applyAsset`. */
+  failApply: Error | null = null;
   visibility: ConfirmedVisibility = { visible: true, minimized: false };
   confirm: () => Promise<ConfirmedVisibility> = () => Promise.resolve({ ...this.visibility });
 
@@ -224,7 +234,13 @@ class FakeEnv {
     },
     attest: (_renderer, initDurationMs) => attestation(initDurationMs),
     createScene: (renderer, reducedMotion) => {
+      const failure = this.failNextScene;
+      if (failure) {
+        this.failNextScene = null;
+        throw failure;
+      }
       const scene = new FakeScene(renderer, reducedMotion);
+      scene.failApply = this.failApply;
       this.scenes.push(scene);
       return scene;
     },
@@ -282,6 +298,23 @@ const naturalLoss: RendererLossInfo = { api: "WebGPU", message: "GPU process res
 
 function model(...ids: string[]): SceneModel {
   return { workers: ids.map((id) => ({ id, label: id, state: "attention" as const })), selectedId: null };
+}
+
+/** Terminal outcomes; after quiescence they must equal `started`. */
+function outcomes(asset: AssetCounts): number {
+  return asset.applied + asset.aborted + asset.discardedLate + asset.failed + asset.releasedBeforeScene;
+}
+
+/** A deterministic PRNG (mulberry32), so a failing interleaving replays from its seed. */
+function seeded(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 // ------------------------------------------------------------------ tests
@@ -745,5 +778,260 @@ describe("RendererLifecycle 2D mode, frames, assets and motion", () => {
     expect(env.media.listeners.size).toBe(0);
     expect(lifecycle.getSnapshot().state).toBe("detached");
     expect(env.renderer(0).disposed).toBe(true);
+  });
+});
+
+describe("RendererLifecycle asset outcome accounting", () => {
+  /** Attaches with init held open and delivers generation 1's asset before any scene exists. */
+  async function heldBeforeScene(env: FakeEnv): Promise<{ lifecycle: RendererLifecycle<FakeRenderer, FakeAsset>; early: FakeAsset }> {
+    env.autoInit = false;
+    const lifecycle = env.lifecycle();
+    lifecycle.attach(host);
+    await tick();
+    const early = fakeAsset(1);
+    env.assetRequests[0]?.gate.resolve(early);
+    await tick();
+    expect(early.disposeCalls).toBe(0);
+    expect(env.scenes).toHaveLength(0);
+    return { lifecycle, early };
+  }
+
+  it("releases an asset received before its scene once when the generation retires before a scene exists", async () => {
+    const env = new FakeEnv();
+    const { lifecycle, early } = await heldBeforeScene(env);
+
+    env.visibility = { visible: false, minimized: false };
+    lifecycle.setHostVisibility("hidden");
+    await tick();
+    expect(lifecycle.getSnapshot().initPending).toEqual({ generation: 1, retired: true });
+    expect(early.disposeCalls).toBe(0);
+
+    env.renderer(0).initGate.resolve();
+    await lifecycle.settled();
+    expect(env.scenes).toHaveLength(0);
+    expect(early.disposeCalls).toBe(1);
+    const { asset } = lifecycle.getSnapshot();
+    expect(asset).toEqual({ started: 1, applied: 0, aborted: 0, discardedLate: 0, failed: 0, releasedBeforeScene: 1, disposed: 1 });
+    expect(outcomes(asset)).toBe(asset.started);
+    expect(env.reports.filter((report) => report.event === "asset-released-before-scene")).toHaveLength(1);
+  });
+
+  it("releases an asset received during init once when the init rejects", async () => {
+    const env = new FakeEnv();
+    const { lifecycle, early } = await heldBeforeScene(env);
+
+    env.renderer(0).initGate.reject(new Error("Unable to create WebGPU adapter."));
+    await lifecycle.settled();
+    const snapshot = lifecycle.getSnapshot();
+    expect(snapshot.state).toBe("failed-fallback");
+    expect(env.renderer(0).disposeCalls).toBe(0);
+    expect(early.disposeCalls).toBe(1);
+    expect(snapshot.asset).toEqual({ started: 1, applied: 0, aborted: 0, discardedLate: 0, failed: 0, releasedBeforeScene: 1, disposed: 1 });
+    expect(outcomes(snapshot.asset)).toBe(snapshot.asset.started);
+  });
+
+  it("releases a held asset once when scene construction fails", async () => {
+    const env = new FakeEnv();
+    env.failNextScene = new Error("node material compile failed");
+    const { lifecycle, early } = await heldBeforeScene(env);
+
+    env.renderer(0).initGate.resolve();
+    await lifecycle.settled();
+    const snapshot = lifecycle.getSnapshot();
+    expect(snapshot.state).toBe("failed-fallback");
+    expect(snapshot.fallbackReason).toContain("scene construction failed");
+    expect(env.renderer(0).disposeCalls).toBe(1);
+    expect(early.disposeCalls).toBe(1);
+    expect(snapshot.asset).toEqual({ started: 1, applied: 0, aborted: 0, discardedLate: 0, failed: 0, releasedBeforeScene: 1, disposed: 1 });
+    expect(outcomes(snapshot.asset)).toBe(snapshot.asset.started);
+  });
+
+  it("releases a held asset once when a device loss retires the generation before its scene", async () => {
+    const env = new FakeEnv();
+    const { lifecycle, early } = await heldBeforeScene(env);
+
+    env.renderer(0).onDeviceLost(naturalLoss);
+    await tick();
+    expect(lifecycle.getSnapshot().deviceLosses[0]).toMatchObject({ generation: 1, outcome: "rebuild" });
+    env.autoInit = true;
+    env.renderer(0).initGate.resolve();
+    await lifecycle.settled();
+    expect(early.disposeCalls).toBe(1);
+    expect(lifecycle.getSnapshot()).toMatchObject({ state: "live", liveGeneration: 2 });
+
+    const current = fakeAsset(2);
+    env.assetRequests[1]?.gate.resolve(current);
+    await tick();
+    expect(env.scene(0).assets).toEqual([current]);
+    const { asset } = lifecycle.getSnapshot();
+    expect(asset).toEqual({ started: 2, applied: 1, aborted: 0, discardedLate: 0, failed: 0, releasedBeforeScene: 1, disposed: 1 });
+    expect(outcomes(asset)).toBe(asset.started);
+  });
+
+  it("counts an asset the scene throws on as failed, once, and still disposes it once", async () => {
+    // Thrown while the scene is built: the generation falls back as before.
+    const building = new FakeEnv();
+    building.failApply = new Error("texture upload rejected");
+    const { lifecycle, early } = await heldBeforeScene(building);
+    building.renderer(0).initGate.resolve();
+    await lifecycle.settled();
+    expect(lifecycle.getSnapshot().fallbackReason).toContain("texture upload rejected");
+    expect(early.disposeCalls).toBe(1);
+    expect(lifecycle.getSnapshot().asset).toEqual({ started: 1, applied: 0, aborted: 0, discardedLate: 0, failed: 1, releasedBeforeScene: 0, disposed: 1 });
+
+    // Thrown by a live scene: the generation stays live.
+    const env = new FakeEnv();
+    const live = await env.live();
+    env.scene(0).failApply = new Error("texture upload rejected");
+    const asset = fakeAsset(1);
+    env.assetRequests[0]?.gate.resolve(asset);
+    await tick();
+    expect(live.getSnapshot()).toMatchObject({ state: "live", liveGeneration: 1 });
+    expect(env.reports.filter((report) => report.event === "asset-failed")).toHaveLength(1);
+    await env.show(live, false);
+    expect(asset.disposeCalls).toBe(1);
+    const counts = live.getSnapshot().asset;
+    expect(counts).toEqual({ started: 1, applied: 0, aborted: 0, discardedLate: 0, failed: 1, releasedBeforeScene: 0, disposed: 1 });
+    expect(outcomes(counts)).toBe(counts.started);
+  });
+
+  it("gives every started asset one outcome and one disposal across seeded random interleavings", { timeout: 120_000 }, async () => {
+    const SEED = 0xc12;
+    const ITERATIONS = 600;
+    const random = seeded(SEED);
+    const chance = (p: number) => random() < p;
+    const pick = <T>(items: readonly T[]): T | undefined => items[Math.floor(random() * items.length)];
+    const totals = {
+      steps: 0,
+      delivered: 0,
+      identityChecks: 0,
+      started: 0,
+      applied: 0,
+      aborted: 0,
+      discardedLate: 0,
+      failed: 0,
+      releasedBeforeScene: 0,
+      disposed: 0,
+    };
+
+    for (let iteration = 0; iteration < ITERATIONS; iteration += 1) {
+      const label = `seed ${SEED} iteration ${iteration}`;
+      const env = new FakeEnv();
+      env.autoInit = false;
+      const lifecycle = env.lifecycle();
+      const delivered: FakeAsset[] = [];
+      const settledRequests = new Set<number>();
+      const settledInits = new Set<FakeRenderer>();
+      const pendingRequests = () => env.assetRequests.map((_, index) => index).filter((index) => !settledRequests.has(index));
+      const pendingInits = () => env.renderers.filter((renderer) => !settledInits.has(renderer));
+      // One request per generation, so request `index` belongs to generation `index + 1`.
+      const settleRequest = (index: number, deliver: boolean): void => {
+        const request = env.assetRequests[index];
+        if (!request) return;
+        settledRequests.add(index);
+        if (deliver) {
+          const asset = fakeAsset(index + 1);
+          delivered.push(asset);
+          request.gate.resolve(asset);
+        } else if (request.signal.aborted) {
+          request.gate.reject(new DOMException("The operation was aborted.", "AbortError"));
+        } else {
+          request.gate.reject(new Error("floor texture request failed: HTTP 500"));
+        }
+      };
+      const settleInit = (renderer: FakeRenderer, succeed: boolean): void => {
+        settledInits.add(renderer);
+        if (succeed) renderer.initGate.resolve();
+        else renderer.initGate.reject(new Error("Unable to create WebGPU adapter."));
+      };
+
+      lifecycle.attach(host);
+      const steps = 6 + Math.floor(random() * 18);
+      for (let step = 0; step < steps; step += 1) {
+        const index = pick(pendingRequests());
+        const renderer = pick(pendingInits());
+        switch (Math.floor(random() * 11)) {
+          case 0:
+            if (index !== undefined) settleRequest(index, true);
+            break;
+          case 1:
+            if (index !== undefined) settleRequest(index, false);
+            break;
+          case 2:
+            if (renderer) settleInit(renderer, true);
+            break;
+          case 3:
+            if (renderer) settleInit(renderer, false);
+            break;
+          case 4:
+            env.visibility = chance(0.5) ? { visible: false, minimized: false } : { visible: true, minimized: true };
+            lifecycle.setHostVisibility("hidden");
+            break;
+          case 5:
+            env.visibility = { visible: true, minimized: false };
+            lifecycle.setHostVisibility("visible");
+            break;
+          case 6:
+            lifecycle.setMode2d(true);
+            break;
+          case 7:
+            lifecycle.setMode2d(false);
+            break;
+          case 8:
+            env.renderers.at(-1)?.onDeviceLost(naturalLoss);
+            break;
+          case 9:
+            env.failNextScene = new Error("node material compile failed");
+            break;
+          default:
+            env.failApply = env.failApply ? null : new Error("texture upload rejected");
+        }
+        // Interleave: the next action runs in the same turn, a few microtasks later, or after everything queued.
+        if (chance(0.3)) await tick();
+        else for (let hops = Math.floor(random() * 6); hops > 0; hops -= 1) await Promise.resolve();
+      }
+
+      // Quiescence: settle every outstanding init and request until the lifecycle starts no more.
+      for (let round = 0; ; round += 1) {
+        await tick();
+        const requests = pendingRequests();
+        const inits = pendingInits();
+        if (requests.length === 0 && inits.length === 0) break;
+        expect(round, label).toBeLessThan(32);
+        for (const pending of inits) settleInit(pending, chance(0.85));
+        for (const pending of requests) settleRequest(pending, chance(0.7));
+      }
+      const quiet = lifecycle.getSnapshot();
+      expect(quiet.initPending, label).toBeNull();
+      expect(quiet.asset.started, label).toBe(env.assetRequests.length);
+      expect(outcomes(quiet.asset), label).toBe(quiet.asset.started);
+      expect(delivered.every((asset) => asset.disposeCalls <= 1), label).toBe(true);
+      // Only the live generation may still hold its asset.
+      const held = delivered.filter((asset) => asset.disposeCalls === 0);
+      expect(held.length, label).toBeLessThanOrEqual(1);
+      if (held[0]) expect(held[0].generation, label).toBe(quiet.liveGeneration);
+      expect(quiet.asset.disposed, label).toBe(delivered.length - held.length);
+
+      lifecycle.detach();
+      await lifecycle.settled();
+      const final = lifecycle.getSnapshot();
+      expect(final.state, label).toBe("detached");
+      expect(delivered.every((asset) => asset.disposeCalls === 1), label).toBe(true);
+      expect(final.asset.disposed, label).toBe(delivered.length);
+      expect(outcomes(final.asset), label).toBe(final.asset.started);
+
+      totals.steps += steps;
+      totals.delivered += delivered.length;
+      totals.identityChecks += 2;
+      for (const key of ["started", "applied", "aborted", "discardedLate", "failed", "releasedBeforeScene", "disposed"] as const) {
+        totals[key] += final.asset[key];
+      }
+    }
+
+    // Every outcome occurred, so the identity held on each path, not only the common ones.
+    for (const key of ["applied", "aborted", "discardedLate", "failed", "releasedBeforeScene"] as const) {
+      expect(totals[key], key).toBeGreaterThan(0);
+    }
+    console.info(`asset outcome interleavings: seed ${SEED}, ${ITERATIONS} iterations, ${JSON.stringify(totals)}`);
   });
 });
