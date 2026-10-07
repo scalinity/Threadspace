@@ -90,6 +90,28 @@ impl Log {
     }
 }
 
+/// A companion log line fit for public evidence: home paths shortened to
+/// `~` and a client's executable reduced to its file name.
+fn public_line(line: &Value) -> Value {
+    let mut line = line.clone();
+    if let Some(map) = line.as_object_mut() {
+        for (key, value) in map.iter_mut() {
+            if let Some(text) = value.as_str() {
+                let public = if key == "peerExecutable" {
+                    std::path::Path::new(text)
+                        .file_name()
+                        .map(|name| name.to_string_lossy().into_owned())
+                        .unwrap_or_default()
+                } else {
+                    threadspace_relay::paths::redact_home(text)
+                };
+                *value = json!(public);
+            }
+        }
+    }
+    line
+}
+
 fn is_pid(pid: i32) -> impl Fn(&Value) -> bool {
     move |line: &Value| line["pid"] == pid
 }
@@ -595,7 +617,7 @@ pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
             "companion-log.jsonl",
             &log.seen
                 .iter()
-                .map(Value::to_string)
+                .map(|line| public_line(line).to_string())
                 .collect::<Vec<_>>()
                 .join("\n"),
         )
