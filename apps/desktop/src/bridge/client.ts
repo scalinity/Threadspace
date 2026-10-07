@@ -192,6 +192,8 @@ export class BridgeClient {
   readonly faults = { dropFrames: "none" as "none" | "next" | "all", withholdAcks: false, ackDelayMs: 0, stallNext: false, dropped: 0 };
   private qualificationHandler: QualificationHandler | null = null;
   private pagingEpoch: string | null = null;
+  /** Intents this view applied, across resubscriptions; one is never applied twice. */
+  private readonly appliedIntentIds: string[] = [];
 
   readonly subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
@@ -577,6 +579,13 @@ export class BridgeClient {
   }
 
   private applyIntent(header: FrameHeader, intent: NativeIntent, stream: StreamStats): void {
+    if (this.appliedIntentIds.includes(intent.intentId)) {
+      // Re-sent after a resubscription that lost this view's acknowledgement.
+      this.ackFrame(header);
+      return;
+    }
+    this.appliedIntentIds.push(intent.intentId);
+    if (this.appliedIntentIds.length > 256) this.appliedIntentIds.shift();
     const action = intent.action;
     const appliedAtMs = performance.now();
     if (action.kind === "QualificationCommand") {

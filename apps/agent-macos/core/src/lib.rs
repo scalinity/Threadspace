@@ -14,6 +14,7 @@
 mod bridge;
 mod discovery;
 mod forward;
+mod intent_store;
 mod log;
 mod maintenance;
 mod native_ops;
@@ -70,7 +71,34 @@ struct StartConfig {
 struct Running {
     writer: SyncSender<WriterCommand>,
     discovery: Option<SyncSender<discovery::Trigger>>,
+    store_dir: PathBuf,
     _lock: WriterLock,
+}
+
+/// Accepts a notification response for this process's writer (SPEC §7.5):
+/// it takes the response while it accepts, otherwise the response is
+/// spooled for the next writer. Never dropped.
+pub(crate) fn accept_response(notification_request_id: String, attention_id: String) -> bool {
+    let Some(running) = RUNNING.get() else {
+        return false;
+    };
+    intent_store::accept(
+        &running.store_dir,
+        &running.writer,
+        notification_request_id,
+        attention_id,
+    );
+    true
+}
+
+/// Exits through the writer, which finishes what it accepted first.
+pub(crate) fn release(code: i32) {
+    match RUNNING.get() {
+        Some(running) => {
+            let _ = running.writer.send(WriterCommand::Release { code });
+        }
+        None => std::process::exit(code),
+    }
 }
 
 static RUNNING: OnceLock<Running> = OnceLock::new();
@@ -145,20 +173,8 @@ fn handle_event(event: BridgeEvent) {
         return;
     }
     match RUNNING.get() {
-        Some(running) => {
-            if running
-                .writer
-                .try_send(WriterCommand::NotificationResponse {
-                    notification_request_id: request_id,
-                    attention_id,
-                })
-                .is_err()
-            {
-                log::warn(
-                    "NOTIFICATION_RESPONSE_DROPPED",
-                    json!({ "reason": "writer queue full" }),
-                );
-            }
+        Some(_) => {
+            accept_response(request_id, attention_id);
         }
         None => {
             if let Ok(mut queue) = PRESTART.lock() {
@@ -215,15 +231,13 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         log::error("STORE_DIR_FAILED", json!({ "error": error.to_string() }));
         return EXIT_FATAL;
     }
-    let mut inherited_intents = Vec::new();
     let mut acquired = WriterLock::acquire(&paths.store_dir);
     if matches!(acquired, Err(LockError::Held { .. }))
         && RUNTIME.supervised()
-        && let Some((lock, intents)) = forward::claim(&paths.locator, &paths.store_dir)
+        && let Some(lock) = forward::claim(&paths.locator, &paths.store_dir)
     {
         // The login item's companion took the store from an unsupervised
-        // incumbent, with the intents no view had consumed (SPEC §18.9).
-        inherited_intents = intents;
+        // incumbent (SPEC §18.9); the intents it left are in the store.
         acquired = Ok(lock);
     }
     let lock = match acquired {
@@ -233,7 +247,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
             // notification response it may have been launched for, then
             // exits; it never becomes a second writer (SPEC §7.5).
             log::warn("WRITER_LOCK_HELD", json!({ "mode": "forwarder" }));
-            forward::enter(paths.locator.clone());
+            forward::enter(paths.locator.clone(), paths.store_dir.clone());
             let queued: Vec<BridgeEvent> = PRESTART
                 .lock()
                 .map(|mut queue| queue.drain(..).collect())
@@ -348,11 +362,12 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
     let spawned = writer::spawn(WriterSetup {
         journal,
         commands: writer_rx,
+        sender: writer_tx.clone(),
         notifier: notify_tx,
         responder: respond_tx,
         identity: identity.clone(),
         store_dir: paths.store_dir.clone(),
-        intents: inherited_intents,
+        intents: intent_store::load(&paths.store_dir),
     })
     .and_then(|_| notify::spawn(notify_rx, writer_tx.clone()))
     .and_then(|_| discovery::spawn(claude.clone()))
@@ -406,6 +421,7 @@ fn start(config: StartConfig, callback: BridgeCallback) -> i32 {
         .set(Running {
             writer: writer_tx,
             discovery: discovery_trigger,
+            store_dir: paths.store_dir.clone(),
             _lock: lock,
         })
         .is_err()

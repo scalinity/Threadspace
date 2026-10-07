@@ -164,6 +164,19 @@ pub enum ControlRequestBody {
     /// route is held.
     #[cfg(feature = "qualification")]
     QualifyReleaseRouteBarrier,
+    /// Qualification only: release a yielding writer held at an armed handoff
+    /// barrier (`QualificationFault::Hold…Yield…`). Answers `NotFound` when
+    /// none is held.
+    #[cfg(feature = "qualification")]
+    QualifyReleaseHandoffBarrier,
+    /// Qualification only: accept a notification response exactly as a
+    /// banner click delivered to this companion, so a test can place one at
+    /// a chosen handoff phase.
+    #[cfg(feature = "qualification")]
+    QualifyNotificationResponse {
+        notification_request_id: String,
+        attention_id: String,
+    },
     /// Qualification only: remove this companion's own delivered and pending
     /// notifications from Notification Center.
     #[cfg(feature = "qualification")]
@@ -228,10 +241,12 @@ pub enum ControlResponseBody {
     MaintenancePrepared {
         report: Box<MaintenanceReport>,
     },
-    /// The unsupervised incumbent's answer to `YieldWriter`: intents no view
-    /// has consumed yet. It exits right after, releasing the writer lock.
+    /// The unsupervised incumbent's answer to `YieldWriter`: the intents no
+    /// view had consumed when it yielded, already in the store. It keeps
+    /// accepting until its writer has drained, then exits and releases the
+    /// writer lock; the claimant loads every pending intent from the store.
     WriterYielded {
-        intents: Vec<NativeIntent>,
+        pending_intent_ids: Vec<String>,
     },
     #[cfg(feature = "qualification")]
     SyntheticChangesStarted {
@@ -314,6 +329,14 @@ pub enum QualificationFault {
     /// The next Return holds after its post-focus revalidation and before
     /// its final decision.
     HoldNextRouteBeforeDecision,
+    /// The next yield holds after its reply, while its writer still accepts,
+    /// until `QualifyReleaseHandoffBarrier` (or a bounded timeout).
+    HoldNextYieldAfterReply,
+    /// The next yield holds after its writer stopped accepting and drained,
+    /// immediately before the process exits.
+    HoldNextYieldBeforeExit,
+    /// The next `YieldWriter` is carried out but its reply is never sent.
+    DropNextYieldReply,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -445,6 +468,9 @@ mod release_build_tests {
             r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_ROUTE_BEFORE_FOCUS"}"#,
             r#"{"kind":"QualifyArmFault","fault":"HOLD_NEXT_ROUTE_BEFORE_DECISION"}"#,
             r#"{"kind":"QualifyReleaseRouteBarrier"}"#,
+            r#"{"kind":"QualifyArmFault","fault":"DROP_NEXT_YIELD_REPLY"}"#,
+            r#"{"kind":"QualifyReleaseHandoffBarrier"}"#,
+            r#"{"kind":"QualifyNotificationResponse","notificationRequestId":"x","attentionId":"y"}"#,
             r#"{"kind":"QualifyAdmit","observationId":"x","capturedWallMs":1}"#,
         ] {
             assert!(

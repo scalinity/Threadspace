@@ -69,8 +69,10 @@ pub fn spawn_idle_exit() {
                 if OPEN_CONNECTIONS.load(Ordering::Acquire) > 0 {
                     idle_since = Instant::now();
                 } else if idle_since.elapsed() >= DISABLED_IDLE_EXIT {
+                    // Through the writer, which keeps everything it accepted.
                     log::info("DISABLED_IDLE_EXIT", json!({}));
-                    std::process::exit(0);
+                    crate::release(0);
+                    return;
                 }
             }
         });
@@ -463,23 +465,9 @@ fn dispatch(
                 "NOTIFICATION_RESPONSE_RECEIVED_FORWARDED",
                 json!({ "requestId": notification_request_id, "attentionId": attention_id }),
             );
-            if context
-                .writer
-                .try_send(WriterCommand::NotificationResponse {
-                    notification_request_id,
-                    attention_id,
-                })
-                .is_ok()
-            {
-                respond(outbound, request_id, Ok(ControlResponseBody::Done));
-            } else {
-                refuse(
-                    outbound,
-                    request_id,
-                    ControlErrorCode::Busy,
-                    "writer queue full",
-                );
-            }
+            // Taken by the writer or spooled for the next one; never dropped.
+            crate::accept_response(notification_request_id, attention_id);
+            respond(outbound, request_id, Ok(ControlResponseBody::Done));
         }
         ControlRequestBody::IntentConsumed { intent_id } => to_writer(
             context,
@@ -516,6 +504,8 @@ fn dispatch(
         | ControlRequestBody::QualifyViewCommand { .. }
         | ControlRequestBody::QualifyArmFault { .. }
         | ControlRequestBody::QualifyReleaseRouteBarrier
+        | ControlRequestBody::QualifyReleaseHandoffBarrier
+        | ControlRequestBody::QualifyNotificationResponse { .. }
             if role != ClientRole::Qualification =>
         {
             refuse(
@@ -626,8 +616,42 @@ fn dispatch(
                 threadspace_contracts::control::QualificationFault::HoldNextRouteBeforeDecision => {
                     crate::route::barrier::arm(threadspace_surfaces::RoutePoint::BeforeDecision)
                 }
+                threadspace_contracts::control::QualificationFault::HoldNextYieldAfterReply => {
+                    crate::writer::handoff::arm(crate::writer::handoff::Point::AfterReply)
+                }
+                threadspace_contracts::control::QualificationFault::HoldNextYieldBeforeExit => {
+                    crate::writer::handoff::arm(crate::writer::handoff::Point::BeforeExit)
+                }
+                threadspace_contracts::control::QualificationFault::DropNextYieldReply => {
+                    crate::writer::handoff::arm_dropped_reply()
+                }
             }
             log::info("QUALIFICATION_FAULT_ARMED", json!({ "fault": fault }));
+            respond(outbound, request_id, Ok(ControlResponseBody::Done));
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyReleaseHandoffBarrier => {
+            if crate::writer::handoff::release() {
+                respond(outbound, request_id, Ok(ControlResponseBody::Done));
+            } else {
+                refuse(
+                    outbound,
+                    request_id,
+                    ControlErrorCode::NotFound,
+                    "no yield is held at a barrier",
+                );
+            }
+        }
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyNotificationResponse {
+            notification_request_id,
+            attention_id,
+        } => {
+            log::info(
+                "QUALIFY_NOTIFICATION_RESPONSE",
+                json!({ "requestId": notification_request_id, "attentionId": attention_id }),
+            );
+            crate::accept_response(notification_request_id, attention_id);
             respond(outbound, request_id, Ok(ControlResponseBody::Done));
         }
         #[cfg(feature = "qualification")]

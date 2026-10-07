@@ -38,6 +38,10 @@ pub type RecoveryHook = Box<dyn Fn(Uuid, &'static str) + Send + Sync>;
 pub type EventLog = Box<dyn Fn(&str, serde_json::Value) + Send + Sync>;
 /// Bounded memory of epochs already used; a used epoch never reconnects.
 const REMEMBERED_EPOCHS: usize = 1024;
+/// Bounded memory of intents a view applied, across view reloads and
+/// companion handoffs, so a companion that never heard the consumption
+/// cannot have one applied twice.
+const REMEMBERED_INTENTS: usize = 256;
 
 pub struct Subscription {
     pub id: String,
@@ -58,6 +62,7 @@ pub struct Bridge {
     used_epochs: Mutex<(HashSet<String>, VecDeque<String>)>,
     queries_in_flight: AtomicUsize,
     large_replies: Mutex<HashMap<Uuid, Instant>>,
+    applied_intents: Mutex<VecDeque<String>>,
     recovery: Mutex<Option<RecoveryHook>>,
     event_log: Mutex<Option<EventLog>>,
 }
@@ -118,6 +123,7 @@ impl Bridge {
             used_epochs: Mutex::new((HashSet::new(), VecDeque::new())),
             queries_in_flight: AtomicUsize::new(0),
             large_replies: Mutex::new(HashMap::new()),
+            applied_intents: Mutex::new(VecDeque::new()),
             recovery: Mutex::new(None),
             event_log: Mutex::new(None),
         }
@@ -135,6 +141,25 @@ impl Bridge {
         {
             log(event, detail);
         }
+    }
+
+    fn remember_applied(&self, intent_ids: &[String]) {
+        if let Ok(mut applied) = self.applied_intents.lock() {
+            for intent_id in intent_ids {
+                if !applied.contains(intent_id) {
+                    applied.push_back(intent_id.clone());
+                }
+            }
+            while applied.len() > REMEMBERED_INTENTS {
+                applied.pop_front();
+            }
+        }
+    }
+
+    fn already_applied(&self, intent_id: &str) -> bool {
+        self.applied_intents
+            .lock()
+            .is_ok_and(|applied| applied.iter().any(|id| id == intent_id))
     }
 
     pub fn set_recovery_hook(&self, hook: RecoveryHook) {
@@ -400,6 +425,7 @@ impl Bridge {
                 }
                 other => UiError::new(UiErrorCode::AckRejected, format!("{other:?}")),
             })?;
+        self.remember_applied(&outcome.consumed_intents);
         let notify: Vec<ControlRequestBody> = outcome
             .newly_hydrated
             .then(|| ControlRequestBody::ViewHydrated {
@@ -523,6 +549,23 @@ impl Bridge {
                 cursor,
                 intent,
             } => {
+                if self.already_applied(&intent.intent_id) {
+                    // A view applied it; this companion only missed the
+                    // consumption (a handoff or reload came in between).
+                    self.log(
+                        "INTENT_ALREADY_APPLIED",
+                        serde_json::json!({ "intentId": intent.intent_id, "subscriptionId": subscription_id }),
+                    );
+                    if let Some(link) = self.current_link().filter(|link| link.id == link_id) {
+                        let body = ControlRequestBody::IntentConsumed {
+                            intent_id: intent.intent_id,
+                        };
+                        tauri::async_runtime::spawn(async move {
+                            let _ = link.request(body, REQUEST_TIMEOUT).await;
+                        });
+                    }
+                    return;
+                }
                 let subscription = self
                     .subscriptions
                     .lock()

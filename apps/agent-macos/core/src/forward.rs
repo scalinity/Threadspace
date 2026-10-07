@@ -5,8 +5,10 @@
 //! bounded wait when nothing arrives.
 //!
 //! The login item's own companion first tries to claim the store: an
-//! unsupervised incumbent hands over its undelivered intents and exits
-//! (SPEC §18.9).
+//! unsupervised incumbent yields it and exits once its writer has finished
+//! what it accepted; its pending intents are already in the store
+//! (SPEC §18.9). A forwarded response is spooled first, so a failed hand-off
+//! leaves it for the next writer.
 
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
@@ -15,11 +17,11 @@ use std::time::{Duration, Instant};
 
 use serde_json::json;
 use threadspace_contracts::control::{ClientRole, ControlRequestBody, ControlResponseBody};
-use threadspace_contracts::projection::NativeIntent;
 use threadspace_journal::{LockError, WriterLock};
-use threadspace_relay::client::{BlockingClient, connect};
+use threadspace_relay::client::{BlockingClient, ClientError, connect};
 
 use crate::EXIT_WRITER_LOCK_HELD;
+use crate::intent_store;
 use crate::log;
 
 /// Long enough for a launch-time notification response to arrive.
@@ -28,23 +30,30 @@ const FORWARD_WINDOW: Duration = Duration::from_secs(15);
 const CLAIM_WAIT: Duration = Duration::from_secs(10);
 
 /// Asks the incumbent to yield the store, then takes the writer lock it
-/// releases. `None` when the incumbent refuses (it is the supervised
-/// companion), cannot be reached, or the lock does not come free in time; the
-/// caller then forwards and exits nonzero, so launchd tries again.
-pub fn claim(locator: &Path, store_dir: &Path) -> Option<(WriterLock, Vec<NativeIntent>)> {
-    let reply = connect(locator, ClientRole::Ui, Duration::from_secs(2))
-        .map_err(|error| error.to_string())
-        .and_then(|connection| {
-            BlockingClient::new(connection)
-                .request(ControlRequestBody::YieldWriter)
-                .map_err(|error| error.to_string())
-        });
-    let intents = match reply {
-        Ok(ControlResponseBody::WriterYielded { intents }) => intents,
+/// releases. The pending intents travel through the store, not the reply,
+/// so a lost reply only means waiting for the lock. `None` when the
+/// incumbent refuses (it is the supervised companion) or the lock does not
+/// come free in time; the caller then forwards and exits nonzero, so launchd
+/// tries again.
+pub fn claim(locator: &Path, store_dir: &Path) -> Option<WriterLock> {
+    let reply = connect(locator, ClientRole::Ui, Duration::from_secs(2)).and_then(|connection| {
+        BlockingClient::new(connection).request(ControlRequestBody::YieldWriter)
+    });
+    let reported = match reply {
+        Ok(ControlResponseBody::WriterYielded { pending_intent_ids }) => {
+            json!(pending_intent_ids)
+        }
+        Err(ClientError::Rejected(error)) => {
+            log::info(
+                "WRITER_CLAIM_REFUSED",
+                json!({ "code": error.code, "detail": error.detail }),
+            );
+            return None;
+        }
         other => {
             let detail: String = format!("{other:?}").chars().take(200).collect();
-            log::info("WRITER_CLAIM_REFUSED", json!({ "reply": detail }));
-            return None;
+            log::info("WRITER_CLAIM_UNANSWERED", json!({ "reply": detail }));
+            serde_json::Value::Null
         }
     };
     let deadline = Instant::now() + CLAIM_WAIT;
@@ -53,9 +62,9 @@ pub fn claim(locator: &Path, store_dir: &Path) -> Option<(WriterLock, Vec<Native
             Ok(lock) => {
                 log::info(
                     "WRITER_CLAIMED",
-                    json!({ "inheritedIntents": intents.len() }),
+                    json!({ "reportedPendingIntents": reported }),
                 );
-                return Some((lock, intents));
+                return Some(lock);
             }
             Err(LockError::Held { .. }) if Instant::now() < deadline => {
                 thread::sleep(Duration::from_millis(100));
@@ -63,7 +72,7 @@ pub fn claim(locator: &Path, store_dir: &Path) -> Option<(WriterLock, Vec<Native
             Err(error) => {
                 log::warn(
                     "WRITER_CLAIM_LOCK_FAILED",
-                    json!({ "error": error.to_string(), "droppedIntents": intents.len() }),
+                    json!({ "error": error.to_string() }),
                 );
                 return None;
             }
@@ -71,14 +80,15 @@ pub fn claim(locator: &Path, store_dir: &Path) -> Option<(WriterLock, Vec<Native
     }
 }
 
-static LOCATOR: OnceLock<PathBuf> = OnceLock::new();
+/// The incumbent's locator and the store a response is spooled in.
+static FORWARDING: OnceLock<(PathBuf, PathBuf)> = OnceLock::new();
 
 pub fn active() -> bool {
-    LOCATOR.get().is_some()
+    FORWARDING.get().is_some()
 }
 
-pub fn enter(locator: PathBuf) {
-    if LOCATOR.set(locator).is_err() {
+pub fn enter(locator: PathBuf, store_dir: PathBuf) {
+    if FORWARDING.set((locator, store_dir)).is_err() {
         return;
     }
     let _ = thread::Builder::new()
@@ -91,9 +101,10 @@ pub fn enter(locator: PathBuf) {
 }
 
 pub fn notification_response(request_id: &str, attention_id: &str) {
-    let Some(locator) = LOCATOR.get() else {
+    let Some((locator, store_dir)) = FORWARDING.get() else {
         return;
     };
+    intent_store::spool_for_forwarding(store_dir, request_id, attention_id);
     let outcome = connect(locator, ClientRole::Ui, Duration::from_secs(2))
         .map_err(|error| error.to_string())
         .and_then(|connection| {

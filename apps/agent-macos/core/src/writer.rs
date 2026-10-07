@@ -3,7 +3,7 @@
 //! snapshot reply, then registers the view, all on this thread, so no change
 //! after S can reach a connection ahead of its snapshot.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use std::sync::mpsc::{Receiver, Sender, SyncSender, TrySendError};
 use std::thread;
@@ -28,6 +28,7 @@ use threadspace_journal::{
 use uuid::Uuid;
 
 use crate::bridge::{self, BridgeRequest};
+use crate::intent_store;
 use crate::log;
 use crate::respond::ResponseJob;
 use crate::state::RUNTIME;
@@ -101,10 +102,17 @@ pub enum WriterCommand {
         outbound: Outbound,
     },
     /// An unsupervised incumbent hands the store to the login item's
-    /// companion: answer with the undelivered intents, then exit (SPEC §18.9).
+    /// companion (SPEC §18.9): report the pending intents, which are already
+    /// in the store, then release.
     Yield {
         request_id: u64,
         outbound: Outbound,
+    },
+    /// Every voluntary exit of a writer process: stop accepting responses
+    /// (later ones are spooled), finish everything already accepted, then
+    /// exit with `code`.
+    Release {
+        code: i32,
     },
     /// Queue a validated intent for hydrated views, optionally bringing the
     /// containing application forward.
@@ -196,6 +204,8 @@ struct View {
     connection_id: u64,
     outbound: Outbound,
     hydrated: bool,
+    /// Pending intents already sent to this view.
+    delivered: HashSet<String>,
 }
 
 struct Writer {
@@ -204,6 +214,8 @@ struct Writer {
     intents: VecDeque<NativeIntent>,
     last_cursor: i64,
     responder: SyncSender<ResponseJob>,
+    /// This writer's own queue, for releasing it after a yield.
+    commands: SyncSender<WriterCommand>,
     identity: ProcessIdentity,
     store_dir: PathBuf,
     // In M0A only qualification attention reaches the outbox; provider-derived
@@ -272,6 +284,16 @@ fn valid_uuid(value: &str) -> bool {
     Uuid::parse_str(value).is_ok_and(|parsed| parsed.hyphenated().to_string() == value)
 }
 
+/// The intent of a notification response is named by its notification
+/// request, so a response taken twice yields one intent.
+pub fn response_intent_id(notification_request_id: &str) -> String {
+    if valid_uuid(notification_request_id) {
+        notification_request_id.to_owned()
+    } else {
+        Uuid::new_v4().to_string()
+    }
+}
+
 pub fn respond(
     outbound: &Outbound,
     request_id: u64,
@@ -327,25 +349,40 @@ impl Writer {
         );
     }
 
+    /// Sends a hydrated view each pending intent it has not had yet.
     fn push_intents(&mut self, subscription_id: &str) {
-        let Some(view) = self.views.get(subscription_id) else {
+        let Some(view) = self.views.get_mut(subscription_id) else {
             return;
         };
         if !view.hydrated {
             return;
         }
         for intent in &self.intents {
+            if view.delivered.contains(&intent.intent_id) {
+                continue;
+            }
             let message = ControlMessage::Intent {
                 subscription_id: subscription_id.to_owned(),
                 cursor: format_cursor(self.last_cursor),
                 intent: intent.clone(),
             };
             if view.outbound.try_send(message).is_ok() {
+                view.delivered.insert(intent.intent_id.clone());
                 log::info(
                     "INTENT_DELIVERED",
                     json!({ "intentId": intent.intent_id, "subscriptionId": subscription_id }),
                 );
             }
+        }
+    }
+
+    /// Writes the pending notification and inspector intents to the store.
+    fn persist_intents(&self) {
+        if let Err(error) = intent_store::save(&self.store_dir, self.intents.iter()) {
+            log::error(
+                "PENDING_INTENTS_PERSIST_FAILED",
+                json!({ "error": error.to_string() }),
+            );
         }
     }
 
@@ -387,6 +424,7 @@ impl Writer {
                                 connection_id,
                                 outbound,
                                 hydrated: false,
+                                delivered: HashSet::new(),
                             },
                         );
                     }
@@ -430,10 +468,20 @@ impl Writer {
                 intent_id,
                 outbound,
             } => {
+                let durable = self
+                    .intents
+                    .iter()
+                    .any(|intent| intent.intent_id == intent_id && intent_store::durable(intent));
                 let before = self.intents.len();
                 self.intents.retain(|intent| intent.intent_id != intent_id);
                 if self.intents.len() < before {
-                    log::info("INTENT_CONSUMED", json!({ "intentId": intent_id }));
+                    if durable {
+                        self.persist_intents();
+                    }
+                    log::info(
+                        "INTENT_CONSUMED",
+                        json!({ "intentId": intent_id, "pending": self.intents.len() }),
+                    );
                 }
                 respond(&outbound, request_id, Ok(ControlResponseBody::Done));
             }
@@ -613,24 +661,22 @@ impl Writer {
                 outbound,
             } if !RUNTIME.supervised() => {
                 // Only the companion its login item started opens observation
-                // (SPEC §18.9, §19.5). This unsupervised instance answers,
-                // then exits with its preference unchanged (a permitted
-                // deliberate exit), releasing the writer lock to it.
-                log::info("UNSUPERVISED_HANDOVER", json!({}));
+                // (SPEC §18.9, §19.5). This unsupervised instance refuses with
+                // its preference unchanged and stays control-only, keeping
+                // what it holds, until the login item's companion claims the
+                // store with `YieldWriter`.
+                log::info(
+                    "UNSUPERVISED_ENABLE_REFUSED",
+                    json!({ "pendingIntents": self.intents.len() }),
+                );
                 respond(
                     &outbound,
                     request_id,
                     Err(ControlError::new(
                         ControlErrorCode::NotSupervised,
-                        "not started by the login item; handing the store to its companion",
+                        "not started by the login item; its companion takes the store when it starts",
                     )),
                 );
-                let _ = thread::Builder::new()
-                    .name("handover-exit".into())
-                    .spawn(|| {
-                        thread::sleep(std::time::Duration::from_millis(500));
-                        std::process::exit(crate::EXIT_RUNNING);
-                    });
             }
             WriterCommand::SetObservationEnabled {
                 request_id,
@@ -651,24 +697,52 @@ impl Writer {
                 request_id,
                 outbound,
             } => {
-                let intents: Vec<NativeIntent> = self.intents.drain(..).collect();
+                // The pending intents are already in the store, where the
+                // claimant loads them once it holds the lock; the reply only
+                // reports them, so its loss loses nothing.
+                let pending: Vec<String> = self
+                    .intents
+                    .iter()
+                    .filter(|intent| intent_store::durable(intent))
+                    .map(|intent| intent.intent_id.clone())
+                    .collect();
                 log::info(
                     "UNSUPERVISED_YIELD",
                     json!({
-                        "intents": intents.iter().map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
+                        "pendingIntents": pending,
                         "observationEnabled": RUNTIME.observation_enabled(),
                     }),
                 );
-                respond(
-                    &outbound,
-                    request_id,
-                    Ok(ControlResponseBody::WriterYielded { intents }),
-                );
-                let _ = thread::Builder::new().name("yield-exit".into()).spawn(|| {
-                    thread::sleep(std::time::Duration::from_millis(500));
-                    std::process::exit(crate::EXIT_RUNNING);
-                });
+                #[cfg(feature = "qualification")]
+                let dropped = handoff::take_dropped_reply();
+                #[cfg(not(feature = "qualification"))]
+                let dropped = false;
+                if dropped {
+                    log::info("YIELD_REPLY_DROPPED", json!({}));
+                } else {
+                    respond(
+                        &outbound,
+                        request_id,
+                        Ok(ControlResponseBody::WriterYielded {
+                            pending_intent_ids: pending,
+                        }),
+                    );
+                }
+                // Until this writer processes the release, it keeps accepting,
+                // and whatever it accepts is persisted as it is queued.
+                let commands = self.commands.clone();
+                let _ = thread::Builder::new()
+                    .name("writer-yield".into())
+                    .spawn(move || {
+                        #[cfg(feature = "qualification")]
+                        handoff::pass(handoff::Point::AfterReply);
+                        let _ = commands.send(WriterCommand::Release {
+                            code: crate::EXIT_RUNNING,
+                        });
+                    });
             }
+            // Handled by the writer loop, which owns the queue it drains.
+            WriterCommand::Release { .. } => {}
             WriterCommand::PrepareMaintenance {
                 request_id,
                 purpose,
@@ -755,7 +829,7 @@ impl Writer {
                 notification_request_id,
                 attention_id,
             } => {
-                self.notification_response(&notification_request_id, &attention_id);
+                self.notification_response(&notification_request_id, &attention_id, false);
             }
             WriterCommand::LiveExecutions { provider, reply } => {
                 let _ = reply.send(
@@ -1014,13 +1088,40 @@ impl Writer {
         }
     }
 
-    /// Queues an intent until a view has applied its snapshot and delivers it
-    /// to every hydrated view.
+    /// Queues an intent until a view has consumed it and delivers it to every
+    /// hydrated view. A notification or inspector intent is persisted before
+    /// any view sees it, so no exit of this process can lose it; an intent
+    /// already pending (one response recovered twice) is kept once.
     fn queue_intent(&mut self, intent: NativeIntent) {
-        if self.intents.len() >= MAX_PENDING_INTENTS {
-            self.intents.pop_front();
+        if self
+            .intents
+            .iter()
+            .any(|pending| pending.intent_id == intent.intent_id)
+        {
+            log::info(
+                "INTENT_ALREADY_PENDING",
+                json!({ "intentId": intent.intent_id }),
+            );
+            return;
         }
+        if self.intents.len() >= MAX_PENDING_INTENTS
+            && let Some(evicted) = self.intents.pop_front()
+        {
+            log::warn(
+                "INTENT_EVICTED",
+                json!({ "intentId": evicted.intent_id, "limit": MAX_PENDING_INTENTS }),
+            );
+        }
+        let durable = intent_store::durable(&intent);
+        let intent_id = intent.intent_id.clone();
         self.intents.push_back(intent);
+        if durable {
+            self.persist_intents();
+        }
+        log::info(
+            "INTENT_QUEUED",
+            json!({ "intentId": intent_id, "persisted": durable, "pending": self.intents.len() }),
+        );
         let hydrated: Vec<String> = self
             .views
             .iter()
@@ -1032,11 +1133,31 @@ impl Writer {
         }
     }
 
+    /// Takes one accepted response; a spooled copy is removed only once its
+    /// intent is persisted or its Return is planned.
+    fn notification_response(
+        &mut self,
+        notification_request_id: &str,
+        attention_id: &str,
+        recovered: bool,
+    ) {
+        self.plan_response(notification_request_id, attention_id, recovered);
+        intent_store::unspool(&self.store_dir, notification_request_id);
+    }
+
     /// Re-reads the item on every click (SPEC §7.5). An outstanding item with
     /// observation enabled gets the verified current-session Return (planned
-    /// off this thread); anything else opens the inspector. Nothing here
-    /// acknowledges, resolves or starts capture.
-    fn notification_response(&mut self, notification_request_id: &str, attention_id: &str) {
+    /// off this thread); anything else opens the inspector, as does a
+    /// response recovered from a previous writer, because a Return planned
+    /// now would move focus long after the click. Nothing here acknowledges,
+    /// resolves or starts capture. The intent is named by its notification
+    /// request, so one response is one intent however often it is recovered.
+    fn plan_response(
+        &mut self,
+        notification_request_id: &str,
+        attention_id: &str,
+        recovered: bool,
+    ) {
         if !valid_uuid(attention_id) {
             log::warn(
                 "NOTIFICATION_RESPONSE_REJECTED",
@@ -1056,7 +1177,7 @@ impl Writer {
             }
         };
         let observing = RUNTIME.admission_open();
-        let plan = if target.outstanding && observing {
+        let plan = if target.outstanding && observing && !recovered {
             "RETURN"
         } else {
             "INSPECTOR"
@@ -1073,6 +1194,7 @@ impl Writer {
                 "admissionOpen": observing,
                 "maintenance": RUNTIME.maintenance(),
                 "plan": plan,
+                "recovered": recovered,
                 "hydratedViews": self.views.values().filter(|view| view.hydrated).count(),
             }),
         );
@@ -1091,7 +1213,7 @@ impl Writer {
             );
         }
         let intent = NativeIntent {
-            intent_id: Uuid::new_v4().to_string(),
+            intent_id: response_intent_id(notification_request_id),
             action: IntentAction::OpenAttention {
                 attention_id: target.attention_id,
                 session_id: target.session_id,
@@ -1111,6 +1233,58 @@ impl Writer {
             "CONTAINING_APP_OPEN_REQUESTED",
             json!({ "attentionId": attention_id }),
         );
+    }
+
+    /// Takes over what previous writers left (C-02): their pending intents
+    /// came with the store; responses they could only spool are taken now.
+    fn recover(&mut self) {
+        let spooled = intent_store::spooled(&self.store_dir);
+        log::info(
+            "PENDING_INTENTS_LOADED",
+            json!({
+                "intents": self.intents.iter().map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
+                "spooledResponses": spooled.iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
+            }),
+        );
+        for record in spooled {
+            self.notification_response(&record.notification_request_id, &record.attention_id, true);
+        }
+    }
+
+    /// The only voluntary exit of a writer process (SPEC §18.9, C-02). It
+    /// stops accepting responses, so later ones are spooled; finishes every
+    /// command already accepted, persisting each intent as it is queued; and
+    /// waits for any response still being spooled. Only then does it exit:
+    /// nothing it accepted depends on a reply or a timer having reached
+    /// anyone.
+    fn release(&mut self, code: i32, commands: &Receiver<WriterCommand>) -> ! {
+        intent_store::close();
+        let mut drained = self.drain(commands);
+        #[cfg(feature = "qualification")]
+        handoff::pass(handoff::Point::BeforeExit);
+        drained += self.drain(commands);
+        let _sealed = intent_store::seal();
+        log::info(
+            "WRITER_RELEASED",
+            json!({
+                "code": code,
+                "drainedCommands": drained,
+                "pendingIntents": self.intents.iter().filter(|intent| intent_store::durable(intent)).map(|intent| intent.intent_id.clone()).collect::<Vec<_>>(),
+                "spooledResponses": intent_store::spooled(&self.store_dir).iter().map(|record| record.notification_request_id.clone()).collect::<Vec<_>>(),
+            }),
+        );
+        std::process::exit(code);
+    }
+
+    fn drain(&mut self, commands: &Receiver<WriterCommand>) -> usize {
+        let mut drained = 0;
+        while let Ok(command) = commands.try_recv() {
+            if !matches!(command, WriterCommand::Release { .. }) {
+                drained += 1;
+                self.handle(command);
+            }
+        }
+        drained
     }
 
     /// SPEC §19.5 preparation: record PREPARING (closing admission), finish
@@ -1195,11 +1369,13 @@ impl Writer {
 pub struct WriterSetup {
     pub journal: Journal,
     pub commands: Receiver<WriterCommand>,
+    /// The sending side of `commands`, for the writer's own release.
+    pub sender: SyncSender<WriterCommand>,
     pub notifier: SyncSender<NotificationIntent>,
     pub responder: SyncSender<ResponseJob>,
     pub identity: ProcessIdentity,
     pub store_dir: PathBuf,
-    /// Intents inherited from an unsupervised incumbent that yielded the store.
+    /// Pending intents a previous writer left in the store.
     pub intents: Vec<NativeIntent>,
 }
 
@@ -1207,6 +1383,7 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
     let WriterSetup {
         journal,
         commands,
+        sender,
         notifier,
         responder,
         identity,
@@ -1223,13 +1400,132 @@ pub fn spawn(setup: WriterSetup) -> std::io::Result<thread::JoinHandle<()>> {
                 intents: VecDeque::from(intents),
                 last_cursor,
                 responder,
+                commands: sender,
                 identity,
                 store_dir,
                 notifier,
             };
-            for command in commands {
-                writer.handle(command);
+            writer.recover();
+            for command in commands.iter() {
+                match command {
+                    WriterCommand::Release { code } => writer.release(code, &commands),
+                    command => writer.handle(command),
+                }
             }
             log::warn("WRITER_STOPPED", json!({}));
         })
+}
+
+/// Qualification only (C-02 handoff witnesses): one armed yield holds at a
+/// named point until the harness releases it, so a response can be placed
+/// after the yield's reply, while its writer still accepts, or after the
+/// writer stopped accepting. A held yield always resumes. The yield's reply
+/// can also be withheld. Release builds contain none of this.
+#[cfg(feature = "qualification")]
+pub mod handoff {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::{Condvar, Mutex};
+    use std::time::{Duration, Instant};
+
+    use serde_json::json;
+
+    use crate::log;
+
+    const MAX_HOLD: Duration = Duration::from_secs(60);
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Point {
+        /// The yield's reply was sent (or withheld); the writer still accepts.
+        AfterReply,
+        /// The writer stopped accepting and drained; the process exits next.
+        BeforeExit,
+    }
+
+    impl Point {
+        fn code(self) -> &'static str {
+            match self {
+                Self::AfterReply => "AFTER_REPLY",
+                Self::BeforeExit => "BEFORE_EXIT",
+            }
+        }
+    }
+
+    struct State {
+        armed: Option<Point>,
+        holding: Option<Point>,
+        released: bool,
+    }
+
+    static STATE: Mutex<State> = Mutex::new(State {
+        armed: None,
+        holding: None,
+        released: false,
+    });
+    static WAKE: Condvar = Condvar::new();
+    static DROP_REPLY: AtomicBool = AtomicBool::new(false);
+
+    pub fn arm(point: Point) {
+        if let Ok(mut state) = STATE.lock() {
+            state.armed = Some(point);
+            log::info("HANDOFF_BARRIER_ARMED", json!({ "point": point.code() }));
+        }
+    }
+
+    pub fn arm_dropped_reply() {
+        DROP_REPLY.store(true, Ordering::SeqCst);
+    }
+
+    pub fn take_dropped_reply() -> bool {
+        DROP_REPLY.swap(false, Ordering::SeqCst)
+    }
+
+    /// Releases a held yield; false when none is held.
+    pub fn release() -> bool {
+        let Ok(mut state) = STATE.lock() else {
+            return false;
+        };
+        if state.holding.is_none() {
+            return false;
+        }
+        state.released = true;
+        WAKE.notify_all();
+        true
+    }
+
+    /// Holds the calling yield when `point` is armed (one shot).
+    pub fn pass(point: Point) {
+        let Ok(mut state) = STATE.lock() else {
+            return;
+        };
+        if state.armed != Some(point) {
+            return;
+        }
+        state.armed = None;
+        state.holding = Some(point);
+        state.released = false;
+        let reached = Instant::now();
+        log::info(
+            "HANDOFF_BARRIER_REACHED",
+            json!({ "point": point.code(), "reachedAtMs": log::now_ms() }),
+        );
+        while !state.released && reached.elapsed() < MAX_HOLD {
+            let remaining = MAX_HOLD.saturating_sub(reached.elapsed());
+            state = match WAKE.wait_timeout(state, remaining) {
+                Ok((guard, _)) => guard,
+                Err(_) => return,
+            };
+        }
+        let by = if state.released { "COMMAND" } else { "TIMEOUT" };
+        state.holding = None;
+        state.released = false;
+        log::info(
+            "HANDOFF_BARRIER_RELEASED",
+            json!({
+                "point": point.code(),
+                "releasedBy": by,
+                "heldMs": reached.elapsed().as_millis() as u64,
+                "releasedAtMs": log::now_ms(),
+            }),
+        );
+    }
 }

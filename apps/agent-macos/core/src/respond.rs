@@ -89,7 +89,7 @@ pub fn spawn(
                     }),
                 );
                 let intent = NativeIntent {
-                    intent_id: Uuid::new_v4().to_string(),
+                    intent_id: crate::writer::response_intent_id(&notification_request_id),
                     action: IntentAction::OpenAttention {
                         attention_id,
                         session_id,
