@@ -89,6 +89,7 @@ fn main() -> ExitCode {
         "h10-terminal" => terminal_gates::remediation(&ctx),
         "c11-deadline" => deadline::c11(&ctx),
         "c02-durable" => ownership::c02_durable(&ctx, args.get(2).map_or("all", String::as_str)),
+        "c02-consume-retry" => ownership::c02_durable(&ctx, "D"),
         "c11-receipt" => ownership::c11_receipt(&ctx),
         "c02-handoff" => handoff::c02_handoff(&ctx, args.get(2).map_or("all", String::as_str)),
         "h11-graphics" => graphics_overlap::overlap(&ctx),

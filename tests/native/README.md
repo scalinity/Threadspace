@@ -76,6 +76,7 @@ $M c02-handoff prod all      # intent ownership across handoff: AGB, CF, D, E (o
 $M c11-deadline prod         # one Return deadline: ordinary, fullscreen, and expiry at focus/settle/decision
 $M c02-durable prod all      # durable ownership: 40-response backlog (A), storage-failure matrix (B), Return in flight (C)
 $M c11-receipt prod          # notification Return budget from receipt: queued past it, part of it, direct route
+$M c02-consume-retry prod    # repeated consumption Done only once its removal commits (case D of c02-durable)
 ```
 
 `c02-durable` arms storage failures in the real intent store with
@@ -84,7 +85,11 @@ $M c11-receipt prod          # notification Return budget from receipt: queued p
 directly at each step and writes a per-response ownership trace
 (`traces.jsonl`). `c11-receipt` holds the first notification Return before
 focus so a second waits in the responder queue, and releases it once the
-first is past its own deadline.
+first is past its own deadline. `c02-consume-retry` holds the UI unhydrated
+so the harness is the only consumer, sends each `IntentConsumed` through the
+companion's control server under a new request ID, fails backlog renames
+with `QualifyArmStorageFault`, and kills the writer before any successful
+removal commit.
 
 `c02-handoff` places notification responses at exact handoff phases with
 `QualifyNotificationResponse` (the banner click's own acceptance path) and the

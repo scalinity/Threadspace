@@ -9,7 +9,9 @@
 //!   retired only after the held commit lands, a failed consumption is
 //!   reported and not re-applied, and exits after failures lose nothing;
 //! - C: a notification Return in flight when the companion is killed or
-//!   observation is stopped, and a normal Return.
+//!   observation is stopped, and a normal Return;
+//! - D (C-02B, also `c02-consume-retry`): a repeated consumption is Done
+//!   only once the committed backlog no longer lists the intent.
 //!
 //! `c11-receipt` qualifies the notification Return's receipt deadline: a
 //! Return queued behind a held one past its own deadline, one that waited
@@ -23,13 +25,14 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 use threadspace_contracts::control::{
-    ControlRequestBody, ControlResponseBody, QualificationFault, StorageFaultStep,
-    StorageFaultStore,
+    ControlErrorCode, ControlRequestBody, ControlResponseBody, QualificationFault,
+    StorageFaultStep, StorageFaultStore,
 };
 use threadspace_harness::evidence::Run;
 use threadspace_harness::procs;
 use threadspace_harness::service;
 use threadspace_harness::terminal::Tab;
+use threadspace_relay::client::{BlockingClient, ClientError};
 
 use crate::ctx::Ctx;
 use crate::deadline::{exact, route_full};
@@ -85,7 +88,7 @@ fn trace(log: &Log, id: &str, injected: Option<&str>) -> Value {
                 "ts": line["ts"], "pid": line["pid"], "event": line["event"],
                 "revision": line["revision"], "plan": line["plan"], "recovered": line["recovered"],
                 "recorded": line["recorded"], "failure": line["failure"], "owner": line["owner"],
-                "inFlight": line["inFlight"], "queuedMs": line["queuedMs"], "remainingMs": line["remainingMs"],
+                "inFlight": line["inFlight"], "queuedMs": line["queuedMs"], "remainingMs": line["remainingMs"], "retry": line["retry"],
                 "route": line["route"].get("reasonCode").map(|_| json!({ "reasonCode": line["route"]["reasonCode"], "focusPerformed": line["route"]["focusPerformed"], "latencyMs": line["route"]["latencyMs"] })),
             })
         })
@@ -166,12 +169,14 @@ pub fn c02_durable(ctx: &Ctx, selection: &str) -> Result<Value, String> {
         .collect();
     let all = wanted.iter().any(|c| c == "ALL");
     let want = |c: &str| all || wanted.iter().any(|w| w == c);
-    let run_dir = Run::create(
-        &ctx.evidence_root(),
-        "remediation/c02-durable-ownership",
-        ctx.channel_name(),
-    )
-    .map_err(|e| e.to_string())?;
+    // C-02B's consumption-retry closure (D alone) keeps its own root.
+    let area = if wanted.iter().all(|c| c == "D") {
+        "remediation/c02-consumption-retry"
+    } else {
+        "remediation/c02-durable-ownership"
+    };
+    let run_dir =
+        Run::create(&ctx.evidence_root(), area, ctx.channel_name()).map_err(|e| e.to_string())?;
     let mut log = Log {
         cursor: ctx.companion().log(),
         seen: Vec::new(),
@@ -212,6 +217,9 @@ pub fn c02_durable(ctx: &Ctx, selection: &str) -> Result<Value, String> {
                 &mut windows,
                 &mut spares,
             )?;
+        }
+        if want("D") {
+            consumption_retry(ctx, &run_dir, &mut log, &mut cases, since, tag)?;
         }
         Ok(())
     })();
@@ -686,6 +694,234 @@ fn storage_matrix(
             "releaseStale": stale4, "released": released4, "claimantPid": cpid, "loaded": loaded4, "consumedOnClaimant": consumed4,
             "shellSkipped": skipped, "applications": applied4, "storeAtEnd": store4_end,
             "applied": { "lost": u64::from(applied4 == 0), "duplicates": applied4.saturating_sub(1) },
+        }),
+    )
+}
+
+/// One `IntentConsumed` on `client`, whose requests are numbered from 1, and
+/// the store read right after its reply.
+fn consume(ctx: &Ctx, client: &mut BlockingClient, next: &mut u64, intent_id: &str) -> Value {
+    let request_id = *next;
+    *next += 1;
+    let sent_ms = threadspace_harness::now_ms();
+    let reply = match client.request(ControlRequestBody::IntentConsumed {
+        intent_id: intent_id.to_owned(),
+    }) {
+        Ok(ControlResponseBody::Done) => json!("DONE"),
+        Ok(other) => json!(format!("{other:?}")),
+        Err(ClientError::Rejected(error)) if error.code == ControlErrorCode::Unavailable => {
+            json!({ "code": "UNAVAILABLE", "detail": error.detail })
+        }
+        Err(error) => json!({ "error": error.to_string() }),
+    };
+    json!({ "requestId": request_id, "intentId": intent_id, "sentMs": sent_ms, "reply": reply, "storeAfter": durable(ctx) })
+}
+
+/// One writer's lines with `event` about `id`.
+fn events(log: &Log, pid: i32, event: &str, id: &str) -> Vec<Value> {
+    log.seen
+        .iter()
+        .filter(|l| l["pid"] == pid && l["event"] == event && mentions(l, id))
+        .map(|l| json!({ "ts": l["ts"], "retry": l["retry"], "revision": l["revision"], "failure": l["failure"]["step"] }))
+        .collect()
+}
+
+fn done(consumption: &Value) -> bool {
+    consumption["reply"] == "DONE"
+}
+
+fn unavailable(consumption: &Value) -> bool {
+    consumption["reply"]["code"] == "UNAVAILABLE"
+}
+
+/// The store's pending intents among `ids`, in stored order.
+fn among(store: &Value, ids: &[&String]) -> Vec<String> {
+    store["pendingIntents"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+        .iter()
+        .filter_map(|v| v.as_str().map(str::to_owned))
+        .filter(|id| ids.contains(&id))
+        .collect()
+}
+
+/// D (C-02B): `Done` for a consumption means the committed backlog no longer
+/// lists the intent. Durable intents X, Y, Z and K are accepted by a
+/// cold-started writer while the UI is held unhydrated, so the harness is
+/// their only consumer; it sends each consumption through the companion's
+/// control server under a new request ID. X: removal fails, a repeat before
+/// any successful commit fails, a repeat that commits is Done, and a repeat
+/// after that is Done without a write; Y and Z stay pending in order. K: its
+/// removal fails twice, the writer is killed, the claimant reloads K and
+/// consumes it, and a restart recovers neither X nor K.
+fn consumption_retry(
+    ctx: &Ctx,
+    run_dir: &Run,
+    log: &mut Log,
+    cases: &mut Vec<Value>,
+    since: i64,
+    tag: &str,
+) -> Result<(), String> {
+    use StorageFaultStep::Rename;
+    use StorageFaultStore::Backlog;
+
+    let (supervised, pre) = precondition(ctx, log, "D-start")?;
+    let (w, cold) = cold_start(
+        ctx,
+        log,
+        &supervised,
+        "unregister",
+        &format!("c02r-d0-{tag}"),
+    )?;
+    let pid = w.pid;
+    let (ui, hold) = freeze_ui(ctx);
+    let a = raise(ctx, &format!("c02r-d1-{tag}"))?;
+    let mut accepted = Vec::new();
+    let mut ids = Vec::new();
+    for _ in 0..4 {
+        let response = fresh(&a);
+        let sent = inject(ctx, &response);
+        let line = log.wait(
+            "INTENT_ACCEPTED",
+            &|l| l["pid"] == pid && mentions(l, &response.1),
+            10,
+        );
+        accepted.push(json!({ "intentId": response.1, "sent": sent, "accepted": line }));
+        ids.push(response.1);
+    }
+    let (x, y, z, k) = (&ids[0], &ids[1], &ids[2], &ids[3]);
+    let store0 = durable(ctx);
+    let mut client = ctx.companion().client(Duration::from_secs(10))?;
+    let mut next = 1;
+
+    // X: two failing commits, then storage works again.
+    let armed_x = storage_fault(ctx, Backlog, Rename, 2);
+    let x1 = consume(ctx, &mut client, &mut next, x);
+    let x2 = consume(ctx, &mut client, &mut next, x);
+    let x3 = consume(ctx, &mut client, &mut next, x);
+    let x4 = consume(ctx, &mut client, &mut next, x);
+    log.drain();
+    let x_not_recorded = events(log, pid, "CONSUMPTION_NOT_RECORDED", x);
+    let x_consumed = events(log, pid, "INTENT_CONSUMED", x);
+    let revision = |c: &Value| c["storeAfter"]["revision"].as_u64();
+    let x_checks = json!({
+        "acceptedDurably": accepted.iter().all(|a| !a["accepted"].is_null()) && among(&store0, &[x, y, z, k]) == [x.clone(), y.clone(), z.clone(), k.clone()],
+        "firstNotDone": unavailable(&x1) && has_id(&x1["storeAfter"]["pendingIntents"], x) && revision(&x1) == store0["revision"].as_u64(),
+        "repeatBeforeAnyCommitNotDone": unavailable(&x2) && has_id(&x2["storeAfter"]["pendingIntents"], x) && x2["storeAfter"]["backlogSha256"] == store0["backlogSha256"],
+        "repeatRetriedTheCommit": x_not_recorded.len() == 2 && x_not_recorded[0]["retry"] == false && x_not_recorded[1]["retry"] == true,
+        "doneOnlyWhenTheRetryCommitted": done(&x3) && !has_id(&x3["storeAfter"]["pendingIntents"], x) && revision(&x3) == store0["revision"].as_u64().map(|r| r + 1) && x_consumed.len() == 1 && x_consumed[0]["retry"] == true,
+        "otherIntentsKeptInOrder": among(&x3["storeAfter"], &[x, y, z, k]) == [y.clone(), z.clone(), k.clone()],
+        "alreadyRecordedRepeatDoneWithoutAWrite": done(&x4) && x4["storeAfter"]["backlogSha256"] == x3["storeAfter"]["backlogSha256"] && revision(&x4) == revision(&x3) && events(log, pid, "INTENT_CONSUMED", x).len() == 1,
+        "noTemporaryLeft": x4["storeAfter"]["backlogTemporaries"].as_array().is_some_and(Vec::is_empty),
+    });
+
+    // K: two failing commits, then the writer is killed.
+    let armed_k = storage_fault(ctx, Backlog, Rename, 2);
+    let k1 = consume(ctx, &mut client, &mut next, k);
+    let k2 = consume(ctx, &mut client, &mut next, k);
+    drop(client);
+    log.drain();
+    let k_not_recorded = events(log, pid, "CONSUMPTION_NOT_RECORDED", k);
+    let killed = procs::signal(pid, libc::SIGKILL);
+    let exited = procs::wait_exit(&w, Duration::from_secs(10));
+    let registered = service::bootstrap(&ctx.id, "register");
+    let (cpid, loaded) = claimant_after(ctx, log);
+    let mut client = ctx.companion().client(Duration::from_secs(10))?;
+    let mut next = 1;
+    let k3 = consume(ctx, &mut client, &mut next, k);
+    let y1 = consume(ctx, &mut client, &mut next, y);
+    let z1 = consume(ctx, &mut client, &mut next, z);
+    drop(client);
+    let (restart_pid, restart_loaded) = match kill_companion(ctx) {
+        Ok((_, fresh, _)) => (
+            fresh.pid,
+            log.wait("PENDING_INTENTS_LOADED", &is_pid(fresh.pid), 15),
+        ),
+        Err(error) => return Err(format!("D restart: {error}")),
+    };
+    let thawed = thaw_ui(&ui);
+    let hydrated = log.wait("VIEW_HYDRATED", &is_pid(restart_pid), 90);
+    threadspace_harness::pause_ms(3000);
+    log.drain();
+    let redelivered = log
+        .seen
+        .iter()
+        .filter(|l| {
+            l["event"] == "INTENT_DELIVERED"
+                && (l["pid"] == cpid || l["pid"] == restart_pid)
+                && ids.iter().any(|id| mentions(l, id))
+        })
+        .count();
+    let applied: usize = ids
+        .iter()
+        .map(|id| applications(ctx, id, since).len())
+        .sum();
+    let store_end = durable(ctx);
+    let point = checkpoint(ctx, "D-after");
+    run_dir
+        .append("checkpoints.jsonl", &point)
+        .map_err(|e| e.to_string())?;
+    let loaded_ids = |line: &Option<Value>| -> Vec<String> {
+        line.as_ref()
+            .and_then(|l| l["intents"].as_array().cloned())
+            .unwrap_or_default()
+            .iter()
+            .filter_map(|v| v.as_str().map(str::to_owned))
+            .filter(|id| ids.contains(id))
+            .collect()
+    };
+    let k_checks = json!({
+        "neitherAttemptDone": unavailable(&k1) && unavailable(&k2) && k_not_recorded.len() == 2 && k_not_recorded[1]["retry"] == true,
+        "committedBacklogStillListsIt": has_id(&k2["storeAfter"]["pendingIntents"], k),
+        "killedBeforeAnySuccessfulCommit": killed && exited.is_some(),
+        "claimantReloadedIt": loaded_ids(&loaded) == [y.clone(), z.clone(), k.clone()],
+        "claimantConsumptionDoneAndCommitted": done(&k3) && !has_id(&k3["storeAfter"]["pendingIntents"], k),
+        "restartRecoversNeitherXNorK": restart_loaded.is_some() && loaded_ids(&restart_loaded).is_empty(),
+        "storeEmptyOfTheseAtEnd": among(&store_end, &[x, y, z, k]).is_empty(),
+        "noRedeliveryAfterRestart": hydrated.is_some() && redelivered == 0 && applied == 0,
+        "hydrationHeld": held(&hold),
+        "singleWriter": single_writer(&point) && login_item_owns(&point),
+    });
+    write_traces(
+        run_dir,
+        log,
+        &[
+            (
+                x.clone(),
+                Some("BACKLOG RENAME x2 at consumption and its repeat"),
+            ),
+            (y.clone(), None),
+            (z.clone(), None),
+            (k.clone(), Some("BACKLOG RENAME x2, then SIGKILL")),
+        ],
+    )?;
+    record(
+        run_dir,
+        cases,
+        "D1-repeat-before-commit-retry-and-idempotent",
+        all_true(&x_checks),
+        json!({
+            "checks": x_checks, "precondition": pre, "coldStart": cold, "writerPid": pid, "hydrationHold": hold,
+            "intents": { "X": x, "Y": y, "Z": z, "K": k }, "accepted": accepted, "storeInitial": store0,
+            "armed": armed_x, "consumptions": [x1, x2, x3, x4],
+            "consumptionNotRecorded": x_not_recorded, "intentConsumed": x_consumed,
+            "applied": { "lost": 0, "duplicates": 0 },
+        }),
+    )?;
+    record(
+        run_dir,
+        cases,
+        "D2-restart-before-commit",
+        all_true(&k_checks),
+        json!({
+            "checks": k_checks, "writerPid": pid, "armed": armed_k, "consumptions": [k1, k2],
+            "consumptionNotRecorded": k_not_recorded, "killed": killed, "exitedAfterMs": exited,
+            "register": registered["ok"], "claimantPid": cpid, "claimantLoaded": loaded,
+            "claimantConsumptions": [k3, y1, z1], "restartPid": restart_pid, "restartLoaded": restart_loaded,
+            "thawed": thawed, "hydratedOnRestart": hydrated.is_some(), "redeliveredAfterKill": redelivered,
+            "applications": applied, "storeAtEnd": store_end,
+            "applied": { "lost": 0, "duplicates": applied },
         }),
     )
 }
