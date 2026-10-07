@@ -28,6 +28,7 @@
 //!   threadspace-m0c resolve-qualification <prod|dev> [reason]
 //!   threadspace-m0c view-command <prod|dev> <command> [json-args]
 //!   threadspace-m0c c02-supervision <prod|dev> [all|A,B,C,D,E]
+//!   threadspace-m0c h10-terminal <prod|dev>
 
 mod bridge_gates;
 mod cleanup;
@@ -78,6 +79,7 @@ fn main() -> ExitCode {
             supervision::c02(&ctx, args.get(2).map(String::as_str).unwrap_or("all"))
         }
         "g08-terminal" => terminal_gates::negatives(&ctx),
+        "h10-terminal" => terminal_gates::remediation(&ctx),
         "g06-notifications" => notifications::lifecycle(&ctx),
         "g05-denied" => notifications::denied(&ctx),
         "g13-renderer" => graphics::renderer(&ctx),

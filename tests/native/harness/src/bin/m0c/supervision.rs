@@ -59,12 +59,21 @@ impl Log {
     }
 
     /// The first matching line, already read or arriving within `timeout`.
-    fn wait(&mut self, event: &str, matches: &dyn Fn(&Value) -> bool, timeout_s: u64) -> Option<Value> {
+    fn wait(
+        &mut self,
+        event: &str,
+        matches: &dyn Fn(&Value) -> bool,
+        timeout_s: u64,
+    ) -> Option<Value> {
         if let Some(hit) = self.find(event, matches) {
             return Some(hit);
         }
-        self.cursor
-            .wait_for(event, matches, Duration::from_secs(timeout_s), &mut self.seen)
+        self.cursor.wait_for(
+            event,
+            matches,
+            Duration::from_secs(timeout_s),
+            &mut self.seen,
+        )
     }
 
     fn drain(&mut self) {
@@ -210,7 +219,9 @@ fn attention_state(ctx: &Ctx, attention_id: &str) -> Value {
 }
 
 fn outstanding(state: &Value) -> bool {
-    state["present"] == true && state["acknowledgedAtMs"].is_null() && state["resolvedAtMs"].is_null()
+    state["present"] == true
+        && state["acknowledgedAtMs"].is_null()
+        && state["resolvedAtMs"].is_null()
 }
 
 fn session_journaled(ctx: &Ctx, native_session_id: &str) -> Value {
@@ -315,7 +326,9 @@ fn invariants(log: &Log, samples: &[(i64, Vec<i32>)]) -> Value {
     }
     let mut procs_by_pid: BTreeMap<i64, Proc> = BTreeMap::new();
     for line in &log.seen {
-        let Some(pid) = line["pid"].as_i64() else { continue };
+        let Some(pid) = line["pid"].as_i64() else {
+            continue;
+        };
         let entry = procs_by_pid.entry(pid).or_default();
         let ts = line["ts"].as_i64();
         match line["event"].as_str() {
@@ -356,22 +369,29 @@ fn invariants(log: &Log, samples: &[(i64, Vec<i32>)]) -> Value {
     let unsupervised_observers: Vec<i64> = procs_by_pid
         .iter()
         .filter(|(_, p)| {
-            p.admission_open == Some(true) && p.provenance.as_ref().and_then(Value::as_str) != Some("LOGIN_ITEM")
+            p.admission_open == Some(true)
+                && p.provenance.as_ref().and_then(Value::as_str) != Some("LOGIN_ITEM")
         })
         .map(|(pid, _)| *pid)
         .collect();
-    let max_simultaneous = samples.iter().map(|(_, pids)| pids.len()).max().unwrap_or(0);
+    let max_simultaneous = samples
+        .iter()
+        .map(|(_, pids)| pids.len())
+        .max()
+        .unwrap_or(0);
     let per_process: Vec<Value> = procs_by_pid
         .iter()
-        .map(|(pid, p)| json!({
-            "pid": pid,
-            "launchProvenance": p.provenance,
-            "writerSinceMs": p.writer_since,
-            "forwarder": p.forwarder,
-            "admissionOpen": p.admission_open,
-            "firstSeenMs": p.first_seen,
-            "lastSeenMs": p.last_seen,
-        }))
+        .map(|(pid, p)| {
+            json!({
+                "pid": pid,
+                "launchProvenance": p.provenance,
+                "writerSinceMs": p.writer_since,
+                "forwarder": p.forwarder,
+                "admissionOpen": p.admission_open,
+                "firstSeenMs": p.first_seen,
+                "lastSeenMs": p.last_seen,
+            })
+        })
         .collect();
     // Overlap within one sampling period is the sampler's resolution, not
     // two holders: the writer lock is an exclusive flock.
@@ -417,29 +437,47 @@ fn restore(ctx: &Ctx, log: &mut Log) -> Value {
     json!({ "steps": steps, "after": checkpoint(ctx, "restored") })
 }
 
-fn record(run_dir: &Run, cases: &mut Vec<Value>, case: &str, pass: bool, detail: Value) -> Result<(), String> {
+fn record(
+    run_dir: &Run,
+    cases: &mut Vec<Value>,
+    case: &str,
+    pass: bool,
+    detail: Value,
+) -> Result<(), String> {
     let entry = json!({ "case": case, "pass": pass, "detail": detail });
-    run_dir.append("cases.jsonl", &entry).map_err(|e| e.to_string())?;
+    run_dir
+        .append("cases.jsonl", &entry)
+        .map_err(|e| e.to_string())?;
     cases.push(entry);
     Ok(())
 }
 
 pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
-    let tokens: Vec<String> = selection.split(',').map(|c| c.trim().to_uppercase()).collect();
+    let tokens: Vec<String> = selection
+        .split(',')
+        .map(|c| c.trim().to_uppercase())
+        .collect();
     // `legacy` marks a negative control against a build that predates the
     // repair: its older diagnostics cannot be parsed, so only the start
     // precondition's preference read is skipped. No case check changes.
     let negative_control = tokens.iter().any(|t| t == "LEGACY");
     let wanted: Vec<String> = if tokens.iter().any(|t| t == "ALL") {
-        ["A", "B", "C", "D", "E"].iter().map(|c| (*c).to_owned()).collect()
+        ["A", "B", "C", "D", "E"]
+            .iter()
+            .map(|c| (*c).to_owned())
+            .collect()
     } else {
         tokens.into_iter().filter(|t| t != "LEGACY").collect()
     };
     if wanted.iter().any(|c| c == "B") && !wanted.iter().any(|c| c == "A") {
         return Err("case B needs case A's unsupervised incumbent".into());
     }
-    let run_dir = Run::create(&ctx.evidence_root(), "remediation/c02-supervision", ctx.channel_name())
-        .map_err(|e| e.to_string())?;
+    let run_dir = Run::create(
+        &ctx.evidence_root(),
+        "remediation/c02-supervision",
+        ctx.channel_name(),
+    )
+    .map_err(|e| e.to_string())?;
     let mut log = Log {
         cursor: ctx.companion().log(),
         seen: Vec::new(),
@@ -454,25 +492,44 @@ pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
     let mut open_attention: Vec<String> = Vec::new();
     let sampler = Sampler::start(ctx.id.companion_executable.clone());
     let environment = ctx.environment();
-    run_dir.write_json("environment.json", &environment).map_err(|e| e.to_string())?;
+    run_dir
+        .write_json("environment.json", &environment)
+        .map_err(|e| e.to_string())?;
     // Banner presses and Terminal windows take focus: start only once the owner is idle.
-    let gate = threadspace_harness::idle::wait_for_idle(&ctx.native, 10.0, Duration::from_secs(1800));
-    run_dir.write_json("idle-gate.json", &json!(gate)).map_err(|e| e.to_string())?;
+    let gate =
+        threadspace_harness::idle::wait_for_idle(&ctx.native, 10.0, Duration::from_secs(1800));
+    run_dir
+        .write_json("idle-gate.json", &json!(gate))
+        .map_err(|e| e.to_string())?;
 
     // Precondition for every case: the login item's enabled companion owns the store.
     let start = checkpoint(ctx, "start");
     let start_ok = single_writer(&start)
         && login_item_owns(&start)
         && (negative_control || start["diagnostics"]["observationEnabled"] == true);
-    run_dir.append("checkpoints.jsonl", &start).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &start)
+        .map_err(|e| e.to_string())?;
     if !start_ok {
         let _ = sampler.finish();
-        return Err(format!("precondition: the login item's enabled companion must own the store: {start}"));
+        return Err(format!(
+            "precondition: the login item's enabled companion must own the store: {start}"
+        ));
     }
 
     let outcome = (|| -> Result<(), String> {
         if wanted.iter().any(|c| c == "A") {
-            case_a_b(ctx, &run_dir, &mut log, &mut cases, &mut windows, &mut open_attention, &mut retained, &root, wanted.iter().any(|c| c == "B"))?;
+            case_a_b(
+                ctx,
+                &run_dir,
+                &mut log,
+                &mut cases,
+                &mut windows,
+                &mut open_attention,
+                &mut retained,
+                &root,
+                wanted.iter().any(|c| c == "B"),
+            )?;
         }
         if wanted.iter().any(|c| c == "C") {
             case_c(ctx, &run_dir, &mut log, &mut cases, &mut retained)?;
@@ -488,7 +545,9 @@ pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
     let outcome_error = outcome.err();
 
     let restored = restore(ctx, &mut log);
-    run_dir.write_json("restore.json", &restored).map_err(|e| e.to_string())?;
+    run_dir
+        .write_json("restore.json", &restored)
+        .map_err(|e| e.to_string())?;
     // Nothing acknowledged was lost: each admitted record replays as
     // ALREADY_COMMITTED at its original cursor; outstanding items stay open.
     let durability: Vec<Value> = retained
@@ -517,15 +576,29 @@ pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
     log.drain();
     let samples = sampler.finish();
     let f = invariants(&log, &samples);
-    let durable_ok = durability.iter().all(|d| d["preserved"] == true) && attention.iter().all(|a| a["outstanding"] == true);
+    let durable_ok = durability.iter().all(|d| d["preserved"] == true)
+        && attention.iter().all(|a| a["outstanding"] == true);
     let f_ran = wanted.len() >= 4;
     if f_ran {
-        record(&run_dir, &mut cases, "F-single-writer-and-observer", f["pass"] == true && durable_ok,
-            json!({ "invariants": f, "durability": durability, "outstandingAttention": attention }))?;
+        record(
+            &run_dir,
+            &mut cases,
+            "F-single-writer-and-observer",
+            f["pass"] == true && durable_ok,
+            json!({ "invariants": f, "durability": durability, "outstandingAttention": attention }),
+        )?;
     } else {
         run_dir.write_json("invariants.json", &json!({ "invariants": f, "durability": durability, "outstandingAttention": attention })).map_err(|e| e.to_string())?;
     }
-    run_dir.write_text("companion-log.jsonl", &log.seen.iter().map(Value::to_string).collect::<Vec<_>>().join("\n"))
+    run_dir
+        .write_text(
+            "companion-log.jsonl",
+            &log.seen
+                .iter()
+                .map(Value::to_string)
+                .collect::<Vec<_>>()
+                .join("\n"),
+        )
         .map_err(|e| e.to_string())?;
     let passed = cases.iter().filter(|c| c["pass"] == true).count();
     let summary = json!({
@@ -540,7 +613,9 @@ pub fn c02(ctx: &Ctx, selection: &str) -> Result<Value, String> {
         "executableSha256": environment["executableSha256"],
         "disposableRoot": root.display().to_string(),
     });
-    run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
+    run_dir
+        .write_json("summary.json", &summary)
+        .map_err(|e| e.to_string())?;
     Ok(json!({ "summary": summary, "dir": run_dir.dir }))
 }
 
@@ -564,7 +639,11 @@ fn case_a_b(
     let label_a = format!("c02-a-{}", &uuid::Uuid::new_v4().to_string()[..6]);
     let (attention_a, request_a) = raise(ctx, &label_a)?;
     open_attention.push(attention_a.clone());
-    let submitted = log.wait("NOTIFICATION_SUBMISSION", &|l| l["attentionId"] == attention_a.as_str() && l["state"] == "SUBMITTED", 20);
+    let submitted = log.wait(
+        "NOTIFICATION_SUBMISSION",
+        &|l| l["attentionId"] == attention_a.as_str() && l["state"] == "SUBMITTED",
+        20,
+    );
 
     // A2. The background item becomes unavailable with the preference still
     //     enabled: unregistering ends the login item's companion. Only fast
@@ -579,22 +658,32 @@ fn case_a_b(
         "loginItemPid": service::login_item_pid(&ctx.id),
         "writerLockFree": writer_lock_free(ctx),
     });
-    run_dir.append("checkpoints.jsonl", &unavailable).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &unavailable)
+        .map_err(|e| e.to_string())?;
     let unavailable_ok = supervised_exit.is_some()
         && unavailable["serviceStatusAfterUnregister"] != "ENABLED"
         && unavailable["loginItemPid"].is_null()
         && unavailable["writerLockFree"] == true
-        && unavailable["companionProcesses"].as_array().is_some_and(Vec::is_empty);
+        && unavailable["companionProcesses"]
+            .as_array()
+            .is_some_and(Vec::is_empty);
 
     // A3. The click cold-starts the companion through LaunchServices.
     let since = threadspace_harness::now_ms();
     let pressed = press(ctx, &label_a);
     let Some(cold) = wait_new_companion(ctx, &[supervised.pid], 30) else {
-        return record(run_dir, cases, "A-enabled-preference-unsupervised-cold-start", false, json!({
-            "error": "the notification did not start a companion",
-            "preconditionServiceUnavailable": unavailable_ok, "notificationSubmitted": submitted,
-            "press": pressed, "unregister": unregistered,
-        }));
+        return record(
+            run_dir,
+            cases,
+            "A-enabled-preference-unsupervised-cold-start",
+            false,
+            json!({
+                "error": "the notification did not start a companion",
+                "preconditionServiceUnavailable": unavailable_ok, "notificationSubmitted": submitted,
+                "press": pressed, "unregister": unregistered,
+            }),
+        );
     };
     let pid = cold.pid;
     // A4. Real provider activity while this instance holds the store.
@@ -605,10 +694,23 @@ fn case_a_b(
     let core_start = log.wait("CORE_START", &is_pid(pid), 20);
     let state = log.wait("OBSERVATION_STATE", &is_pid(pid), 20);
     let ready = log.wait("CORE_READY", &is_pid(pid), 20);
-    let response = log.wait("NOTIFICATION_RESPONSE", &|l| l["pid"] == pid && l["attentionId"] == attention_a.as_str(), 45);
-    let inspector = log.wait("NOTIFICATION_INSPECTOR", &|l| l["pid"] == pid && l["attentionId"] == attention_a.as_str(), 30);
+    let response = log.wait(
+        "NOTIFICATION_RESPONSE",
+        &|l| l["pid"] == pid && l["attentionId"] == attention_a.as_str(),
+        45,
+    );
+    let inspector = log.wait(
+        "NOTIFICATION_INSPECTOR",
+        &|l| l["pid"] == pid && l["attentionId"] == attention_a.as_str(),
+        30,
+    );
     let intent = app
-        .wait_report("notification-intent", since, |r| r["report"]["attentionId"].as_str() == Some(attention_a.as_str()), Duration::from_secs(60))
+        .wait_report(
+            "notification-intent",
+            since,
+            |r| r["report"]["attentionId"].as_str() == Some(attention_a.as_str()),
+            Duration::from_secs(60),
+        )
         .map(|(_, r)| r["report"].clone());
     // A5. Capture stays closed in this instance: the durability stand-in and
     //     a forced discovery pass are refused; provider polling never runs.
@@ -620,7 +722,9 @@ fn case_a_b(
     let discovery_passes = log.of_pid(pid, "DISCOVERY_PASS").len();
     let journaled = session_journaled(ctx, &claude_native);
     let point = checkpoint(ctx, "A-unsupervised-instance");
-    run_dir.append("checkpoints.jsonl", &point).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &point)
+        .map_err(|e| e.to_string())?;
     let attention_after = attention_state(ctx, &attention_a);
     let truthful = point["diagnostics"]["observationEnabled"] == true
         && point["diagnostics"]["admissionOpen"] == false
@@ -643,18 +747,26 @@ fn case_a_b(
         "diagnosticsTruthful": truthful,
         "attentionOutstanding": outstanding(&attention_after),
     });
-    let pass_a = checks.as_object().is_some_and(|m| m.values().all(|v| v == true));
-    record(run_dir, cases, "A-enabled-preference-unsupervised-cold-start", pass_a, json!({
-        "checks": checks,
-        "attentionId": attention_a, "notificationRequestId": request_a,
-        "unregister": unregistered, "supervisedBefore": supervised, "supervisedExitedAfterMs": supervised_exit,
-        "coldStart": cold, "launchWitness": witness,
-        "coreStart": core_start, "observationState": state, "coreReady": ready.map(|l| l["ts"].clone()),
-        "notificationResponse": response, "viewIntent": intent,
-        "captureProbe": capture_probe, "refreshProbe": refresh_probe,
-        "discoveryPassesFromInstance": discovery_passes, "providerSession": { "nativeSessionId": claude_native, "journal": journaled },
-        "attentionAfter": attention_after,
-    }))?;
+    let pass_a = checks
+        .as_object()
+        .is_some_and(|m| m.values().all(|v| v == true));
+    record(
+        run_dir,
+        cases,
+        "A-enabled-preference-unsupervised-cold-start",
+        pass_a,
+        json!({
+            "checks": checks,
+            "attentionId": attention_a, "notificationRequestId": request_a,
+            "unregister": unregistered, "supervisedBefore": supervised, "supervisedExitedAfterMs": supervised_exit,
+            "coldStart": cold, "launchWitness": witness,
+            "coreStart": core_start, "observationState": state, "coreReady": ready.map(|l| l["ts"].clone()),
+            "notificationResponse": response, "viewIntent": intent,
+            "captureProbe": capture_probe, "refreshProbe": refresh_probe,
+            "discoveryPassesFromInstance": discovery_passes, "providerSession": { "nativeSessionId": claude_native, "journal": journaled },
+            "attentionAfter": attention_after,
+        }),
+    )?;
     if !with_b {
         return Ok(());
     }
@@ -666,10 +778,18 @@ fn case_a_b(
     let label_b = format!("c02-b-{}", &uuid::Uuid::new_v4().to_string()[..6]);
     let (attention_b, _) = raise(ctx, &label_b)?;
     open_attention.push(attention_b.clone());
-    let submitted_b = log.wait("NOTIFICATION_SUBMISSION", &|l| l["attentionId"] == attention_b.as_str() && l["state"] == "SUBMITTED", 20);
+    let submitted_b = log.wait(
+        "NOTIFICATION_SUBMISSION",
+        &|l| l["attentionId"] == attention_b.as_str() && l["state"] == "SUBMITTED",
+        20,
+    );
     let since_b = threadspace_harness::now_ms();
     let pressed_b = press(ctx, &label_b);
-    let queued_b = log.wait("NOTIFICATION_INSPECTOR", &|l| l["pid"] == pid && l["attentionId"] == attention_b.as_str(), 30);
+    let queued_b = log.wait(
+        "NOTIFICATION_INSPECTOR",
+        &|l| l["pid"] == pid && l["attentionId"] == attention_b.as_str(),
+        30,
+    );
 
     // B2. The login item is registered again; its companion claims the store.
     let registered = service::bootstrap(&ctx.id, "register");
@@ -683,11 +803,18 @@ fn case_a_b(
     let fresh_state = log.wait("OBSERVATION_STATE", &is_pid(fresh_pid), 10);
     let fresh_witness = launch_witness(fresh_pid);
     // B3. Only now is the provider session captured, by the login item's companion.
-    let bound = windows.last().and_then(|w| w.bound_session(ctx, Duration::from_secs(90)));
+    let bound = windows
+        .last()
+        .and_then(|w| w.bound_session(ctx, Duration::from_secs(90)));
     log.drain();
     let fresh_passes = log.of_pid(fresh_pid, "DISCOVERY_PASS").len();
     let intent_b = app
-        .wait_report("notification-intent", since_b, |r| r["report"]["attentionId"].as_str() == Some(attention_b.as_str()), Duration::from_secs(90))
+        .wait_report(
+            "notification-intent",
+            since_b,
+            |r| r["report"]["attentionId"].as_str() == Some(attention_b.as_str()),
+            Duration::from_secs(90),
+        )
         .map(|(_, r)| r["report"].clone());
     let projection = compare_projection(ctx, "after-claim");
     let admit_id = uuid::Uuid::new_v4().to_string();
@@ -697,7 +824,9 @@ fn case_a_b(
         retained.push((admit_id.clone(), cursor.to_owned(), json!(captured)));
     }
     let point_b = checkpoint(ctx, "B-login-item-observer");
-    run_dir.append("checkpoints.jsonl", &point_b).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &point_b)
+        .map_err(|e| e.to_string())?;
     let checks_b = json!({
         "secondIntentQueuedByUnsupervised": submitted_b.is_some() && pressed_b["pressed"] == true && queued_b.is_some(),
         "registered": registered["ok"] == true,
@@ -713,26 +842,44 @@ fn case_a_b(
         "singleWriter": single_writer(&point_b),
         "diagnostics": point_b["diagnostics"]["launchProvenance"] == "LOGIN_ITEM" && point_b["diagnostics"]["admissionOpen"] == true,
     });
-    let pass_b = checks_b.as_object().is_some_and(|m| m.values().all(|v| v == true));
-    record(run_dir, cases, "B-login-item-claims-the-store", pass_b, json!({
-        "checks": checks_b,
-        "register": registered, "ownerAfterMs": owner_after,
-        "unsupervisedIncumbent": cold, "incumbentExitedAfterMs": incumbent_exit, "yield": yielded,
-        "claimant": fresh, "claim": claimed, "coreStart": fresh_start, "observationState": fresh_state, "launchWitness": fresh_witness,
-        "inheritedIntents": claimed.as_ref().map(|l| l["inheritedIntents"].clone()),
-        "providerSessionBoundAs": bound, "discoveryPassesFromLoginItem": fresh_passes,
-        "secondAttentionId": attention_b, "secondIntent": intent_b, "projection": projection, "admit": admitted,
-    }))?;
+    let pass_b = checks_b
+        .as_object()
+        .is_some_and(|m| m.values().all(|v| v == true));
+    record(
+        run_dir,
+        cases,
+        "B-login-item-claims-the-store",
+        pass_b,
+        json!({
+            "checks": checks_b,
+            "register": registered, "ownerAfterMs": owner_after,
+            "unsupervisedIncumbent": cold, "incumbentExitedAfterMs": incumbent_exit, "yield": yielded,
+            "claimant": fresh, "claim": claimed, "coreStart": fresh_start, "observationState": fresh_state, "launchWitness": fresh_witness,
+            "inheritedIntents": claimed.as_ref().map(|l| l["inheritedIntents"].clone()),
+            "providerSessionBoundAs": bound, "discoveryPassesFromLoginItem": fresh_passes,
+            "secondAttentionId": attention_b, "secondIntent": intent_b, "projection": projection, "admit": admitted,
+        }),
+    )?;
     Ok(())
 }
 
-fn case_c(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>, retained: &mut Vec<(String, String, Value)>) -> Result<(), String> {
+fn case_c(
+    ctx: &Ctx,
+    run_dir: &Run,
+    log: &mut Log,
+    cases: &mut Vec<Value>,
+    retained: &mut Vec<(String, String, Value)>,
+) -> Result<(), String> {
     ctx.app().stop_all();
     threadspace_harness::pause_ms(2000);
     let before = checkpoint(ctx, "C-before-crash");
-    run_dir.append("checkpoints.jsonl", &before).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &before)
+        .map_err(|e| e.to_string())?;
     let since = threadspace_harness::now_ms();
-    let precondition = single_writer(&before) && login_item_owns(&before) && before["uiProcesses"].as_array().is_some_and(Vec::is_empty);
+    let precondition = single_writer(&before)
+        && login_item_owns(&before)
+        && before["uiProcesses"].as_array().is_some_and(Vec::is_empty);
     let (old, fresh, waited) = kill_companion(ctx)?;
     let start = log.wait("CORE_START", &is_pid(fresh.pid), 20);
     let state = log.wait("OBSERVATION_STATE", &is_pid(fresh.pid), 20);
@@ -745,7 +892,10 @@ fn case_c(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>, retai
         .filter(|l| l["ts"].as_i64().is_some_and(|ts| ts >= since))
         .map(|l| json!({ "ts": l["ts"], "role": l["role"], "peerPid": l["peerPid"] }))
         .collect();
-    let foreign_clients = clients.iter().filter(|c| c["role"] != "QUALIFICATION").count();
+    let foreign_clients = clients
+        .iter()
+        .filter(|c| c["role"] != "QUALIFICATION")
+        .count();
     let admit_id = uuid::Uuid::new_v4().to_string();
     let captured = threadspace_harness::now_ms();
     let admitted = admit(ctx, &admit_id, captured);
@@ -753,7 +903,9 @@ fn case_c(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>, retai
         retained.push((admit_id.clone(), cursor.to_owned(), json!(captured)));
     }
     let after = checkpoint(ctx, "C-after-relaunch");
-    run_dir.append("checkpoints.jsonl", &after).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &after)
+        .map_err(|e| e.to_string())?;
     let checks = json!({
         "preconditionLoginItemOwnsNoUi": precondition,
         "relaunchedBySupervision": login_item_owns(&after) && after["locatorIncarnation"]["pid"] == fresh.pid,
@@ -765,57 +917,100 @@ fn case_c(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>, retai
         "captureAdmitted": admitted["admitted"] == true,
         "singleWriter": single_writer(&after),
     });
-    let pass = checks.as_object().is_some_and(|m| m.values().all(|v| v == true));
-    record(run_dir, cases, "C-crash-relaunch-no-ui-no-hook", pass, json!({
-        "checks": checks, "killed": old, "relaunched": fresh, "relaunchWaitMs": waited,
-        "coreStart": start, "observationState": state, "discoveryPass": pass_after_start,
-        "clientsAfterKill": clients, "admit": admitted,
-    }))
+    let pass = checks
+        .as_object()
+        .is_some_and(|m| m.values().all(|v| v == true));
+    record(
+        run_dir,
+        cases,
+        "C-crash-relaunch-no-ui-no-hook",
+        pass,
+        json!({
+            "checks": checks, "killed": old, "relaunched": fresh, "relaunchWaitMs": waited,
+            "coreStart": start, "observationState": state, "discoveryPass": pass_after_start,
+            "clientsAfterKill": clients, "admit": admitted,
+        }),
+    )
 }
 
-fn case_d(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>, open_attention: &mut Vec<String>) -> Result<(), String> {
+fn case_d(
+    ctx: &Ctx,
+    run_dir: &Run,
+    log: &mut Log,
+    cases: &mut Vec<Value>,
+    open_attention: &mut Vec<String>,
+) -> Result<(), String> {
     let app = ctx.app();
     app.stop_all();
     let supervised = ctx.companion().incarnation().ok_or("no companion")?;
     let label = format!("c02-d-{}", &uuid::Uuid::new_v4().to_string()[..6]);
     let (attention, _) = raise(ctx, &label)?;
     open_attention.push(attention.clone());
-    let submitted = log.wait("NOTIFICATION_SUBMISSION", &|l| l["attentionId"] == attention.as_str() && l["state"] == "SUBMITTED", 20);
+    let submitted = log.wait(
+        "NOTIFICATION_SUBMISSION",
+        &|l| l["attentionId"] == attention.as_str() && l["state"] == "SUBMITTED",
+        20,
+    );
     let stopped = service::bootstrap(&ctx.id, "stop");
     let exited = procs::wait_exit(&supervised, Duration::from_secs(20));
     let since = threadspace_harness::now_ms();
     let pressed = press(ctx, &label);
-    let cold = wait_new_companion(ctx, &[supervised.pid], 30).ok_or("the notification did not start a companion")?;
+    let cold = wait_new_companion(ctx, &[supervised.pid], 30)
+        .ok_or("the notification did not start a companion")?;
+    // Read while the cold-started process is alive: enable hands it over.
+    let witness = launch_witness(cold.pid);
     let start = log.wait("CORE_START", &is_pid(cold.pid), 20);
     let state = log.wait("OBSERVATION_STATE", &is_pid(cold.pid), 20);
-    let response = log.wait("NOTIFICATION_RESPONSE", &|l| l["pid"] == cold.pid && l["attentionId"] == attention.as_str(), 45);
+    let response = log.wait(
+        "NOTIFICATION_RESPONSE",
+        &|l| l["pid"] == cold.pid && l["attentionId"] == attention.as_str(),
+        45,
+    );
     let intent = app
-        .wait_report("notification-intent", since, |r| r["report"]["attentionId"].as_str() == Some(attention.as_str()), Duration::from_secs(60))
+        .wait_report(
+            "notification-intent",
+            since,
+            |r| r["report"]["attentionId"].as_str() == Some(attention.as_str()),
+            Duration::from_secs(60),
+        )
         .map(|(_, r)| r["report"].clone());
     let enabled = service::bootstrap(&ctx.id, "enable");
     let owner_after = wait_login_item_owner(ctx, 60);
     let handed = checkpoint(ctx, "D-after-enable");
-    run_dir.append("checkpoints.jsonl", &handed).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &handed)
+        .map_err(|e| e.to_string())?;
     let incumbent_exit = procs::wait_exit(&cold, Duration::from_secs(15));
     let (_, relaunched, waited) = kill_companion(ctx)?;
     let relaunch_state = log.wait("OBSERVATION_STATE", &is_pid(relaunched.pid), 20);
     let after = checkpoint(ctx, "D-after-crash");
-    run_dir.append("checkpoints.jsonl", &after).map_err(|e| e.to_string())?;
+    run_dir
+        .append("checkpoints.jsonl", &after)
+        .map_err(|e| e.to_string())?;
     let checks = json!({
         "stopped": stopped["ok"] == true && exited.is_some(),
-        "notificationColdStart": submitted.is_some() && pressed["pressed"] == true,
+        "notificationColdStart": submitted.is_some() && pressed["pressed"] == true
+            && witness["xpcServiceName"].as_str().is_some_and(|n| n.starts_with(&format!("application.{}.", ctx.id.agent_identifier))),
         "coldStartUnsupervisedAndStopped": start.as_ref().is_some_and(|l| l["supervised"] == false) && state.as_ref().is_some_and(|l| l["observationEnabled"] == false && l["admissionOpen"] == false),
         "inspector": response.as_ref().is_some_and(|l| l["plan"] == "INSPECTOR") && intent.as_ref().is_some_and(|i| i["appliedAfterHydration"] == true),
         "enableHandsOverToLoginItem": enabled["ok"] == true && owner_after.is_some() && incumbent_exit.is_some() && single_writer(&handed) && login_item_owns(&handed),
         "crashRelaunchedSupervised": login_item_owns(&after) && after["locatorIncarnation"]["pid"] == relaunched.pid && relaunch_state.as_ref().is_some_and(|l| l["admissionOpen"] == true),
         "singleWriter": single_writer(&after),
     });
-    let pass = checks.as_object().is_some_and(|m| m.values().all(|v| v == true));
-    record(run_dir, cases, "D-stop-cold-start-enable-crash", pass, json!({
-        "checks": checks, "attentionId": attention, "stop": stopped, "coldStart": cold, "launchWitness": launch_witness(cold.pid),
-        "coreStart": start, "observationState": state, "notificationResponse": response, "viewIntent": intent,
-        "enable": enabled, "ownerAfterMs": owner_after, "relaunched": relaunched, "relaunchWaitMs": waited, "relaunchState": relaunch_state,
-    }))
+    let pass = checks
+        .as_object()
+        .is_some_and(|m| m.values().all(|v| v == true));
+    record(
+        run_dir,
+        cases,
+        "D-stop-cold-start-enable-crash",
+        pass,
+        json!({
+            "checks": checks, "attentionId": attention, "stop": stopped, "coldStart": cold, "launchWitness": witness,
+            "coreStart": start, "observationState": state, "notificationResponse": response, "viewIntent": intent,
+            "enable": enabled, "ownerAfterMs": owner_after, "relaunched": relaunched, "relaunchWaitMs": waited, "relaunchState": relaunch_state,
+        }),
+    )
 }
 
 fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Result<(), String> {
@@ -824,8 +1019,12 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
     let unregistered = service::bootstrap(&ctx.id, "unregister");
     let exited = procs::wait_exit(&supervised, Duration::from_secs(20));
     let unavailable = checkpoint(ctx, "E-service-unavailable");
-    run_dir.append("checkpoints.jsonl", &unavailable).map_err(|e| e.to_string())?;
-    let precondition = exited.is_some() && unavailable["writerLockFree"] == true && unavailable["loginItemPid"].is_null();
+    run_dir
+        .append("checkpoints.jsonl", &unavailable)
+        .map_err(|e| e.to_string())?;
+    let precondition = exited.is_some()
+        && unavailable["writerLockFree"] == true
+        && unavailable["loginItemPid"].is_null();
     let label = ctx.id.agent_identifier.clone();
     let variants: [(&str, Option<String>); 3] = [
         ("label-absent", None),
@@ -835,7 +1034,10 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
     let mut results = Vec::new();
     for (name, value) in variants {
         let mut command = Command::new(&ctx.id.companion_executable);
-        command.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null());
         match &value {
             Some(v) => command.env("XPC_SERVICE_NAME", v),
             None => command.env_remove("XPC_SERVICE_NAME"),
@@ -847,7 +1049,11 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
         let ready = log.wait("CORE_READY", &is_pid(pid), 20);
         let witness = launch_witness(pid);
         let cursor_before = companion_snapshot(ctx).map(|(c, _)| c).ok();
-        let capture_probe = admit(ctx, &uuid::Uuid::new_v4().to_string(), threadspace_harness::now_ms());
+        let capture_probe = admit(
+            ctx,
+            &uuid::Uuid::new_v4().to_string(),
+            threadspace_harness::now_ms(),
+        );
         let refresh_probe = ask(ctx, ControlRequestBody::RefreshEvidence);
         let diagnostics_seen = diagnostics(ctx);
         threadspace_harness::pause_ms(10_000);
@@ -856,7 +1062,9 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
         let cursor_after = companion_snapshot(ctx).map(|(c, _)| c).ok();
         let incarnation = Incarnation::of(pid);
         procs::signal(pid, libc::SIGTERM);
-        let ended = incarnation.as_ref().and_then(|i| procs::wait_exit(i, Duration::from_secs(10)));
+        let ended = incarnation
+            .as_ref()
+            .and_then(|i| procs::wait_exit(i, Duration::from_secs(10)));
         if ended.is_none() {
             procs::signal(pid, libc::SIGKILL);
         }
@@ -874,7 +1082,9 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
             "journalUnchanged": cursor_before.is_some() && cursor_before == cursor_after,
             "lockReleasedAfter": lock_after == true,
         });
-        let pass = checks.as_object().is_some_and(|m| m.values().all(|v| v == true));
+        let pass = checks
+            .as_object()
+            .is_some_and(|m| m.values().all(|v| v == true));
         results.push(json!({ "variant": name, "pass": pass, "checks": checks, "launchWitness": witness,
             "coreStart": start, "observationState": state, "diagnostics": diagnostics_seen,
             "captureProbe": capture_probe, "refreshProbe": refresh_probe, "journalCursor": { "before": cursor_before, "after": cursor_after },
@@ -883,10 +1093,21 @@ fn case_e(ctx: &Ctx, run_dir: &Run, log: &mut Log, cases: &mut Vec<Value>) -> Re
     let registered = service::bootstrap(&ctx.id, "register");
     let owner_after = wait_login_item_owner(ctx, 60);
     let after = checkpoint(ctx, "E-restored");
-    run_dir.append("checkpoints.jsonl", &after).map_err(|e| e.to_string())?;
-    let pass = precondition && results.iter().all(|r| r["pass"] == true) && owner_after.is_some() && single_writer(&after);
-    record(run_dir, cases, "E-unknown-or-malformed-provenance", pass, json!({
-        "preconditionServiceUnavailable": precondition, "unregister": unregistered, "variants": results,
-        "register": registered, "loginItemOwnerAfterMs": owner_after,
-    }))
+    run_dir
+        .append("checkpoints.jsonl", &after)
+        .map_err(|e| e.to_string())?;
+    let pass = precondition
+        && results.iter().all(|r| r["pass"] == true)
+        && owner_after.is_some()
+        && single_writer(&after);
+    record(
+        run_dir,
+        cases,
+        "E-unknown-or-malformed-provenance",
+        pass,
+        json!({
+            "preconditionServiceUnavailable": precondition, "unregister": unregistered, "variants": results,
+            "register": registered, "loginItemOwnerAfterMs": owner_after,
+        }),
+    )
 }

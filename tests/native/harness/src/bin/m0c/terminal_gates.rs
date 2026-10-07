@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
-use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody};
+use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody, QualificationFault};
 use threadspace_contracts::route::RouteRequest;
 use threadspace_harness::evidence::Run;
 use threadspace_harness::idle::wait_for_idle;
@@ -161,7 +161,11 @@ impl StartedClaude {
 
 /// `(process group, terminal foreground process group)` of `pid`.
 fn foreground_group(pid: i32) -> Option<(i64, i64)> {
-    let out = run("/bin/ps", &["-o", "pgid=,tpgid=", "-p", &pid.to_string()], Duration::from_secs(3));
+    let out = run(
+        "/bin/ps",
+        &["-o", "pgid=,tpgid=", "-p", &pid.to_string()],
+        Duration::from_secs(3),
+    );
     let mut fields = out.stdout.split_whitespace().map(|f| f.parse::<i64>().ok());
     Some((fields.next()??, fields.next()??))
 }
@@ -188,6 +192,7 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
         chosen_binding_id: None,
         expected_binding_revision: None,
     };
+    let request_id = request.request_id.clone();
     // Callers hold the shared GUI lock around each case (setup + route).
     let started = Instant::now();
     let outcome = ctx.companion().request(
@@ -205,6 +210,8 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
                 && format!("{:?}", result.session_verification) == "CurrentNativeRevalidated";
             let readback_matches = expected_tty.is_some_and(|tty| selected.as_deref() == Some(tty));
             json!({
+                "requestId": request_id,
+                "focus": result.evidence.focus,
                 "surfaceResult": result.surface_result,
                 "sessionVerification": result.session_verification,
                 "inputReadiness": result.input_readiness,
@@ -225,7 +232,7 @@ pub fn route(ctx: &Ctx, session_id: &str, expected_tty: Option<&str>) -> Value {
         }
         Ok(other) => json!({ "error": format!("unexpected {other:?}") }),
         Err(error) => {
-            json!({ "refused": error, "independentSelectedTty": selected, "independentFrontmost": front, "wrongTarget": false })
+            json!({ "requestId": request_id, "refused": error, "independentSelectedTty": selected, "independentFrontmost": front, "wrongTarget": false })
         }
     }
 }
@@ -351,22 +358,25 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
     // terminal's foreground. `b` runs as a shell job; SIGSTOP cannot be
     // caught. `fg` is typed only once the shell owns the foreground, so it
     // never reaches Claude as a prompt.
-    let (foreground_before, foreground_stopped, background, foreground_after) = locked(ctx, "g08 foreground mismatch", || {
-        let before = foreground_group(b.pid);
-        procs::signal(b.pid, libc::SIGSTOP);
-        threadspace_harness::pause_ms(1500);
-        let stopped = foreground_group(b.pid);
-        let shell_has_foreground = stopped.as_ref().is_some_and(|(pgid, tpgid)| pgid != tpgid);
-        let background = route(ctx, &b.session_id, Some(&b.tab.tty));
-        if shell_has_foreground {
-            b.tab.type_line("fg");
-        } else {
-            procs::signal(b.pid, libc::SIGCONT);
-        }
-        threadspace_harness::pause_ms(1500);
-        (before, stopped, background, foreground_group(b.pid))
-    });
-    let shell_held = foreground_stopped.as_ref().is_some_and(|(pgid, tpgid)| pgid != tpgid);
+    let (foreground_before, foreground_stopped, background, foreground_after) =
+        locked(ctx, "g08 foreground mismatch", || {
+            let before = foreground_group(b.pid);
+            procs::signal(b.pid, libc::SIGSTOP);
+            threadspace_harness::pause_ms(1500);
+            let stopped = foreground_group(b.pid);
+            let shell_has_foreground = stopped.as_ref().is_some_and(|(pgid, tpgid)| pgid != tpgid);
+            let background = route(ctx, &b.session_id, Some(&b.tab.tty));
+            if shell_has_foreground {
+                b.tab.type_line("fg");
+            } else {
+                procs::signal(b.pid, libc::SIGCONT);
+            }
+            threadspace_harness::pause_ms(1500);
+            (before, stopped, background, foreground_group(b.pid))
+        });
+    let shell_held = foreground_stopped
+        .as_ref()
+        .is_some_and(|(pgid, tpgid)| pgid != tpgid);
     let readiness_ok = shell_held
         && background["inputReadiness"] != "FOREGROUND_COMPATIBLE"
         && background["wrongTarget"] == false;
@@ -507,6 +517,376 @@ pub fn negatives(ctx: &Ctx) -> Result<Value, String> {
         "wrongTargets": wrong_total,
         "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
         "terminalIncarnationUnchanged": terminal_before == terminal_after,
+        "disposableRoot": root.display().to_string(),
+    });
+    run_dir
+        .write_json("summary.json", &summary)
+        .map_err(|e| e.to_string())?;
+    Ok(json!({ "summary": summary, "dir": run_dir.dir }))
+}
+
+/// Every Terminal window's ID and selected-tab TTY, and the front window.
+const WINDOW_SELECTION: &str = r#"tell application "Terminal"
+  set out to "front" & tab & (id of front window) & linefeed
+  repeat with w in windows
+    set out to out & (id of w) & tab & (tty of selected tab of w) & linefeed
+  end repeat
+  return out
+end tell"#;
+
+/// Brings one window forward as Terminal orders its own windows; macOS shows
+/// that window's Space.
+const RAISE_WINDOW: &str = r#"on run argv
+tell application "Terminal"
+  set index of window id ((item 1 of argv) as integer) to 1
+  activate
+end tell
+end run"#;
+
+fn window_selection() -> Value {
+    let out = threadspace_harness::run::osascript(WINDOW_SELECTION, &[], Duration::from_secs(10));
+    let mut front = None;
+    let mut windows = serde_json::Map::new();
+    for line in out.stdout.lines() {
+        let mut fields = line.split('\t');
+        match (fields.next(), fields.next()) {
+            (Some("front"), Some(id)) => front = id.trim().parse::<i64>().ok(),
+            (Some(id), Some(tty)) => {
+                windows.insert(id.trim().to_owned(), json!(tty.trim()));
+            }
+            _ => {}
+        }
+    }
+    json!({ "atMs": threadspace_harness::now_ms(), "front": front, "selected": windows, "error": (!out.ok).then(|| out.stderr.trim().to_owned()) })
+}
+
+fn raise_window(window_id: i64) -> bool {
+    threadspace_harness::run::osascript(
+        RAISE_WINDOW,
+        &[&window_id.to_string()],
+        Duration::from_secs(10),
+    )
+    .ok
+}
+
+/// Reads `read` until `done` holds or `timeout` passes; returns the last
+/// reading, whether it held and how long it took.
+fn poll(
+    timeout: Duration,
+    read: impl Fn() -> Value,
+    done: impl Fn(&Value) -> bool,
+) -> (Value, bool, u64) {
+    let started = Instant::now();
+    loop {
+        let value = read();
+        if done(&value) {
+            return (value, true, started.elapsed().as_millis() as u64);
+        }
+        if started.elapsed() >= timeout {
+            return (value, false, started.elapsed().as_millis() as u64);
+        }
+        threadspace_harness::pause_ms(150);
+    }
+}
+
+/// H-10 (G08 remediation): an exact baseline route; a fullscreen/Space
+/// transition proven by the target's own CoreGraphics window number; and a
+/// target close that genuinely overlaps a route held at each qualification
+/// barrier, proven by ordered native and companion timestamps.
+pub fn remediation(ctx: &Ctx) -> Result<Value, String> {
+    let run_dir = Run::create(
+        &ctx.evidence_root(),
+        "remediation/h10-terminal",
+        ctx.channel_name(),
+    )
+    .map_err(|e| e.to_string())?;
+    let root = PathBuf::from(format!(
+        "/private/tmp/ts-m0c-h10-{}",
+        &uuid::Uuid::new_v4().to_string()[..8]
+    ));
+    let terminal_before = terminal::terminal_process();
+    let mut cases: Vec<Value> = Vec::new();
+    let record =
+        |cases: &mut Vec<Value>, name: &str, detail: Value, pass: bool| -> Result<(), String> {
+            let entry = json!({ "case": name, "pass": pass, "detail": detail });
+            run_dir
+                .append("cases.jsonl", &entry)
+                .map_err(|e| e.to_string())?;
+            cases.push(entry);
+            Ok(())
+        };
+    let gate = wait_for_idle(&ctx.native, 10.0, Duration::from_secs(1800));
+    run_dir
+        .write_json("idle-gate.json", &json!(gate))
+        .map_err(|e| e.to_string())?;
+    run_dir
+        .write_json("environment.json", &ctx.environment())
+        .map_err(|e| e.to_string())?;
+    let a = spawn_claude(ctx, root.join("a"))?;
+    let spare = locked(ctx, "h10 open spare window", || {
+        Tab::open_inert(root.join("spare"))
+    })?;
+    let tpid = terminal_pid()?;
+    let owned: Vec<i64> = vec![a.tab.window_id, spare.window_id];
+    // Distinct frames: each window's AX element is found from its CoreGraphics number.
+    locked(ctx, "h10 frames", || {
+        a.tab.set_bounds(137, 151, 1001, 707);
+        spare.set_bounds(211, 233, 1011, 733);
+    });
+    let window = |id: i64| {
+        ctx.native
+            .json(&["window-state", &tpid.to_string(), &id.to_string()])
+    };
+    let exact_ok = |r: &Value| r["exact"] == true && r["wrongTarget"] == false;
+
+    // 1. Baseline exact route (routing regression).
+    let baseline = locked(ctx, "h10 baseline", || {
+        route(ctx, &a.session_id, Some(&a.tab.tty))
+    });
+    record(
+        &mut cases,
+        "baseline-exact-route",
+        baseline.clone(),
+        exact_ok(&baseline),
+    )?;
+
+    // 2. Fullscreen and its own Space, entered and left, with routes.
+    let fullscreen = locked(ctx, "h10 fullscreen", || {
+        let pre = (window(a.tab.window_id), window(spare.window_id));
+        let enter = ctx.native.json(&[
+            "ax-action-number",
+            &tpid.to_string(),
+            &a.tab.window_id.to_string(),
+            "fullscreen",
+        ]);
+        let (entered, entered_ok, enter_ms) = poll(
+            Duration::from_secs(10),
+            || json!({ "target": window(a.tab.window_id), "spare": window(spare.window_id) }),
+            |v| {
+                v["target"]["ax"]["fullScreen"] == true
+                    && v["target"]["fullscreenFrame"] == true
+                    && v["target"]["onScreen"] == true
+                    && v["spare"]["onScreen"] == false
+            },
+        );
+        let left_space = raise_window(spare.window_id);
+        let (away, away_ok, away_ms) = poll(
+            Duration::from_secs(10),
+            || json!({ "target": window(a.tab.window_id), "spare": window(spare.window_id) }),
+            |v| v["target"]["onScreen"] == false && v["spare"]["onScreen"] == true,
+        );
+        let routed = route(ctx, &a.session_id, Some(&a.tab.tty));
+        let (returned, returned_ok, return_ms) = poll(
+            Duration::from_secs(5),
+            || json!({ "target": window(a.tab.window_id), "spare": window(spare.window_id) }),
+            |v| {
+                v["target"]["onScreen"] == true
+                    && v["target"]["fullscreenFrame"] == true
+                    && v["spare"]["onScreen"] == false
+            },
+        );
+        let exit = ctx.native.json(&[
+            "ax-action-number",
+            &tpid.to_string(),
+            &a.tab.window_id.to_string(),
+            "exit-fullscreen",
+        ]);
+        let pre_bounds = pre.0["bounds"].clone();
+        let (exited, exited_ok, exit_ms) = poll(
+            Duration::from_secs(10),
+            || json!({ "target": window(a.tab.window_id), "spare": window(spare.window_id) }),
+            |v| {
+                v["target"]["ax"]["fullScreen"] == false
+                    && v["target"]["bounds"] == pre_bounds
+                    && v["target"]["onScreen"] == true
+                    && v["spare"]["onScreen"] == true
+            },
+        );
+        let after_exit = route(ctx, &a.session_id, Some(&a.tab.tty));
+        json!({
+            "pre": { "target": pre.0, "spare": pre.1 },
+            "enter": enter, "entered": entered, "enteredWitnessed": entered_ok, "enterWaitMs": enter_ms,
+            "raisedSpareInDesktopSpace": left_space, "away": away, "awayWitnessed": away_ok, "awayWaitMs": away_ms,
+            "routeWhileFullscreen": routed, "returned": returned, "returnWitnessed": returned_ok, "returnWaitMs": return_ms,
+            "exit": exit, "exited": exited, "exitWitnessed": exited_ok, "exitWaitMs": exit_ms,
+            "routeAfterExit": after_exit,
+        })
+    });
+    let pre_not_fullscreen = fullscreen["pre"]["target"]["ax"]["fullScreen"] == false
+        && fullscreen["pre"]["target"]["axMatches"] == 1;
+    let fullscreen_checks = json!({
+        "preNotFullscreenUniqueWindow": pre_not_fullscreen,
+        "enteredFullscreenAndOwnSpace": fullscreen["enteredWitnessed"] == true,
+        "leftItsSpace": fullscreen["awayWitnessed"] == true,
+        "routeWhileFullscreenExact": exact_ok(&fullscreen["routeWhileFullscreen"]),
+        "routeBroughtItsSpaceBack": fullscreen["returnWitnessed"] == true,
+        "exitedFullscreenBoundsRestored": fullscreen["exitWitnessed"] == true,
+        "routeAfterExitExact": exact_ok(&fullscreen["routeAfterExit"]),
+    });
+    let fullscreen_pass = fullscreen_checks
+        .as_object()
+        .is_some_and(|m| m.values().all(|v| v == true));
+    record(
+        &mut cases,
+        "fullscreen-space-entry-route-exit-route",
+        json!({ "checks": fullscreen_checks, "observed": fullscreen }),
+        fullscreen_pass,
+    )?;
+
+    // 3. Target closed while a route is held at each barrier.
+    let mut extra = Vec::new();
+    for (point, fault) in [
+        ("BEFORE_FOCUS", QualificationFault::HoldNextRouteBeforeFocus),
+        (
+            "BEFORE_READBACK",
+            QualificationFault::HoldNextRouteBeforeReadback,
+        ),
+    ] {
+        let c = spawn_claude(ctx, root.join(format!("c-{}", point.to_lowercase())))?;
+        let c_id = c.tab.window_id;
+        let mut owned_now = owned.clone();
+        owned_now.push(c_id);
+        let detail = locked(ctx, "h10 close during held route", || {
+            raise_window(spare.window_id);
+            threadspace_harness::pause_ms(800);
+            let before = window_selection();
+            let mut log = ctx.companion().log();
+            let mut seen = Vec::new();
+            let armed = ctx.companion().request(
+                ControlRequestBody::QualifyArmFault { fault },
+                Duration::from_secs(5),
+            );
+            std::thread::scope(|scope| {
+                let routing = scope.spawn(|| route(ctx, &c.session_id, Some(&c.tab.tty)));
+                let reached = log.wait_for(
+                    "ROUTE_BARRIER_REACHED",
+                    |l| l["point"] == point,
+                    Duration::from_secs(20),
+                    &mut seen,
+                );
+                let close_started_ms = threadspace_harness::now_ms();
+                let closed = c.tab.close();
+                let close_returned_ms = threadspace_harness::now_ms();
+                let (gone, gone_ok, gone_ms) = poll(
+                    Duration::from_secs(5),
+                    || window(c_id),
+                    |w| w["exists"] == false,
+                );
+                let provider_exited = procs::Incarnation::of(c.pid).is_none();
+                seen.extend(log.read_new());
+                let held_through_close = reached.is_some()
+                    && !seen.iter().any(|l| {
+                        l["event"] == "ROUTE_RESULT" || l["event"] == "ROUTE_BARRIER_RELEASED"
+                    });
+                let release_sent_ms = threadspace_harness::now_ms();
+                let release = ctx.companion().request(
+                    ControlRequestBody::QualifyReleaseRouteBarrier,
+                    Duration::from_secs(5),
+                );
+                let routed = routing
+                    .join()
+                    .unwrap_or_else(|_| json!({ "error": "route thread panicked" }));
+                let released = log.wait_for(
+                    "ROUTE_BARRIER_RELEASED",
+                    |l| l["point"] == point,
+                    Duration::from_secs(10),
+                    &mut seen,
+                );
+                let request_id = routed["requestId"].as_str().unwrap_or_default().to_owned();
+                let result_line = log.wait_for(
+                    "ROUTE_RESULT",
+                    |l| l["requestId"].as_str() == Some(request_id.as_str()),
+                    Duration::from_secs(10),
+                    &mut seen,
+                );
+                let after = window_selection();
+                json!({
+                    "armed": format!("{armed:?}"),
+                    "selectionBefore": before, "selectionAfter": after,
+                    "barrierReached": reached, "closeStartedMs": close_started_ms, "closeReturnedMs": close_returned_ms,
+                    "close": closed, "targetWindowGone": gone_ok, "targetWindowGoneAfterMs": gone_ms, "targetWindowState": gone,
+                    "providerExitedBeforeRelease": provider_exited, "routeHeldThroughClose": held_through_close,
+                    "releaseSentMs": release_sent_ms, "release": format!("{release:?}"), "barrierReleased": released,
+                    "route": routed, "routeResultLogged": result_line,
+                })
+            })
+        });
+        let reached_ms = detail["barrierReached"]["reachedAtMs"].as_i64();
+        let released_ms = detail["barrierReleased"]["releasedAtMs"].as_i64();
+        let result_ms = detail["routeResultLogged"]["ts"].as_i64();
+        let close_started = detail["closeStartedMs"].as_i64();
+        let ordered = matches!((reached_ms, close_started, released_ms, result_ms), (Some(r), Some(c0), Some(rel), Some(res)) if r <= c0 && c0 < rel && rel <= res)
+            && detail["targetWindowGone"] == true
+            && detail["releaseSentMs"].as_i64() >= detail["closeReturnedMs"].as_i64();
+        // Threadspace focused nothing but the target: the companion's own focus
+        // evidence names only the target window, and no other window's
+        // selected tab changed.
+        let focus = &detail["route"]["focus"];
+        let focused_only_target =
+            focus["targetWindowId"].is_null() || focus["targetWindowId"] == c_id;
+        let unrelated_changes: Vec<String> = detail["selectionBefore"]["selected"]
+            .as_object()
+            .map(|m| {
+                m.iter()
+                    .filter(|(id, _)| !owned_now.iter().any(|o| o.to_string() == **id))
+                    .filter(|(id, tty)| detail["selectionAfter"]["selected"][id.as_str()] != **tty)
+                    .map(|(id, _)| id.clone())
+                    .collect()
+            })
+            .unwrap_or_default();
+        let checks = json!({
+            "barrierReachedForTarget": detail["barrierReached"]["tty"] == c.tab.tty || point == "BEFORE_READBACK",
+            "routeHeldThroughClose": detail["routeHeldThroughClose"] == true,
+            "orderedOverlap": ordered,
+            "providerGoneBeforeRelease": detail["providerExitedBeforeRelease"] == true,
+            "notExact": detail["route"]["exact"] != true,
+            "typedResult": detail["route"]["reasonCode"].as_str().is_some_and(|r| r != "OK"),
+            "noWrongTarget": detail["route"]["wrongTarget"] == false,
+            "focusedOnlyTheTarget": focused_only_target,
+            "noUnrelatedSelectionChange": unrelated_changes.is_empty(),
+        });
+        let pass = checks
+            .as_object()
+            .is_some_and(|m| m.values().all(|v| v == true));
+        record(
+            &mut cases,
+            &format!(
+                "target-closed-while-route-held-{}",
+                point.to_lowercase().replace('_', "-")
+            ),
+            json!({
+                "checks": checks, "point": point, "target": { "windowId": c_id, "tty": c.tab.tty, "pid": c.pid, "sessionId": c.session_id },
+                "unrelatedWindowsWhoseSelectionChanged": unrelated_changes, "observed": detail,
+            }),
+            pass,
+        )?;
+        extra.push(c);
+    }
+
+    locked(ctx, "h10 cleanup", || {
+        for tab in [&a.tab, &spare] {
+            let _ = run_dir.append("cleanup.jsonl", &tab.close());
+        }
+    });
+    let terminal_after = terminal::terminal_process();
+    let wrong_total = cases
+        .iter()
+        .filter(|c| {
+            c["detail"]["wrongTarget"] == true
+                || c["detail"]["observed"]["route"]["wrongTarget"] == true
+                || ["routeWhileFullscreen", "routeAfterExit"]
+                    .iter()
+                    .any(|k| c["detail"]["observed"][*k]["wrongTarget"] == true)
+        })
+        .count();
+    let summary = json!({
+        "issue": "H-10",
+        "gate": "G08",
+        "pass": cases.iter().all(|c| c["pass"] == true) && wrong_total == 0,
+        "wrongTargets": wrong_total,
+        "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
+        "terminalIncarnationUnchanged": terminal_before == terminal_after,
+        "terminalRestart": "not attempted: deferred to M15 by D-0006",
         "disposableRoot": root.display().to_string(),
     });
     run_dir

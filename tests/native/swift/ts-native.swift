@@ -6,6 +6,9 @@
 //
 //   ts-native windows <owner-pid>
 //   ts-native ax-window <pid> [title]
+//   ts-native window-state <pid> <window-number>       (CoreGraphics facts plus the AX window with exactly that frame)
+//   ts-native ax-action-number <pid> <window-number> <fullscreen|exit-fullscreen|raise>
+//   ts-native voiceover                                (VoiceOver on/off and the text of its windows, e.g. the caption panel)
 //   ts-native ax-action <pid> <minimize|unminimize|fullscreen|exit-fullscreen|raise|press-close|press-minimize|press-zoom|press-fullscreen|set-frame x y w h> [title]
 //   ts-native ax-tree <pid> [max-depth]
 //   ts-native notification <find|press> <needle> [timeout-seconds]
@@ -112,6 +115,56 @@ func tree(_ element: AXUIElement, depth: Int, maxDepth: Int, into nodes: inout [
     nodes.append(node)
     let children: [AXUIElement] = attribute(element, kAXChildrenAttribute) ?? []
     for child in children { tree(child, depth: depth + 1, maxDepth: maxDepth, into: &nodes) }
+}
+
+// MARK: Windows by CoreGraphics number (titles can be rewritten by the app)
+
+func cgWindow(pid: Int, number: Int) -> [String: Any]? {
+    let list = (CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]]) ?? []
+    return list.first { ($0[kCGWindowOwnerPID as String] as? Int) == pid && ($0[kCGWindowNumber as String] as? Int) == number }
+}
+
+func cgBounds(_ info: [String: Any]) -> CGRect {
+    let b = info[kCGWindowBounds as String] as? [String: Double] ?? [:]
+    return CGRect(x: b["X"] ?? 0, y: b["Y"] ?? 0, width: b["Width"] ?? 0, height: b["Height"] ?? 0)
+}
+
+/// The AX windows of `pid` whose frame equals `bounds` (within half a point).
+func axWindows(pid: pid_t, matching bounds: CGRect) -> [AXUIElement] {
+    let app = AXUIElementCreateApplication(pid)
+    let windows: [AXUIElement] = attribute(app, kAXWindowsAttribute) ?? []
+    return windows.filter {
+        let f = frame($0)
+        return abs(f.origin.x - bounds.origin.x) <= 0.5 && abs(f.origin.y - bounds.origin.y) <= 0.5
+            && abs(f.size.width - bounds.size.width) <= 0.5 && abs(f.size.height - bounds.size.height) <= 0.5
+    }
+}
+
+func windowState(pid: pid_t, number: Int) -> [String: Any] {
+    var report: [String: Any] = ["pid": pid, "number": number, "atMs": Int(Date().timeIntervalSince1970 * 1000)]
+    let main = CGDisplayBounds(CGMainDisplayID())
+    report["mainDisplay"] = rect(main)
+    report["frontmostPid"] = NSWorkspace.shared.frontmostApplication?.processIdentifier ?? 0
+    guard let info = cgWindow(pid: Int(pid), number: number) else {
+        report["exists"] = false
+        return report
+    }
+    let bounds = cgBounds(info)
+    report["exists"] = true
+    report["bounds"] = rect(bounds)
+    report["onScreen"] = info[kCGWindowIsOnscreen as String] as? Bool ?? false
+    report["layer"] = info[kCGWindowLayer as String] as? Int ?? 0
+    report["coversMainDisplay"] = bounds.equalTo(main)
+    // A fullscreen window on a panel with a camera housing sits below the
+    // screen's top safe-area inset.
+    let safeTop = Double(NSScreen.screens.first?.safeAreaInsets.top ?? 0)
+    report["safeAreaTop"] = safeTop
+    report["fullscreenFrame"] = bounds.equalTo(main)
+        || bounds.equalTo(CGRect(x: main.origin.x, y: main.origin.y + safeTop, width: main.width, height: main.height - safeTop))
+    let matches = axWindows(pid: pid, matching: bounds)
+    report["axMatches"] = matches.count
+    if matches.count == 1 { report["ax"] = describe(matches[0]) }
+    return report
 }
 
 // MARK: Notifications (the Accessibility path VoiceOver uses)
@@ -293,6 +346,53 @@ case "ax-action":
     pause(action.contains("fullscreen") ? 2.5 : 1.0)
     let after = window(pid: pid, title: title).map(describe) ?? ["gone": true]
     emit(["pid": pid, "action": action, "performed": done, "before": before, "after": after], ok: done)
+
+case "window-state":
+    guard args.count >= 3, let pid = pid_t(args[1]), let number = Int(args[2]), AXIsProcessTrusted() else { usage() }
+    let report = windowState(pid: pid, number: number)
+    emit(report, ok: report["exists"] as? Bool ?? false)
+
+case "ax-action-number":
+    // Resolves the AX window by its CoreGraphics number's exact frame; an
+    // absent or ambiguous match acts on nothing.
+    guard args.count >= 4, let pid = pid_t(args[1]), let number = Int(args[2]), AXIsProcessTrusted() else { usage() }
+    let action = args[3]
+    let before = windowState(pid: pid, number: number)
+    guard let info = cgWindow(pid: Int(pid), number: number) else { emit(["before": before, "performed": false, "reason": "no such window"], ok: false) }
+    let matches = axWindows(pid: pid, matching: cgBounds(info))
+    guard matches.count == 1 else { emit(["before": before, "performed": false, "reason": "\(matches.count) AX windows share that frame"], ok: false) }
+    let w = matches[0]
+    var done = false
+    switch action {
+    case "fullscreen": done = setBool(w, "AXFullScreen", true)
+    case "exit-fullscreen": done = setBool(w, "AXFullScreen", false)
+    case "raise":
+        NSRunningApplication(processIdentifier: pid)?.activate()
+        done = AXUIElementPerformAction(w, kAXRaiseAction as CFString) == .success
+    default: usage()
+    }
+    let actedAtMs = Int(Date().timeIntervalSince1970 * 1000)
+    emit(["action": action, "performed": done, "actedAtMs": actedAtMs, "before": before], ok: done)
+
+case "voiceover":
+    var report: [String: Any] = ["enabled": NSWorkspace.shared.isVoiceOverEnabled, "atMs": Int(Date().timeIntervalSince1970 * 1000)]
+    let running = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.VoiceOver")
+    report["pids"] = running.map { Int($0.processIdentifier) }
+    var windows: [[String: Any]] = []
+    if AXIsProcessTrusted() {
+        for app in running {
+            let element = AXUIElementCreateApplication(app.processIdentifier)
+            let list: [AXUIElement] = attribute(element, kAXWindowsAttribute) ?? []
+            for w in list {
+                var nodes: [[String: Any]] = []
+                tree(w, depth: 0, maxDepth: 6, into: &nodes)
+                let texts = nodes.compactMap { ($0["value"] as? String) ?? ($0["label"] as? String) }.filter { !$0.isEmpty }
+                windows.append(["title": (attribute(w, kAXTitleAttribute) as String?) ?? "", "frame": rect(frame(w)), "texts": Array(texts.prefix(12))])
+            }
+        }
+    }
+    report["windows"] = windows
+    emit(report)
 
 case "ax-tree":
     guard args.count >= 2, let pid = pid_t(args[1]), AXIsProcessTrusted() else { usage() }
