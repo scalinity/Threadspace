@@ -2,15 +2,15 @@
   "schema": 1,
   "milestone": "M0C",
   "title": "Platform Reliability / Recovery Qualification",
-  "verdict": "M0C C-02B CONSUMPTION RETRY REMEDIATION COMPLETE — candidate pending final independent acceptance",
-  "verdictScope": "The independent acceptance review of eb5eb0d accepted the durable-ownership / receipt-deadline repair except one blocker, C-02B: a repeated IntentConsumed answered Done while the intent's durable removal was uncommitted (G06/G09 FAIL, G17 BLOCKED). Application build fd02d6a closes it with writer tests on the actual handler, negative controls and a native closure; G06/G09 PASS; G17 is a candidate pending final independent acceptance. Everything else that review accepted is unchanged. No merge or M1 authorization.",
-  "generatedAt": "2026-10-07T08:03:53Z",
+  "verdict": "M0C ACCEPTED",
+  "verdictScope": "Final independent acceptance of exact candidate 7cc386f240eb56403fdd3326566bda816f5c2f6d closes the sole remaining C-02B repeated-consumption defect on application build fd02d6a. Known consumed-but-uncommitted IDs retry the current backlog and cannot return Done before durable removal commits. C-02B and C-02 are fully CLOSED; G06/G09/G17 PASS; G08 remains PASS. All G01-G17 gates pass under their existing accepted scopes. M1 is authorized and has not started; m0c remains unmerged. Accepted M1/M6/M15 obligations and all prior accepted decisions remain unchanged.",
+  "generatedAt": "2026-10-07T22:28:51Z",
   "baseCommit": "8558854fad5162c0182dd36d76f8f8ae5d282529",
   "branch": "m0c",
   "applicationCommit": "fd02d6afd0e3ac07474387c26c9c170da656b8c0",
   "harnessCommit": "f7661b6",
-  "applicationSourcesUnchangedSince": "fd02d6afd0e3ac07474387c26c9c170da656b8c0; later commits change tests/native and evidence only",
-  "evidenceCommit": "the m0c commit that records this manifest",
+  "applicationSourcesUnchangedSince": "fd02d6afd0e3ac07474387c26c9c170da656b8c0; later commits change tests/native, evidence and documentation only",
+  "evidenceCommit": "7cc386f240eb56403fdd3326566bda816f5c2f6d",
   "target": {
     "os": "macOS 27.2 (26B5091g)",
     "machine": "Apple M5 Pro, built-in Retina panel only",
@@ -81,7 +81,7 @@
         "evidence/M0C/g06-notifications/20261007T052731Z-prod/",
         "evidence/M0C/g06-notifications/20261006T140836Z-prod/"
       ],
-      "scope": "Independent acceptance review of eb5eb0d: FAIL for C-02B only. Closed on fd02d6a: a consumption is answered Done only once the committed backlog no longer lists the intent; a repeat before that retries the commit and is Done only if it commits (native: repeat before any successful commit Unavailable with the backlog unchanged, the committing repeat Done, a restart recovered nothing); the 40-response backlog and storage-failure matrix pass again; 11/11 native banner interactions. Earlier, on 6cfac57: Final acceptance review of 46dae33: FAIL for C-02. Closed on 6cfac57: every accepted response is owned by its record or the backlog; storage failures never claim ownership; 40 responses beyond the old bound, the storage-failure matrix and Returns interrupted by crash or Stop each reach the UI exactly once (0 lost, 0 duplicated); 11/11 native banner interactions; handoff orderings pass again."
+      "scope": "Final independent acceptance of 7cc386f confirms C-02B and C-02 CLOSED, G06 PASS. Independent acceptance review of eb5eb0d: FAIL for C-02B only. Closed on fd02d6a: a consumption is answered Done only once the committed backlog no longer lists the intent; a repeat before that retries the commit and is Done only if it commits (native: repeat before any successful commit Unavailable with the backlog unchanged, the committing repeat Done, a restart recovered nothing); the 40-response backlog and storage-failure matrix pass again; 11/11 checks (ten native banner interactions plus the Enable handoff). Earlier, on 6cfac57: Final acceptance review of 46dae33: FAIL for C-02. Closed on 6cfac57: every accepted response is owned by its record or the backlog; storage failures never claim ownership; 40 responses beyond the old bound, the storage-failure matrix and Returns interrupted by crash or Stop each reach the UI exactly once (0 lost, 0 duplicated); 11/11 native banner interactions; handoff orderings pass again."
     },
     "G07": {
       "result": "PASS",
@@ -90,7 +90,7 @@
         "docs/decisions/D-0004-codex-runtime-modes-and-daemon-probe.md"
       ],
       "notRun": "Codex live detached-hook ancestry in both embedded/shared-daemon modes and live observer handshake: NOT_RUN, deferred to M6 by accepted D-0004. No daemon answered M0C.",
-      "scope": "Accepted revised M0C mechanism and read-only provider-probe scope under D-0004/D-0005. Positive supervision now protects admission; the remaining C-02 handoff intent defect is tracked at G06/G09."
+      "scope": "Accepted revised M0C mechanism and read-only provider-probe scope under D-0004/D-0005. Positive supervision protects admission; C-02, including its final consumption-completion branch, is CLOSED at G06/G09."
     },
     "G08": {
       "result": "PASS",
@@ -120,7 +120,7 @@
         "evidence/M0C/remediation/c02-supervision/20261007T020101Z-prod/",
         "evidence/M0C/remediation/c02-supervision/negative-control-8c82212/"
       ],
-      "scope": "Independent acceptance review of eb5eb0d: FAIL with G06 for C-02B only. Closed on fd02d6a: a writer killed before any successful removal commit had answered no Done, its claimant reloaded the intent and consumed it, a restart recovered nothing; Release still retries unrecorded removals (B4 passes again); 6/6 regression. Earlier, on 6cfac57: Final acceptance review of 46dae33: FAIL with G06 for C-02. Closed on 6cfac57: positive supervision and exclusive ownership hold (supervision A, B, D); handoff orderings, delayed and unavailable claimants, withheld reply and launchd retry pass again; an exit after a storage failure leaves the record as owner for the claimant. One writer and one effective observer; no unsupervised admission; G09 6/6."
+      "scope": "Final independent acceptance of 7cc386f confirms C-02B and C-02 CLOSED, G09 PASS. Independent acceptance review of eb5eb0d: FAIL with G06 for C-02B only. Closed on fd02d6a: a writer killed before any successful removal commit had answered no Done, its claimant reloaded the intent and consumed it, a restart recovered nothing; Release still retries unrecorded removals (B4 passes again); 6/6 regression. Earlier, on 6cfac57: Final acceptance review of 46dae33: FAIL with G06 for C-02. Closed on 6cfac57: positive supervision and exclusive ownership hold (supervision A, B, D); handoff orderings, delayed and unavailable claimants, withheld reply and launchd retry pass again; an exit after a storage failure leaves the record as owner for the claimant. One writer and one effective observer; no unsupervised admission; G09 6/6."
     },
     "G10": {
       "result": "PASS",
@@ -180,13 +180,13 @@
       "scope": "Under D-0006. H-12 independently closed: VoiceOver cursor reports and perform action produce 3D to 2D, then after actual fullscreen enter/exit 2D to 3D, verified by independent lifecycle state; keyboard regression passes. VoiceOver, scripting, welcome and output mute restored; authorized Terminal-to-VoiceOver Automation consent remains, inert with scripting disabled. H-14 history retained. Earlier built-in-display/window/DPR/AX/Reduce Motion proofs remain credited."
     },
     "G17": {
-      "result": "CANDIDATE_PENDING_FINAL_ACCEPTANCE",
+      "result": "PASS",
       "evidence": [
         "evidence/M0C/gate-checklist.md",
         "evidence/M0C/failure-ledger.md",
         "evidence/M0C/remediation/README.md"
       ],
-      "scope": "Independent acceptance review of eb5eb0d: BLOCKED for C-02B alone; closed on fd02d6a with its affected regressions. Earlier: Final acceptance review of 46dae33: BLOCKED for C-02/C-11. Both closed on 6cfac57 with targeted regressions; H-10-H-12 closed; C-12 and C-13 nonblocking M1 diagnostics; D-0004-D-0006 and C-04 mandatory M1 closure unchanged. No merge or M1 authorization."
+      "scope": "Final independent review of 7cc386f240eb56403fdd3326566bda816f5c2f6d: PASS. The last C-02B consumption-completion defect is closed on fd02d6a; every successful current-state backlog commit records all pending removals before unrecorded clears. Focused actual-handler tests, both negative controls, native retry/crash evidence and affected regressions support closure. C-02 fully CLOSED; C-11/G08, H-10-H-12, G12 and D-0004-D-0006 remain accepted. C-04/C-12/C-13 stay M1 obligations, Codex live ancestry/handshake M6, and controlled Terminal restart/external-display unplug M15. M1 authorized, not started; m0c unmerged."
     }
   },
   "maintenanceOrdering": {
@@ -202,12 +202,13 @@
   "defectsFixed": [
     "C-01 device pixel ratio (7e8043d): accepted",
     "C-03 keyboard focus after fullscreen/zoom (8c82212): accepted",
-    "C-02 startup-admission bypass (d0598a5): repaired and natively demonstrated; handoff intent preservation remains open",
-    "C-11 Space-switch false READBACK_FAILED (88817eb): repaired and natively demonstrated; aggregate Return deadline remains open",
+    "C-02 startup-admission bypass (d0598a5): repaired and natively demonstrated; subsequent handoff and consumption repairs are now accepted under C-02",
+    "C-11 Space-switch false READBACK_FAILED (88817eb): repaired and natively demonstrated; subsequent whole-route and receipt-deadline repairs are accepted under C-11",
     "C-02 handoff intent ownership (1270175): accepted intents store-owned, late responses spooled, every writer exit drains through the writer, Enable refusal stays; natively closed on ab11b8a",
     "C-11 whole-route Return deadline (fdee5ad): one monotonic RouteDeadline, focus script stopped at it, Run::finish turns late results into TIMEOUT; natively closed on ab11b8a",
     "C-02 durable ownership (81d72e3): no eviction (backlog 256, refusal before acceptance, 32-intent window), typed storage failures with commit-then-retire, Return keeps its record until its result commits; natively closed on 6cfac57",
-    "C-11 receipt deadline (81d72e3, 75de6bb): receipt instant from the native callback carried through queueing; spent budget does no native work; natively closed on 6cfac57"
+    "C-11 receipt deadline (81d72e3, 75de6bb): receipt instant from the native callback carried through queueing; spent budget does no native work; natively closed on 6cfac57",
+    "C-02B repeated consumption completion (15ccc21): known unrecorded removals retry the current backlog and return Done only after commit; final independent acceptance of 7cc386f on fd02d6a closes C-02B and C-02 fully"
   ],
   "risks": [
     "C-04: one retired native shell per recovery; 18 to 28 across ten repeated recoveries; reproduction note reports about 33 KB/recovery and bounded WebContent. Lifetime shell count is not bounded. D-0006 accepts this only with mandatory M1 exit closure: nativeWindowShells.after == nativeWindowShells.before after destruction/quiescence, stable content/cache resources and preserved recovery invariants.",
@@ -285,10 +286,10 @@
   "nextMilestoneStarted": false,
   "captures": "Committed: a curated set (official G15 first/last per phase and every tenth sustained frame, first/last G02 launch per context, every image an ATTEMPT-NOTE names, all other official captures). The full 612 captures (327 MB) stay on disk under evidence/M0C/captures-full/ (git-ignored). Every capture's pixel statistics and diffs are in the committed timelines.",
   "originalManifestGeneratedAt": "2026-10-06T15:10:00Z",
-  "reviewedCandidateCommit": "ccdfc8a38773aac01121601bde6121dd1760b6ea",
+  "reviewedCandidateCommit": "7cc386f240eb56403fdd3326566bda816f5c2f6d",
   "defectsReopened": [
-    "C-02: startup admission repaired; re-review of ccdfc8a finds accepted intent can be lost through Yield and unsupervised Enable exits",
-    "C-11: Space false negative repaired; re-review finds the added settle does not share the existing hard deadline with the complete route"
+    "C-02: startup admission repaired; re-review of ccdfc8a finds accepted intent can be lost through Yield and unsupervised Enable exits; historical finding, now CLOSED by the subsequent repairs and final acceptance",
+    "C-11: Space false negative repaired; re-review finds the added settle does not share the existing hard deadline with the complete route; historical finding, now CLOSED by the subsequent repairs and final acceptance"
   ],
   "acceptedDecisions": [
     "D-0001",
@@ -442,7 +443,8 @@
         "crates",
         "packages"
       ]
-    }
+    },
+    "historical": true
   },
   "finalRemediation": {
     "base": "02947d8dd3a627afef945a0d57497095cfbbae20",
@@ -700,6 +702,78 @@
     ],
     "ownerInteraction": "None; Terminal was not restarted.",
     "publicEvidencePrivacy": "All 876 M0C files rescanned; only milestone names match; no home path, account name, email or credential pattern; no redaction needed.",
-    "recordedAt": "2026-10-07T08:03:53Z"
+    "recordedAt": "2026-10-07T08:03:53Z",
+    "status": "CLOSED",
+    "acceptedBy": "finalIndependentAcceptance"
+  },
+  "nextMilestoneAuthorized": true,
+  "finalIndependentAcceptance": {
+    "candidateCommit": "7cc386f240eb56403fdd3326566bda816f5c2f6d",
+    "remediationBase": "eb5eb0d6343943f819173459e99e6010e76c70ab",
+    "acceptedMain": "8558854fad5162c0182dd36d76f8f8ae5d282529",
+    "applicationBuild": "fd02d6afd0e3ac07474387c26c9c170da656b8c0",
+    "repairCommit": "15ccc210c921467721ac9ee917bb02076650fdb1",
+    "harnessCommit": "f7661b6e948e1aeaaa50f97d71026da33e200384",
+    "acceptanceCommit": "the m0c commit recording this final acceptance metadata",
+    "verdict": "ACCEPT M0C",
+    "scope": "One-defect acceptance review: final C-02B repeated-consumption completion only; accepted prior gates and future obligations preserved.",
+    "closedDefects": [
+      "C-02B",
+      "C-02"
+    ],
+    "remainingM0CBlockers": [],
+    "sourceInvariant": "A repeated consume for an ID in unrecorded retries the current complete backlog. Acceptance, consumption and Release clear pending-removal tracking only after their synchronous current-state commit succeeds. Already committed and truly unknown IDs return idempotent Done without a new write.",
+    "details": "evidence/M0C/remediation/README.md#final-independent-acceptance",
+    "nextMilestoneAuthorized": true,
+    "nextMilestoneStarted": false,
+    "branch": "m0c",
+    "branchMerged": false,
+    "nativeExecutionRerun": false,
+    "rustTestsRerun": false,
+    "rawNativeEvidenceChanged": false,
+    "qualificationBuild": true,
+    "futureObligations": [
+      "M1 C-04 native window-shell reclamation",
+      "M1 C-12 renderer outcome diagnostics",
+      "M1 C-13 companion diagnostic framing",
+      "M6 Codex live ancestry/handshake",
+      "M15 controlled full Terminal restart",
+      "M15 physical external-display unplug/reconnect"
+    ],
+    "validation": {
+      "status": "PASS",
+      "reviewedCandidateCommit": "7cc386f240eb56403fdd3326566bda816f5c2f6d",
+      "applicationSourceChangesDuringAcceptance": 0,
+      "applicationSourcesMatchQualifiedBuild": true,
+      "writerMatchesProductionRepair": true,
+      "documentationFilesChanged": 6,
+      "gitDiffCheck": "PASS",
+      "lockfileAndToolchainHashes": {
+        "Cargo.lock": "ae9fe9069d540b3fcb8ec23829d1cc934ced5311fce823eaa0edf88893e3409f",
+        "package-lock.json": "ae82fd2ec4b28e3256958e864acf305acd6854826f49478089f4e40e18fcd025",
+        "rust-toolchain.toml": "3ac87df98c6720396dac364b4b94273e9261ee2b1a971af6c43e0a714efa84cd"
+      },
+      "gateStatusChecks": 17,
+      "gateEvidenceReferencesChecked": 61,
+      "acceptedFutureObligationsPreserved": true,
+      "jsonDocumentsParsed": 453,
+      "primaryJsonlFilesParsed": 108,
+      "primaryJsonlRecordsParsed": 6433,
+      "knownExcludedSupplementalFile": "evidence/M0C/g16-window/display-reconfiguration-observed/samples.jsonl (accepted H-13 exclusion; unchanged)",
+      "relativeMarkdownLinksChecked": 18,
+      "recordedExecutableHashesCrossChecked": 4,
+      "recordedSignatureChecksCrossChecked": 6,
+      "nativeConsumptionRequestsCrossChecked": 9,
+      "focusedNativeLogRecordsCrossChecked": 170,
+      "recordedAffectedRegressionChecks": {
+        "C02DurableAB": "PASS",
+        "G06": "11/11 (10 banner interactions plus Enable handoff)",
+        "G09": "6/6"
+      },
+      "nativeAndRustRerun": "NOT_RUN: Linux review environment has no Rust toolchain or target macOS; committed execution evidence audited.",
+      "primaryJsonlScope": "Tracked M0C JSONL outside attempts/, excluding only the already-disqualified H-13 supplemental file; historical failures are preserved."
+    },
+    "mergeRecommendation": "SAFE TO FAST-FORWARD M0C INTO MAIN",
+    "recordedAt": "2026-10-07T22:28:51Z"
   }
 }

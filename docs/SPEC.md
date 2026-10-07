@@ -1,7 +1,7 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** M0A/M0B accepted on `8558854`; the M0C candidate on application build `fd02d6a` closes C-02 (accepted notification work durably owned until its lifecycle completes, a consumption done only once its removal commits) and C-11 (the complete Return deadline, from receipt) and awaits final independent acceptance before merge or M1. H-10–H-12 are closed. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
+**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a`. The final C-02B consumption-completion defect and C-02 are CLOSED; G01–G17 PASS under their accepted scopes, including the unchanged C-11/G08 and H-10–H-12 closures. M1 is authorized; M0C remains unmerged and M1 has not started. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
 
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.
@@ -17,7 +17,7 @@ Two provider reference points materially inform the design:
 - Claude Code **2.1.290**, released October 5, was the researched candidate; M0C qualifies the installed **2.1.291** observer profile under [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md). The researched release-pinned public declaration snapshot identifies **2.1.277**. Generated declarations from the exact installed build and recorded runtime fixtures control compatibility; a larger version number is not automatic certification. [Claude release][C9] [Mod reference][C7] [Release-pinned declarations][C8_PIN] [Public declarations][C8]
 - Codex **0.160.1**, release commit **d27764b82f7118f674371e6d6e76271d9d606edb**, is the researched release. Some generic documentation lagged that release. Where they conflict, this document cites the released schema and implementation, with actual installed CLI and desktop runtimes qualified separately. [Codex release][O1] [Released hook schema][O2]
 
-The original research was not native certification. Committed M0A/M0B evidence now establishes the accepted substrate and real Claude/Terminal identity-and-return path. M0C reviews reliability on the target Mac; its successful native runs do not override a code defect or missing required evidence. M1 remains gated by G17.
+The original research was not native certification. Committed M0A/M0B evidence now establishes the accepted substrate and real Claude/Terminal identity-and-return path. M0C reviews reliability on the target Mac; its successful native runs do not override a code defect or missing required evidence. The final one-defect acceptance review closes the consumption-completion defect; G17 is PASS and M1 is authorized, but has not started.
 
 ### 0.1 Frozen decisions
 
@@ -2061,7 +2061,7 @@ The following decisions control implementation at the failure boundaries:
 
 ### 22.2 External boundaries that remain explicit
 
-- **Native qualification:** M0A/M0B are accepted; M0C remains under a remediation hold recorded in its checklist. Built-in-display qualification does not certify physical external-monitor disconnect/reconnect, deferred to M15 by D-0006. No M1 work begins before G17 passes.
+- **Native qualification:** M0A/M0B/M0C are accepted; the final M0C disposition is G17 PASS in its checklist. Built-in-display qualification does not certify physical external-monitor disconnect/reconnect, deferred to M15 by D-0006. M1 is authorized and has not started; it begins from accepted main after the separate branch closeout.
 - **Tauri prerelease drift:** current source supports the architecture, but later alphas may change APIs. Exact locks and the native boundary contain that risk; changes require deliberate regression.
 - **Claude mod compatibility:** the public snapshot and exact installed runtime may differ. Generate/pin installed declarations and qualify callback semantics. Original human-input acceptance and positive original causal order are different capabilities; absent a sufficient order witness, automatic follow-up resolution stays disabled and explicit Mark handled remains available without blocking otherwise qualified native observation.
 - **Codex shared-daemon routing:** the researched public interface lacks a live TUI-client→thread→TTY registry. Preserve lifecycle visibility and explicit pairing/last-known routes; do not claim current-session verification.
