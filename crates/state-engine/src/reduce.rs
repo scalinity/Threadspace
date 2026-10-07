@@ -21,7 +21,7 @@ use threadspace_contracts::canonical::records::{
     ActivityRecord, ActorRecord, ActorRelationRecord, AttentionRecord, AttentionScope,
     CommandEffect, ExactRequestRecord, ExecutionRecord, HumanFrontier, InputRecord,
     InventoryObservation, NamespaceRecord, OutboxRecord, OutboxState, OwnerActionKind,
-    ProcessRecord, ResolutionCause, ResolutionKind, RouteRecord, SequenceRange, SessionRecord,
+    ProcessImage, ProcessRecord, ResolutionCause, ResolutionKind, RouteRecord, SequenceRange, SessionRecord,
     SourceCoverage, SourceSurfaceRecord, SummaryAuthority, SurfaceBindingRecord,
     TurnIdentityKind, TurnRecord, WaitEpisode, WaitScopeRecord,
 };
@@ -112,6 +112,27 @@ fn wait_kind(category: WaitCategory) -> &'static str {
 
 fn is_native_resolution(kind: ResolutionKind) -> bool {
     !matches!(kind, ResolutionKind::Owner)
+}
+
+/// The image of the one observation every other observation precedes; with
+/// a single image, that image. Unordered replacements leave it unknown.
+fn current_image(images: &BTreeSet<ProcessImage>) -> Option<String> {
+    let distinct: BTreeSet<&String> = images.iter().map(|i| &i.executable).collect();
+    if distinct.len() == 1 {
+        return distinct.into_iter().next().cloned();
+    }
+    images
+        .iter()
+        .find(|candidate| {
+            images.iter().all(|other| {
+                other.executable == candidate.executable
+                    || match (&other.point, &candidate.point) {
+                        (Some(o), Some(c)) => compare(o, c) == CausalOrder::Before,
+                        _ => false,
+                    }
+            })
+        })
+        .map(|image| image.executable.clone())
 }
 
 /// Inserts one sequence into a set of merged inclusive ranges.
@@ -355,7 +376,8 @@ impl Tx<'_> {
                 ProcessRecord {
                     id: process_id.clone(),
                     key: key.clone(),
-                    executables: BTreeSet::new(),
+                    images: BTreeSet::new(),
+                    current_executable: None,
                     exited: false,
                     created_cursor: cursor,
                     revision: cursor,
@@ -653,7 +675,11 @@ impl Tx<'_> {
                 if let Some(id) = &refs.process_id {
                     self.touch_process(id);
                     if let Some(process) = self.state.processes.get_mut(id) {
-                        process.executables.insert(executable_identity.clone());
+                        process.images.insert(ProcessImage {
+                            executable: executable_identity.clone(),
+                            point: fact.causal.clone(),
+                        });
+                        process.current_executable = current_image(&process.images);
                     }
                 }
             }
@@ -1171,10 +1197,14 @@ impl Tx<'_> {
         for id in &bindings {
             let Some(binding) = self.state.bindings.get(id) else { continue };
             let execution = self.state.executions.get(&binding.execution_id);
+            // In-place exec invalidates a proof only when the current image
+            // is determinable and is not the one the binding was proven with.
             let replaced = execution
                 .and_then(|e| e.process_id.as_ref())
                 .and_then(|p| self.state.processes.get(p))
-                .is_some_and(|p| p.executables.len() > 1);
+                .and_then(|p| p.current_executable.as_ref())
+                .zip(binding.executable_identity.as_ref())
+                .is_some_and(|(current, proven)| current != proven);
             let ended = execution.is_some_and(|e| e.presence == ExecutionPresence::Ended);
             let reason = if let Some(reason) = binding.invalidations.iter().next() {
                 Some(reason.clone())

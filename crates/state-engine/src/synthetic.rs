@@ -155,7 +155,7 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Result<Vec<NativeFactDraft>,
                         ..NativeRefs::default()
                     },
                     EvidenceClass::Kernel,
-                    None,
+                    point.clone(),
                     FactPayload::ProcessObserved {
                         executable_identity: executable.clone(),
                     },
@@ -207,7 +207,7 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Result<Vec<NativeFactDraft>,
                 vec![draft(
                     process_refs,
                     EvidenceClass::Kernel,
-                    None,
+                    point,
                     FactPayload::ProcessObserved {
                         executable_identity: executable.ok_or(NormalizeError::Malformed("executable"))?,
                     },

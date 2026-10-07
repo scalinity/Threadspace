@@ -118,11 +118,25 @@ pub struct ActorRelationRecord {
 pub struct ProcessRecord {
     pub id: String,
     pub key: ProcessKey,
-    /// More than one image means the executable was replaced in place.
-    pub executables: BTreeSet<String>,
+    /// Every executable image observed for this incarnation. More than one
+    /// means the image was replaced in place (`exec`).
+    pub images: BTreeSet<ProcessImage>,
+    /// The causally latest image when one is determinable; `None` when the
+    /// observations do not order (then no image is assumed current).
+    pub current_executable: Option<String>,
     pub exited: bool,
     pub created_cursor: i64,
     pub revision: i64,
+}
+
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ProcessImage {
+    pub executable: String,
+    pub point: Option<CausalPoint>,
 }
 
 /// One logical activation of a Session/Actor in a runtime (SPEC §4.2).

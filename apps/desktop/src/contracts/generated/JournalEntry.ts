@@ -8,4 +8,8 @@ import type { SequenceMeaning } from "./SequenceMeaning";
  * the header the reducer may use, and its resolved facts in order. `cursor`
  * is the observation's ingest position (a local commit cursor, SPEC §5.4).
  */
-export type JournalEntry = { cursor: number, observationId: string, sourceId: string, sourceEpoch: string, sourceSequence: string | null, sequenceMeaning: SequenceMeaning | null, capturedWallMs: number, delivery: Delivery, facts: Array<ResolvedFact>, };
+export type JournalEntry = { cursor: number, 
+/**
+ * The endpoint that admitted the entry (the local endpoint for captures).
+ */
+endpointId: string, observationId: string, sourceId: string, sourceEpoch: string, sourceSequence: string | null, sequenceMeaning: SequenceMeaning | null, capturedWallMs: number, delivery: Delivery, facts: Array<ResolvedFact>, };

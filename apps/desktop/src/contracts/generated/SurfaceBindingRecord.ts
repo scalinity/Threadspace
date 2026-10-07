@@ -5,4 +5,9 @@ import type { BindingMethod } from "./BindingMethod";
  * A versioned relation between one activation and one surface. Invalidation
  * is permanent: nothing revives a binding (SPEC §4.12, INV-03/04).
  */
-export type SurfaceBindingRecord = { id: string, sessionId: string, executionId: string, surfaceId: string, method: BindingMethod, executableIdentity: string | null, windowHint: number | null, tabHint: number | null, proof: unknown, evidenceObservation: string, invalidations: Array<string>, valid: boolean, recordedCursor: number, invalidatedCursor: number | null, revision: number, };
+export type SurfaceBindingRecord = { id: string, sessionId: string, executionId: string, surfaceId: string, 
+/**
+ * None until the proof itself is admitted: an invalidation can arrive
+ * first, and the binding is then invalid from birth.
+ */
+method: BindingMethod | null, executableIdentity: string | null, windowHint: number | null, tabHint: number | null, proof: unknown, evidenceObservation: string | null, invalidations: Array<string>, valid: boolean, invalidationReason: string | null, recordedCursor: number | null, invalidatedCursor: number | null, createdCursor: number, revision: number, };

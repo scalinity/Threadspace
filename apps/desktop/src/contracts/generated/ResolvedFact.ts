@@ -3,9 +3,15 @@ import type { CanonicalRefs } from "./CanonicalRefs";
 import type { CausalPoint } from "./CausalPoint";
 import type { EvidenceClass } from "./EvidenceClass";
 import type { FactPayload } from "./FactPayload";
+import type { NativeRefs } from "./NativeRefs";
 
 export type ResolvedFact = { factId: string, observationId: string, 
 /**
  * Position among the facts of one observation.
  */
-factIndex: number, refs: CanonicalRefs, provenance: EvidenceClass, causal: CausalPoint | null, payloadVersion: number, payload: FactPayload, };
+factIndex: number, refs: CanonicalRefs, 
+/**
+ * The draft's native references, kept as relationship evidence: the
+ * reducer records native keys from them, never by re-resolving.
+ */
+native: NativeRefs, provenance: EvidenceClass, causal: CausalPoint | null, payloadVersion: number, payload: FactPayload, };

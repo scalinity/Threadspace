@@ -475,6 +475,40 @@ pub fn executable_replaced() -> Scenario {
     })
 }
 
+/// The provider re-execs a new image in place; a fresh activation proven with
+/// the new image requalifies, while the old proof stays invalid.
+pub fn executable_requalified() -> Scenario {
+    let mut b = Builder::new("executable-requalified", "activation-changes");
+    let s = session(CLAUDE_LIKE, "sess-requalify");
+    b.obs(Some(&s), "session.start").push();
+    attach(&mut b, &s, "act-1", 810, 1000, 16_777_251);
+    bind(&mut b, &s, "act-1", "/dev/ttys031", 16_777_251, "810:1000");
+    b.obs(Some(&s), "execution.end").activation("act-1").payload(json!({ "reason": "EXECUTABLE_REPLACED" })).push();
+    b.obs(Some(&s), "execution.attach")
+        .activation("act-2")
+        .provider(process(810, 1000), "/opt/synthetic/bin/claude-2", Some(16_777_251))
+        .payload(json!({ "mode": "terminal_embedded", "presence": "LIVE", "device": 16_777_251 }))
+        .push();
+    b.obs(Some(&s), "surface.bind")
+        .activation("act-2")
+        .payload(json!({
+            "surface": tty_surface("/dev/ttys031", 16_777_251, "810:1000"),
+            "method": "NATIVE_INVENTORY",
+            "executable": "/opt/synthetic/bin/claude-2",
+        }))
+        .push();
+    b.build(|state| {
+        let v = View::new(state);
+        let old = v.execution("sess-requalify", "act-1").ok_or("act-1")?;
+        let new = v.execution("sess-requalify", "act-2").ok_or("act-2")?;
+        ensure!(v.bindings(old).iter().all(|b| !b.valid), "old image's proof stays invalid");
+        ensure!(v.bindings(new).iter().all(|b| b.valid), "the new image requalifies");
+        let process = state.processes.values().next().ok_or("process")?;
+        ensure!(process.current_executable.as_deref() == Some("/opt/synthetic/bin/claude-2"), "current image");
+        Ok(())
+    })
+}
+
 pub fn routing_ambiguity() -> Scenario {
     let mut b = Builder::new("routing-ambiguity", "activation-changes");
     let s = session(CLAUDE_LIKE, "sess-ambiguous");
@@ -645,6 +679,7 @@ pub fn catalog() -> Vec<Scenario> {
         resume(),
         pid_tty_reuse(),
         executable_replaced(),
+        executable_requalified(),
         routing_ambiguity(),
         execution_end_retained(),
         a_b_a_delayed(),

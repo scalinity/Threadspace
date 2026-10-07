@@ -976,6 +976,229 @@
       ],
       "type": "string"
     },
+    "NativeActorRef": {
+      "description": "An Actor within its owning Session: the principal worker, or a\nsubordinate named by its native agent ID. `agent_type` is never a key.",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "PRINCIPAL",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "AGENT",
+              "type": "string"
+            },
+            "nativeAgentId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "nativeAgentId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "NativeExecutionRef": {
+      "description": "One logical activation of a Session/Actor in a runtime (SPEC §4.2). The\nactivation is keyed by what the native source proves, never by PID alone.",
+      "oneOf": [
+        {
+          "description": "A native activation reference (a runtime/thread activation ID, or the\nobservation that proved a new activation of a process).",
+          "properties": {
+            "activationRef": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ACTIVATION",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "activationRef"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A record a reconciler already holds; admission verifies it exists.",
+          "properties": {
+            "executionId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "CANONICAL",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "executionId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "NativeRefs": {
+      "description": "Native-keyed references of a draft. Only an explicit reconciler reference\n(`NativeExecutionRef::Canonical`, `attention`) names a canonical record.",
+      "properties": {
+        "activity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActorRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attention": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "execution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeExecutionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "process": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProcessKey"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Endpoint may be empty for a local capture; admission fills it."
+        },
+        "relatedActor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActorRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeSurfaceRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turn": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "NativeSessionRef": {
+      "description": "A provider conversation as the provider names it, within one profile on\nthe local endpoint. The namespace UUID is resolved at admission.",
+      "properties": {
+        "nativeSessionId": {
+          "description": "Opaque, even when it looks like a UUID.",
+          "type": "string"
+        },
+        "profileRef": {
+          "description": "The provider profile/store authority (for example a config home).",
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "profileRef",
+        "nativeSessionId"
+      ],
+      "type": "object"
+    },
+    "NativeSurfaceRef": {
+      "description": "A native surface (terminal tab, pane, window). The locator (a TTY path)\nis not identity: the application generation and the adapter's surface\ngeneration are part of the key, so a reused path is a new surface.",
+      "properties": {
+        "appGeneration": {
+          "type": "string"
+        },
+        "deviceNumber": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "locator": {
+          "type": "string"
+        },
+        "surfaceGeneration": {
+          "type": "string"
+        },
+        "surfaceKind": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "surfaceKind",
+        "appGeneration",
+        "locator",
+        "surfaceGeneration"
+      ],
+      "type": "object"
+    },
     "NotificationState": {
       "enum": [
         "NOT_REQUESTED",
@@ -997,6 +1220,38 @@
       ],
       "type": "string"
     },
+    "ProcessKey": {
+      "description": "SPEC §3.2 `ProcessKey`: endpoint, boot, PID and kernel birth.",
+      "properties": {
+        "bootId": {
+          "type": "string"
+        },
+        "endpointId": {
+          "type": "string"
+        },
+        "pid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startMicroseconds": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "startSeconds": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointId",
+        "bootId",
+        "pid",
+        "startSeconds",
+        "startMicroseconds"
+      ],
+      "type": "object"
+    },
     "ResolvedFact": {
       "properties": {
         "causal": {
@@ -1017,6 +1272,10 @@
           "format": "uint32",
           "minimum": 0,
           "type": "integer"
+        },
+        "native": {
+          "$ref": "#/$defs/NativeRefs",
+          "description": "The draft's native references, kept as relationship evidence: the\nreducer records native keys from them, never by re-resolving."
         },
         "observationId": {
           "type": "string"
@@ -1041,6 +1300,7 @@
         "observationId",
         "factIndex",
         "refs",
+        "native",
         "provenance",
         "payloadVersion",
         "payload"
@@ -1173,6 +1433,10 @@
     "delivery": {
       "$ref": "#/$defs/Delivery"
     },
+    "endpointId": {
+      "description": "The endpoint that admitted the entry (the local endpoint for captures).",
+      "type": "string"
+    },
     "facts": {
       "items": {
         "$ref": "#/$defs/ResolvedFact"
@@ -1207,6 +1471,7 @@
   },
   "required": [
     "cursor",
+    "endpointId",
     "observationId",
     "sourceId",
     "sourceEpoch",

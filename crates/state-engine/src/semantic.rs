@@ -178,7 +178,8 @@ pub fn projection(state: &CanonicalState) -> Value {
             n.actor(&r.actor_id), n.actor(&r.related_actor_id), r.relation,
         ])).collect()),
         "processes": map(state.processes.values().map(|p| (n.process(&p.id), json!({
-            "executables": p.executables,
+            "images": p.images,
+            "currentExecutable": p.current_executable,
             "exited": p.exited,
         })))),
         "executions": map(state.executions.values().map(|e| (n.execution(&e.id), json!({
