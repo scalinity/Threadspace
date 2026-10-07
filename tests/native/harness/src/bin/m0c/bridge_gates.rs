@@ -540,8 +540,19 @@ fn settle_shells(ctx: &Ctx, pid: u32) -> Value {
 /// processes serving it and its physical footprint.
 fn ui_resources(ctx: &Ctx, pid: u32) -> Value {
     let web_content = procs::web_content_of(pid as i32);
+    // Each layer-0 window as [number, on screen, width, height].
+    let windows: Vec<Value> = ctx.native.json(&["windows", &pid.to_string()])["windows"]
+        .as_array()
+        .map(|ws| {
+            ws.iter()
+                .filter(|w| w["layer"].as_i64() == Some(0))
+                .map(|w| json!([w["id"], w["onScreen"], w["width"], w["height"]]))
+                .collect()
+        })
+        .unwrap_or_default();
     json!({
-        "windowShells": ctx.native.window_count(pid),
+        "windowShells": windows.len(),
+        "windows": windows,
         "webContentProcesses": web_content.as_ref().map(Vec::len),
         "webContentPids": web_content,
         "footprintBytes": procs::phys_footprint(pid as i32),
