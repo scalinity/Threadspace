@@ -87,6 +87,18 @@ fn first_event(events: &[Value], name: &str, matches: impl Fn(&Value) -> bool) -
         .cloned()
 }
 
+/// Outside interference in a case: owner keyboard/mouse input (HID idle time
+/// shorter than the case; this runner posts no input events), or the office
+/// left 3D without a harness command. Such a case is reported as
+/// interfered, not as a renderer result.
+fn interference(ctx: &Ctx, case_started: Instant, view: &Value) -> Value {
+    let idle = ctx.native.idle_seconds();
+    let elapsed = case_started.elapsed().as_secs_f64();
+    let owner_input = idle < elapsed;
+    let not_3d = view["presentation"] != "3d";
+    json!({ "ownerHidIdleS": idle, "caseElapsedS": elapsed, "ownerInputDuringCase": owner_input, "officeNot3dBeforeCapture": not_3d, "interfered": owner_input || not_3d })
+}
+
 /// Three canvas captures two seconds apart; the scene must change.
 fn fresh_pixels(captures: &mut Captures<'_>, phase: &str) -> (Vec<Value>, usize) {
     captures.previous = None;
@@ -171,6 +183,7 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
             "the init gate does not observe renderer initialization: {gate_seen}"
         ));
     }
+    let case_a_started = Instant::now();
     let before = state(ctx);
     let before_generation = before["generation"].as_i64().unwrap_or(0);
     log("enter-2d", command(ctx, "enter-2d"));
@@ -193,8 +206,8 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     );
     log("init-pending", pending.clone());
     let held_generation = pending["initPending"]["generation"].as_i64();
+    let minimize_requested_ms = threadspace_harness::now_ms();
     let minimize = ctx.native.ax_action(pid, "minimize", Some(TITLE));
-    let minimized_ms = threadspace_harness::now_ms();
     log("minimize", minimize.clone());
     let (retired, retired_ok, _) = poll(
         Duration::from_secs(15),
@@ -237,7 +250,7 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     let released_at = release_record["releasedAtMs"].as_i64();
     let retired_at = retired_event.as_ref().and_then(|e| e["atMs"].as_i64());
     let late_at = late_event.as_ref().and_then(|e| e["atMs"].as_i64());
-    let ordered = matches!((held_at, retired_at, released_at, late_at), (Some(h), Some(r), Some(rel), Some(l)) if h <= minimized_ms && h < r && r < rel && rel <= l);
+    let ordered = matches!((held_at, retired_at, released_at, late_at), (Some(h), Some(r), Some(rel), Some(l)) if h < minimize_requested_ms && minimize_requested_ms < r && r < rel && rel <= l);
     ctx.native.ax_action(pid, "unminimize", Some(TITLE));
     ctx.native.ax_action(pid, "raise", Some(TITLE));
     let (back, back_ok, _) = poll(
@@ -247,6 +260,7 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     );
     log("returned-visible", back.clone());
     log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
+    let interference_a = interference(ctx, case_a_started, &state(ctx));
     let (shots_a, moving_a) = fresh_pixels(&mut captures, "after-init-race");
     let init_checks = json!({
         "barrierInstalledAndArmed": armed["result"]["initBarrier"]["installed"] == true && armed["result"]["initBarrier"]["armed"] == true,
@@ -266,13 +280,14 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     });
     let init_pass = init_checks
         .as_object()
-        .is_some_and(|m| m.values().all(|v| v == true));
+        .is_some_and(|m| m.values().all(|v| v == true))
+        && interference_a["interfered"] == false;
     record(
         "hide-while-renderer-init-pending",
         init_pass,
         json!({
-            "checks": init_checks, "heldGeneration": held_generation, "pendingWaitMs": pending_ms,
-            "times": { "heldAtMs": held_at, "minimizedAtMs": minimized_ms, "retiredAtMs": retired_at, "releasedAtMs": released_at, "lateInitDiscardedAtMs": late_at },
+            "checks": init_checks, "interference": interference_a, "heldGeneration": held_generation, "pendingWaitMs": pending_ms,
+            "times": { "heldAtMs": held_at, "minimizeRequestedAtMs": minimize_requested_ms, "retiredAtMs": retired_at, "releasedAtMs": released_at, "lateInitDiscardedAtMs": late_at },
             "release": release_record, "pending": pending, "retired": retired, "hidden": hidden,
             "frames": { "first": quiet_a["frames"], "afterTenSeconds": quiet_b["frames"] },
             "projectionWhileHidden": projection_hidden["equal"], "returned": { "state": back["state"], "generation": back["generation"], "liveGeneration": back["liveGeneration"], "attestation": back["lastAttestation"] },
@@ -281,7 +296,12 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     );
 
     // ----------------------------------------- H-11B: pending resource
+    let case_b_started = Instant::now();
     let shells_before = ctx.native.window_count(pid);
+    // Outstanding requests before the held one: an asset a generation received
+    // before its scene existed is disposed at retirement without a counter, so
+    // the held request is measured as a change from this baseline.
+    let outstanding_before = outstanding_assets(&peek(ctx));
     let mut desktop = app.desktop_log();
     let mut lines = Vec::new();
     let armed_hold = hold(ctx, "ARM");
@@ -347,6 +367,7 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     let shells_after = ctx.native.window_count(pid);
     let projection_new = compare_projection(ctx, "after-resource-reload");
     log("motion-fixture", keep_centre_animated(ctx, &mut fixture));
+    let interference_b = interference(ctx, case_b_started, &state(ctx));
     let calibration_new = captures.take("calibration-new-view");
     let surface_new = state(ctx);
     captures.crop = calibration_new["stats"]["width"]
@@ -363,7 +384,7 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     let resource_checks = json!({
         "holdArmed": armed_hold["ok"] == true && armed_hold["result"]["armed"] == "floor-grain",
         "sameSchemeRequestHeld": held.as_ref().is_some_and(|l| l["detail"]["path"].as_str().is_some_and(|p| p.contains("floor-grain"))),
-        "pendingInView": outstanding_assets(&pending_view) == 1,
+        "pendingInView": outstanding_assets(&pending_view) - outstanding_before == 1,
         "viewRetiredWhilePending": recovered.as_ref().is_some_and(|l| l["detail"]["retiredIncarnation"] == held_incarnation),
         "orderedOverlap": resource_ordered,
         "lateResponseToRetiredView": released_line.as_ref().is_some_and(|l| l["detail"]["incarnationActiveAtRelease"] == false && l["detail"]["releasedBy"] == "COMMAND"),
@@ -374,12 +395,13 @@ pub fn overlap(ctx: &Ctx) -> Result<Value, String> {
     });
     let resource_pass = resource_checks
         .as_object()
-        .is_some_and(|m| m.values().all(|v| v == true));
+        .is_some_and(|m| m.values().all(|v| v == true))
+        && interference_b["interfered"] == false;
     record(
         "reload-while-resource-pending",
         resource_pass,
         json!({
-            "checks": resource_checks,
+            "checks": resource_checks, "interference": interference_b, "outstandingBeforeHold": outstanding_before,
             "times": { "heldAtMs": held_ms, "reloadSentMs": reload_sent_ms, "viewRetiredAtMs": retired_ms, "releasedAtMs": released_ms },
             "held": held, "pendingView": { "generation": pending_view["generation"], "asset": pending_view["asset"] },
             "recovered": recovered, "newView": { "state": new_view["state"], "generation": new_view["generation"], "asset": new_view["asset"], "attestation": new_view["lastAttestation"] },
