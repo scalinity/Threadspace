@@ -1,0 +1,64 @@
+{
+  "durability": [
+    {
+      "observationId": "103dbeac-e98e-4306-a3a6-250d295b31de",
+      "originalCursor": "314244",
+      "preserved": true,
+      "replay": {
+        "admitted": true,
+        "cursor": "314244",
+        "ok": true,
+        "status": "ALREADY_COMMITTED"
+      }
+    }
+  ],
+  "invariants": {
+    "maxObserverOverlapMs": 0,
+    "maxSimultaneousCompanionProcesses": 1,
+    "maxWriterOverlapMs": 0,
+    "pass": true,
+    "processes": [
+      {
+        "admissionOpen": null,
+        "firstSeenMs": 1791348226267,
+        "forwarder": false,
+        "lastSeenMs": 1791348254926,
+        "launchProvenance": null,
+        "pid": 12016,
+        "writerSinceMs": null
+      },
+      {
+        "admissionOpen": true,
+        "firstSeenMs": 1791348255163,
+        "forwarder": false,
+        "lastSeenMs": 1791348256354,
+        "launchProvenance": "LOGIN_ITEM",
+        "pid": 28134,
+        "writerSinceMs": 1791348255006
+      },
+      {
+        "admissionOpen": false,
+        "firstSeenMs": 1791348379393,
+        "forwarder": false,
+        "lastSeenMs": 1791348403239,
+        "launchProvenance": "LOGIN_ITEM",
+        "pid": 30613,
+        "writerSinceMs": 1791348379390
+      }
+    ],
+    "sampleIntervalMs": 200,
+    "samples": 742,
+    "unsupervisedObservers": []
+  },
+  "outstandingAttention": [
+    {
+      "attentionId": "919f4c3e-f733-4f13-af9c-03238bd4912d",
+      "outstanding": true,
+      "state": {
+        "acknowledgedAtMs": null,
+        "present": true,
+        "resolvedAtMs": null
+      }
+    }
+  ]
+}

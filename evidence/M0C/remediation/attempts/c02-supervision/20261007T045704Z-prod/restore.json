@@ -1,0 +1,97 @@
+{
+  "after": {
+    "atMs": 1791349127223,
+    "companionProcesses": [
+      {
+        "pid": 86782,
+        "ppid": 1,
+        "startMicroseconds": 924546,
+        "startSeconds": 1791349126
+      }
+    ],
+    "diagnostics": {
+      "admissionOpen": true,
+      "coreGeneration": "e46e4fe8-dde8-49ab-a965-a0b590604c0d",
+      "launchProvenance": "LOGIN_ITEM",
+      "maintenancePhase": "NONE",
+      "observationEnabled": true,
+      "pid": 86782,
+      "storeGeneration": "f3eefe4f-6d5e-48fb-9dda-354159660588"
+    },
+    "label": "restored",
+    "locatorIncarnation": {
+      "pid": 86782,
+      "ppid": 1,
+      "startMicroseconds": 924546,
+      "startSeconds": 1791349126
+    },
+    "loginItemPid": 86782,
+    "serviceStatus": "ENABLED",
+    "uiProcesses": [],
+    "writerLockFree": false
+  },
+  "steps": [
+    {
+      "register": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 93,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "register",
+        "statusAfter": "ENABLED"
+      }
+    },
+    {
+      "enable": {
+        "agentIdentifier": "ai.scalinity.threadspace.agent",
+        "appIdentifier": "ai.scalinity.threadspace",
+        "detail": {
+          "steps": [
+            {
+              "detail": "already enabled",
+              "elapsedMs": 14,
+              "ok": true,
+              "step": "register"
+            },
+            {
+              "detail": {
+                "companionPid": 86782,
+                "waitedMs": 0
+              },
+              "elapsedMs": 14,
+              "ok": true,
+              "step": "connect"
+            },
+            {
+              "detail": {
+                "error": null,
+                "phase": "PREPARED"
+              },
+              "elapsedMs": 15,
+              "ok": true,
+              "step": "leave-maintenance"
+            },
+            {
+              "detail": null,
+              "elapsedMs": 15,
+              "ok": true,
+              "step": "record-observation-enabled"
+            }
+          ]
+        },
+        "elapsedMs": 36,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "enable",
+        "statusAfter": "ENABLED"
+      }
+    }
+  ]
+}

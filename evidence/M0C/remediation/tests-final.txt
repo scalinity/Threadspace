@@ -1,0 +1,53 @@
+# Test and lint results for the final remediation (source ab11b8a, 2026-10-07T05:08:59Z)
+## cargo test -p threadspace-contracts
+test result: ok. 99 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-contracts --features qualification
+test result: ok. 97 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-surfaces
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-surfaces-macos
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-agent
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-agent --features qualification
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-desktop
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-desktop --features qualification
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-journal --features qualification
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-relay
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo test -p threadspace-provider-claude
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+## cargo clippy --all-targets -p threadspace-agent -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+## cargo clippy --all-targets -p threadspace-agent --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
+## cargo clippy --all-targets -p threadspace-desktop -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.22s
+## cargo clippy --all-targets -p threadspace-desktop --features qualification -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.55s
+## cargo clippy --all-targets -p threadspace-surfaces -p threadspace-surfaces-macos -p threadspace-contracts -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.51s
+## desktop UI: tsc --noEmit; vitest
+ Test Files  2 passed (2)
+      Tests  13 passed (13)

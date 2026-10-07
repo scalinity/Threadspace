@@ -2,15 +2,15 @@
   "schema": 1,
   "milestone": "M0C",
   "title": "Platform Reliability / Recovery Qualification",
-  "verdict": "M0C REMEDIATION REQUIRED",
-  "verdictScope": "Independent re-review of ccdfc8a accepts H-10, H-11 and H-12 and the startup-admission portion of C-02. Two code repairs remain: notification-intent preservation throughout companion handoff (C-02, G06/G09 FAIL) and enforcement of the complete native Return deadline (C-11, G08 FAIL). G15/G16 PASS under accepted scopes; G17 BLOCKED. No merge or M1 authorization.",
-  "generatedAt": "2026-10-07T03:14:35Z",
+  "verdict": "M0C FINAL REMEDIATION COMPLETE — candidate pending independent acceptance review",
+  "verdictScope": "Final remediation from 02947d8 closes the two code defects the independent re-review of ccdfc8a left open: C-02 handoff intent ownership (G06/G09 PASS) and C-11 whole-route Return deadline (G08 PASS), both on application build ab11b8a with their targeted native regressions. H-10–H-12 stay closed; C-12 and C-13 are nonblocking M1 diagnostics. G17 is a candidate pending final independent acceptance. No merge or M1 authorization.",
+  "generatedAt": "2026-10-07T05:37:17Z",
   "baseCommit": "8558854fad5162c0182dd36d76f8f8ae5d282529",
   "branch": "m0c",
-  "applicationCommit": "89fce79d52a9cb5805ad1fa99c3e50648a3629cf",
-  "harnessCommit": "1ac8b9cda7c779e82d30d462192c780c3117d399",
-  "applicationSourcesUnchangedSince": "c3f6de135c925cefbad5e7cba2d5b771d4feca77; 89fce79 and later remediation commits change tests/native and evidence only",
-  "evidenceCommit": "ccdfc8a38773aac01121601bde6121dd1760b6ea",
+  "applicationCommit": "ab11b8a9ae474420d2e71ea2c506b81df98ff12a",
+  "harnessCommit": "9a0155e0dc0f968749e85ec2f629b5ddbb447671",
+  "applicationSourcesUnchangedSince": "ab11b8a9ae474420d2e71ea2c506b81df98ff12a; later commits change tests/native and evidence only",
+  "evidenceCommit": "the m0c commit that records this manifest",
   "target": {
     "os": "macOS 27.2 (26B5091g)",
     "machine": "Apple M5 Pro, built-in Retina panel only",
@@ -20,8 +20,8 @@
     "tauri": "3.0.0-alpha.4",
     "three": "r186"
   },
-  "install": "evidence/M0C/install/20261007T005438Z-89fce79/",
-  "tests": "Remediation suites (evidence/M0C/remediation/tests.txt): contracts 99 (release, incl. barrier absence) / 97 (qualification), companion core 7 (both feature sets), journal 33, relay 10, surfaces 22, desktop 17, frontend 13 + scene 24, typecheck clean; clippy clean for companion and shell in release and qualification builds. Earlier recorded native suite: build/tests.txt. Harness clippy reports one preexisting type_complexity error in the old graphics runner; no all-workspace clippy-clean claim.",
+  "install": "evidence/M0C/install/20261007T041247Z-ab11b8a/",
+  "tests": "Final suites (evidence/M0C/remediation/tests-final.txt): contracts, surfaces (27, incl. five deadline regressions), surfaces-macos, companion (release and qualification, incl. intent-store tests), desktop shell (release and qualification), journal, relay, provider: all pass; clippy clean for companion, shell, contracts and surfaces in release and qualification builds; UI type-check and 13 UI tests pass. Earlier: evidence/M0C/remediation/tests.txt.",
   "gates": {
     "G01": {
       "result": "PASS",
@@ -29,9 +29,11 @@
         "evidence/M0C/install/20261006T140713Z-8c82212/",
         "evidence/M0C/build/tests.txt",
         "evidence/M0C/install/20261007T005438Z-89fce79/",
-        "evidence/M0C/remediation/tests.txt"
+        "evidence/M0C/remediation/tests.txt",
+        "evidence/M0C/install/20261007T041247Z-ab11b8a/",
+        "evidence/M0C/remediation/tests-final.txt"
       ],
-      "scope": "Both identities built clean and signed from 8c82212, and again from 89fce79 for the remediation; no lockfile or toolchain change."
+      "scope": "Both identities built clean and signed from 8c82212, and again from 89fce79 for the remediation; no lockfile or toolchain change. Final: rebuilt clean and signed from ab11b8a for both identities, no lockfile or toolchain change; every affected suite passes."
     },
     "G02": {
       "result": "PASS",
@@ -62,13 +64,14 @@
       ]
     },
     "G06": {
-      "result": "FAIL",
+      "result": "PASS",
       "evidence": [
+        "evidence/M0C/g06-notifications/20261007T052731Z-prod/",
+        "evidence/M0C/remediation/c02-intent-handoff/20261007T043351Z-prod/",
         "evidence/M0C/g06-notifications/20261006T140836Z-prod/",
-        "evidence/M0C/g06-notifications/20261007T020240Z-prod/",
-        "evidence/M0C/remediation/README.md#independent-re-review"
+        "evidence/M0C/g06-notifications/20261007T020240Z-prod/"
       ],
-      "scope": "Recorded workloads remain PASS: ten native banner presses plus a separate enable handoff, repeated on 89fce79. Gate FAIL for C-02: an accepted notification callback during orderly handoff can lose its inspector intent before hydration. Same code defect as G09; the executed workload does not cover the post-drain callback or delayed-claimant exit ordering."
+      "scope": "C-02 closed on ab11b8a: accepted intents are store-owned from acceptance to consumption. Eleven native banner interactions pass; responses placed before the yield, after its reply (post-drain), while the claimant waits and after acceptance closed, with hydration held, each reach the UI exactly once from the claimant (0 lost, 0 duplicated)."
     },
     "G07": {
       "result": "PASS",
@@ -80,34 +83,43 @@
       "scope": "Accepted revised M0C mechanism and read-only provider-probe scope under D-0004/D-0005. Positive supervision now protects admission; the remaining C-02 handoff intent defect is tracked at G06/G09."
     },
     "G08": {
-      "result": "FAIL",
+      "result": "PASS",
       "evidence": [
+        "evidence/M0C/remediation/c11-route-deadline/20261007T052511Z-prod/",
+        "evidence/M0C/remediation/h10-terminal/20261007T052629Z-prod/",
+        "evidence/M0C/remediation/c11-route-deadline/unit/",
         "evidence/M0C/remediation/h10-terminal/20261007T015957Z-prod/",
-        "evidence/M0C/g08-terminal/20261006T144151Z-prod/",
-        "evidence/M0C/remediation/README.md#independent-re-review"
+        "evidence/M0C/g08-terminal/20261006T144151Z-prod/"
       ],
       "blocked": "C-08 full Terminal.app restart: native BLOCKED/not executed; formally deferred to isolated M15 qualification by D-0006. H-10 independently closed by the final remediation run.",
-      "scope": "H-10 closed on 89fce79: actual fullscreen/Space entry, away, exact Return, exit and exact Return again; two causal target-close overlaps, TARGET_GONE / READBACK_FAILED, target-only focus, zero wrong targets. C-11 Space false negative repaired, but the existing aggregate deadline is unenforced: phases after the pre-focus check can return exact/OK after two seconds. Final ordinary/fullscreen routes took 805/1109/821 ms; qualification holds are not ordinary timing evidence."
+      "scope": "C-11 closed on ab11b8a: one monotonic deadline from receipt bounds every native phase and no late result is exact. Ordinary 789 ms and fullscreen-Space 1,058 ms Returns exact; expiry held before focus, focus script in flight, Space settle and late decision all TIMEOUT with issued focus recorded; 0 wrong targets. H-10 regression passes with populated unrelated-selection inventories. Earlier route proofs remain credited."
     },
     "G09": {
-      "result": "FAIL",
+      "result": "PASS",
       "evidence": [
+        "evidence/M0C/remediation/c02-intent-handoff/20261007T043638Z-prod/",
+        "evidence/M0C/remediation/c02-intent-handoff/20261007T044049Z-prod/",
+        "evidence/M0C/remediation/c02-supervision/20261007T052955Z-prod/",
+        "evidence/M0C/remediation/c02-supervision/20261007T044346Z-prod/",
+        "evidence/M0C/remediation/c02-supervision/20261007T050045Z-prod/",
+        "evidence/M0C/remediation/c02-supervision/20261007T050722Z-prod/",
+        "evidence/M0C/g09-companion/20261007T052838Z-prod/",
         "evidence/M0C/remediation/c02-supervision/20261007T020101Z-prod/",
         "evidence/M0C/remediation/c02-supervision/negative-control-8c82212/",
         "evidence/M0C/g09-companion/20261007T020340Z-prod/",
-        "evidence/M0C/g09-companion/20261006T141203Z-prod/",
-        "evidence/M0C/remediation/README.md#independent-re-review"
+        "evidence/M0C/g09-companion/20261006T141203Z-prod/"
       ],
-      "scope": "C-02 admission repair accepted: positive LOGIN_ITEM classification and preference/supervision/maintenance/awake predicate. A-F pass their executed cases, old 8c82212 controls fail behaviorally, and six independence/crash scenarios pass on 89fce79. Yield drains intents before a 500 ms exit while callbacks remain accepted; unsupervised Enable can also exit before a claimant. Preserve accepted pending intents across both paths, including late callbacks and handoff reply failure. Exclusive writer ownership and durable journal records are not shown violated."
+      "scope": "Positive supervision and exclusive ownership hold (A–E on ab11b8a); the Enable refusal stays until the claim with the claimant delayed five seconds; an unavailable claimant leaves the intent in the store through idle exit for a later login item; a withheld reply and a launchd-retried claim converge. One writer and one effective observer throughout; no unsupervised admission. G09 six-scenario regression passes."
     },
     "G10": {
       "result": "PASS",
       "evidence": [
         "evidence/M0C/g10-sqlite-live/20261006T140951Z-prod/",
         "evidence/M0C/sqlite/",
-        "evidence/M0C/g10-sqlite-live/20261007T020446Z-prod/"
+        "evidence/M0C/g10-sqlite-live/20261007T020446Z-prod/",
+        "evidence/M0C/g10-sqlite-live/20261007T050801Z-prod/"
       ],
-      "scope": "57,799 acknowledged receipts rechecked with zero missing across five live process-crash rounds; total may include post-relaunch admissions. Separate deterministic commit/ACK crash suite supplies boundary proof. No power-loss claim. Rerun on 89fce79: 58,895 acknowledged, 0 lost over five rounds; second writer refused (75); idempotent retry ALREADY_COMMITTED at its cursor."
+      "scope": "57,799 acknowledged receipts rechecked with zero missing across five live process-crash rounds; total may include post-relaunch admissions. Separate deterministic commit/ACK crash suite supplies boundary proof. No power-loss claim. Rerun on 89fce79: 58,895 acknowledged, 0 lost over five rounds; second writer refused (75); idempotent retry ALREADY_COMMITTED at its cursor. Rerun on ab11b8a: 24,458 acknowledged, 0 lost over five rounds; second writer refused (75), incumbent unchanged; idempotent retry ALREADY_COMMITTED at its cursor."
     },
     "G11": {
       "result": "PASS",
@@ -156,13 +168,13 @@
       "scope": "Under D-0006. H-12 independently closed: VoiceOver cursor reports and perform action produce 3D to 2D, then after actual fullscreen enter/exit 2D to 3D, verified by independent lifecycle state; keyboard regression passes. VoiceOver, scripting, welcome and output mute restored; authorized Terminal-to-VoiceOver Automation consent remains, inert with scripting disabled. H-14 history retained. Earlier built-in-display/window/DPR/AX/Reduce Motion proofs remain credited."
     },
     "G17": {
-      "result": "BLOCKED",
+      "result": "CANDIDATE_PENDING_FINAL_ACCEPTANCE",
       "evidence": [
         "evidence/M0C/gate-checklist.md",
         "evidence/M0C/failure-ledger.md",
         "evidence/M0C/remediation/README.md"
       ],
-      "scope": "Independent re-review requires only C-02 handoff intent preservation and C-11 whole-route deadline enforcement plus their focused regressions. H-10/H-11/H-12 accepted; C-12 nonblocking M1 diagnostics; D-0004-D-0006 and C-04 mandatory M1 closure unchanged. No merge or M1 authorization."
+      "scope": "The two required code repairs are in ab11b8a with their targeted regressions; H-10–H-12 closed; C-12 and C-13 nonblocking M1 diagnostics; D-0004–D-0006 and C-04 mandatory M1 closure unchanged. No merge or M1 authorization."
     }
   },
   "maintenanceOrdering": {
@@ -179,7 +191,9 @@
     "C-01 device pixel ratio (7e8043d): accepted",
     "C-03 keyboard focus after fullscreen/zoom (8c82212): accepted",
     "C-02 startup-admission bypass (d0598a5): repaired and natively demonstrated; handoff intent preservation remains open",
-    "C-11 Space-switch false READBACK_FAILED (88817eb): repaired and natively demonstrated; aggregate Return deadline remains open"
+    "C-11 Space-switch false READBACK_FAILED (88817eb): repaired and natively demonstrated; aggregate Return deadline remains open",
+    "C-02 handoff intent ownership (1270175): accepted intents store-owned, late responses spooled, every writer exit drains through the writer, Enable refusal stays; natively closed on ab11b8a",
+    "C-11 whole-route Return deadline (fdee5ad): one monotonic RouteDeadline, focus script stopped at it, Run::finish turns late results into TIMEOUT; natively closed on ab11b8a"
   ],
   "risks": [
     "C-04: one retired native shell per recovery; 18 to 28 across ten repeated recoveries; reproduction note reports about 33 KB/recovery and bounded WebContent. Lifetime shell count is not bounded. D-0006 accepts this only with mandatory M1 exit closure: nativeWindowShells.after == nativeWindowShells.before after destruction/quiescence, stable content/cache resources and preserved recovery invariants.",
@@ -240,7 +254,12 @@
     "2df7316 Match a fullscreen frame to the camera-housing band, as measured",
     "0ac5c2e Write the C-02 runner's companion log copy without private paths",
     "ec8fd26 Drive the H-12 VoiceOver smoke through VoiceOver's scripting interface",
-    "1ac8b9c Name the C-02 sampler's sample type"
+    "1ac8b9c Name the C-02 sampler's sample type",
+    "fdee5ad Enforce one Return deadline across the whole native attempt (C-11)",
+    "1270175 Keep every accepted notification intent owned across companion handoff (C-02)",
+    "ab11b8a State the single Return deadline and durable intent ownership in the SPEC",
+    "b757c75 Add C-02 handoff and C-11 deadline qualification runners",
+    "9a0155e Fix the Terminal selection readback and hold banner presses under the GUI lock"
   ],
   "nextMilestoneStarted": false,
   "captures": "Committed: a curated set (official G15 first/last per phase and every tenth sustained frame, first/last G02 launch per context, every image an ATTEMPT-NOTE names, all other official captures). The full 612 captures (327 MB) stay on disk under evidence/M0C/captures-full/ (git-ignored). Every capture's pixel statistics and diffs are in the committed timelines.",
@@ -297,10 +316,11 @@
     }
   ],
   "remediationBase": "24035492eed28c342d09c36b52aed61c2bc17a53",
-  "applicationSourcesCommit": "c3f6de135c925cefbad5e7cba2d5b771d4feca77",
-  "previousInstall": "evidence/M0C/install/20261006T140713Z-8c82212/",
+  "applicationSourcesCommit": "ab11b8a9ae474420d2e71ea2c506b81df98ff12a",
+  "previousInstall": "evidence/M0C/install/20261007T005438Z-89fce79/",
   "observations": [
-    "C-12: diagnostic-only; resources are disposed but a received-before-scene asset lacks an outcome count. Discrepancy can accumulate without retaining resources; no lifecycle/watchdog decision consumes it. Owner M1 renderer diagnostics; closure requires complete outcome accounting after quiescence and exactly-once texture/bitmap disposal."
+    "C-12: diagnostic-only; resources are disposed but a received-before-scene asset lacks an outcome count. Discrepancy can accumulate without retaining resources; no lifecycle/watchdog decision consumes it. Owner M1 renderer diagnostics; closure requires complete outcome accounting after quiescence and exactly-once texture/bitmap disposal.",
+    "C-13: a companion log record and its newline are separate writes, so a process killed between them leaves the next process's first record on the same line. Records stay complete; the harness parses every record on a line. Owner M1 diagnostics; closure writes record and newline in one write."
   ],
   "remediation": {
     "readme": "evidence/M0C/remediation/README.md",
@@ -402,5 +422,55 @@
         "packages"
       ]
     }
+  },
+  "finalRemediation": {
+    "base": "02947d8dd3a627afef945a0d57497095cfbbae20",
+    "applicationBuild": "ab11b8a9ae474420d2e71ea2c506b81df98ff12a",
+    "harness": [
+      "b757c75",
+      "9a0155e"
+    ],
+    "readme": "evidence/M0C/remediation/README.md#final-remediation",
+    "executables": "evidence/M0C/install/20261007T041247Z-ab11b8a/hashes.txt",
+    "c02": {
+      "protocol": "Accepted intents persisted to the store before delivery and removed on consumption; any writer loads them on taking the lock. Late, overflow and forwarded responses spooled per notification request and recovered as inspector intents. Every voluntary writer exit is Release on the writer thread (close acceptance, finish accepted commands, wait for spooling, exit). Yield reply reports only; claimant waits for the lock regardless. Enable refusal stays until the claim.",
+      "citedRuns": {
+        "AGB": "evidence/M0C/remediation/c02-intent-handoff/20261007T043351Z-prod/",
+        "CF_D_E1": "evidence/M0C/remediation/c02-intent-handoff/20261007T043638Z-prod/",
+        "E2": "evidence/M0C/remediation/c02-intent-handoff/20261007T044049Z-prod/"
+      },
+      "placedIntents": 10,
+      "lost": 0,
+      "duplicateApplications": 0,
+      "maxWriterOverlapMs": 0,
+      "maxObserverOverlapMs": 0,
+      "negativeControl": "Not executable on 89fce79 (no response injection or handoff holds); source-level defect cited in the README; no negative result claimed."
+    },
+    "c11": {
+      "deadline": "RouteDeadline::for_request(received) on the monotonic clock; every waiting native call uses remaining(); focus script stopped at the deadline; Run::finish checks the deadline last.",
+      "citedRun": "evidence/M0C/remediation/c11-route-deadline/20261007T052511Z-prod/",
+      "ordinaryLatencyMs": 789,
+      "fullscreenLatencyMs": 1058,
+      "wrongTargets": 0,
+      "negativeControls": [
+        "evidence/M0C/remediation/c11-route-deadline/unit/negative-control-gate-removed.txt",
+        "evidence/M0C/remediation/h10-terminal/20261007T015957Z-prod/ (89fce79: held route started its focus script 2,142 ms after its barrier)"
+      ],
+      "attention": "No automatic acknowledgement in M0C; timed-out notification Return leaves attention unacknowledged."
+    },
+    "regressions": {
+      "c02SupervisionA_B": "evidence/M0C/remediation/c02-supervision/20261007T052955Z-prod/",
+      "c02SupervisionC": "evidence/M0C/remediation/c02-supervision/20261007T044346Z-prod/",
+      "c02SupervisionD": "evidence/M0C/remediation/c02-supervision/20261007T050045Z-prod/",
+      "c02SupervisionE": "evidence/M0C/remediation/c02-supervision/20261007T050722Z-prod/",
+      "G06": "evidence/M0C/g06-notifications/20261007T052731Z-prod/",
+      "G09": "evidence/M0C/g09-companion/20261007T052838Z-prod/",
+      "G10": "evidence/M0C/g10-sqlite-live/20261007T050801Z-prod/",
+      "H10": "evidence/M0C/remediation/h10-terminal/20261007T052629Z-prod/"
+    },
+    "supersededRuns": "evidence/M0C/remediation/attempts/{c02-intent-handoff,c02-supervision,c11-route-deadline}/*/ATTEMPT-NOTE.md (H-15)",
+    "ownerInteraction": "One Terminal restart: the owner's Terminal incarnation refused every element query for more than 50 minutes (H-15).",
+    "publicEvidencePrivacy": "All 765 M0C files rescanned; only milestone names matched; 114 home paths in ten new run files replaced with ~, originals kept outside the repository; no captures added.",
+    "recordedAt": "2026-10-07T05:37:17Z"
   }
 }

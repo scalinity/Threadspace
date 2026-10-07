@@ -1,0 +1,3 @@
+# Superseded: hydration hold did not hold (harness design)
+
+The runner delayed hydration with the shell's one-shot resource hold followed by a view reload. A reload makes the shell retire the view and create a new one (MAIN_DOCUMENT_REPLACED); the retiring view's script request consumed the hold, and the new view loaded and hydrated at once, so the intents were applied before the handoff and the persistence checks never saw them pending. Lost 0, duplicates 0. Replaced by a harness-launched UI process suspended (SIGSTOP) before it connects and resumed after the handoff. Cited run: ../../../c02-intent-handoff/20261007T043351Z-prod/.

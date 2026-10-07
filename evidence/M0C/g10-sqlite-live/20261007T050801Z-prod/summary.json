@@ -1,0 +1,31 @@
+{
+  "acknowledgedTotal": 24458,
+  "crashRounds": 5,
+  "engine": {
+    "fullfsync": false,
+    "journalMode": "wal",
+    "sourceId": "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+    "sqlite": "3.53.4",
+    "synchronous": 2
+  },
+  "gate": "G10",
+  "idempotentRetry": {
+    "first": {
+      "cursor": "338766",
+      "status": "COMMITTED"
+    },
+    "retryAfterRestart": {
+      "cursor": "338766",
+      "status": "ALREADY_COMMITTED"
+    }
+  },
+  "lostAcknowledgedTotal": 0,
+  "pass": true,
+  "portion": "live companion",
+  "secondWriter": {
+    "elapsedMs": 15067,
+    "exitStatus": 75,
+    "incumbentUnchanged": true,
+    "pass": true
+  }
+}

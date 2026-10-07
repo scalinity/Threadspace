@@ -1,0 +1,3 @@
+# Superseded: independent selection readback was empty (harness defect)
+
+Every route result matched the design (TIMEOUT where expected, exact ordinary and fullscreen routes, no focus on the held-before-focus case), but every check that read Terminal's front window independently failed: the harness's window-selection script wrote the separator as the word "tab", because inside `tell application "Terminal"` the term names Terminal's tab class, so its output never parsed. The same defect left the earlier H-10 selection inventories empty. The script now defines its separator outside the `tell`. Cited run: ../../../c11-route-deadline/20261007T052511Z-prod/.

@@ -1,0 +1,6 @@
+# C-11 negative control: Run::finish's deadline gate removed
+# Source: crates/surfaces/src/lib.rs at fdee5ad with 'if claims && self.deadline.expired()' replaced by 'if claims && false'; restored afterwards (git diff clean).
+# Command: cargo test -p threadspace-surfaces
+test tests::a_late_decision_with_valid_proof_is_not_exact ... FAILED
+test tests::a_focus_completing_after_the_deadline_is_recorded_but_not_exact ... FAILED
+test result: FAILED. 25 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
