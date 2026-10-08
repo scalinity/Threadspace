@@ -1,0 +1,142 @@
+Disposable Cargo-only adaptations. None is applied to the accepted repository. No Rust implementation or focused test is changed by these scaffolds.
+
+## Candidate focused tests
+
+diff --git a/Cargo.lock b/Cargo.lock
+index b94a3a8..89ac8cc 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -3604,10 +3604,8 @@ dependencies = [
+  "serde",
+  "serde_json",
+  "sha2 0.11.0",
+- "threadspace-agent",
+  "threadspace-contracts",
+  "threadspace-journal",
+- "threadspace-relay",
+  "threadspace-state-engine",
+  "uuid",
+ ]
+diff --git a/tests/synthetic/Cargo.toml b/tests/synthetic/Cargo.toml
+index 641393c..166f355 100644
+--- a/tests/synthetic/Cargo.toml
++++ b/tests/synthetic/Cargo.toml
+@@ -1,4 +1,5 @@
+ [package]
++autobins = false
+ name = "threadspace-synthetic"
+ description = "Deterministic synthetic provider, replay CLI and M1 qualification runners (no model calls)."
+ version.workspace = true
+@@ -10,8 +11,6 @@ license.workspace = true
+ [dependencies]
+ threadspace-contracts.workspace = true
+ threadspace-journal = { workspace = true, features = ["qualification"] }
+-threadspace-relay.workspace = true
+-threadspace-agent = { path = "../../apps/agent-macos/core", features = ["qualification"] }
+ rusqlite.workspace = true
+ libc.workspace = true
+ threadspace-state-engine = { workspace = true, features = ["synthetic"] }
+@@ -20,9 +19,5 @@ serde_json.workspace = true
+ sha2.workspace = true
+ uuid.workspace = true
+ 
+-[[bin]]
+-name = "threadspace-m1"
+-path = "src/bin/m1/main.rs"
+-
+ [lints]
+ workspace = true
+
+## Historical reducer-1 emitter
+
+diff --git a/Cargo.lock b/Cargo.lock
+index b94a3a8..89ac8cc 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -3604,10 +3604,8 @@ dependencies = [
+  "serde",
+  "serde_json",
+  "sha2 0.11.0",
+- "threadspace-agent",
+  "threadspace-contracts",
+  "threadspace-journal",
+- "threadspace-relay",
+  "threadspace-state-engine",
+  "uuid",
+ ]
+diff --git a/tests/synthetic/Cargo.toml b/tests/synthetic/Cargo.toml
+index 641393c..166f355 100644
+--- a/tests/synthetic/Cargo.toml
++++ b/tests/synthetic/Cargo.toml
+@@ -1,4 +1,5 @@
+ [package]
++autobins = false
+ name = "threadspace-synthetic"
+ description = "Deterministic synthetic provider, replay CLI and M1 qualification runners (no model calls)."
+ version.workspace = true
+@@ -10,8 +11,6 @@ license.workspace = true
+ [dependencies]
+ threadspace-contracts.workspace = true
+ threadspace-journal = { workspace = true, features = ["qualification"] }
+-threadspace-relay.workspace = true
+-threadspace-agent = { path = "../../apps/agent-macos/core", features = ["qualification"] }
+ rusqlite.workspace = true
+ libc.workspace = true
+ threadspace-state-engine = { workspace = true, features = ["synthetic"] }
+@@ -20,9 +19,5 @@ serde_json.workspace = true
+ sha2.workspace = true
+ uuid.workspace = true
+ 
+-[[bin]]
+-name = "threadspace-m1"
+-path = "src/bin/m1/main.rs"
+-
+ [lints]
+ workspace = true
+
+## Candidate/controls/restored
+
+diff --git a/Cargo.lock b/Cargo.lock
+index b94a3a8..89ac8cc 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -3604,10 +3604,8 @@ dependencies = [
+  "serde",
+  "serde_json",
+  "sha2 0.11.0",
+- "threadspace-agent",
+  "threadspace-contracts",
+  "threadspace-journal",
+- "threadspace-relay",
+  "threadspace-state-engine",
+  "uuid",
+ ]
+diff --git a/tests/synthetic/Cargo.toml b/tests/synthetic/Cargo.toml
+index 641393c..166f355 100644
+--- a/tests/synthetic/Cargo.toml
++++ b/tests/synthetic/Cargo.toml
+@@ -1,4 +1,5 @@
+ [package]
++autobins = false
+ name = "threadspace-synthetic"
+ description = "Deterministic synthetic provider, replay CLI and M1 qualification runners (no model calls)."
+ version.workspace = true
+@@ -10,8 +11,6 @@ license.workspace = true
+ [dependencies]
+ threadspace-contracts.workspace = true
+ threadspace-journal = { workspace = true, features = ["qualification"] }
+-threadspace-relay.workspace = true
+-threadspace-agent = { path = "../../apps/agent-macos/core", features = ["qualification"] }
+ rusqlite.workspace = true
+ libc.workspace = true
+ threadspace-state-engine = { workspace = true, features = ["synthetic"] }
+@@ -20,9 +19,5 @@ serde_json.workspace = true
+ sha2.workspace = true
+ uuid.workspace = true
+ 
+-[[bin]]
+-name = "threadspace-m1"
+-path = "src/bin/m1/main.rs"
+-
+ [lints]
+ workspace = true

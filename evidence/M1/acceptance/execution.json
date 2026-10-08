@@ -1,0 +1,891 @@
+{
+  "scope": "New independent portable Rust/SQLite execution using the reviewed Rust source, not native macOS qualification or the unchanged complete workspace dependency graph.",
+  "sourceCandidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+  "qualificationSource": "80df8b09c04c13c7b527d8913eb890858da3a606",
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+  },
+  "target": "x86_64-unknown-linux-gnu",
+  "scaffolds": "portable-scaffolds.txt",
+  "logs": "portable-execution.txt",
+  "publishedLogsSha256": "a3c7e00b742f7e3f0ff0671291422bf5bc9d6ccb1d5e5ba859a039aacf913478",
+  "pathSanitization": "Ephemeral scratch checkouts and dependency-cache paths are replaced by <review> and <cached-toolchain>. Original per-log digests in receipts precede path replacement; publishedLogsSha256 covers the published combined transcript.",
+  "setupAttempt": {
+    "startedUtc": "2026-10-08T23:39:03.224188+00:00",
+    "command": [
+      "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--offline",
+      "-p",
+      "threadspace-synthetic",
+      "--test",
+      "checkpoint_tail_upgrade",
+      "--test",
+      "reducer_upgrade",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "<review>/Threadspace-fixture-review",
+    "environment": {
+      "CARGO_HOME": "<cached-toolchain>/review-cargo",
+      "CARGO_TARGET_DIR": "<review>/fixture-review-target",
+      "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+      "CARGO_BUILD_JOBS": "4",
+      "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/fixture-review-evidence/positive"
+    },
+    "finishedUtc": "2026-10-08T23:39:03.595451+00:00",
+    "exitCode": 101
+  },
+  "positive": {
+    "startedUtc": "2026-10-08T23:39:11.375254+00:00",
+    "command": [
+      "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--offline",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "-p",
+      "threadspace-synthetic",
+      "--test",
+      "checkpoint_tail_upgrade",
+      "--test",
+      "reducer_upgrade",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "<review>/Threadspace-fixture-review",
+    "environment": {
+      "CARGO_HOME": "<cached-toolchain>/review-cargo",
+      "CARGO_TARGET_DIR": "<review>/fixture-review-target",
+      "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+      "CARGO_BUILD_JOBS": "4",
+      "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/fixture-review-evidence/positive"
+    },
+    "finishedUtc": "2026-10-08T23:39:33.919138+00:00",
+    "exitCode": 0
+  },
+  "historical": {
+    "startedUtc": "2026-10-08T23:39:20.602991+00:00",
+    "command": [
+      "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+      "test",
+      "--offline",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "-p",
+      "threadspace-synthetic",
+      "--test",
+      "emit_reducer1_store",
+      "--",
+      "--nocapture"
+    ],
+    "cwd": "<review>/Threadspace-fixture-historical",
+    "environment": {
+      "CARGO_HOME": "<cached-toolchain>/review-cargo",
+      "CARGO_TARGET_DIR": "<review>/fixture-historical-target",
+      "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+      "CARGO_BUILD_JOBS": "4",
+      "REDUCER1_OUT": "<review>/fixture-review-evidence/historical/journal-resolved-at.sqlite3",
+      "REDUCER1_HISTORIES": "resolved-at",
+      "REDUCER1_CHECKPOINT_STEP": "4"
+    },
+    "finishedUtc": "2026-10-08T23:39:42.743305+00:00",
+    "exitCode": 0
+  },
+  "controls": [
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "candidate",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {},
+      "canonicalSha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/candidate"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:39:26.334388+00:00",
+          "endedUtc": "2026-10-08T23:39:48.660268+00:00",
+          "logSha256": "7d32cfd839df238763ca7d435cbafb2474be7bf150f06b9c712a42761219dc65"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:39:48.665993+00:00",
+          "endedUtc": "2026-10-08T23:39:58.723180+00:00",
+          "logSha256": "1b9a536ff1cac5c9e066ff3cd1c2f39b8494068251ef3c97e2d1a4d1e82851ff"
+        }
+      ]
+    },
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "timestamp-restoration-removed",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "c9627b215901e0d4a80b3ba951239d96f4ab2418ffe601c0c6ab415d439e7be3"
+      },
+      "canonicalSha256": "c9627b215901e0d4a80b3ba951239d96f4ab2418ffe601c0c6ab415d439e7be3",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/timestamp-restoration-removed"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "startedUtc": "2026-10-08T23:39:58.761623+00:00",
+          "endedUtc": "2026-10-08T23:40:00.729291+00:00",
+          "logSha256": "e896cdb9d00d10f1a732a3a2eaa90b0fe9e3e0d27e4df55982122aca86f0de5a"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:40:00.735375+00:00",
+          "endedUtc": "2026-10-08T23:40:01.165703+00:00",
+          "logSha256": "e90ed345c528b36ba86e811249b4cef6e3671c9c7aafd9dfb8db93a2e04f3c2b"
+        }
+      ]
+    },
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "committed-time-always-kept",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "389c9bc3096f4fd96e3caacd30551fa9770d6f60785dc17b61095d70af18e3e6"
+      },
+      "canonicalSha256": "389c9bc3096f4fd96e3caacd30551fa9770d6f60785dc17b61095d70af18e3e6",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/committed-time-always-kept"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "startedUtc": "2026-10-08T23:40:01.201290+00:00",
+          "endedUtc": "2026-10-08T23:40:03.457696+00:00",
+          "logSha256": "0123e1ebc97fad51beb90beb631913548cbd9e65eb3c0af4988ed127add20aab"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:40:03.469512+00:00",
+          "endedUtc": "2026-10-08T23:40:03.933340+00:00",
+          "logSha256": "a6825f48d814358ca9230d148998be64ee883e4ea11f48a9afb3718f36c7bdbb"
+        }
+      ]
+    },
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "null-read-as-zero",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "c225ff818bc30d1ba4fb47926cc80f98c8cdba501e71642cc801eb73cdcef8cb"
+      },
+      "canonicalSha256": "c225ff818bc30d1ba4fb47926cc80f98c8cdba501e71642cc801eb73cdcef8cb",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/null-read-as-zero"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:40:03.981663+00:00",
+          "endedUtc": "2026-10-08T23:40:06.009365+00:00",
+          "logSha256": "1d7af884058be8860ed6f6b2aa26a8ebf88550dd6c0827cb680aaba050b80368"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "startedUtc": "2026-10-08T23:40:06.014579+00:00",
+          "endedUtc": "2026-10-08T23:40:06.426003+00:00",
+          "logSha256": "619fa0763be73fb44a9848fb1ff4891f428d1ce54e417783b0a76df953964263"
+        }
+      ]
+    },
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "other-type-read-as-null",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "a9648ed91bec5ef8e70546e058486fafb1b3c6f7d313836ecd414bf2fa60cc7d"
+      },
+      "canonicalSha256": "a9648ed91bec5ef8e70546e058486fafb1b3c6f7d313836ecd414bf2fa60cc7d",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/other-type-read-as-null"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "startedUtc": "2026-10-08T23:40:06.464735+00:00",
+          "endedUtc": "2026-10-08T23:40:07.770100+00:00",
+          "logSha256": "b27a6d801ff04e2f9f0f7e7250136701cca10aeb6c48d0d73ddb5eb3c9254ba5"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 101,
+          "startedUtc": "2026-10-08T23:40:07.775932+00:00",
+          "endedUtc": "2026-10-08T23:40:08.106014+00:00",
+          "logSha256": "b2531b54f13d990fbf449cf6f21843f83f27fcd3ef0a7a38d9c72e71129120eb"
+        }
+      ]
+    },
+    {
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "stage": "restored",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Independent portable focused execution; Cargo scaffold removes unused native dependencies and synthetic CLI target; all 197 Rust files match candidate except the named production control patch.",
+      "rustSourceChanges": {},
+      "canonicalSha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "environment": {
+        "RUSTC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<cached-toolchain>/review-cargo",
+        "CARGO_TARGET_DIR": "<review>/source-controls/target",
+        "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review>/source-controls/runs/restored"
+      },
+      "commands": [
+        {
+          "label": "synthetic",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:40:08.137217+00:00",
+          "endedUtc": "2026-10-08T23:40:09.341112+00:00",
+          "logSha256": "e1776dcc298daed22ddb609872028cba3c70ed6d5d14e58fa638cc2185a9e2be"
+        },
+        {
+          "label": "journal",
+          "command": [
+            "<cached-toolchain>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--locked",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "exitCode": 0,
+          "startedUtc": "2026-10-08T23:40:09.352941+00:00",
+          "endedUtc": "2026-10-08T23:40:09.712736+00:00",
+          "logSha256": "bc08cbc19b3e4b606305b75f30720f83d3d475c3855f9ff4c5038dd188acce97"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "historicalRegeneration": {
+      "committedSha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+      "regeneratedSha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+      "identicalBytes": true,
+      "bytes": 299008
+    },
+    "reports": {
+      "resolved-at.json": {
+        "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64",
+        "equalsCommittedRemediation4": true
+      },
+      "checkpoint-tail.json": {
+        "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549",
+        "equalsCommittedRemediation4": true,
+        "equalsRemediation3": true
+      },
+      "unordered-pair.json": {
+        "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994",
+        "equalsCommittedRemediation4": true,
+        "equalsRemediation3": true
+      }
+    },
+    "sourceIdentities": {
+      "crates/journal/src/canonical.rs": {
+        "sha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+        "candidateEqualsQualificationSource": true
+      },
+      "tests/synthetic/tests/checkpoint_tail_upgrade.rs": {
+        "sha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+        "candidateEqualsQualificationSource": true
+      },
+      "tests/synthetic/tests/reducer_upgrade.rs": {
+        "sha256": "c57d6616ec0e53c84512b36656e6ceab46e07ff19bff0451d079027394da0908",
+        "candidateEqualsQualificationSource": true
+      },
+      "fixtures/m1/reducer-1-store/emit_reducer1_store.rs": {
+        "sha256": "60c36018ed854d71ecfd739f3a61f292225c61a6c18343eae0d9890759046c60",
+        "candidateEqualsQualificationSource": true
+      }
+    },
+    "positiveResults": {
+      "resolved-at": [
+        {
+          "variant": "A",
+          "digest": {
+            "checkpointCursor": 6,
+            "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "entries": 6,
+            "facts": 6,
+            "firstCursor": 1,
+            "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+            "lastCursor": 6,
+            "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 0,
+          "ownerCommands": [
+            1,
+            1
+          ],
+          "counts": {
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 2,
+                "origin": "FIXTURE",
+                "reducerVersion": 1,
+                "throughCursor": 4
+              },
+              {
+                "id": 3,
+                "origin": "FIXTURE",
+                "reducerVersion": 1,
+                "throughCursor": 6
+              },
+              {
+                "id": 4,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 6
+              }
+            ],
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+          },
+          "attention": {
+            "createdCursor": 3,
+            "resolutionReason": "handled P3",
+            "resolutions": [
+              {
+                "detail": "handled P3",
+                "kind": "OWNER"
+              },
+              {
+                "detail": "native wait cleared",
+                "kind": "WAIT_ENDED"
+              }
+            ],
+            "revision": 6
+          },
+          "resolvedAtMs": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          }
+        },
+        {
+          "variant": "B",
+          "digest": {
+            "checkpointCursor": 6,
+            "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "entries": 6,
+            "facts": 6,
+            "firstCursor": 1,
+            "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+            "lastCursor": 6,
+            "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 6,
+          "ownerCommands": [
+            1,
+            1
+          ],
+          "counts": {
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 4,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 6
+              }
+            ],
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+          },
+          "attention": {
+            "createdCursor": 3,
+            "resolutionReason": "handled P3",
+            "resolutions": [
+              {
+                "detail": "handled P3",
+                "kind": "OWNER"
+              },
+              {
+                "detail": "native wait cleared",
+                "kind": "WAIT_ENDED"
+              }
+            ],
+            "revision": 6
+          },
+          "resolvedAtMs": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          }
+        },
+        {
+          "variant": "C",
+          "digest": {
+            "checkpointCursor": 6,
+            "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "entries": 6,
+            "facts": 6,
+            "firstCursor": 1,
+            "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+            "lastCursor": 6,
+            "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 2,
+          "ownerCommands": [
+            1,
+            1
+          ],
+          "counts": {
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 2,
+                "origin": "FIXTURE",
+                "reducerVersion": 1,
+                "throughCursor": 4
+              },
+              {
+                "id": 4,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 6
+              }
+            ],
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+          },
+          "attention": {
+            "createdCursor": 3,
+            "resolutionReason": "handled P3",
+            "resolutions": [
+              {
+                "detail": "handled P3",
+                "kind": "OWNER"
+              },
+              {
+                "detail": "native wait cleared",
+                "kind": "WAIT_ENDED"
+              }
+            ],
+            "revision": 6
+          },
+          "resolvedAtMs": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          }
+        }
+      ],
+      "checkpoint-tail": [
+        {
+          "variant": "A",
+          "digest": {
+            "checkpointCursor": 30,
+            "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "entries": 30,
+            "facts": 30,
+            "firstCursor": 1,
+            "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+            "lastCursor": 30,
+            "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 0,
+          "ownerCommands": [
+            5,
+            5
+          ],
+          "counts": {
+            "HELD": 4,
+            "PENDING": 1,
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 1,
+                "origin": "EMPTY",
+                "reducerVersion": 1,
+                "throughCursor": 0
+              },
+              {
+                "id": 2,
+                "origin": "FIXTURE",
+                "reducerVersion": 1,
+                "throughCursor": 30
+              },
+              {
+                "id": 3,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 30
+              }
+            ],
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+          }
+        },
+        {
+          "variant": "B",
+          "digest": {
+            "checkpointCursor": 30,
+            "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "entries": 30,
+            "facts": 30,
+            "firstCursor": 1,
+            "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+            "lastCursor": 30,
+            "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 30,
+          "ownerCommands": [
+            5,
+            5
+          ],
+          "counts": {
+            "HELD": 4,
+            "PENDING": 1,
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 1,
+                "origin": "EMPTY",
+                "reducerVersion": 1,
+                "throughCursor": 0
+              },
+              {
+                "id": 3,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 30
+              }
+            ],
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+          }
+        },
+        {
+          "variant": "C",
+          "digest": {
+            "checkpointCursor": 30,
+            "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "entries": 30,
+            "facts": 30,
+            "firstCursor": 1,
+            "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+            "lastCursor": 30,
+            "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "reducerVersion": 2,
+            "schemaVersion": 3,
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+          },
+          "stateDifferencesFromA": [],
+          "suffixEntriesReplayed": 24,
+          "ownerCommands": [
+            5,
+            5
+          ],
+          "counts": {
+            "HELD": 4,
+            "PENDING": 1,
+            "SUPPRESSED": 1
+          },
+          "restart": {
+            "checkpoints": [
+              {
+                "id": 2,
+                "origin": "FIXTURE",
+                "reducerVersion": 1,
+                "throughCursor": 6
+              },
+              {
+                "id": 4,
+                "origin": "REDUCER_UPGRADE",
+                "reducerVersion": 2,
+                "throughCursor": 30
+              }
+            ],
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+          }
+        }
+      ]
+    }
+  },
+  "controlVerification": {
+    "fixtureFilesChecked": 9,
+    "fixtureChanges": [],
+    "controlPatchesExact": {
+      "timestamp-restoration-removed": true,
+      "committed-time-always-kept": true,
+      "null-read-as-zero": true,
+      "other-type-read-as-null": true
+    },
+    "finalGitStatus": " M Cargo.lock\n M tests/synthetic/Cargo.toml\n"
+  }
+}

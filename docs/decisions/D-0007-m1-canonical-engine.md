@@ -1,6 +1,6 @@
 # D-0007 — M1 canonical engine: evidence-set reduction, derived identities and scoped limits
 
-**Status:** PROPOSED with the M1 candidate; for acceptance by the M1 independent review.
+**Status:** ACCEPTED on 2026-10-08 by the final timestamp-only independent M1 review of `01a215ddb55c3214a7d669b040f84886ede0be58`, with production repair `7fe5539` qualified at `80df8b0`. Acceptance preserves every scoped limitation and future obligation below; see the [acceptance record](../../evidence/M1/acceptance/README.md).
 **Affects:** SPEC §5.1–§5.5 (admission, identity, reduction, semantic equality), §6.1 (turn state), §7.1–§7.6 (attention, follow-up, outbox), §8.2–§8.5 (capture, spool), §9.2–§9.4 (projections, checkpoints, migration), §11.2/§11.3 (Claude classic hooks, inventory); MILESTONES M1, M2, M5.
 
 ## Evidence

@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "checkedAtUtc": "2026-10-08T23:45:33.757274+00:00",
+  "reviewedCandidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+  "pass": true,
+  "checks": [
+    {
+      "name": "frozen_candidate",
+      "pass": true,
+      "detail": "01a215ddb55c3214a7d669b040f84886ede0be58"
+    },
+    {
+      "name": "fetched_branch_identities",
+      "pass": true,
+      "detail": {
+        "m1": "01a215ddb55c3214a7d669b040f84886ede0be58",
+        "main": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54"
+      }
+    },
+    {
+      "name": "main_is_merge_base",
+      "pass": true,
+      "detail": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54"
+    },
+    {
+      "name": "candidate_ahead",
+      "pass": true,
+      "detail": 90
+    },
+    {
+      "name": "only_production_file_changed_since_rejection",
+      "pass": true,
+      "detail": [
+        "crates/journal/src/canonical.rs"
+      ]
+    },
+    {
+      "name": "qualified_application_unchanged",
+      "pass": true,
+      "detail": "80df8b09c04c13c7b527d8913eb890858da3a606"
+    },
+    {
+      "name": "acceptance_application_and_test_sources_unchanged",
+      "pass": true,
+      "detail": "No changes in application, focused tests, fixtures, toolchain, or locks"
+    },
+    {
+      "name": "only_authorized_existing_metadata_files_changed",
+      "pass": true,
+      "detail": [
+        "docs/MILESTONES.md",
+        "docs/SPEC.md",
+        "docs/decisions/D-0007-m1-canonical-engine.md",
+        "evidence/M1/README.md",
+        "evidence/M1/manifest.json"
+      ]
+    },
+    {
+      "name": "candidate_manifest_archived_verbatim",
+      "pass": true,
+      "detail": "93b8c412c8a97de2865bb34349e2634e72a57d648f416b0c634893f2fba25c0c"
+    },
+    {
+      "name": "rejected_manifest_preserved_verbatim",
+      "pass": true,
+      "detail": "909fea443da96f24324e3044345a6bf4d1adb01c4e0c2d8fd6c8b03779843877"
+    },
+    {
+      "name": "all_existing_manifest_results_preserved",
+      "pass": true,
+      "detail": "Only verdict changed; separate acceptance object added"
+    },
+    {
+      "name": "all_16_qualified_limitations_preserved",
+      "pass": true,
+      "detail": 16
+    },
+    {
+      "name": "future_milestone_contracts_unchanged",
+      "pass": true,
+      "detail": "M2 through M15 text unchanged"
+    },
+    {
+      "name": "d0008_unchanged",
+      "pass": true,
+      "detail": "ACCEPTED and version-scoped"
+    },
+    {
+      "name": "d0007_decisions_and_limits_unchanged",
+      "pass": true,
+      "detail": "Status-only edit"
+    },
+    {
+      "name": "status_consistency",
+      "pass": true,
+      "detail": "M1 and D-0007 accepted; M2 authorized and unstarted"
+    },
+    {
+      "name": "no_published_m2_evidence",
+      "pass": true,
+      "detail": "Published branch state only; no owner-machine activity claim"
+    },
+    {
+      "name": "no_stale_active_pending_status",
+      "pass": true,
+      "detail": "Active status paragraphs updated"
+    },
+    {
+      "name": "fresh_positive_reports_match_committed_evidence",
+      "pass": true,
+      "detail": {
+        "resolved-at.json": {
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64",
+          "matches": true
+        },
+        "checkpoint-tail.json": {
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549",
+          "matches": true
+        },
+        "unordered-pair.json": {
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994",
+          "matches": true
+        }
+      }
+    },
+    {
+      "name": "all_18_independent_control_reports_match",
+      "pass": true,
+      "detail": {
+        "candidate/resolved-at.json": true,
+        "candidate/checkpoint-tail.json": true,
+        "candidate/unordered-pair.json": true,
+        "timestamp-restoration-removed/resolved-at.json": true,
+        "timestamp-restoration-removed/checkpoint-tail.json": true,
+        "timestamp-restoration-removed/unordered-pair.json": true,
+        "committed-time-always-kept/resolved-at.json": true,
+        "committed-time-always-kept/checkpoint-tail.json": true,
+        "committed-time-always-kept/unordered-pair.json": true,
+        "null-read-as-zero/resolved-at.json": true,
+        "null-read-as-zero/checkpoint-tail.json": true,
+        "null-read-as-zero/unordered-pair.json": true,
+        "other-type-read-as-null/resolved-at.json": true,
+        "other-type-read-as-null/checkpoint-tail.json": true,
+        "other-type-read-as-null/unordered-pair.json": true,
+        "restored/resolved-at.json": true,
+        "restored/checkpoint-tail.json": true,
+        "restored/unordered-pair.json": true
+      }
+    },
+    {
+      "name": "historical_fixture_reproduced_byte_for_byte",
+      "pass": true,
+      "detail": {
+        "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+        "bytes": 299008
+      }
+    },
+    {
+      "name": "six_original_committed_entries",
+      "pass": true,
+      "detail": [
+        [
+          1,
+          1791000000010
+        ],
+        [
+          2,
+          1791000000020
+        ],
+        [
+          3,
+          1791000000030
+        ],
+        [
+          4,
+          1791000000040
+        ],
+        [
+          5,
+          1791000000050
+        ],
+        [
+          6,
+          1791000000060
+        ]
+      ]
+    },
+    {
+      "name": "one_original_owner_command",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "original_timestamp_and_revision",
+      "pass": true,
+      "detail": [
+        1791000000040,
+        6
+      ]
+    },
+    {
+      "name": "original_checkpoint_checksums",
+      "pass": true,
+      "detail": {
+        "checkpoints": [
+          0,
+          4,
+          6
+        ],
+        "sha256Recomputed": true
+      }
+    },
+    {
+      "name": "new_metadata_json_parses",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "relative_document_links_resolve",
+      "pass": true,
+      "detail": {
+        "checked": 83,
+        "broken": []
+      }
+    },
+    {
+      "name": "bounded_public_evidence_privacy_scan",
+      "pass": true,
+      "detail": {
+        "files": 50,
+        "patterns": 7,
+        "matches": [],
+        "scope": "Candidate changed evidence/fixtures plus acceptance update; not exhaustive secret detection"
+      }
+    },
+    {
+      "name": "published_validation_record_and_link",
+      "pass": true,
+      "detail": "validation.json parses and now exists at every referenced relative path."
+    },
+    {
+      "name": "documentation_metadata_whitespace",
+      "pass": true,
+      "detail": "git diff --cached --check excludes portable-execution.txt and portable-scaffolds.txt, which preserve raw log blank lines and unified-diff blank context prefixes."
+    }
+  ],
+  "limitations": [
+    "Checks are source, metadata, artifact, hash, SQLite-read and bounded privacy checks.",
+    "No native application, live store, merge, installation, or M2 work was executed.",
+    "Fresh runtime checks are separately identified in execution.json."
+  ]
+}

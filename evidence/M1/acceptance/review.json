@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "milestone": "M1",
+  "verdict": "ACCEPT M1",
+  "reviewedAtUtc": "2026-10-08T23:43:03.673973+00:00",
+  "scope": "Final single-defect closure: committed nullable resolution timestamp must not depend on reducer-1 checkpoint placement.",
+  "reviewedCandidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+  "previousRejectedCandidate": "579df5b7902396f706095a28b455f9189513daa5",
+  "acceptedMain": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54",
+  "productionRepair": "7fe5539c97a47e0d223d30b43550bdc51570c366",
+  "retainedQualificationSource": "80df8b09c04c13c7b527d8913eb890858da3a606",
+  "manifestCompositionSource": "787a3d42ec053a4d0d47555382458c01e61de0ad",
+  "sourceIdentities": {
+    "crates/journal/src/canonical.rs": {
+      "sha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+      "candidateEqualsQualificationSource": true
+    },
+    "tests/synthetic/tests/checkpoint_tail_upgrade.rs": {
+      "sha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "candidateEqualsQualificationSource": true
+    },
+    "tests/synthetic/tests/reducer_upgrade.rs": {
+      "sha256": "c57d6616ec0e53c84512b36656e6ceab46e07ff19bff0451d079027394da0908",
+      "candidateEqualsQualificationSource": true
+    },
+    "fixtures/m1/reducer-1-store/emit_reducer1_store.rs": {
+      "sha256": "60c36018ed854d71ecfd739f3a61f292225c61a6c18343eae0d9890759046c60",
+      "candidateEqualsQualificationSource": true
+    }
+  },
+  "productionDiffFromRejected": [
+    "crates/journal/src/canonical.rs"
+  ],
+  "qualifiedApplicationUnchangedThroughCandidate": true,
+  "laterRustChange": "tests/synthetic/src/bin/m1/manifest.rs assembles evidence; application implementation and focused tests are unchanged.",
+  "timestampRepair": "PASS",
+  "nullableDecoder": "PASS",
+  "currentEvidenceRederivation": "PASS",
+  "negativeControlDiscrimination": "PASS",
+  "historicalFixture": {
+    "producer": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
+    "emitterSource": "80df8b09c04c13c7b527d8913eb890858da3a606",
+    "path": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3",
+    "committedSha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+    "regeneratedSha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+    "identicalBytes": true,
+    "bytes": 299008
+  },
+  "sixEntryRegression": {
+    "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+    "checkpoints": [
+      6,
+      0,
+      4
+    ],
+    "suffixEntries": [
+      0,
+      6,
+      2
+    ],
+    "resolvedAtMs": 1791000000040,
+    "completeStateDifferences": [
+      0,
+      0,
+      0
+    ],
+    "revision": 6,
+    "throughCursor": 6,
+    "upgradeCheckpointsPerVariant": 1,
+    "restartRepeatedUpgrade": false,
+    "digest": {
+      "checkpointCursor": 6,
+      "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+      "entries": 6,
+      "facts": 6,
+      "firstCursor": 1,
+      "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+      "lastCursor": 6,
+      "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+      "reducerVersion": 2,
+      "schemaVersion": 3,
+      "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+      "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+      "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+    }
+  },
+  "previousMigration": {
+    "checkpoints": [
+      30,
+      0,
+      6
+    ],
+    "counts": {
+      "HELD": 4,
+      "PENDING": 1,
+      "SUPPRESSED": 1
+    },
+    "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+    "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+    "requests": [
+      {
+        "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+        "detail": null,
+        "reducer1": "SUPPRESSED",
+        "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+        "scope": "sess-partial t1 episode 0",
+        "upgraded": "HELD"
+      },
+      {
+        "attentionId": "38cc3ee8-5b0f-8db0-b9f9-5009640eba9c",
+        "detail": null,
+        "reducer1": "SUPPRESSED",
+        "requestId": "60b47679-b35e-8713-8a93-887e332d3f23",
+        "scope": "sess-partial-actions t1 episode 0",
+        "upgraded": "HELD"
+      },
+      {
+        "attentionId": "9c14d766-ad73-835e-ae27-ff21b71c0222",
+        "detail": null,
+        "reducer1": "PENDING",
+        "requestId": "62917481-141c-8b01-9f08-8b9039b114d2",
+        "scope": "sess-partial-actions t2 episode 0",
+        "upgraded": "PENDING"
+      },
+      {
+        "attentionId": "7b5efbc8-620e-8af7-b38a-5933656372eb",
+        "detail": null,
+        "reducer1": "SUPPRESSED",
+        "requestId": "c225bdd2-c3d5-8948-8fb9-777919d8656d",
+        "scope": "sess-unordered-wait t1 episode 0",
+        "upgraded": "HELD"
+      },
+      {
+        "attentionId": "d3561f2e-346b-8bf7-a15f-48d9d2563591",
+        "detail": "ineligible before submission",
+        "reducer1": "SUPPRESSED",
+        "requestId": "d2f458a7-c106-8216-938e-665fa5b6d380",
+        "scope": "sess-merge t1 superseded",
+        "upgraded": "SUPPRESSED"
+      },
+      {
+        "attentionId": "3e47b2b0-a74f-827a-97d8-ce9cae31767e",
+        "detail": null,
+        "reducer1": null,
+        "requestId": "e976fef2-0ab9-86de-86e5-5eb61c2cadc1",
+        "scope": "sess-merge t1 episode 1",
+        "upgraded": "HELD"
+      }
+    ],
+    "precision": "Five outbox rows existed in reducer 1. The sixth expected final request is newly derived HELD for an existing attention item. All six final mappings are identical to the accepted remediation-3 evidence.",
+    "checkpointTailAndUnorderedPairByteIdenticalToRemediation3": true
+  },
+  "independentExecution": "evidence/M1/acceptance/execution.json",
+  "retainedQualification": {
+    "source": "80df8b09c04c13c7b527d8913eb890858da3a606",
+    "record": "evidence/M1/remediation-4/test-runs.txt",
+    "workspaceSuites": 53,
+    "workspacePassed": 440,
+    "workspaceFailed": 0,
+    "clippyWarningsOrErrors": 0,
+    "schemaPassed": 3,
+    "vitestPassed": 43,
+    "recordType": "Audited implementation-run summary, not complete broad-suite raw stdout or independently rerun broad qualification."
+  },
+  "retainedNativeBuilds": {
+    "c04": "73636ec2482313f3507f32b378fb64cd3ef082de",
+    "m0b": "5944c81228f163e2583a8418369450ba5f1a0829",
+    "newNativeExecution": false
+  },
+  "transaction": {
+    "mechanism": "Existing IMMEDIATE transaction writes projections and REDUCER_UPGRADE checkpoint, followed by one commit. Decode refusal precedes upgrade persistence.",
+    "malformedPrecommitCasesExecuted": [
+      "TEXT",
+      "REAL",
+      "BLOB"
+    ],
+    "failurePreservation": "Logical non-checkpoint rows and reducer-1 checkpoint records unchanged; physical database/WAL byte identity is not claimed.",
+    "midUpgradeTransactionCrashInjected": false,
+    "unchangedAcceptedTransactionEvidenceSufficient": true
+  },
+  "decisions": {
+    "D-0007": "ACCEPTED with all existing scoped limitations",
+    "D-0008": "ACCEPTED and version-scoped, unchanged"
+  },
+  "futureObligationsPreserved": [
+    "M2",
+    "M5",
+    "M6",
+    "M13",
+    "M15"
+  ],
+  "mergeRecommendation": "SAFE TO FAST-FORWARD M1 INTO MAIN",
+  "branch": "m1",
+  "m1Merged": false,
+  "m2Authorized": true,
+  "m2Started": false,
+  "ownerStoreAccessed": false,
+  "appInstalled": false,
+  "nextStep": "Fast-forward the final accepted M1 SHA into main; verify integration and retire completed branches/worktrees; separately install reducer 2 with a verified pre-upgrade backup and post-upgrade checks before starting M2.",
+  "acceptanceMetadataScope": "The commit containing this record changes documentation and evidence only; it does not change application source, focused tests, fixtures, dependency locks, or toolchain.",
+  "manifestRegeneration": "The unchanged composer produces candidate evidence only. Regeneration cannot grant or carry forward this independent acceptance."
+}
