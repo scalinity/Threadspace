@@ -9,12 +9,13 @@ set -u
 out=${1:?usage: d0008-guard.sh <evidence dir>}
 root=$(git rev-parse --show-toplevel)
 mkdir -p "$out"
-work=$(mktemp -d "${TMPDIR:-/tmp}/d0008-negative.XXXXXX")
+work=$(cd "$(mktemp -d "${TMPDIR:-/tmp}/d0008-negative.XXXXXX")" && pwd -P)
 trap 'rm -rf "$work"' EXIT
 
 head=$(git -C "$root" rev-parse HEAD)
-(cd "$root" && cargo build -p threadspace-desktop) >"$out/positive.log" 2>&1
+(cd "$root" && cargo build -p threadspace-desktop) >"$work/positive.log" 2>&1
 positive=$?
+sed -e "s|$root|<repo>|g" -e "s|$HOME|~|g" "$work/positive.log" >"$out/positive.log"
 
 mkdir -p "$work/src"
 git -C "$root" archive HEAD | tar -x -C "$work/src"
