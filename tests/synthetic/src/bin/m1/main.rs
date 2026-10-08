@@ -10,6 +10,7 @@
 //! threadspace-m1 crash                    # 100 commit/ACK crash injections
 //! threadspace-m1 capture <hook> [runs]    # native capture timing + fail-open + saturation
 //! threadspace-m1 migration                # M0 store upgrade, future-schema refusal
+//! threadspace-m1 sanitization <hook>      # planted secrets through hook, journal and spool
 //! threadspace-m1 contracts                # versions, digests, schema validation
 //! threadspace-m1 verify <journal.jsonl>   # replay a journal export from genesis
 //! ```
@@ -21,6 +22,7 @@ mod evidence;
 mod migration;
 mod permutations;
 mod replay;
+mod sanitization;
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -61,9 +63,13 @@ fn main() -> ExitCode {
                 capture::measure(&root, Path::new(hook), runs)
             }
             Some("migration") => migration::run(&repo, &root),
+            Some("sanitization") => {
+                let hook = args.get(2).ok_or("sanitization <hook executable>")?;
+                sanitization::run(&root, Path::new(hook))
+            }
             Some("contracts") => contracts::run(&repo, &root),
             Some("verify") => replay::verify(Path::new(args.get(2).ok_or("verify <journal.jsonl>")?)),
-            _ => Err("usage: threadspace-m1 fixtures|replay|permutations|crash|capture|migration|contracts|verify".into()),
+            _ => Err("usage: threadspace-m1 fixtures|replay|permutations|crash|capture|migration|sanitization|contracts|verify".into()),
         }
     })();
     match result {

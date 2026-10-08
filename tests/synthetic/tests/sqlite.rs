@@ -203,3 +203,59 @@ fn preserved_failing_seeds_now_keep_tables_equal_to_state_at_every_step() {
         assert!(report.violations.is_empty(), "{name} seed {seed}: {:?}", report.violations);
     }
 }
+
+/// Ingest cursors are local commit positions: a jump in them is not
+/// provider event loss, a completion or an invalidation, and raises nothing.
+/// A source-sequence gap is a coverage gap of that source epoch only.
+#[test]
+fn ingest_cursor_gaps_raise_nothing_and_source_gaps_stay_scoped() {
+    use threadspace_synthetic::builder::{Builder, session};
+    let store = TempStore::new("cursor-gap");
+    let path = store.journal_path();
+    let mut sqlite = SqliteRunner::open(store, 21).expect("open");
+    let mut b = Builder::new("cursor-gap", "snapshot-live");
+    let s = session("claude-like", "sess-cursor");
+    b.obs(Some(&s), "session.start").push();
+    b.obs(Some(&s), "turn.start").turn("t1").push();
+    // Inventory source: sequences 1, 2 then 4 (3 missing).
+    for (sequence, present) in [(1, true), (2, true), (4, true)] {
+        b.obs(Some(&s), "inventory.row")
+            .source("synthetic.inventory", "inv-epoch-1")
+            .sequence(sequence)
+            .payload(serde_json::json!({ "present": present, "row": null, "interval": { "startMs": 1, "endMs": 2 } }))
+            .push();
+    }
+    b.obs(Some(&s), "turn.step").turn("t1").push();
+    let scenario = b.build(|_| Ok(()));
+    let steps: Vec<usize> = (0..scenario.steps.len()).collect();
+    let (first, rest) = steps.split_at(3);
+    run(&scenario, first, &mut sqlite);
+    let before = sqlite.state().clone();
+    // Open a 1,000-position hole in the local ingest cursor while closed.
+    let restarted = {
+        let SqliteRunner { journal, store, .. } = sqlite;
+        drop(journal);
+        let conn = rusqlite::Connection::open(&path).expect("raw");
+        conn.execute("UPDATE sqlite_sequence SET seq = seq + 1000 WHERE name = 'observations'", []).expect("hole");
+        drop(conn);
+        SqliteRunner::open(store, 22).expect("reopen")
+    };
+    let mut sqlite = restarted;
+    assert_eq!(state_hash(sqlite.state()), state_hash(&before), "a cursor hole changes nothing at restart");
+    run(&scenario, rest, &mut sqlite);
+    let state = sqlite.state();
+    let cursors: Vec<i64> = sqlite.journal.journal_entries(0).expect("entries").iter().map(|e| e.cursor).collect();
+    assert!(cursors.windows(2).any(|w| w[1] - w[0] > 1000), "the hole is real: {cursors:?}");
+    // No diagnostic, gap fact, completion or invalidation from the hole.
+    assert!(sqlite.journal.admission_diagnostics(50).expect("diag").is_empty());
+    let turn = state.turns.values().next().expect("turn");
+    assert_eq!(serde_json::to_value(&turn.state).expect("json"), "WORKING");
+    // The inventory source's own gap is recorded for that source only.
+    let gaps: Vec<_> = state.coverage.values().filter(|c| !c.gaps.is_empty()).collect();
+    assert_eq!(gaps.len(), 1, "one source epoch has a gap");
+    assert_eq!(gaps[0].source_id, "synthetic.inventory");
+    assert_eq!((gaps[0].gaps[0].first.as_str(), gaps[0].gaps[0].last.as_str()), ("3", "3"));
+    let digest = sqlite.journal.replay_digest().expect("digest");
+    assert_eq!(digest.projection_sha256, digest.tables_sha256);
+    assert_eq!(state_hash(&sqlite.journal.replay_from_genesis().expect("genesis")), state_hash(state));
+}
