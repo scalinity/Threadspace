@@ -339,8 +339,12 @@ fn free_window_device_on_close<R: Runtime>(window: &tauri::WebviewWindow<R>) {
             // SAFETY: the live view's window, borrowed on the main thread for
             // this call only.
             if let Some(ns_window) = unsafe { webview.ns_window().cast::<AnyObject>().as_ref() } {
-                // SAFETY: NSWindow's `oneShot` setter, on the main thread.
-                let () = unsafe { msg_send![ns_window, setOneShot: true] };
+                // SAFETY: NSWindow's `oneShot` setter and `orderOut:`, on the
+                // main thread.
+                unsafe {
+                    let () = msg_send![ns_window, setOneShot: true];
+                    let () = msg_send![ns_window, orderOut: std::ptr::null::<AnyObject>()];
+                }
             }
         }
         let _ = done.send(());
@@ -457,17 +461,27 @@ mod shells {
                 .map(|r| {
                     let window = r.window.load();
                     // Includes this probe's own reference.
-                    let retain_count = window.as_ref().map(|window| {
-                        // SAFETY: NSObject's retainCount, on a live object.
-                        let count: usize = unsafe { msg_send![&**window, retainCount] };
-                        count
+                    // Retain count (including this probe's own reference),
+                    // current window number (at most 0 once the window
+                    // device is freed) and `oneShot`, while it is alive.
+                    let now = window.as_ref().map(|window| {
+                        // SAFETY: NSObject/NSWindow getters on a live window,
+                        // on the main thread.
+                        unsafe {
+                            let count: usize = msg_send![&**window, retainCount];
+                            let number: isize = msg_send![&**window, windowNumber];
+                            let one_shot: bool = msg_send![&**window, isOneShot];
+                            (count, number, one_shot)
+                        }
                     });
                     json!({
                         "incarnation": r.incarnation,
                         "windowNumber": r.number,
                         "windowAlive": window.is_some(),
                         "windowRetainCountLive": r.retain_count_live,
-                        "windowRetainCount": retain_count,
+                        "windowRetainCount": now.map(|n| n.0),
+                        "windowNumberNow": now.map(|n| n.1),
+                        "oneShot": now.map(|n| n.2),
                         "delegateAlive": alive(r.delegate.as_ref()),
                         "contentViewAlive": alive(r.content_view.as_ref()),
                         "webviewAlive": alive(r.webview.as_ref()),
