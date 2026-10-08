@@ -541,37 +541,26 @@ fn keep_web_focus<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
 
 #[cfg(test)]
 mod tests {
+    include!("../d0008_guard.rs");
+
     /// `release_window_on_close` balances a reference tao 0.37.0 never
-    /// releases (D-0008). A Tauri, tao or Wry other than the qualified set
-    /// fails here: remove the workaround and requalify the view-recovery
-    /// shell gate without it before changing this list.
+    /// releases (D-0008). `build.rs` refuses every build on any other Tauri,
+    /// tao or Wry; this repeats its check as defence in depth, and shows the
+    /// check refuses a moved tao.
     #[test]
     fn window_dependencies_are_the_ones_d0008_qualified() {
-        let lock =
-            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../Cargo.lock"))
-                .unwrap_or_default();
-        let versions = |name: &str| -> Vec<String> {
-            lock.split("[[package]]")
-                .filter(|package| package.contains(&format!("\nname = \"{name}\"\n")))
-                .filter_map(|package| {
-                    package
-                        .lines()
-                        .find_map(|line| line.strip_prefix("version = "))
-                        .map(|v| v.trim_matches('"').to_owned())
-                })
-                .collect()
-        };
-        for (name, qualified) in [
-            ("tao", "0.37.0"),
-            ("wry", "0.57.0"),
-            ("tauri", "3.0.0-alpha.4"),
-            ("tauri-runtime-wry", "3.0.0-alpha.4"),
-        ] {
-            assert_eq!(
-                versions(name),
-                [qualified],
-                "{name} moved: remove the D-0008 workaround and requalify C-04 without it first"
-            );
+        let lockfile = d0008_lockfile(env!("CARGO_MANIFEST_DIR"));
+        if let Err(refusal) = d0008_guard(&lockfile) {
+            panic!("{refusal}");
         }
+        let lock = std::fs::read_to_string(&lockfile).unwrap_or_default();
+        let moved = lock.replace(
+            "name = \"tao\"\nversion = \"0.37.0\"",
+            "name = \"tao\"\nversion = \"0.37.1\"",
+        );
+        assert_ne!(moved, lock);
+        assert!(
+            d0008_moved(&moved).is_some_and(|m| m.starts_with("tao resolves to [\"0.37.1 from "))
+        );
     }
 }

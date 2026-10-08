@@ -3,6 +3,7 @@
 //! qualification commands as native intents and reads back the reports the
 //! view records natively, the companion log and the desktop shell log.
 
+use std::collections::BTreeSet;
 use std::io::{Read, Write};
 use std::net::TcpListener;
 use std::time::{Duration, Instant};
@@ -617,6 +618,68 @@ fn footprint_slope(samples: &[Value]) -> Option<f64> {
     Some(num / den)
 }
 
+/// C-04's native oracle over a run's `recoveries` recovery cases (the
+/// bootstrap case excluded). Each case names the office incarnation its
+/// recovery retired (`OFFICE_VIEW_RECOVERED`), all distinct. The desktop's
+/// qualification-only `OFFICE_NATIVE_WINDOWS` account read in the last case,
+/// logged after that case's recovery, must list exactly those incarnations,
+/// one entry each, with the window, its delegate, its content view and the
+/// web view each reported and released (`false`). Absent or null data fails:
+/// it is never read as no survivors.
+fn retired_native_released(cases: &[Value], recoveries: usize) -> Value {
+    const RELEASED: [&str; 4] = [
+        "windowAlive",
+        "delegateAlive",
+        "contentViewAlive",
+        "webviewAlive",
+    ];
+    let named: Vec<Option<&str>> = cases
+        .iter()
+        .map(|c| c["recovered"]["detail"]["retiredIncarnation"].as_str())
+        .collect();
+    let expected: BTreeSet<&str> = named.iter().flatten().copied().collect();
+    let report = cases.last().map_or(&Value::Null, |c| &c["nativeWindows"]);
+    let retired = report["retired"].as_array();
+    let entries = retired.map_or(&[][..], Vec::as_slice);
+    let observed: BTreeSet<&str> = entries
+        .iter()
+        .filter_map(|r| r["incarnation"].as_str())
+        .collect();
+    let unreleased: Vec<&Value> = entries
+        .iter()
+        .filter(|r| {
+            !RELEASED
+                .iter()
+                .all(|flag| r[*flag].as_bool() == Some(false))
+        })
+        .map(|r| &r["incarnation"])
+        .collect();
+    let alive = |flag: &str| entries.iter().filter(|r| r[flag] == true).count();
+    let pass = named.len() == recoveries
+        && expected.len() == recoveries
+        && retired.is_some()
+        && observed.len() == entries.len()
+        && observed == expected
+        && unreleased.is_empty()
+        && report["afterRecoveryOf"]
+            .as_str()
+            .is_some_and(|after| named.last() == Some(&Some(after)));
+    json!({
+        "recoveries": recoveries,
+        "retiredIncarnations": named.iter().flatten().count(),
+        "afterRecoveryOf": report["afterRecoveryOf"],
+        "retired": retired.map(Vec::len),
+        "missing": expected.difference(&observed).collect::<Vec<_>>(),
+        "extra": observed.difference(&expected).collect::<Vec<_>>(),
+        "unreleased": unreleased,
+        "windowsAlive": alive("windowAlive"),
+        "delegatesAlive": alive("delegateAlive"),
+        "contentViewsAlive": alive("contentViewAlive"),
+        "webviewsAlive": alive("webviewAlive"),
+        "pass": pass,
+    })
+}
+
 /// One sample of the UI's native resources: office windows (shells and the
 /// live view), every layer-0 window, the WebContent processes serving it and
 /// its physical footprint.
@@ -798,21 +861,11 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let shells_pass = same_ui
         && matches!((&before, &after), (Some(b), Some(a))
             if measured(b) && measured(a) && a["count"] == b["count"]);
-    // The desktop's own account after the last recovery, when it gives one.
-    let retired_native = cases
-        .iter()
-        .rev()
-        .find_map(|c| c["nativeWindows"]["retired"].as_array())
-        .map(|retired| {
-            let alive = |key: &str| retired.iter().filter(|r| r[key] == true).count();
-            json!({
-                "retired": retired.len(),
-                "windowsAlive": alive("windowAlive"),
-                "delegatesAlive": alive("delegateAlive"),
-                "contentViewsAlive": alive("contentViewAlive"),
-                "webviewsAlive": alive("webviewAlive"),
-            })
-        });
+    // The desktop's own account after the last recovery (the three single
+    // recoveries above and the repeats): every retired office window's native
+    // objects released, which the window-server count alone cannot show.
+    let retired_native = retired_native_released(&cases, 3 + repeats as usize);
+    let retired_pass = retired_native["pass"] == true;
     let window_shells = json!({
         "uiPid": ui_pid,
         "retiredNative": retired_native,
@@ -872,7 +925,8 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             "pass": suite_ok && probe_refused,
         },
     });
-    let c04_pass = shells_pass && resources_pass && office_pass && intents_pass && suite_ok && probe_refused;
+    let c04_pass =
+        shells_pass && retired_pass && resources_pass && office_pass && intents_pass && suite_ok && probe_refused;
     let delays: Vec<Value> = cases
         .iter()
         .filter_map(|c| {
@@ -937,7 +991,99 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
+    use serde_json::{Value, json};
+
+    /// A retained view-recovery run's recovery cases (bootstrap excluded).
+    fn recovery_cases(run: &str) -> Vec<Value> {
+        let path = format!(
+            "{}/../../../evidence/M1/{run}/cases.jsonl",
+            env!("CARGO_MANIFEST_DIR")
+        );
+        std::fs::read_to_string(&path)
+            .expect("retained evidence run")
+            .lines()
+            .map(|line| serde_json::from_str::<Value>(line).expect("case record"))
+            .filter(|case| case["case"] != "bootstrap-with-companion-unavailable")
+            .collect()
+    }
+
+    /// The last recovery case, which carries the final account.
+    fn last(cases: &mut [Value]) -> &mut Value {
+        cases.last_mut().expect("a recovery case")
+    }
+
+    /// The final account's retired entries.
+    fn retired(cases: &mut [Value]) -> &mut Vec<Value> {
+        last(cases)["nativeWindows"]["retired"]
+            .as_array_mut()
+            .expect("retired entries")
+    }
+
+    /// The accepted run (three single recoveries and 60 repeats) passes;
+    /// every mutation of its retirement data fails.
+    #[test]
+    fn retired_native_objects_are_a_hard_c04_oracle() {
+        let accepted = recovery_cases("view-recovery/20261008T015231Z-prod");
+        assert_eq!(accepted.len(), 63);
+        let verdict = super::retired_native_released(&accepted, 63);
+        assert_eq!(verdict["pass"], true, "{verdict}");
+        assert_eq!(verdict["retired"], 63);
+
+        // (mutation, recoveries expected, change to the accepted cases)
+        type Mutation = (&'static str, usize, fn(&mut [Value]));
+        let mutations: [Mutation; 12] = [
+            ("account deleted", 63, |c| {
+                last(c)["nativeWindows"] = Value::Null;
+            }),
+            ("retired entries deleted", 63, |c| {
+                last(c)["nativeWindows"]["retired"] = Value::Null;
+            }),
+            ("no account in any case", 63, |c| {
+                c.iter_mut().for_each(|c| c["nativeWindows"] = Value::Null);
+            }),
+            ("one retired window alive", 63, |c| {
+                retired(c)[17]["windowAlive"] = json!(true);
+            }),
+            ("one flag unreported", 63, |c| {
+                retired(c)[17]["delegateAlive"] = Value::Null;
+            }),
+            ("one more recovery expected", 64, |_| {}),
+            ("one fewer recovery expected", 62, |_| {}),
+            ("one recovery names no incarnation", 63, |c| {
+                c[5]["recovered"]["detail"]["retiredIncarnation"] = Value::Null;
+            }),
+            ("one incarnation omitted", 63, |c| {
+                retired(c).remove(5);
+            }),
+            ("one incarnation listed twice", 63, |c| {
+                let again = retired(c)[5].clone();
+                retired(c).push(again);
+            }),
+            ("one foreign incarnation", 63, |c| {
+                retired(c)[5]["incarnation"] = json!("00000000-0000-0000-0000-000000000000");
+            }),
+            ("account logged before the last recovery", 63, |c| {
+                let earlier = c[c.len() - 2]["recovered"]["detail"]["retiredIncarnation"].clone();
+                last(c)["nativeWindows"]["afterRecoveryOf"] = earlier;
+            }),
+        ];
+        for (mutation, recoveries, mutate) in mutations {
+            let mut cases = accepted.clone();
+            mutate(&mut cases);
+            let verdict = super::retired_native_released(&cases, recoveries);
+            assert_eq!(verdict["pass"], false, "{mutation} must fail: {verdict}");
+        }
+    }
+
+    /// The retained run that kept every retired window alive (before the
+    /// D-0008 containment) fails the oracle on its own data.
+    #[test]
+    fn retired_native_oracle_fails_the_leaking_run() {
+        let leaking = recovery_cases("c04/20261007T233730Z-diagnostic");
+        let verdict = super::retired_native_released(&leaking, leaking.len());
+        assert_eq!(verdict["pass"], false, "{verdict}");
+        assert_eq!(verdict["windowsAlive"], 8);
+    }
 
     #[test]
     fn footprint_slope_is_the_least_squares_trend_per_sample() {
