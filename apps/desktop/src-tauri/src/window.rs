@@ -342,8 +342,9 @@ pub fn recover<R: Runtime>(
 // any Tauri, tao or Wry update, remove this call first and requalify the
 // view-recovery shell gate without it on the new dependency; restore it only
 // if that gate shows the leak again, under a new decision.
-// `tests::window_dependencies_are_the_ones_d0008_qualified` fails the build
-// when any of them moves.
+// `build.rs` (`d0008_guard.rs`) refuses every build of this crate when any
+// of them moves; `tests::window_dependencies_are_the_ones_d0008_qualified`
+// checks the same set again.
 // ======================================================================
 
 /// Has AppKit release the retiring office window once, when it closes
