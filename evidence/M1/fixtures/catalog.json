@@ -320,7 +320,87 @@
       "scenario": "sensitive-payload",
       "sha256": "7a6495993de38cbf21434195719cf0bdd532773a530da4a562a6d9be09881ccf",
       "steps": 3
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-partial-coverage.jsonl",
+      "observations": 5,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-partial-coverage",
+      "sha256": "97d6e402c4dd65bdb50dfea53f8692059123c9b9114426e22913ac5bedb6b247",
+      "steps": 6
+    },
+    {
+      "deliveryConstraints": 2,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-merge-keeps-coverage.jsonl",
+      "observations": 6,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-merge-keeps-coverage",
+      "sha256": "20c0657f2744effa6c2da130c8ad7fc193a8a46732a7addfa0238b78e73bcb55",
+      "steps": 7
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-covered-p.jsonl",
+      "observations": 5,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-covered-p",
+      "sha256": "0689744ccb765f3efa77970d270ea189aa78d915743e82a496cd9f9fee9d8092",
+      "steps": 6
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-covered-q.jsonl",
+      "observations": 5,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-covered-q",
+      "sha256": "6bde9838b6d7eb3bd3db8497d5f60fc3fe730af26452a9bb49c778822b6d9b43",
+      "steps": 6
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-covers-both.jsonl",
+      "observations": 5,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-covers-both",
+      "sha256": "c6f53220b09c410ba959e17126fe65b3952e495d4b839f6bce4539140f18e9e9",
+      "steps": 6
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-scopes.jsonl",
+      "observations": 6,
+      "ownerCommands": 2,
+      "scenario": "wait-owner-scopes",
+      "sha256": "bf8fd0b8d3942d66261b62990e917c800f74fe3ac613d30d73c6c653dacaf6af",
+      "steps": 8
+    },
+    {
+      "deliveryConstraints": 7,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-partial-actions.jsonl",
+      "observations": 9,
+      "ownerCommands": 2,
+      "scenario": "wait-owner-partial-actions",
+      "sha256": "e22b175e37c9d07dafa7bf8cda34afdf30463786b5c9fcb3c97a8305c27092bb",
+      "steps": 11
+    },
+    {
+      "deliveryConstraints": 3,
+      "family": "wait-events",
+      "file": "fixtures/m1/wait-owner-unordered-coverage.jsonl",
+      "observations": 5,
+      "ownerCommands": 1,
+      "scenario": "wait-owner-unordered-coverage",
+      "sha256": "5ecbae47c85f0f50637c32607b75fd3bb60be43c6b707a39fb807623263947ee",
+      "steps": 6
     }
   ],
-  "scenarios": 32
+  "scenarios": 40
 }

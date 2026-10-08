@@ -1,12 +1,12 @@
 {
   "area": "permutations",
-  "durationMs": 13264,
+  "durationMs": 26526,
   "failures": 0,
   "families": {
     "activation-changes": {
-      "duplicateDeliveriesInjected": 1203,
+      "duplicateDeliveriesInjected": 2498,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "resume",
         "pid-tty-reuse",
@@ -20,44 +20,44 @@
         {
           "from": 9000000,
           "scenario": "resume",
-          "to": 9000178
+          "to": 9000357
         },
         {
           "from": 9100000,
           "scenario": "pid-tty-reuse",
-          "to": 9100178
+          "to": 9100356
         },
         {
           "from": 9200000,
           "scenario": "executable-replaced",
-          "to": 9200178
+          "to": 9200356
         },
         {
           "from": 9300000,
           "scenario": "replaced-then-unordered-image",
-          "to": 9300178
+          "to": 9300356
         },
         {
           "from": 9400000,
           "scenario": "executable-requalified",
-          "to": 9400177
+          "to": 9400356
         },
         {
           "from": 9500000,
           "scenario": "routing-ambiguity",
-          "to": 9500177
+          "to": 9500356
         },
         {
           "from": 9600000,
           "scenario": "execution-end-retained",
-          "to": 9600177
+          "to": 9600356
         }
       ]
     },
     "actor-events": {
-      "duplicateDeliveriesInjected": 1232,
+      "duplicateDeliveriesInjected": 2541,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "child-actors",
         "shared-native-turn-id"
@@ -66,19 +66,19 @@
         {
           "from": 1500000,
           "scenario": "child-actors",
-          "to": 1500624
+          "to": 1501249
         },
         {
           "from": 1600000,
           "scenario": "shared-native-turn-id",
-          "to": 1600624
+          "to": 1601249
         }
       ]
     },
     "completion": {
-      "duplicateDeliveriesInjected": 1264,
+      "duplicateDeliveriesInjected": 2532,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "normal-session",
         "parallel-tools",
@@ -89,29 +89,29 @@
         {
           "from": 3000000,
           "scenario": "normal-session",
-          "to": 3000312
+          "to": 3000624
         },
         {
           "from": 3100000,
           "scenario": "parallel-tools",
-          "to": 3100312
+          "to": 3100624
         },
         {
           "from": 3200000,
           "scenario": "outcomes",
-          "to": 3200311
+          "to": 3200624
         },
         {
           "from": 3300000,
           "scenario": "latest-turn-outcome",
-          "to": 3300311
+          "to": 3300624
         }
       ]
     },
     "delayed-callbacks": {
-      "duplicateDeliveriesInjected": 1292,
+      "duplicateDeliveriesInjected": 2560,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "a-b-a-delayed"
       ],
@@ -119,7 +119,7 @@
         {
           "from": 6700000,
           "scenario": "a-b-a-delayed",
-          "to": 6701249
+          "to": 6702499
         }
       ]
     },
@@ -139,9 +139,9 @@
       ]
     },
     "output-input": {
-      "duplicateDeliveriesInjected": 1197,
+      "duplicateDeliveriesInjected": 2430,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "followup-witnessed",
         "followup-claude"
@@ -150,19 +150,19 @@
         {
           "from": 1700000,
           "scenario": "followup-witnessed",
-          "to": 1700624
+          "to": 1701249
         },
         {
           "from": 1800000,
           "scenario": "followup-claude",
-          "to": 1800624
+          "to": 1801249
         }
       ]
     },
     "owner-commands": {
-      "duplicateDeliveriesInjected": 1247,
+      "duplicateDeliveriesInjected": 2457,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "owner-commands"
       ],
@@ -170,7 +170,7 @@
         {
           "from": 6900000,
           "scenario": "owner-commands",
-          "to": 6901249
+          "to": 6902499
         }
       ]
     },
@@ -196,9 +196,9 @@
       ]
     },
     "snapshot-live": {
-      "duplicateDeliveriesInjected": 1259,
+      "duplicateDeliveriesInjected": 2479,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "stale-snapshot",
         "dropped-observation"
@@ -207,19 +207,19 @@
         {
           "from": 8800000,
           "scenario": "stale-snapshot",
-          "to": 8800624
+          "to": 8801249
         },
         {
           "from": 8900000,
           "scenario": "dropped-observation",
-          "to": 8900624
+          "to": 8901249
         }
       ]
     },
     "wait-events": {
-      "duplicateDeliveriesInjected": 1199,
+      "duplicateDeliveriesInjected": 2459,
       "failures": 0,
-      "permutations": 1250,
+      "permutations": 2500,
       "scenarios": [
         "waiting",
         "delayed-positive-wait",
@@ -230,66 +230,114 @@
         "wait-new-after-resolution",
         "wait-turn-ownership",
         "wait-session-scoped",
-        "wait-generations"
+        "wait-generations",
+        "wait-owner-partial-coverage",
+        "wait-owner-merge-keeps-coverage",
+        "wait-owner-covered-p",
+        "wait-owner-covered-q",
+        "wait-owner-covers-both",
+        "wait-owner-scopes",
+        "wait-owner-partial-actions",
+        "wait-owner-unordered-coverage"
       ],
       "seedRanges": [
         {
           "from": 2700000,
           "scenario": "waiting",
-          "to": 2700124
+          "to": 2700138
         },
         {
           "from": 2800000,
           "scenario": "delayed-positive-wait",
-          "to": 2800124
+          "to": 2800138
         },
         {
           "from": 2900000,
           "scenario": "delayed-clear-wait",
-          "to": 2900124
+          "to": 2900138
         },
         {
           "from": 3000000,
           "scenario": "wait-reappears",
-          "to": 3000124
+          "to": 3000138
         },
         {
           "from": 3100000,
           "scenario": "wait-uncertain-reopens",
-          "to": 3100124
+          "to": 3100138
         },
         {
           "from": 3200000,
           "scenario": "wait-owner-resolution-kept",
-          "to": 3200124
+          "to": 3200138
         },
         {
           "from": 3300000,
           "scenario": "wait-new-after-resolution",
-          "to": 3300124
+          "to": 3300138
         },
         {
           "from": 3400000,
           "scenario": "wait-turn-ownership",
-          "to": 3400124
+          "to": 3400138
         },
         {
           "from": 3500000,
           "scenario": "wait-session-scoped",
-          "to": 3500124
+          "to": 3500138
         },
         {
           "from": 3600000,
           "scenario": "wait-generations",
-          "to": 3600124
+          "to": 3600138
+        },
+        {
+          "from": 5200000,
+          "scenario": "wait-owner-partial-coverage",
+          "to": 5200138
+        },
+        {
+          "from": 5300000,
+          "scenario": "wait-owner-merge-keeps-coverage",
+          "to": 5300138
+        },
+        {
+          "from": 5400000,
+          "scenario": "wait-owner-covered-p",
+          "to": 5400138
+        },
+        {
+          "from": 5500000,
+          "scenario": "wait-owner-covered-q",
+          "to": 5500138
+        },
+        {
+          "from": 5600000,
+          "scenario": "wait-owner-covers-both",
+          "to": 5600138
+        },
+        {
+          "from": 5700000,
+          "scenario": "wait-owner-scopes",
+          "to": 5700138
+        },
+        {
+          "from": 5800000,
+          "scenario": "wait-owner-partial-actions",
+          "to": 5800137
+        },
+        {
+          "from": 5900000,
+          "scenario": "wait-owner-unordered-coverage",
+          "to": 5900137
         }
       ]
     }
   },
   "pass": true,
-  "requestedRequiredPermutations": 10000,
-  "requiredFamilyPermutations": 10000,
+  "requestedRequiredPermutations": 20000,
+  "requiredFamilyPermutations": 20000,
   "seedScheme": "seed = familyIndex * 1000000 + scenarioIndex * 100000 + index; duplicates injected when Rng(seed ^ 0xD0D0D0D0) draws 1/2",
-  "sqliteCrossChecks": 1040,
-  "totalPermutations": 10400
+  "sqliteCrossChecks": 2040,
+  "totalPermutations": 20400
 }
