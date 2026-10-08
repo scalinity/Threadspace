@@ -231,7 +231,7 @@ Render one simple worker from canonical view state and provide an explicit Retur
 
 **Required evidence/artifacts.** Uncut native vertical-slice recording; redacted hook/mod/inventory trace joined to journal IDs; install diff/rollback; tab readbacks; native outcome and acceptance fixtures; route timings.
 
-**Exit gate.** A normal manually launched Claude session is discovered, works, completes while staying present, accepts follow-up as the same worker, and returns to its freshly verified original surface.
+**Exit gate.** A normal manually launched Claude session is discovered, works, completes while staying present, accepts follow-up as the same worker, and returns to its freshly verified original surface. The three fields [D-0007 §10](decisions/D-0007-m1-canonical-engine.md) leaves as last-observation become evidence sets before any M2 producer can emit competing observations of them: (1) an execution's attach mode and presence, once more than one attach observation or producer mode is possible; (2) the human follow-up frontier, once acceptance and rejection evidence can both exist for one input; (3) a session's observer link state, once a production observer reports it. Each needs adversarial reorder and duplicate scenarios in the seeded permutation campaign that converge in state and semantic hash; last-arrival-wins behaviour is not kept for any of them once conflicting valid observations can be emitted.
 
 ## M3 — Identity, reconciliation, same-cwd and resume
 

@@ -632,7 +632,7 @@ Exact replay of the same admitted journal/checkpoint reproduces recorded canonic
 
 Projection changes, attention changes, outbox entries and the applied journal cursor commit atomically. OS side effects run after commit and record their outcome separately. The reducer never calls provider controls, launches a model, or performs focus itself.
 
-The reducer keeps each record's evidence as sets (outcomes, end reasons, wait positives and clear barriers, resolution causes) and re-derives every displayed state from that evidence, so arrival order cannot decide a state that the evidence decides; an execution's attach mode/presence and the human follow-up frontier remain last-observation fields until M2 gives them more than one producer. Admission alone allocates identities for never-seen native keys and records them; records the reducer derives (attention items, wait episodes, outbox intents) take name-based UUIDs of their canonical scope. In the semantic comparison, presentation metadata includes display names, summaries, route records and surface status, the outbox is compared by its still-eligible intents, and a wait item whose episode a late, earlier clear emptied (resolved as superseded) is omitted. One row builder per record both writes and hashes the materialized projection, so the tables are checkable against the state at any time ([D-0007](decisions/D-0007-m1-canonical-engine.md)).
+The reducer keeps each record's evidence as sets (outcomes, end reasons, wait positives, clear barriers and owner decisions, resolution causes) and re-derives every displayed state from that evidence, so arrival order cannot decide a state that the evidence decides; an execution's attach mode/presence, the human follow-up frontier and a session's observer link state remain last-observation fields until M2, whose exit converts them to evidence sets before it adds competing producers. A wait with known turn identity belongs to that turn; a wait without it is session-scoped. Owner decisions on a wait item are kept with the evidence they were made on, so a late clear that repartitions episodes never reopens a condition the owner handled, and a new wait after a clear is not covered. The public read model shows the canonical session state. Admission alone allocates identities for never-seen native keys and records them; records the reducer derives (attention items, wait episodes, outbox intents) take name-based UUIDs of their canonical scope. In the semantic comparison, presentation metadata includes display names, summaries, route records and surface status, the outbox is compared by its currently eligible intents, a wait item whose episode a late, earlier clear emptied (resolved as superseded, holding no evidence or owner state) is omitted, and owner decisions are always compared by the evidence they govern. One row builder per record both writes and hashes the materialized projection, so the tables are checkable against the state at any time ([D-0007](decisions/D-0007-m1-canonical-engine.md)).
 
 
 ## 6. Lifecycle and presence semantics
@@ -866,12 +866,14 @@ Spool layout uses exclusive temporary files and atomic ready-file publication:
 
 ~~~text
 capture-spool/
-  pending/<observation-uuid>.tmp
-  ready/<observation-uuid>.json
+  quota.lock
+  pending/<observation-uuid>.<writer-nonce>.tmp
+  ready/<observation-uuid>.<bytes>.json
+  dropped/<observation-uuid>.<event-or-reason>
   quarantine/<reason>/<observation-uuid>.json
 ~~~
 
-Write a complete bounded record, flush according to the selected platform policy, close it, and atomically rename into ready. The reader ignores temporary/partial files. Normal replay removes a ready record only after a durable journal receipt. The explicit local-spool age/quota cleanup below is an exception for records not yet accepted by the companion: the expiry/coverage loss is journaled before the record leaves ready or a saturation marker is removed, and it is a loss, not successful delivery. A record the journal refuses on its own (`NOT_ACCEPTED`) moves to quarantine, so it cannot hold back the records around it. ACK loss safely causes duplicate transport delivery.
+Write a complete bounded record, flush according to the selected platform policy, close it, and atomically rename into ready. Each capture is its own process, so the bound check and the rename happen under one advisory `quota.lock` (`flock`) held only for the recount, the decision and the rename; the kernel releases it if its holder dies, so a killed publisher leaves no reservation. A publisher waits for it at most 50 ms of its 250 ms budget; one that cannot take it in time does not publish and leaves a `spoolbusy` loss marker. The record bound counts ready files; the byte bound counts their real sizes, never pending temporaries. The reader ignores temporary/partial files. Normal replay removes a ready record only after a durable journal receipt. The explicit local-spool age/quota cleanup below is an exception for records not yet accepted by the companion: the expiry/coverage loss is journaled before the record leaves ready or a saturation marker is removed, and it is a loss, not successful delivery. A record the journal refuses on its own (`NOT_ACCEPTED`) moves to quarantine, so it cannot hold back the records around it. ACK loss safely causes duplicate transport delivery.
 
 **Durability domains:**
 
@@ -984,7 +986,7 @@ Do not retain full transcripts. Store a provider transcript reference only where
 - On an incomplete migration, rollback or enter explicit recovery mode. Never start a second database under a different path and claim the original state was restored.
 - On corruption, preserve the original database and recover from the newest verified consistent SQLite backup plus retained journal/checkpoint evidence; a checkpoint stored only inside the corrupted database is not an independent backup. Report unrecovered coverage; do not synthesize successful histories.
 - Before a schema-changing update, use SQLite's consistent backup API (or a separately qualified consistent snapshot method), not a copy of the live main file alone, and record version compatibility. [SQLite backup][D_BACKUP]
-- Older binaries refuse a newer unsupported schema and leave capture spooling available.
+- Older binaries refuse a newer unsupported schema or reducer checkpoint and leave capture spooling available. The refusal writes nothing: a read-only preflight checks both before any pragma, migration or bootstrap write, reading a WAL-mode store's `-wal` without rebuilding its `-shm` and creating no sidecar. The one exception is SQLite rolling back a hot rollback journal, which restores the last committed bytes and is required before the store can be read at all.
 - A singleton writer lock and protocol handshake prevent old/new companions from writing concurrently.
 - UI reload is not a database restart.
 
