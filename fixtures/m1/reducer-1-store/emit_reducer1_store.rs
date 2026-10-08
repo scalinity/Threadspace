@@ -13,7 +13,11 @@
 //! `n` histories, writing the same history with one more checkpoint. With
 //! `REDUCER1_HISTORIES=unordered-pair` it writes `wait-owner-unordered-pair`
 //! instead: one owner decision over P3 and two positives without a causal
-//! point, which reducer 1 records as a flag.
+//! point, which reducer 1 records as a flag. With
+//! `REDUCER1_HISTORIES=resolved-at` it writes `wait-owner-resolved-at`: an
+//! owner Resolve over P3, then an uncovered P4 and a comparable clear C5;
+//! with `REDUCER1_CHECKPOINT_STEP=<n>` it also checkpoints after each
+//! history's first `n` steps.
 //!
 //! The histories are built with exactly the builder calls of the current
 //! catalog's `wait-owner-partial-coverage`, `wait-owner-merge-keeps-coverage`,
@@ -109,6 +113,19 @@ fn wait_owner_unordered_coverage() -> Scenario {
     b.build(|_| Ok(()))
 }
 
+fn wait_owner_resolved_at() -> Scenario {
+    let mut b = Builder::new("wait-owner-resolved-at", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-resolved-at");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p3 = input_wait(&mut b, &s, Some("t1"), 3, "POSITIVE");
+    let resolve = b.owner("cmd-resolve-p3", wait_target(&s, Some("t1"), 3), OwnerAction::Resolve { reason: "handled P3".into() }, &[p3]);
+    let p4 = input_wait(&mut b, &s, Some("t1"), 4, "POSITIVE");
+    input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    b.before(resolve, p4);
+    b.build(|_| Ok(()))
+}
+
 fn wait_owner_unordered_pair() -> Scenario {
     let mut b = Builder::new("wait-owner-unordered-pair", "wait-events");
     let s = session(CLAUDE_LIKE, "sess-unordered-pair");
@@ -126,9 +143,11 @@ fn wait_owner_unordered_pair() -> Scenario {
 fn emit() {
     let out = std::env::var("REDUCER1_OUT").expect("REDUCER1_OUT");
     let after: Option<usize> = std::env::var("REDUCER1_CHECKPOINT_AFTER").ok().map(|n| n.parse().expect("count"));
+    let step: Option<usize> = std::env::var("REDUCER1_CHECKPOINT_STEP").ok().map(|n| n.parse().expect("count"));
     let mut sqlite = SqliteRunner::open(TempStore::new("reducer1-emit"), 31).expect("open");
     let histories = match std::env::var("REDUCER1_HISTORIES").as_deref() {
         Ok("unordered-pair") => vec![wait_owner_unordered_pair()],
+        Ok("resolved-at") => vec![wait_owner_resolved_at()],
         _ => vec![
             wait_owner_partial_coverage(),
             wait_owner_merge_keeps_coverage(),
@@ -138,7 +157,15 @@ fn emit() {
     };
     for (done, scenario) in histories.into_iter().enumerate() {
         let order: Vec<usize> = (0..scenario.steps.len()).collect();
-        let report = run(&scenario, &order, &mut sqlite);
+        let report = match step {
+            Some(n) => {
+                let head = run(&scenario, &order[..n], &mut sqlite);
+                assert!(head.owner_failures.is_empty(), "{}: {:?}", scenario.name, head.owner_failures);
+                sqlite.journal.checkpoint("FIXTURE", VirtualClock::EPOCH_MS + 250_000).expect("checkpoint");
+                run(&scenario, &order[n..], &mut sqlite)
+            }
+            None => run(&scenario, &order, &mut sqlite),
+        };
         assert!(report.owner_failures.is_empty(), "{}: {:?}", scenario.name, report.owner_failures);
         if after == Some(done + 1) {
             sqlite.journal.checkpoint("FIXTURE", VirtualClock::EPOCH_MS + 500_000).expect("checkpoint");

@@ -14,9 +14,13 @@
 //! Each opens through the production path (`Journal::open_with`). The
 //! upgrade keeps the notification dispositions reducer 1 committed and holds
 //! eligibility it derives first: 1 PENDING, 4 HELD, 1 SUPPRESSED, asserted
-//! request by request, and the three upgraded states are identical. Writes
-//! each comparison into the directory in `THREADSPACE_WRITE_CHECKPOINT_TAIL`
-//! when set.
+//! request by request, and the three upgraded states are identical.
+//!
+//! `journal-resolved-at.sqlite3` holds six entries whose item reducer 1
+//! kept resolved at the owner's time, while this reducer reopens it and
+//! resolves it again later; it upgrades to the committed time with its
+//! newest checkpoint at cursor 6, 0 or 4. Writes each comparison into the
+//! directory in `THREADSPACE_WRITE_CHECKPOINT_TAIL` when set.
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -24,11 +28,13 @@ use std::path::{Path, PathBuf};
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::fact::Delivery;
 use threadspace_contracts::canonical::records::{CanonicalState, OutboxState};
-use threadspace_journal::EnvelopeAdmission;
+use threadspace_journal::{EnvelopeAdmission, Journal, JournalError};
 use threadspace_state_engine::REDUCER_VERSION;
 use threadspace_state_engine::hash::{sha256_hex, state_hash};
+use threadspace_state_engine::ids::SeededAllocator;
 use threadspace_state_engine::synthetic::normalize_envelope;
 use threadspace_synthetic::builder::{Builder, Step, session};
+use threadspace_synthetic::rng::VirtualClock;
 use threadspace_synthetic::runner::Admit;
 use threadspace_synthetic::scenarios::CLAUDE_LIKE;
 use threadspace_synthetic::sqlite::{SqliteRunner, TempStore};
@@ -421,4 +427,208 @@ fn a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint() {
     // Read as covering one of the two, the decision leaves the item
     // actionable: its suppressed intent re-arms, held.
     assert_eq!(x_report["outbox"], json!({ "HELD": 1 }));
+}
+
+/// Each attention item's committed resolution time, by its ID.
+fn resolution_rows(path: &Path) -> BTreeMap<String, Option<i64>> {
+    rusqlite::Connection::open(path)
+        .and_then(|c| {
+            c.prepare("SELECT id, resolved_at_ms FROM attention_items")?
+                .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+                .collect()
+        })
+        .expect("attention")
+}
+
+const RESOLVED_ITEM: &str = "663fb032-fef5-812b-9104-b15bd1135349";
+const OWNER_RESOLVED_AT: i64 = 1_791_000_000_040;
+
+/// Reducer 1 kept the item resolved at the owner's time (cursor 4) when P4,
+/// which the owner's Resolve over P3 never covered, arrived after it.
+/// Replaying the entries, this reducer reopens the item at P4 and C5
+/// resolves it again at cursor 6; the upgrade keeps the committed time,
+/// since the item is still resolved. `journal-resolved-at.sqlite3` holds
+/// the six entries with reducer-1 checkpoints through cursors 4 and 6:
+/// A keeps both, B removes both, C removes the cursor-6 one.
+#[test]
+fn a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits() {
+    let source = fixture("journal-resolved-at.sqlite3");
+    let committed = outbox_table(&source);
+    assert_eq!(resolution_rows(&source)[RESOLVED_ITEM], Some(OWNER_RESOLVED_AT), "reducer 1 kept the owner's time");
+    let a = copy(&source, "resolved-at-a");
+    let b = copy(&source, "resolved-at-b");
+    without_checkpoint_at(&b, 6);
+    without_checkpoint_at(&b, 4);
+    let c = copy(&source, "resolved-at-c");
+    without_checkpoint_at(&c, 6);
+    let history = history_sha256(&a.journal_path());
+    for (variant, store) in [("B", &b), ("C", &c)] {
+        assert_eq!(history_sha256(&store.journal_path()), history, "variant {variant} holds A's committed history");
+    }
+    let newest: Vec<Value> = [&a, &b, &c]
+        .iter()
+        .map(|s| {
+            let last = checkpoints(&s.journal_path()).last().cloned().expect("checkpoint");
+            json!([last["reducerVersion"], last["throughCursor"]])
+        })
+        .collect();
+    assert_eq!(newest, vec![json!([1, 6]), json!([1, 0]), json!([1, 4])], "newest reducer-1 checkpoints");
+
+    // Every variant's upgrade is recorded before anything is asserted.
+    let opened = [open("A", a, &committed), open("B", b, &committed), open("C", c, &committed)];
+    let base = serde_json::to_value(&opened[0].state).expect("state");
+    let mut variants = Vec::new();
+    for o in &opened {
+        let item = &o.state.attention[RESOLVED_ITEM];
+        let mut diff = Vec::new();
+        differences(&base, &serde_json::to_value(&o.state).expect("state"), "", &mut diff);
+        let mut report = o.report.clone();
+        report["resolvedAtMs"] = json!({
+            "state": item.resolved_at_ms,
+            "row": resolution_rows(&o.sqlite.store.journal_path())[RESOLVED_ITEM],
+        });
+        report["attention"] = json!({
+            "revision": item.revision,
+            "createdCursor": item.created_cursor,
+            "resolutions": item.resolutions,
+            "resolutionReason": item.resolution_reason,
+        });
+        report["ownerDecisions"] = json!(o.state.waits.values().flat_map(|w| &w.owner_decisions).collect::<Vec<_>>());
+        report["stateDifferencesFromA"] = json!(diff);
+        variants.push(report);
+    }
+    let mut report = json!({
+        "fixture": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3",
+        "reducer1": {
+            "resolvedAtMs": OWNER_RESOLVED_AT,
+            "outbox": counts(&committed),
+        },
+        "variants": variants,
+    });
+    write("resolved-at.json", &report);
+
+    for (i, o) in opened.iter().enumerate() {
+        let variant = o.variant;
+        let path = o.sqlite.store.journal_path();
+        assert_eq!(o.state.attention[RESOLVED_ITEM].resolved_at_ms, Some(OWNER_RESOLVED_AT), "variant {variant}: state");
+        assert_eq!(resolution_rows(&path)[RESOLVED_ITEM], Some(OWNER_RESOLVED_AT), "variant {variant}: row");
+        assert_eq!(report["variants"][i]["stateDifferencesFromA"], json!([]), "variant {variant}: state differs from A");
+        for digest in ["stateSha256", "projectionSha256", "tablesSha256", "semanticSha256"] {
+            assert_eq!(o.report["digest"][digest], opened[0].report["digest"][digest], "variant {variant}: {digest}");
+        }
+        assert_eq!(o.report["projectionDifferences"], 0, "variant {variant}: tables equal the state");
+        assert_eq!(o.report["ownerCommands"], json!([1, 1]), "variant {variant}: the owner command kept");
+        assert_eq!(o.report["attentionItems"], json!([1, 1]), "variant {variant}: no attention item added");
+        // The item is resolved, so its intent stays as reducer 1 left it.
+        assert_eq!(outbox_table(&path), committed, "variant {variant}: outbox as committed");
+        let decisions = &report["variants"][i]["ownerDecisions"];
+        assert_eq!(decisions.as_array().map(Vec::len), Some(1), "variant {variant}: one owner decision");
+        assert_eq!(decisions[0]["commandId"], "cmd-resolve-p3", "variant {variant}");
+        assert_eq!(decisions[0]["positives"].as_array().map(Vec::len), Some(1), "variant {variant}: covers P3 alone");
+        assert_eq!(decisions[0]["unordered"], 0, "variant {variant}");
+        let after = checkpoints(&path);
+        let upgrades: Vec<&Value> = after.iter().filter(|c| c["origin"] == "REDUCER_UPGRADE").collect();
+        assert_eq!(upgrades.len(), 1, "variant {variant}: one upgrade checkpoint");
+        assert_eq!(upgrades[0]["throughCursor"], json!(6), "variant {variant}");
+        assert_eq!(after.last(), Some(upgrades[0]), "variant {variant}: the upgrade checkpoint is the newest");
+    }
+
+    // A restart reads the upgrade checkpoint and upgrades nothing again.
+    for (i, o) in opened.into_iter().enumerate() {
+        let variant = o.variant;
+        let path = o.sqlite.store.journal_path();
+        let after = checkpoints(&path);
+        let restarted = o.sqlite.restart(33).expect("restart");
+        assert_eq!(state_hash(restarted.state()), state_hash(&o.state), "variant {variant}: restart");
+        assert_eq!(restarted.state().attention[RESOLVED_ITEM].resolved_at_ms, Some(OWNER_RESOLVED_AT), "variant {variant}");
+        assert_eq!(checkpoints(&path), after, "variant {variant}: no second upgrade");
+        report["variants"][i]["restart"] = json!({ "stateSha256": state_hash(restarted.state()), "checkpoints": after });
+    }
+    write("resolved-at.json", &report);
+}
+
+/// Each attention item of `journal.sqlite3`: reducer 1's committed
+/// resolution time, and the time after the upgrade.
+const RESOLUTION_TIMES: [(&str, Option<i64>, Option<i64>); 6] = [
+    // Acknowledged by reducer 1; never resolved.
+    ("38cc3ee8-5b0f-8db0-b9f9-5009640eba9c", None, None),
+    // Resolved by reducer 1; reopened by Q2, Q1 or U2, which no decision
+    // covered: no resolution time, whatever reducer 1 committed.
+    ("3e47b2b0-a74f-827a-97d8-ce9cae31767e", Some(1_791_000_000_050), None),
+    ("663fb032-fef5-812b-9104-b15bd1135349", Some(1_791_000_000_040), None),
+    ("7b5efbc8-620e-8af7-b38a-5933656372eb", Some(1_791_000_000_050), None),
+    // Snoozed; never resolved.
+    ("9c14d766-ad73-835e-ae27-ff21b71c0222", None, None),
+    // The superseded episode's item stays resolved at its committed time.
+    ("d3561f2e-346b-8bf7-a15f-48d9d2563591", Some(1_791_000_000_070), Some(1_791_000_000_070)),
+];
+
+/// The rebase restores a committed resolution time, but the item's current
+/// evidence decides whether it is resolved: an item this reducer reopens
+/// has no resolution time in any variant, and a committed NULL stays NULL.
+#[test]
+fn an_item_this_reducer_reopens_keeps_no_resolution_time() {
+    let committed = resolution_rows(&fixture("journal.sqlite3"));
+    let a = copy(&fixture("journal.sqlite3"), "reopened-a");
+    let b = copy(&fixture("journal.sqlite3"), "reopened-b");
+    without_checkpoint_at(&b, 30);
+    let c = copy(&fixture("journal-checkpoint-6.sqlite3"), "reopened-c");
+    without_checkpoint_at(&c, 30);
+    let wanted: BTreeMap<String, Option<i64>> = RESOLUTION_TIMES.iter().map(|(id, _, after)| ((*id).to_owned(), *after)).collect();
+    for (id, reducer1, _) in RESOLUTION_TIMES {
+        assert_eq!(committed[id], reducer1, "reducer 1 committed {id}");
+    }
+    for (variant, store) in [("A", a), ("B", b), ("C", c)] {
+        let sqlite = SqliteRunner::open(store, 32).expect("open and upgrade");
+        let state: BTreeMap<String, Option<i64>> =
+            sqlite.state().attention.values().map(|a| (a.id.clone(), a.resolved_at_ms)).collect();
+        assert_eq!(state, wanted, "variant {variant}: state");
+        assert_eq!(resolution_rows(&sqlite.store.journal_path()), wanted, "variant {variant}: rows");
+        for (id, item) in &sqlite.state().attention {
+            assert_eq!(item.resolved_at_ms.is_some(), !item.resolutions.is_empty(), "variant {variant}: {id}");
+        }
+    }
+}
+
+/// A committed resolution time that is neither an integer nor NULL refuses
+/// the upgrade before its transaction: the open fails naming the row, and
+/// the store keeps its rows and its reducer-1 checkpoints. The attention
+/// table is STRICT, so only a disposable copy whose table definition has
+/// lost STRICT can hold such a value.
+#[test]
+fn a_malformed_committed_resolution_time_refuses_the_upgrade() {
+    for (kind, value) in [("text", "'forty'"), ("real", "1791000000040.5"), ("blob", "x'28'")] {
+        let store = copy(&fixture("journal-resolved-at.sqlite3"), &format!("resolved-at-{kind}"));
+        let path = store.journal_path();
+        rusqlite::Connection::open(&path)
+            .and_then(|c| {
+                c.execute_batch("PRAGMA writable_schema = ON")?;
+                c.execute("UPDATE sqlite_schema SET sql = replace(sql, ') STRICT', ')') WHERE name = 'attention_items'", [])
+            })
+            .expect("drop STRICT");
+        let conn = rusqlite::Connection::open(&path).expect("open");
+        let sql = format!("UPDATE attention_items SET resolved_at_ms = {value} WHERE id = ?1");
+        assert_eq!(conn.execute(&sql, [RESOLVED_ITEM]).expect("malform"), 1);
+        let stored: String = conn
+            .query_row("SELECT typeof(resolved_at_ms) FROM attention_items WHERE id = ?1", [RESOLVED_ITEM], |r| r.get(0))
+            .expect("type");
+        assert_eq!(stored, kind);
+        drop(conn);
+        let (history, before) = (history_sha256(&path), checkpoints(&path));
+        let refused = Journal::open_with(
+            &path,
+            "synthetic-core-1",
+            VirtualClock::EPOCH_MS,
+            Box::new(SeededAllocator::new(32)),
+            false,
+        );
+        let detail = format!("committed attention row {RESOLVED_ITEM}");
+        assert!(
+            matches!(&refused, Err(JournalError::Invalid { detail: d }) if *d == detail),
+            "{kind}: {:?}",
+            refused.err()
+        );
+        assert_eq!(checkpoints(&path), before, "{kind}: no upgrade checkpoint");
+        assert_eq!(history_sha256(&path), history, "{kind}: no row rewritten");
+    }
 }
