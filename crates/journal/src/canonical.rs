@@ -592,8 +592,11 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
 ///   detail, times and revision. One without a row was first derived by
 ///   this reducer; it is dropped, and the re-derivation creates it as the
 ///   upgrade's own;
-/// - an attention item keeps its committed revision unless its row now
-///   differs, which makes it a change of the upgrade, at its cursor.
+/// - an attention item takes its committed resolution time, and keeps its
+///   committed revision unless its row now differs, which makes it a change
+///   of the upgrade, at its cursor. The re-derivation then decides from the
+///   item's evidence whether it is resolved: it keeps that time while the
+///   item stays resolved and clears it when it does not.
 fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Result<(), JournalError> {
     let invalid = |table: &str, key: &str| JournalError::Invalid {
         detail: format!("committed {table} row {key}"),
@@ -610,6 +613,9 @@ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Re
             Some(row) => integer(row, "revision").ok_or_else(|| invalid("attention", &item.id))?,
             None => cursor,
         };
+        if let Some(row) = committed {
+            item.resolved_at_ms = nullable_integer(row, "resolved_at_ms").ok_or_else(|| invalid("attention", &item.id))?;
+        }
         if committed != Some(&materialize::attention_row(item).named()) {
             item.revision = cursor;
         }
@@ -633,6 +639,16 @@ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Re
         record.revision = integer(row, "revision").ok_or_else(fail)?;
     }
     Ok(())
+}
+
+/// A committed nullable integer: `Some(None)` for NULL, and `None` when the
+/// column is missing or holds any other type.
+fn nullable_integer(row: &materialize::Named, column: &str) -> Option<Option<i64>> {
+    match row.get(column) {
+        Some(Sql::Integer(value)) => Some(Some(*value)),
+        Some(Sql::Null) => Some(None),
+        _ => None,
+    }
 }
 
 /// Persists a state upgraded from an earlier reducer's checkpoint: every
@@ -1206,4 +1222,26 @@ pub(crate) fn initial_checkpoint(
     }
     write_checkpoint(tx, state, origin, now_ms)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Sql, materialize, nullable_integer};
+
+    /// NULL is a committed absence, an integer its value; any other type,
+    /// or no such column, is not a committed value at all.
+    #[test]
+    fn a_nullable_integer_reads_null_as_none() {
+        let row = |value: Sql| materialize::Named::from([("resolved_at_ms", value)]);
+        assert_eq!(nullable_integer(&row(Sql::Null), "resolved_at_ms"), Some(None));
+        assert_eq!(
+            nullable_integer(&row(Sql::Integer(1_791_000_000_040)), "resolved_at_ms"),
+            Some(Some(1_791_000_000_040))
+        );
+        assert_eq!(nullable_integer(&row(Sql::Integer(0)), "resolved_at_ms"), Some(Some(0)));
+        for malformed in [Sql::Text("40".into()), Sql::Real(40.0), Sql::Blob(vec![40])] {
+            assert_eq!(nullable_integer(&row(malformed), "resolved_at_ms"), None);
+        }
+        assert_eq!(nullable_integer(&row(Sql::Null), "revision"), None);
+    }
 }
