@@ -469,7 +469,11 @@ mod shells {
                     let window: Retained<AnyObject> = msg_send![&windows, objectAtIndex: index];
                     let number: isize = msg_send![&window, windowNumber];
                     let visible: bool = msg_send![&window, isVisible];
-                    (number, visible, window.class().name().to_string_lossy().into_owned())
+                    (
+                        number,
+                        visible,
+                        window.class().name().to_string_lossy().into_owned(),
+                    )
                 };
                 json!({ "number": number, "visible": visible, "class": class })
             })
