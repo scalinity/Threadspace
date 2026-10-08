@@ -137,6 +137,7 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
                 "tests": "2e42561c339ea42955151af4219c295fb5984db3",
                 "checkpointTail": { "pass": tail_pass, "variants": tail_rows, "unorderedPair": { "X": pair["X"]["outbox"], "Y": pair["Y"]["outbox"], "stateDifferencesXY": pair["stateDifferencesXY"] } },
                 "negativeControls": "evidence/M1/remediation-3/negative-controls/",
+                "previousEvidence": "evidence/M1/history/85d188e/",
                 "evidenceSources": {
                     "regenerated": { "areas": ["migration"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "every field reproduced except the per-run file SHA-256 of fresh stores" },
                     "reproduced": { "areas": ["contracts", "fixtures", "replay", "crash"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "files byte-identical to those regenerated at 05a9a2e" },

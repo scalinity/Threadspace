@@ -1,0 +1,700 @@
+{
+  "area": "migration",
+  "baselineCheckpointOrigin": "M0_BASELINE",
+  "deterministicUpgrade": {
+    "pass": true,
+    "upgrades": [
+      {
+        "allocator": "random",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
+        "upgrade": "a"
+      },
+      {
+        "allocator": "random",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
+        "upgrade": "b"
+      },
+      {
+        "allocator": "seeded",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
+        "upgrade": "c"
+      }
+    ]
+  },
+  "fixture": {
+    "path": "fixtures/m1/m0-store-v2/journal.sqlite3",
+    "schemaVersion": 2,
+    "sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
+    "writtenBy": "accepted M0C journal at cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54 (fixtures/m1/m0-store-v2/generator.rs)"
+  },
+  "futureSchemaRefused": {
+    "pass": true,
+    "storeUnchanged": true,
+    "stores": [
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "e3b4ddf33ca8367a93c386424fb7ebaab216e2f3eabb29aa2033ef6ba58a209d"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "e3b4ddf33ca8367a93c386424fb7ebaab216e2f3eabb29aa2033ef6ba58a209d"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "error": "store schema 99 is newer than supported 3",
+        "fileFormatBytes18To19": "0101",
+        "files": [
+          "journal.sqlite3"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 5,
+            "fileFormatReadVersion": 1,
+            "fileFormatWriteVersion": 1,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 5
+          },
+          "before": {
+            "fileChangeCounter": 5,
+            "fileFormatReadVersion": 1,
+            "fileFormatWriteVersion": 1,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 5
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?immutable=1"
+        },
+        "refused": true,
+        "shape": "rollback",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "45d66ce9d71854c324e5cf2f643d0137fc342d2d6ec3cc79efaf299d178b5841"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "45d66ce9d71854c324e5cf2f643d0137fc342d2d6ec3cc79efaf299d178b5841"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "error": "store schema 99 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?immutable=1"
+        },
+        "refused": true,
+        "shape": "wal",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-shm": {
+              "bytes": 32768,
+              "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 4152,
+              "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": true,
+            "wal": true
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-shm": {
+              "bytes": 32768,
+              "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 4152,
+              "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": true,
+            "wal": true
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "error": "store schema 99 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3",
+          "journal.sqlite3-shm",
+          "journal.sqlite3-wal"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?readonly_shm=1"
+        },
+        "refused": true,
+        "shape": "walSidecars",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 4152,
+              "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": true
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 4152,
+              "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": true
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 99
+        },
+        "error": "store schema 99 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3",
+          "journal.sqlite3-wal"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "a copy of the main file and -wal in a private 0700 temporary directory",
+          "uriQuery": ""
+        },
+        "refused": true,
+        "shape": "walNoShm",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "id": 1,
+      "name": "m0-fixture-schema",
+      "sha256": "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8"
+    },
+    {
+      "id": 2,
+      "name": "m0b-identity-and-routes",
+      "sha256": "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2"
+    },
+    {
+      "id": 3,
+      "name": "m1-canonical-journal",
+      "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
+    }
+  ],
+  "newerReducerCheckpointRefused": {
+    "pass": true,
+    "storeUnchanged": true,
+    "stores": [
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "bffc8334f0ec8a685b71c22d7b1c856a7bf4d8e8f10376fbb812a9de220bfee9"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "bffc8334f0ec8a685b71c22d7b1c856a7bf4d8e8f10376fbb812a9de220bfee9"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "error": "store schema 3 is newer than supported 3",
+        "fileFormatBytes18To19": "0101",
+        "files": [
+          "journal.sqlite3"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 5,
+            "fileFormatReadVersion": 1,
+            "fileFormatWriteVersion": 1,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 5
+          },
+          "before": {
+            "fileChangeCounter": 5,
+            "fileFormatReadVersion": 1,
+            "fileFormatWriteVersion": 1,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 5
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?immutable=1"
+        },
+        "refused": true,
+        "shape": "rollback",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "f05428ce65fd7012d11df0dc1adce2e8c1b0fbccf5b83d82f6c802d621c612c8"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "f05428ce65fd7012d11df0dc1adce2e8c1b0fbccf5b83d82f6c802d621c612c8"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": false
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "error": "store schema 3 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?immutable=1"
+        },
+        "refused": true,
+        "shape": "wal",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-shm": {
+              "bytes": 32768,
+              "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 8272,
+              "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": true,
+            "wal": true
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-shm": {
+              "bytes": 32768,
+              "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 8272,
+              "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": true,
+            "wal": true
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "error": "store schema 3 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3",
+          "journal.sqlite3-shm",
+          "journal.sqlite3-wal"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "the store's main file",
+          "uriQuery": "?readonly_shm=1"
+        },
+        "refused": true,
+        "shape": "walSidecars",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      },
+      {
+        "after": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 8272,
+              "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": true
+          }
+        },
+        "before": {
+          "files": {
+            "journal.sqlite3": {
+              "bytes": 286720,
+              "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+            },
+            "journal.sqlite3-wal": {
+              "bytes": 8272,
+              "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+            }
+          },
+          "present": {
+            "journal": false,
+            "main": true,
+            "shm": false,
+            "wal": true
+          }
+        },
+        "committedVersions": {
+          "reducerVersion": 3,
+          "schemaVersion": 3
+        },
+        "error": "store schema 3 is newer than supported 3",
+        "fileFormatBytes18To19": "0202",
+        "files": [
+          "journal.sqlite3",
+          "journal.sqlite3-wal"
+        ],
+        "header": {
+          "after": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          },
+          "before": {
+            "fileChangeCounter": 3,
+            "fileFormatReadVersion": 2,
+            "fileFormatWriteVersion": 2,
+            "magic": "SQLite format 3",
+            "sqliteVersionNumber": 3053004,
+            "versionValidFor": 3
+          }
+        },
+        "mainFileOnlyVersions": {
+          "reducerVersion": 2,
+          "schemaVersion": 3
+        },
+        "preflightOpen": {
+          "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+          "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+          "opens": "a copy of the main file and -wal in a private 0700 temporary directory",
+          "uriQuery": ""
+        },
+        "refused": true,
+        "shape": "walNoShm",
+        "sqliteVersion": "3.53.4",
+        "unchanged": true
+      }
+    ]
+  },
+  "operatesAfterUpgrade": {
+    "ownerCommandThenRestartSameState": true
+  },
+  "pass": true,
+  "preserved": {
+    "acknowledgedItems": 1,
+    "inventoryAbsenceStale": true,
+    "m0bRouteBoundAfterPidReuse": true,
+    "m0bUnprovenSurfaceKept": true,
+    "ownerResolvedItems": 1
+  },
+  "reducerVersion": 2,
+  "targetSchemaVersion": 3
+}

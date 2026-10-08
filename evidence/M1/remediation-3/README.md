@@ -187,7 +187,7 @@ The workspace suites include:
 **`threadspace-m1` rerun on this source:**
 - `fixtures`, `contracts`, `replay` and `crash` reproduced their committed files byte for byte. Replay: 40 scenarios. Crash: 100 injections, 0 acknowledged records lost, 0 duplicate facts.
 - `migration` reproduced every field except the per-store file SHA-256 values. Those differ from run to run, because each run creates fresh stores with new identifiers. Within each run, every refusal store's before and after hashes are equal.
-- All 8 refusals still refuse, with every file unchanged. The regenerated `migration/summary.json` is committed.
+- All 8 refusals still refuse, with every file unchanged. The regenerated `migration/summary.json` is committed. The previous run, which the second remediation's record cites, is kept with the previous manifest in [`../history/85d188e/`](../history/85d188e/README.md).
 
 **Not rerun:**
 - **Permutations.** The 20,400 permutations and 2,040 SQLite checks are retained from `05a9a2e`. The reducer (`reduce.rs`, `wait.rs`) and admission are unchanged. Every permutation store is written by reducer 2, so its load takes the unchanged same-reducer branch.
