@@ -1446,11 +1446,6 @@ impl Tx<'_> {
         let actor_id = scope.actor_id.clone();
         let turn_id = scope.turn_id.clone();
         let category = scope.category;
-        let previous: BTreeMap<u32, Option<String>> = scope
-            .episodes
-            .iter()
-            .map(|e| (e.index, e.attention_id.clone()))
-            .collect();
         let trigger = self.trigger.get(key).cloned();
         let mut derived = Vec::new();
         for (index, (_, open, uncertain)) in episodes {
@@ -1477,7 +1472,6 @@ impl Tx<'_> {
                 ended,
                 "native wait cleared",
             );
-            let _ = previous.get(&index);
             derived.push(WaitEpisode {
                 index,
                 episode_id,
