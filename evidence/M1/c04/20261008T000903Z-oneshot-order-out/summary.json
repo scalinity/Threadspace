@@ -1,0 +1,548 @@
+{
+  "area": "view-recovery",
+  "cases": [
+    {
+      "case": "document-replacement",
+      "pass": true
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "pass": true
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-01",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-02",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-03",
+      "pass": true
+    },
+    {
+      "case": "bootstrap-with-companion-unavailable",
+      "pass": true
+    }
+  ],
+  "companionSha256": "e1845c2d12256e662d5bb63964c749c9c8ba213d59245f987e9c6350c1c1db8d",
+  "executableSha256": "415217a14901fe221d36a92b9ee7c66fccac68da7e0ae38fc25dfe19ca39196a",
+  "nativeWindowShells": {
+    "after": 7,
+    "afterImmediate": 7,
+    "afterSettle": {
+      "count": 7,
+      "layer0": 12,
+      "seen": [
+        [
+          7,
+          12
+        ]
+      ],
+      "settled": true,
+      "titlesReadable": true,
+      "waitedMs": 5429
+    },
+    "before": 4,
+    "beforeSettle": {
+      "count": 4,
+      "layer0": 9,
+      "seen": [
+        [
+          4,
+          9
+        ]
+      ],
+      "settled": true,
+      "titlesReadable": true,
+      "waitedMs": 5482
+    },
+    "layer0": {
+      "after": 12,
+      "afterImmediate": 12,
+      "before": 9
+    },
+    "pass": false,
+    "recoveries": 3,
+    "retiredNative": {
+      "contentViewsAlive": 6,
+      "delegatesAlive": 0,
+      "retired": 6,
+      "webviewsAlive": 0,
+      "windowsAlive": 6
+    },
+    "sameUiIncarnation": true,
+    "uiPid": 80228
+  },
+  "pass": false,
+  "passed": 7,
+  "recoveryDelays": [
+    {
+      "case": "document-replacement",
+      "delayMs": 0
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "delayMs": 0
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-01",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-02",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-03",
+      "delayMs": 0
+    }
+  ],
+  "total": 7,
+  "uiResources": {
+    "after": {
+      "footprintBytes": 33883336,
+      "layer0Windows": 12,
+      "webContentPids": [
+        93803
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 7,
+      "windows": [
+        [
+          22133,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22129,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22128,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22127,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22107,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22106,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22105,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22104,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22101,
+          false,
+          500,
+          500,
+          ""
+        ],
+        [
+          22099,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22132,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22161,
+          true,
+          1000,
+          651,
+          "Threadspace"
+        ]
+      ]
+    },
+    "before": {
+      "footprintBytes": 31868056,
+      "layer0Windows": 9,
+      "webContentPids": [
+        81847
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 4,
+      "windows": [
+        [
+          22129,
+          true,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22128,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22127,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22107,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22106,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22105,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22104,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22101,
+          false,
+          500,
+          500,
+          ""
+        ],
+        [
+          22099,
+          false,
+          1000,
+          651,
+          "Threadspace"
+        ]
+      ]
+    },
+    "perRecovery": [
+      {
+        "footprintBytes": 32900248,
+        "layer0Windows": 10,
+        "webContentPids": [
+          82141
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 5,
+        "windows": [
+          [
+            22129,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22128,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22127,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22107,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22106,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22105,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22104,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22101,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22099,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22132,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32605360,
+        "layer0Windows": 11,
+        "webContentPids": [
+          82387
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            22133,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22129,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22128,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22127,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22107,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22106,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22105,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22104,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22101,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22099,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22132,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 34063560,
+        "layer0Windows": 12,
+        "webContentPids": [
+          93803
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 7,
+        "windows": [
+          [
+            22133,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22129,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22128,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22127,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22107,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22106,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22105,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22104,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22101,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22099,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22132,
+            false,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22161,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ]
+        ]
+      }
+    ]
+  }
+}

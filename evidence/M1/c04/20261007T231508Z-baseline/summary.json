@@ -1,0 +1,406 @@
+{
+  "area": "view-recovery",
+  "cases": [
+    {
+      "case": "document-replacement",
+      "pass": true
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "pass": true
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-01",
+      "pass": false
+    },
+    {
+      "case": "repeated-replacement-02",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-03",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-04",
+      "pass": false
+    },
+    {
+      "case": "repeated-replacement-05",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-06",
+      "pass": false
+    },
+    {
+      "case": "repeated-replacement-07",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-08",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-09",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-10",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-11",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-12",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-13",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-14",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-15",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-16",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-17",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-18",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-19",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-20",
+      "pass": true
+    },
+    {
+      "case": "bootstrap-with-companion-unavailable",
+      "pass": true
+    }
+  ],
+  "companionSha256": "fe1a2e4c222e992fc9dc1268b35c2bd539b4e70494098c609e247e2e5dbcbf7b",
+  "executableSha256": "19efc6920f4774e13f3a4f4708b117f1fcdac6ceeb90141f34c44d47d024f0bc",
+  "nativeWindowShells": {
+    "after": 29,
+    "afterImmediate": 29,
+    "afterSettle": {
+      "count": 29,
+      "seen": [
+        29
+      ],
+      "settled": true,
+      "waitedMs": 5419
+    },
+    "before": 9,
+    "beforeSettle": {
+      "count": 9,
+      "seen": [
+        9
+      ],
+      "settled": true,
+      "waitedMs": 5427
+    },
+    "pass": false,
+    "recoveries": 20,
+    "retiredNative": null,
+    "sameUiIncarnation": true,
+    "uiPid": 83253
+  },
+  "pass": false,
+  "passed": 21,
+  "recoveryDelays": [
+    {
+      "case": "document-replacement",
+      "delayMs": 0
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "delayMs": 0
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-01",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-02",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-03",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-04",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-05",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-06",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-07",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-08",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-09",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-10",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-11",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-12",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-13",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-14",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-15",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-16",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-17",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-18",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-19",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-20",
+      "delayMs": 0
+    }
+  ],
+  "total": 24,
+  "uiResources": {
+    "after": {
+      "footprintBytes": 46957792,
+      "webContentPids": [
+        23085
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 29
+    },
+    "before": {
+      "footprintBytes": 35505304,
+      "webContentPids": [
+        88525
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 9
+    },
+    "perRecovery": [
+      {
+        "footprintBytes": 35652760,
+        "webContentPids": [
+          89537
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 10
+      },
+      {
+        "footprintBytes": 35062936,
+        "webContentPids": [
+          91245
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 11
+      },
+      {
+        "footprintBytes": 35259544,
+        "webContentPids": [
+          93343
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 12
+      },
+      {
+        "footprintBytes": 38634648,
+        "webContentPids": [
+          95002
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 13
+      },
+      {
+        "footprintBytes": 39994520,
+        "webContentPids": [
+          96266
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 14
+      },
+      {
+        "footprintBytes": 41321624,
+        "webContentPids": [
+          98512
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 15
+      },
+      {
+        "footprintBytes": 41632920,
+        "webContentPids": [
+          2117
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 16
+      },
+      {
+        "footprintBytes": 40649880,
+        "webContentPids": [
+          4281
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 17
+      },
+      {
+        "footprintBytes": 40338584,
+        "webContentPids": [
+          4874
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 18
+      },
+      {
+        "footprintBytes": 40600728,
+        "webContentPids": [
+          5883
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 19
+      },
+      {
+        "footprintBytes": 40699104,
+        "webContentPids": [
+          6694
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 20
+      },
+      {
+        "footprintBytes": 41174240,
+        "webContentPids": [
+          7807
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 21
+      },
+      {
+        "footprintBytes": 41551072,
+        "webContentPids": [
+          8714
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 22
+      },
+      {
+        "footprintBytes": 42140896,
+        "webContentPids": [
+          9788
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 23
+      },
+      {
+        "footprintBytes": 42534112,
+        "webContentPids": [
+          10580
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 24
+      },
+      {
+        "footprintBytes": 43140320,
+        "webContentPids": [
+          11328
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 25
+      },
+      {
+        "footprintBytes": 43533536,
+        "webContentPids": [
+          14477
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 26
+      },
+      {
+        "footprintBytes": 43877600,
+        "webContentPids": [
+          15948
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 27
+      },
+      {
+        "footprintBytes": 44385504,
+        "webContentPids": [
+          16763
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 28
+      },
+      {
+        "footprintBytes": 47269088,
+        "webContentPids": [
+          23085
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 29
+      }
+    ]
+  }
+}
