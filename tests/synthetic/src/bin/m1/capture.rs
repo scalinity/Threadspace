@@ -20,6 +20,8 @@ const WARMUP: usize = 20;
 const FAILURE_RUNS: usize = 25;
 const P95_TARGET_US: u64 = 25_000;
 const WALL_BUDGET_US: u64 = 250_000;
+/// One saturation-fixture record; 100 of them exceed the 256 MiB byte bound.
+const SATURATION_FILE_BYTES: usize = 2_700_000;
 
 struct Run {
     micros: u64,
@@ -79,6 +81,19 @@ fn count(store: &Path, sql: &str) -> i64 {
     Connection::open_with_flags(store.join("journal.sqlite3"), OpenFlags::SQLITE_OPEN_READ_ONLY)
         .and_then(|conn| conn.query_row(sql, [], |row| row.get(0)))
         .unwrap_or(-1)
+}
+
+/// The ready records' bytes as their names claim them and as the file
+/// system holds them (the sum of file metadata sizes).
+fn ready_bytes(store: &Path) -> Value {
+    let claimed: u64 = Spool::at(store)
+        .ready(usize::MAX)
+        .map(|records| records.iter().map(|r| r.bytes).sum())
+        .unwrap_or(0);
+    let on_disk: u64 = std::fs::read_dir(store.join("capture-spool/ready"))
+        .map(|entries| entries.filter_map(|e| e.ok()?.metadata().ok()).map(|m| m.len()).sum())
+        .unwrap_or(0);
+    json!({ "claimedByNames": claimed, "onDisk": on_disk })
 }
 
 fn silent(runs: &[Run]) -> bool {
@@ -185,27 +200,39 @@ pub fn measure(root: &Path, hook: &Path, runs: usize) -> Result<Value, String> {
         "pass": markers_before_drain > 0 && gaps >= 1,
     }));
 
-    // Saturation: a spool whose ready records already reach the byte bound.
+    // Saturation: a spool whose ready records already exceed the byte bound
+    // in real bytes on disk; the bound counts file sizes, not name claims.
     let saturated = scratch("saturated");
     let saturated_arg = saturated.display().to_string();
     let ready = saturated.join("capture-spool/ready");
     std::fs::create_dir_all(&ready).map_err(|e| e.to_string())?;
+    let filler = vec![b' '; SATURATION_FILE_BYTES];
     for index in 0..100u32 {
-        // Names carry sizes; 100 x 2.7 MB claims exceed the 256 MiB bound.
-        let name = format!("00000000-0000-4000-8000-{index:012}.2700000.json");
-        std::fs::write(ready.join(name), b"{}").map_err(|e| e.to_string())?;
+        // 100 x 2.7 MB = 270 MB, above the 256 MiB bound; each name states
+        // its file's real size. Synced, so no measured run waits on the
+        // fixture's own flush.
+        let name = format!("00000000-0000-4000-8000-{index:012}.{SATURATION_FILE_BYTES}.json");
+        std::fs::File::create(ready.join(name))
+            .and_then(|mut file| file.write_all(&filler).and_then(|()| file.sync_all()))
+            .map_err(|e| e.to_string())?;
     }
     let saturated_args = ["hook", "--store-dir", &saturated_arg, "--home", &home_arg];
     let before = Spool::at(&saturated).stats();
+    let bytes_before = ready_bytes(&saturated);
     let (_, saturation) = failure_case(hook, &saturated_args, &hook_input(4), FAILURE_RUNS)?;
     let after = Spool::at(&saturated).stats();
+    let bytes_after = ready_bytes(&saturated);
     let saturation_report = json!({
         "boundRecords": threadspace_contracts::limits::capture::SPOOL_MAX_RECORDS,
         "boundBytes": threadspace_contracts::limits::capture::SPOOL_MAX_BYTES,
         "before": before, "after": after, "result": saturation,
+        "readyBytes": { "before": bytes_before, "after": bytes_after },
         "pass": saturation["withinWallBudget"] == true
             && after.ready_records == before.ready_records
-            && after.dropped_markers == FAILURE_RUNS,
+            && after.dropped_markers == FAILURE_RUNS
+            && after.pending_files == 0
+            && bytes_before["onDisk"].as_u64() > Some(threadspace_contracts::limits::capture::SPOOL_MAX_BYTES)
+            && bytes_after == bytes_before,
     });
     area.json("saturation.json", &saturation_report)?;
 

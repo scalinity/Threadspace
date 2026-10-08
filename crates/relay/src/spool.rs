@@ -2,33 +2,56 @@
 //!
 //! ```text
 //! capture-spool/
-//!   pending/<observation-uuid>.tmp
+//!   quota.lock
+//!   pending/<observation-uuid>.<writer-nonce>.tmp
 //!   ready/<observation-uuid>.<bytes>.json
 //!   quarantine/<reason>/<observation-uuid>.json
-//!   dropped/<observation-uuid>.<event>
+//!   dropped/<observation-uuid>.<event-or-reason>
 //! ```
 //!
-//! A record is written to an exclusive temporary file, synced, closed and
-//! atomically renamed into `ready/`, then the directory is synced. Readers
-//! never see a partial record. The record's size is in its name, so the
-//! byte and record bounds are enforced from one directory listing without
-//! reading or stat-ing records. When a bound is reached the record is not
-//! written; a zero-byte marker in `dropped/` names it for saturation
+//! A record is written to a temporary file of its writer's own, synced and
+//! closed; then, under the quota lock, `ready/` is recounted, the bounds are
+//! checked and the temporary is renamed into `ready/`; the directory is
+//! synced after the lock is released. Readers never see a partial record.
+//!
+//! Every hook invocation is its own process, so the quota is decided across
+//! processes: `quota.lock` is an advisory `flock` held only around the
+//! recount, the decision and the rename, which makes them one step for every
+//! competing publisher. The kernel releases it when its holder exits or
+//! dies, so a killed publisher leaves no reservation behind. A publisher
+//! waits for it at most [`QUOTA_WAIT`]; one that cannot take it in time does
+//! not publish and leaves a `spoolbusy` drop marker.
+//!
+//! The record bound counts ready records from the listing; the byte bound
+//! sums their real sizes on disk (one `lstat` each), not the sizes their
+//! names claim. Records are counted first, so a spool at its record bound
+//! refuses without the size pass. When a bound is reached the record is not
+//! published; a zero-byte marker in `dropped/` names it for saturation
 //! diagnostics (itself bounded). Optional activity detail is refused first.
-//! A completed publication survives an ordinary process crash; power-loss
-//! durability is not claimed beyond what the platform's fsync provides.
+//! Temporaries in `pending/` are never counted. A completed publication
+//! survives an ordinary process crash; power-loss durability is not claimed
+//! beyond what the platform's fsync provides.
 
 use std::fs::{self, DirBuilder, OpenOptions};
 use std::io::{self, Read, Write};
+use std::os::fd::AsRawFd;
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant, SystemTime};
 
 use threadspace_contracts::canonical::envelope::ObservationEnvelope;
 use threadspace_contracts::limits::capture::{
     OBSERVATION_MAX_BYTES, SPOOL_LOW_PRIORITY_PERCENT, SPOOL_MAX_BYTES, SPOOL_MAX_MARKERS,
     SPOOL_MAX_RECORDS,
 };
+
+/// The longest a publisher waits for the quota lock. The hook lives at most
+/// `WALL_BUDGET_MS` (250 ms), of which a failed delivery may already have
+/// spent `CONNECT_BUDGET_MS + RECEIPT_BUDGET_MS` (95 ms); the lock is held
+/// only for one listing, the size pass and a rename (about 2 ms at 1,000
+/// ready records), so this covers a burst of concurrent publishers and
+/// leaves the rest of the budget for the write, the recount and the exit.
+pub const QUOTA_WAIT: Duration = Duration::from_millis(50);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Priority {
@@ -52,6 +75,8 @@ impl Priority {
 pub enum SpoolError {
     TooLarge,
     Saturated,
+    /// The quota lock was not obtained within [`QUOTA_WAIT`].
+    Busy,
     InvalidId,
     Io(io::Error),
 }
@@ -61,6 +86,7 @@ impl std::fmt::Display for SpoolError {
         match self {
             Self::TooLarge => f.write_str("record exceeds the observation bound"),
             Self::Saturated => f.write_str("spool bound reached"),
+            Self::Busy => f.write_str("spool quota lock not obtained in time"),
             Self::InvalidId => f.write_str("observation id is not a UUID"),
             Self::Io(error) => write!(f, "{error}"),
         }
@@ -95,6 +121,7 @@ impl Default for Bounds {
 pub struct ReadyRecord {
     pub path: PathBuf,
     pub observation_id: String,
+    /// The size the record's name claims.
     pub bytes: u64,
 }
 
@@ -102,6 +129,7 @@ pub struct ReadyRecord {
 #[serde(rename_all = "camelCase")]
 pub struct SpoolStats {
     pub ready_records: usize,
+    /// Real bytes on disk, as the byte bound counts them.
     pub ready_bytes: u64,
     pub quarantined: usize,
     pub dropped_markers: usize,
@@ -111,6 +139,14 @@ pub struct SpoolStats {
 pub struct Spool {
     root: PathBuf,
     bounds: Bounds,
+}
+
+/// The quota decision for one record, made under the quota lock.
+enum Admission {
+    /// A record with this observation UUID is already published.
+    Existing(PathBuf),
+    Admit,
+    Refuse,
 }
 
 fn private_dir(path: &Path) -> io::Result<()> {
@@ -125,6 +161,17 @@ fn sync_dir(path: &Path) -> io::Result<()> {
     fs::File::open(path)?.sync_all()
 }
 
+/// Creates `path` exclusively, writes `body` and syncs it.
+fn write_synced(path: &Path, body: &[u8]) -> io::Result<()> {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(path)?;
+    file.write_all(body)?;
+    file.sync_all()
+}
+
 fn valid_uuid(text: &str) -> bool {
     text.len() == 36
         && text
@@ -137,6 +184,16 @@ fn valid_uuid(text: &str) -> bool {
                     b.is_ascii_digit() || matches!(b, b'a'..=b'f')
                 }
             })
+}
+
+/// The bytes a file holds (`st_size`); zero once it is gone, as when the
+/// drainer removed it after the listing.
+fn real_size(path: &Path) -> io::Result<u64> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) => Ok(metadata.len()),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(0),
+        Err(error) => Err(error),
+    }
 }
 
 /// `<uuid>.<bytes>.json` → (uuid, bytes).
@@ -191,9 +248,83 @@ impl Spool {
         Ok(records)
     }
 
+    /// Ready records and their real bytes on disk.
     fn totals(&self) -> io::Result<(usize, u64)> {
         let records = self.ready(usize::MAX)?;
-        Ok((records.len(), records.iter().map(|r| r.bytes).sum()))
+        let mut bytes = 0;
+        for record in &records {
+            bytes += real_size(&record.path)?;
+        }
+        Ok((records.len(), bytes))
+    }
+
+    /// Takes the quota lock, waiting at most [`QUOTA_WAIT`]; `None` when it
+    /// stays held elsewhere. Dropping the file releases it, and so does the
+    /// kernel when this process dies.
+    fn lock_quota(&self) -> io::Result<Option<fs::File>> {
+        let file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .mode(0o600)
+            .open(self.root.join("quota.lock"))?;
+        let deadline = Instant::now() + QUOTA_WAIT;
+        // Holds are short, so a waiter polls often enough to catch the gaps.
+        let mut pause = Duration::from_micros(250);
+        loop {
+            // SAFETY: `file` is an open descriptor for the call's duration.
+            if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
+                return Ok(Some(file));
+            }
+            let error = io::Error::last_os_error();
+            if !matches!(error.kind(), io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted) {
+                return Err(error);
+            }
+            let left = deadline.saturating_duration_since(Instant::now());
+            if left.is_zero() {
+                return Ok(None);
+            }
+            std::thread::sleep(pause.min(left));
+            pause = (pause * 2).min(Duration::from_millis(1));
+        }
+    }
+
+    /// Recounts `ready/` and decides whether one more record of `size`
+    /// bytes fits within `percent` of the bounds. Call with the quota lock
+    /// held. The record count comes from the listing alone; real sizes are
+    /// read only when the count admits, and only until the byte bound is
+    /// shown to be exceeded.
+    fn admission(&self, observation_id: &str, size: u64, percent: u64) -> io::Result<Admission> {
+        let mut records = Vec::new();
+        let entries = match fs::read_dir(self.dir("ready")) {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Admission::Admit),
+            Err(error) => return Err(error),
+        };
+        for entry in entries {
+            let entry = entry?;
+            let Some((id, _)) = entry.file_name().to_str().and_then(parse_ready_name) else {
+                continue;
+            };
+            if id == observation_id {
+                return Ok(Admission::Existing(entry.path()));
+            }
+            records.push(entry.path());
+        }
+        // Compared in u128: the bound times a percentage cannot overflow.
+        if (records.len() as u128 + 1) * 100 > self.bounds.max_records as u128 * u128::from(percent) {
+            return Ok(Admission::Refuse);
+        }
+        let limit = u128::from(self.bounds.max_bytes) * u128::from(percent);
+        let mut bytes = u128::from(size);
+        for path in &records {
+            bytes += u128::from(real_size(path)?);
+            if bytes * 100 > limit {
+                return Ok(Admission::Refuse);
+            }
+        }
+        Ok(if bytes * 100 > limit { Admission::Refuse } else { Admission::Admit })
     }
 
     /// Records a capture that could not even be spooled (malformed or
@@ -223,7 +354,8 @@ impl Spool {
             .open(dir.join(format!("{observation_id}.{event}")));
     }
 
-    /// Publishes one envelope atomically under its observation UUID.
+    /// Publishes one envelope atomically under its observation UUID; a
+    /// record already published under that UUID is returned as it is.
     pub fn publish(&self, envelope: &ObservationEnvelope) -> Result<PathBuf, SpoolError> {
         if !valid_uuid(&envelope.observation_id) {
             return Err(SpoolError::InvalidId);
@@ -232,43 +364,59 @@ impl Spool {
         if body.len() > OBSERVATION_MAX_BYTES {
             return Err(SpoolError::TooLarge);
         }
-        let (records, bytes) = self.totals()?;
-        let size = body.len() as u64;
-        // Compared in u128: the bound times a percentage cannot overflow.
-        let over = |records: usize, bytes: u64, percent: u64| {
-            (records as u128 + 1) * 100 > self.bounds.max_records as u128 * u128::from(percent)
-                || (u128::from(bytes) + u128::from(size)) * 100
-                    > u128::from(self.bounds.max_bytes) * u128::from(percent)
-        };
-        let saturated = over(records, bytes, 100)
-            || (Priority::of(&envelope.native_event) == Priority::Activity
-                && over(records, bytes, SPOOL_LOW_PRIORITY_PERCENT));
-        if saturated {
-            self.mark_dropped(&envelope.observation_id, &envelope.native_event);
-            return Err(SpoolError::Saturated);
-        }
         let pending = self.dir("pending");
         let ready = self.dir("ready");
         private_dir(&pending)?;
         private_dir(&ready)?;
-        let temporary = pending.join(format!("{}.tmp", envelope.observation_id));
+        // Written and synced before the quota lock is taken, so the lock
+        // covers only the recount, the decision and the rename. The name is
+        // this writer's own: a concurrent publisher of the same UUID never
+        // touches it.
+        let nonce = uuid::Uuid::new_v4().simple();
+        let temporary = pending.join(format!("{}.{nonce}.tmp", envelope.observation_id));
         let target = ready.join(format!("{}.{}.json", envelope.observation_id, body.len()));
-        if target.exists() {
-            return Ok(target);
-        }
+        let published = write_synced(&temporary, &body)
+            .map_err(SpoolError::from)
+            .and_then(|()| self.admit(envelope, &temporary, &target, body.len() as u64));
+        // Gone once renamed; otherwise this writer's own and never accepted.
         let _ = fs::remove_file(&temporary);
-        {
-            let mut file = OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .mode(0o600)
-                .open(&temporary)?;
-            file.write_all(&body)?;
-            file.sync_all()?;
-        }
-        fs::rename(&temporary, &target)?;
+        let path = published?;
         sync_dir(&ready)?;
-        Ok(target)
+        Ok(path)
+    }
+
+    /// The quota decision and the publication as one step for every
+    /// competing publisher: under the quota lock, recount `ready/`, decide,
+    /// and rename the synced temporary into place. A refusal's marker is
+    /// written after the lock is released, keeping the lock short.
+    fn admit(
+        &self,
+        envelope: &ObservationEnvelope,
+        temporary: &Path,
+        target: &Path,
+        size: u64,
+    ) -> Result<PathBuf, SpoolError> {
+        let Some(lock) = self.lock_quota()? else {
+            self.mark_dropped(&envelope.observation_id, "spool-busy");
+            return Err(SpoolError::Busy);
+        };
+        let percent = match Priority::of(&envelope.native_event) {
+            Priority::Essential => 100,
+            Priority::Activity => SPOOL_LOW_PRIORITY_PERCENT,
+        };
+        let admission = self.admission(&envelope.observation_id, size, percent)?;
+        if let Admission::Admit = admission {
+            fs::rename(temporary, target)?;
+        }
+        drop(lock);
+        match admission {
+            Admission::Existing(path) => Ok(path),
+            Admission::Admit => Ok(target.to_path_buf()),
+            Admission::Refuse => {
+                self.mark_dropped(&envelope.observation_id, &envelope.native_event);
+                Err(SpoolError::Saturated)
+            }
+        }
     }
 
     /// Reads a ready record (bounded).
@@ -450,6 +598,38 @@ mod tests {
         assert_eq!(dropped.len(), 2, "{dropped:?}");
         spool.clear_dropped(&dropped);
         assert_eq!(spool.stats().dropped_markers, 0);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn the_byte_bound_counts_real_bytes_not_name_claims() {
+        let dir = temp();
+        let size = serde_json::to_vec(&envelope(2, "Stop")).expect("json").len() as u64;
+        let spool = Spool::with_bounds(&dir, Bounds { max_records: 100, max_bytes: 4 * size, max_markers: 100 });
+        // A record whose name claims 10 bytes but which holds 4 records' worth.
+        let ready = spool.root().join("ready");
+        private_dir(&ready).expect("ready");
+        fs::write(ready.join(format!("{}.10.json", envelope(1, "Stop").observation_id)), vec![b' '; 4 * size as usize])
+            .expect("understated record");
+        assert!(matches!(spool.publish(&envelope(2, "Stop")), Err(SpoolError::Saturated)), "the real bytes fill the bound");
+        assert_eq!(spool.stats().ready_bytes, 4 * size, "stats report the real bytes");
+        // And a name claiming far more than the file holds does not refuse.
+        fs::remove_file(ready.join(format!("{}.10.json", envelope(1, "Stop").observation_id))).expect("remove");
+        fs::write(ready.join(format!("{}.999999999.json", envelope(1, "Stop").observation_id)), b"{}").expect("overstated record");
+        spool.publish(&envelope(2, "Stop")).expect("two real bytes leave room");
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn a_uuid_is_published_once_whatever_the_body() {
+        let dir = temp();
+        let spool = Spool::at(&dir);
+        let path = spool.publish(&envelope(1, "Stop")).expect("publish");
+        let mut changed = envelope(1, "SessionStart");
+        changed.native_event = "SessionStart".into();
+        assert_eq!(spool.publish(&changed).expect("again"), path, "the first record stands");
+        assert_eq!(spool.ready(10).expect("ready").len(), 1);
+        assert_eq!(fs::read_dir(spool.root().join("pending")).expect("pending").count(), 0, "no temporary left");
         let _ = fs::remove_dir_all(dir);
     }
 
