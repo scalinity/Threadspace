@@ -287,11 +287,27 @@ CREATE TABLE actor_relations (
   PRIMARY KEY (actor_id, related_actor_id, relation)
 ) STRICT;
 
-ALTER TABLE turns ADD COLUMN actor_id TEXT REFERENCES actors(id);
-ALTER TABLE turns ADD COLUMN owner_facing INTEGER;
-ALTER TABLE turns ADD COLUMN outcome_conflict INTEGER;
-ALTER TABLE turns ADD COLUMN output_ready INTEGER;
-ALTER TABLE turns ADD COLUMN revision INTEGER;
+-- Native turn IDs are scoped to their actor, so the M0 uniqueness on
+-- (session, native turn) is rebuilt to include the actor.
+CREATE TABLE turns_v3 (
+  id                TEXT PRIMARY KEY,
+  session_id        TEXT NOT NULL REFERENCES sessions(id),
+  execution_id      TEXT REFERENCES executions(id),
+  native_turn_id    TEXT,
+  identity_kind     TEXT NOT NULL,
+  state             TEXT NOT NULL,
+  created_cursor    INTEGER NOT NULL,
+  actor_id          TEXT REFERENCES actors(id),
+  owner_facing      INTEGER,
+  outcome_conflict  INTEGER,
+  output_ready      INTEGER,
+  revision          INTEGER,
+  UNIQUE(session_id, actor_id, native_turn_id)
+) STRICT;
+INSERT INTO turns_v3 (id, session_id, execution_id, native_turn_id, identity_kind, state, created_cursor)
+  SELECT id, session_id, execution_id, native_turn_id, identity_kind, state, created_cursor FROM turns;
+DROP TABLE turns;
+ALTER TABLE turns_v3 RENAME TO turns;
 
 CREATE TABLE inputs (
   id               TEXT PRIMARY KEY,
@@ -434,15 +450,33 @@ pub fn migrate_to(
             }
             continue;
         }
-        let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
-        tx.execute_batch(migration.sql)?;
-        tx.execute(
-            "INSERT INTO schema_migrations (id, name, checksum, applied_at_ms) VALUES (?1, ?2, ?3, ?4)",
-            params![migration.id, migration.name, sum, now_ms],
-        )?;
-        tx.commit()?;
+        // A migration may rebuild a referenced table (SQLite's documented
+        // procedure): foreign keys are off around its transaction and every
+        // reference is checked before it commits.
+        let enforced: bool = conn.query_row("PRAGMA foreign_keys", [], |row| row.get(0))?;
+        conn.pragma_update(None, "foreign_keys", "OFF")?;
+        let result = apply(conn, migration, &sum, now_ms);
+        conn.pragma_update(None, "foreign_keys", enforced)?;
+        result?;
     }
     Ok((applied, target.max(applied)))
+}
+
+fn apply(conn: &mut Connection, migration: &Migration, sum: &str, now_ms: i64) -> Result<(), JournalError> {
+    let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    tx.execute_batch(migration.sql)?;
+    let dangling: i64 = tx.query_row("SELECT COUNT(*) FROM pragma_foreign_key_check", [], |row| row.get(0))?;
+    if dangling > 0 {
+        return Err(JournalError::Invalid {
+            detail: format!("migration {} leaves {dangling} dangling references", migration.id),
+        });
+    }
+    tx.execute(
+        "INSERT INTO schema_migrations (id, name, checksum, applied_at_ms) VALUES (?1, ?2, ?3, ?4)",
+        params![migration.id, migration.name, sum, now_ms],
+    )?;
+    tx.commit()?;
+    Ok(())
 }
 
 /// Checks, without changing anything, that `conn` holds exactly this

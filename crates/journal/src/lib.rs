@@ -114,6 +114,20 @@ impl std::fmt::Display for JournalError {
 
 impl std::error::Error for JournalError {}
 
+impl JournalError {
+    /// The store refused this input itself (a constraint or an invalid
+    /// record), so retrying it unchanged fails the same way.
+    pub fn is_refusal(&self) -> bool {
+        match self {
+            Self::Invalid { .. } => true,
+            Self::Sqlite(rusqlite::Error::SqliteFailure(error, _)) => {
+                error.code == rusqlite::ErrorCode::ConstraintViolation
+            }
+            _ => false,
+        }
+    }
+}
+
 impl From<rusqlite::Error> for JournalError {
     fn from(error: rusqlite::Error) -> Self {
         Self::Sqlite(error)
@@ -590,7 +604,7 @@ impl Journal {
             Delivery::Bootstrap,
             now_ms,
             now_ms,
-            |tx, _, cursor| {
+            |tx, _, cursor, _| {
                 tx.execute(
                     "INSERT INTO store_meta (key, value) VALUES ('fixture_seeded', ?1)",
                     params![format_cursor(cursor)],
@@ -682,7 +696,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         Ok(Change {
             cursor,

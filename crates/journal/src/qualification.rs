@@ -107,7 +107,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         let state = &self.engine.state;
         let intent = output
@@ -157,7 +157,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         Ok(Change {
             cursor,
@@ -196,7 +196,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         Ok(Change {
             cursor,

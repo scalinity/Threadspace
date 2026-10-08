@@ -470,7 +470,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         outcome.change = Some(Change {
             cursor,
@@ -619,7 +619,7 @@ impl Journal {
             Delivery::Live,
             result.started_at_ms,
             now_ms,
-            |tx, observation_id, _| {
+            |tx, observation_id, _, _| {
                 tx.execute(
                     "INSERT INTO route_results (request_id, session_id, binding_id, binding_revision, surface_result,
                        session_verification, input_readiness, reason_code, focus_performed, latency_ms, started_at_ms,

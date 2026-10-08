@@ -259,3 +259,68 @@ fn ingest_cursor_gaps_raise_nothing_and_source_gaps_stay_scoped() {
     assert_eq!(digest.projection_sha256, digest.tables_sha256);
     assert_eq!(state_hash(&sqlite.journal.replay_from_genesis().expect("genesis")), state_hash(state));
 }
+
+#[test]
+fn a_live_batch_returns_only_the_intents_still_pending_after_it() {
+    use threadspace_contracts::canonical::records::OutboxState;
+    use threadspace_journal::EnvelopeAdmission;
+    use threadspace_state_engine::synthetic::normalize_envelope;
+    use threadspace_synthetic::scenarios::waiting;
+    let mut sqlite = SqliteRunner::open(TempStore::new("live-batch"), 5).expect("open");
+    // Raised and ended inside one batch: the input wait and request req-1.
+    let scenario = waiting();
+    let admissions: Vec<EnvelopeAdmission<'_>> = scenario
+        .steps
+        .iter()
+        .filter_map(|step| match step {
+            Step::Observe(envelope) => Some(EnvelopeAdmission { envelope, normalized: normalize_envelope(envelope) }),
+            Step::Owner(_) => None,
+        })
+        .collect();
+    let outcome = sqlite.journal.admit_batch(&admissions, sqlite.delivery, 2).expect("admit");
+    let state = sqlite.journal.canonical_state();
+    assert_eq!(outcome.notifications.len(), 1, "only req-2's item is still eligible");
+    assert!(outcome.notifications.iter().all(|n| state.outbox[&n.request_id].state == OutboxState::Pending));
+}
+
+#[test]
+fn a_command_that_changes_nothing_reports_the_items_unchanged_revision() {
+    use threadspace_contracts::cursor::parse_cursor;
+    use threadspace_synthetic::scenarios::waiting;
+    let mut sqlite = SqliteRunner::open(TempStore::new("noop-command"), 6).expect("open");
+    for step in &waiting().steps {
+        if let Step::Observe(envelope) = step {
+            sqlite.observe(envelope);
+        }
+    }
+    let item = sqlite
+        .journal
+        .canonical_state()
+        .attention
+        .values()
+        .find(|a| !a.resolved())
+        .map(|a| a.id.clone())
+        .expect("an open item");
+    let first = sqlite.journal.resolve_attention("cmd-1", &item, None, "handled", 10).expect("resolve");
+    let again = sqlite.journal.resolve_attention("cmd-2", &item, None, "handled", 11).expect("same resolution");
+    assert_eq!(again.receipt.target_revision, first.receipt.target_revision, "nothing changed");
+    let revision = parse_cursor(&again.receipt.target_revision).expect("revision");
+    sqlite
+        .journal
+        .acknowledge_attention("cmd-3", &item, Some(revision), 12)
+        .expect("the reported revision is the item's current one");
+}
+
+#[test]
+fn an_observation_id_not_in_canonical_form_is_refused() {
+    let mut sqlite = SqliteRunner::open(TempStore::new("uppercase-id"), 7).expect("open");
+    let Some(Step::Observe(envelope)) = duplicate_deliveries().steps.into_iter().next() else {
+        panic!("an observation first");
+    };
+    let mut envelope = *envelope;
+    envelope.observation_id = envelope.observation_id.to_ascii_uppercase();
+    assert_ne!(envelope.observation_id, envelope.observation_id.to_ascii_lowercase(), "has hex letters");
+    let receipt = sqlite.observe(&envelope);
+    assert_eq!(receipt.status, RecordStatus::NotAccepted);
+    assert_eq!(receipt.reason.as_deref(), Some("INVALID_OBSERVATION_ID"));
+}

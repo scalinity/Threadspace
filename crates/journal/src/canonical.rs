@@ -24,7 +24,7 @@ use threadspace_contracts::canonical::envelope::{
 use threadspace_contracts::canonical::fact::{
     Delivery, JournalEntry, NativeFactDraft, ResolvedFact,
 };
-use threadspace_contracts::canonical::records::{CanonicalState, OutboxRecord};
+use threadspace_contracts::canonical::records::{CanonicalState, OutboxRecord, OutboxState};
 use threadspace_contracts::cursor::{format_cursor, parse_cursor};
 use threadspace_contracts::projection::AttentionCategory;
 use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
@@ -104,10 +104,15 @@ pub fn validate_envelope(envelope: &ObservationEnvelope) -> Result<String, &'sta
     if envelope.schema_version != OBSERVATION_SCHEMA_VERSION {
         return Err("UNSUPPORTED_SCHEMA_VERSION");
     }
+    // Only the canonical lowercase hyphenated form: receipts name the ID as
+    // given, and callers match them by it.
     let id = Uuid::parse_str(&envelope.observation_id)
         .map_err(|_| "INVALID_OBSERVATION_ID")?
         .hyphenated()
         .to_string();
+    if id != envelope.observation_id {
+        return Err("INVALID_OBSERVATION_ID");
+    }
     if !bounded(&envelope.source_id, 256)
         || !bounded(&envelope.source_epoch, 256)
         || !bounded(&envelope.native_event, 128)
@@ -698,6 +703,8 @@ impl Journal {
             .outbox
             .iter()
             .filter_map(|id| self.engine.state.outbox.get(id))
+            // An item raised and ended within the batch suppressed its intent.
+            .filter(|outbox| outbox.state == OutboxState::Pending)
             .filter_map(|outbox| intent_for(&self.engine.state, outbox))
             .collect();
         outcome.change = accumulated.change();
@@ -724,7 +731,7 @@ impl Journal {
         delivery: Delivery,
         captured_wall_ms: i64,
         now_ms: i64,
-        extra: impl FnOnce(&Transaction<'_>, &str, i64) -> Result<(), JournalError>,
+        extra: impl FnOnce(&Transaction<'_>, &str, i64, &CanonicalState) -> Result<(), JournalError>,
     ) -> Result<(i64, ReduceOutput), JournalError> {
         self.guard()?;
         let result = self.admit_internal_inner(
@@ -757,7 +764,7 @@ impl Journal {
         delivery: Delivery,
         captured_wall_ms: i64,
         now_ms: i64,
-        extra: impl FnOnce(&Transaction<'_>, &str, i64) -> Result<(), JournalError>,
+        extra: impl FnOnce(&Transaction<'_>, &str, i64, &CanonicalState) -> Result<(), JournalError>,
     ) -> Result<(i64, ReduceOutput), JournalError> {
         let row = ObservationRow {
             observation_id: observation_id.clone(),
@@ -790,7 +797,7 @@ impl Journal {
             )?;
             (cursor, output, resolver.into_assignments())
         };
-        extra(&tx, &observation_id, cursor)?;
+        extra(&tx, &observation_id, cursor, &self.engine.state)?;
         meta_set(&tx, "applied_cursor", &format_cursor(cursor))?;
         maybe_checkpoint(&tx, &self.engine.state, &mut self.entries_since_checkpoint, 1, now_ms)?;
         tx.commit()?;
@@ -877,12 +884,14 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |tx, observation_id, cursor| {
+            |tx, observation_id, cursor, state| {
+                // A command that changed nothing leaves the item's revision.
+                let revision = state.attention.get(&attention_id).map_or(cursor, |item| item.revision);
                 let receipt = CommandReceipt {
                     command_id: command_id.clone(),
                     status: ReceiptStatus::Committed,
                     cursor: format_cursor(cursor),
-                    target_revision: format_cursor(cursor),
+                    target_revision: format_cursor(revision),
                 };
                 let result_json = serde_json::to_string(&receipt).map_err(|e| JournalError::Invalid {
                     detail: e.to_string(),
@@ -955,7 +964,7 @@ impl Journal {
             Delivery::Live,
             now_ms,
             now_ms,
-            |_, _, _| Ok(()),
+            |_, _, _, _| Ok(()),
         )?;
         Ok(Change {
             cursor,
