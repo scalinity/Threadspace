@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 use super::causal::CausalPoint;
+use super::command::OwnerAction;
 use super::envelope::SequenceMeaning;
 use super::fact::{
     AcceptanceProof, ActivityResult, ActorRelationKind, ActorRole, AttachedPresence,
@@ -300,6 +301,22 @@ pub struct WaitEpisode {
     pub attention_id: Option<String>,
 }
 
+/// An owner command on a wait item, kept with the evidence it was made on:
+/// the positive witnesses of the episode the owner acted on. A late clear
+/// that repartitions the episodes moves the decision with that evidence,
+/// never onto a positive it did not cover (D-0007 §4).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct WaitOwnerDecision {
+    pub command_id: String,
+    pub action: OwnerAction,
+    pub at_ms: i64,
+    pub positives: BTreeSet<CausalPoint>,
+    /// The episode also held positives without a causal point.
+    pub unordered: bool,
+}
+
 /// An aggregate native wait scope (SPEC §7.1): namespace/Session, known
 /// actor or execution, category and native generation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
@@ -320,6 +337,8 @@ pub struct WaitScopeRecord {
     pub unordered_positives: u32,
     pub unordered_clears: u32,
     pub episodes: Vec<WaitEpisode>,
+    /// Ordered by command ID.
+    pub owner_decisions: Vec<WaitOwnerDecision>,
     pub created_cursor: i64,
     pub revision: i64,
 }

@@ -9,7 +9,8 @@ use threadspace_journal::EnvelopeAdmission;
 use threadspace_state_engine::synthetic::normalize_envelope;
 use threadspace_synthetic::builder::{Builder, Scenario, Step, process, session};
 use threadspace_synthetic::runner::run;
-use threadspace_synthetic::scenarios::{CLAUDE_LIKE, latest_turn_outcome};
+use threadspace_contracts::canonical::records::{AttentionScope, OutboxState};
+use threadspace_synthetic::scenarios::{CLAUDE_LIKE, latest_turn_outcome, wait_owner_resolution_kept, wait_reappears, wait_turn_ownership};
 use threadspace_synthetic::sqlite::{SqliteRunner, TempStore};
 
 /// The canonical session and its public view after admitting `order`.
@@ -105,4 +106,51 @@ fn public_observation_shows_a_disconnected_observer_link() {
     let scenario = b.build(|_| Ok(()));
     let views = agree(&scenario, &[&[0, 1, 2]], "sess-link");
     assert_eq!(views[0].observation, ObservationState::Disconnected, "not upgraded to CURRENT by inventory presence");
+}
+
+/// The public attention a wait history materializes, read back in two orders:
+/// each open wait item belongs to its own turn, a resolved one never shows as
+/// open, and the materialized outbox holds exactly the canonical eligible
+/// intents.
+fn public_waits(scenario: &Scenario, order: &[usize], native: &str) -> Vec<(Option<String>, bool)> {
+    let mut sqlite = SqliteRunner::open(TempStore::new("public-waits"), 5).expect("open");
+    let report = run(scenario, order, &mut sqlite);
+    assert!(report.violations.is_empty(), "{:?}", report.violations);
+    let state = sqlite.journal.canonical_state().clone();
+    let session = state.sessions.values().find(|s| s.native_session_id == native).expect("session").id.clone();
+    let (_, snapshot) = sqlite.journal.snapshot().expect("snapshot");
+    let mut public: Vec<(Option<String>, bool)> = Vec::new();
+    for view in snapshot.attention.iter().filter(|a| a.session_id == session) {
+        let item = &state.attention[&view.attention_id];
+        if !matches!(item.scope, AttentionScope::SessionWaitCategory { .. }) {
+            continue;
+        }
+        assert_eq!(view.resolved_at_ms.is_some(), item.resolved(), "{order:?}: public resolution is canonical");
+        assert_eq!(view.turn_id, item.turn_id, "{order:?}: public turn is canonical");
+        let turn = view.turn_id.as_ref().and_then(|t| state.turns.get(t)).and_then(|t| t.native_turn_id.clone());
+        public.push((turn, view.resolved_at_ms.is_none()));
+    }
+    let eligible: i64 = rusqlite::Connection::open(sqlite.store.journal_path())
+        .and_then(|conn| conn.query_row("SELECT COUNT(*) FROM notification_outbox WHERE state IN ('PENDING', 'HELD')", [], |row| row.get(0)))
+        .expect("outbox");
+    let canonical = state.outbox.values().filter(|o| matches!(o.state, OutboxState::Pending | OutboxState::Held)).count();
+    assert_eq!(usize::try_from(eligible).ok(), Some(canonical), "{order:?}: materialized eligibility");
+    public.sort();
+    public
+}
+
+#[test]
+fn public_wait_attention_follows_the_canonical_owner_turn_and_eligibility() {
+    let resolved = wait_owner_resolution_kept();
+    for order in [&[0, 1, 2, 3, 4][..], &[0, 1, 4, 2, 3]] {
+        assert!(public_waits(&resolved, order, "sess-owner-wait").iter().all(|(_, open)| !open), "{order:?}: the owner-resolved wait never reopens");
+    }
+    let turns = wait_turn_ownership();
+    let a = public_waits(&turns, &[0, 1, 2, 3, 4, 5, 6], "sess-turn-wait");
+    let b = public_waits(&turns, &[0, 6, 5, 1, 2, 3, 4], "sess-turn-wait");
+    assert_eq!(a, b);
+    assert!(a.iter().filter(|(_, open)| *open).all(|(turn, _)| turn.as_deref() == Some("t2")), "the open wait is t2's");
+    for order in [&[0, 1, 2, 3, 4][..], &[0, 1, 3, 2, 4]] {
+        public_waits(&wait_reappears(), order, "sess-reappear");
+    }
 }

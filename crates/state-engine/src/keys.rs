@@ -76,10 +76,13 @@ pub fn request(session_id: &str, native_request_id: &str) -> String {
     key(&["request", session_id, native_request_id])
 }
 
+/// A wait with known turn identity is that turn's; one without (an
+/// inventory wait) is session-scoped and never guessed onto a turn.
 pub fn wait_scope(
     session_id: &str,
     actor_id: Option<&str>,
     execution_id: Option<&str>,
+    turn_id: Option<&str>,
     category: &str,
     generation: Option<&str>,
 ) -> String {
@@ -88,6 +91,7 @@ pub fn wait_scope(
         session_id,
         actor_id.unwrap_or(""),
         execution_id.unwrap_or(""),
+        turn_id.unwrap_or(""),
         category,
         generation.unwrap_or(""),
     ])

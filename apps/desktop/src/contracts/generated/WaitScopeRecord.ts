@@ -2,6 +2,7 @@
 import type { CausalPoint } from "./CausalPoint";
 import type { WaitCategory } from "./WaitCategory";
 import type { WaitEpisode } from "./WaitEpisode";
+import type { WaitOwnerDecision } from "./WaitOwnerDecision";
 
 /**
  * An aggregate native wait scope (SPEC §7.1): namespace/Session, known
@@ -11,4 +12,8 @@ export type WaitScopeRecord = { key: string, sessionId: string, actorId: string 
 /**
  * Positives without any causal point: active until a clear, uncertain after.
  */
-unorderedPositives: number, unorderedClears: number, episodes: Array<WaitEpisode>, createdCursor: number, revision: number, };
+unorderedPositives: number, unorderedClears: number, episodes: Array<WaitEpisode>, 
+/**
+ * Ordered by command ID.
+ */
+ownerDecisions: Array<WaitOwnerDecision>, createdCursor: number, revision: number, };

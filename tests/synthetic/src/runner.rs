@@ -6,11 +6,15 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use threadspace_contracts::canonical::capture::RecordStatus;
-use threadspace_contracts::canonical::command::OwnerCommand;
+use threadspace_contracts::canonical::command::{OwnerAction, OwnerCommand};
 use threadspace_contracts::canonical::envelope::ObservationEnvelope;
 use threadspace_contracts::canonical::fact::{Delivery, JournalEntry};
-use threadspace_contracts::canonical::records::{CanonicalState, ResolutionKind};
+use threadspace_contracts::canonical::records::{AttentionScope, CanonicalState, ResolutionKind};
 use threadspace_contracts::projection::{ExecutionPresence, TurnState};
+use threadspace_contracts::canonical::causal::CausalOrder;
+use threadspace_contracts::canonical::fact::WaitCategory;
+use threadspace_state_engine::causal::compare;
+use threadspace_state_engine::wait;
 use threadspace_state_engine::command;
 use threadspace_state_engine::engine::Engine;
 use threadspace_state_engine::ids::{Allocator, SeededAllocator};
@@ -74,6 +78,48 @@ pub fn target_attention(state: &CanonicalState, target: &Target) -> Option<Strin
                 .get(&keys::attention_scope(&session.id, "EXACT_REQUEST", request))
                 .cloned()
         }
+        Target::Wait {
+            session,
+            turn,
+            category,
+            witness,
+        } => {
+            let session = find_session(session)?;
+            let turn_id = match turn {
+                Some(turn) => Some(
+                    state
+                        .turns
+                        .values()
+                        .find(|t| t.session_id == session.id && t.native_turn_id.as_deref() == Some(turn.as_str()))?
+                        .id
+                        .clone(),
+                ),
+                None => None,
+            };
+            state.waits.values().find_map(|scope| {
+                if scope.session_id != session.id || scope.turn_id != turn_id || wait_kind(scope.category) != category {
+                    return None;
+                }
+                let point = scope
+                    .positives
+                    .iter()
+                    .find(|p| p.sequence.as_deref() == Some(witness.to_string().as_str()))?;
+                let index = scope
+                    .clears
+                    .iter()
+                    .filter(|clear| compare(clear, point) == CausalOrder::Before)
+                    .count() as u32;
+                scope.episodes.iter().find(|e| e.index == index)?.attention_id.clone()
+            })
+        }
+    }
+}
+
+fn wait_kind(category: WaitCategory) -> &'static str {
+    match category {
+        WaitCategory::Approval => "APPROVAL",
+        WaitCategory::Input => "INPUT",
+        WaitCategory::JobBlocked => "JOB_BLOCKED",
     }
 }
 
@@ -244,6 +290,7 @@ pub struct Monitor {
     ended_executions: BTreeSet<String>,
     owner_resolved: BTreeSet<String>,
     acknowledged: BTreeSet<String>,
+    wait_decisions: BTreeSet<(String, String)>,
     pub violations: Vec<String>,
 }
 
@@ -290,7 +337,44 @@ impl Monitor {
                 self.ended_executions.insert(execution.id.clone());
             }
         }
-        for item in state.attention.values() {
+        // A wait item's owner state follows the evidence its decisions were
+        // made on (D-0007 §4): a decision is never dropped, and every episode
+        // now holding that evidence shows it.
+        for scope in state.waits.values() {
+            let episodes = wait::partition(scope);
+            for decision in &scope.owner_decisions {
+                self.wait_decisions.insert((scope.key.clone(), decision.command_id.clone()));
+                for (index, _) in episodes.iter().filter(|(_, e)| wait::covers(decision, e)) {
+                    let item = scope
+                        .episodes
+                        .iter()
+                        .find(|e| e.index == *index)
+                        .and_then(|e| e.attention_id.as_ref())
+                        .and_then(|id| state.attention.get(id));
+                    let shown = item.is_some_and(|item| match &decision.action {
+                        OwnerAction::Acknowledge => item.acknowledgements.contains(&decision.command_id),
+                        OwnerAction::Resolve { .. } => {
+                            item.resolutions.iter().any(|c| c.kind == ResolutionKind::Owner)
+                        }
+                        OwnerAction::Snooze { until_ms } => item.snoozed_until_ms >= Some(*until_ms),
+                    });
+                    if !shown {
+                        self.violations
+                            .push(format!("owner decision {} not shown on its evidence", decision.command_id));
+                    }
+                }
+            }
+        }
+        for (key, command) in &self.wait_decisions {
+            if !state.waits.get(key).is_some_and(|w| w.owner_decisions.iter().any(|d| &d.command_id == command)) {
+                self.violations.push(format!("owner decision {command} lost"));
+            }
+        }
+        for item in state
+            .attention
+            .values()
+            .filter(|item| !matches!(item.scope, AttentionScope::SessionWaitCategory { .. }))
+        {
             let owner = item.resolutions.iter().any(|c| c.kind == ResolutionKind::Owner);
             if self.owner_resolved.contains(&item.id) && !owner {
                 self.violations.push(format!("owner resolution of {} lost", item.id));

@@ -20,6 +20,7 @@ pub mod semantic;
 #[cfg(feature = "synthetic")]
 pub mod synthetic;
 pub mod validate;
+pub mod wait;
 
 pub use engine::{Changed, Engine, Note, ReduceOutput};
 

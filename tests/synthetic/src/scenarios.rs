@@ -5,12 +5,12 @@
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::command::OwnerAction;
 use threadspace_contracts::canonical::keys::NativeSessionRef;
-use threadspace_contracts::canonical::records::ResolutionKind;
+use threadspace_contracts::canonical::records::{CanonicalState, OutboxState, ResolutionKind};
 use threadspace_contracts::projection::{
     AttentionCategory, ExecutionPresence, ObservationState, TurnState,
 };
 
-use crate::builder::{Builder, Scenario, Target, process, session};
+use crate::builder::{Builder, DEFAULT_SOURCE, Scenario, Target, process, session};
 use crate::view::{View, resolved_by};
 
 macro_rules! ensure {
@@ -325,6 +325,150 @@ pub fn delayed_clear_wait() -> Scenario {
         ensure!(!waits.is_empty(), "the wait raised an item");
         ensure!(waits.iter().all(|w| resolved_by(w, ResolutionKind::WaitEnded)), "no wait item stays open after the last clear");
         ensure!(turn_state(&v, "sess-delayed-clear", "t1")? == TurnState::Working, "not WAITING");
+        Ok(())
+    })
+}
+
+fn input_wait(b: &mut Builder, s: &NativeSessionRef, turn: Option<&str>, sequence: u64, signal: &str) -> usize {
+    let obs = b.obs(Some(s), "wait").sequence(sequence).payload(json!({ "category": "INPUT", "signal": signal }));
+    match turn {
+        Some(turn) => obs.turn(turn).push(),
+        None => obs.push(),
+    }
+}
+
+/// Every unresolved, unacknowledged wait item has a currently eligible
+/// intent, and no resolved one does.
+fn wait_eligibility_matches(state: &CanonicalState, v: &View<'_>, session: &str) -> Result<usize, String> {
+    let mut open = 0;
+    for item in v.wait_items(session) {
+        let eligible = state.outbox.values().any(|o| {
+            o.attention_id == item.id && matches!(o.state, OutboxState::Pending | OutboxState::Held)
+        });
+        let unresolved = !item.resolved() && !item.acknowledged();
+        ensure!(eligible == unresolved, "item eligible={eligible} but unresolved={unresolved}");
+        open += usize::from(unresolved);
+    }
+    Ok(open)
+}
+
+/// P10, C5 (a comparable clear before it, arriving late) and Q (a positive
+/// from another source epoch): the episode C5 empties reappears with Q,
+/// and its item is notifiable again.
+pub fn wait_reappears() -> Scenario {
+    let mut b = Builder::new("wait-reappears", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-reappear");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    input_wait(&mut b, &s, Some("t1"), 10, "POSITIVE");
+    input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    b.obs(Some(&s), "wait").turn("t1").source(DEFAULT_SOURCE, "mod-epoch-2").sequence(1)
+        .payload(json!({ "category": "INPUT", "signal": "POSITIVE" })).push();
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(wait_eligibility_matches(state, &v, "sess-reappear")? == 2, "P10's and Q's waits are both open");
+        ensure!(turn_state(&v, "sess-reappear", "t1")? == TurnState::Waiting, "WAITING");
+        Ok(())
+    })
+}
+
+/// P2, C3 (which clears it) and Q (incomparable with C3): Q keeps the first
+/// episode open and uncertain, and it stays notifiable whatever arrived first.
+pub fn wait_uncertain_reopens() -> Scenario {
+    let mut b = Builder::new("wait-uncertain-reopens", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-uncertain");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(1).push();
+    input_wait(&mut b, &s, Some("t1"), 2, "POSITIVE");
+    input_wait(&mut b, &s, Some("t1"), 3, "CLEARED");
+    b.obs(Some(&s), "wait").turn("t1").source(DEFAULT_SOURCE, "mod-epoch-2").sequence(1)
+        .payload(json!({ "category": "INPUT", "signal": "POSITIVE" })).push();
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(wait_eligibility_matches(state, &v, "sess-uncertain")? == 1, "one open, uncertain wait");
+        Ok(())
+    })
+}
+
+/// P10, the owner marks its item handled, then C5 arrives late and moves P10
+/// into the next episode: the owner's decision still governs P10.
+pub fn wait_owner_resolution_kept() -> Scenario {
+    let mut b = Builder::new("wait-owner-resolution-kept", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-owner-wait");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p10 = input_wait(&mut b, &s, Some("t1"), 10, "POSITIVE");
+    let target = Target::Wait { session: s.clone(), turn: Some("t1".into()), category: "INPUT".into(), witness: 10 };
+    b.owner("cmd-wait-resolve", target, OwnerAction::Resolve { reason: "answered in the terminal".into() }, &[p10]);
+    input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(wait_eligibility_matches(state, &v, "sess-owner-wait")? == 0, "no wait item reopens");
+        ensure!(v.wait_items("sess-owner-wait").iter().any(|i| resolved_by(i, ResolutionKind::Owner)), "the owner's resolution governs P10");
+        Ok(())
+    })
+}
+
+/// An owner decision covers the condition it was made on, not a new wait:
+/// after a clear, a new positive is open again.
+pub fn wait_new_after_resolution() -> Scenario {
+    let mut b = Builder::new("wait-new-after-resolution", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-new-wait");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p10 = input_wait(&mut b, &s, Some("t1"), 10, "POSITIVE");
+    let target = Target::Wait { session: s.clone(), turn: Some("t1".into()), category: "INPUT".into(), witness: 10 };
+    let resolve = b.owner("cmd-wait-handled", target, OwnerAction::Resolve { reason: "handled".into() }, &[p10]);
+    let clear = input_wait(&mut b, &s, Some("t1"), 12, "CLEARED");
+    let p15 = input_wait(&mut b, &s, Some("t1"), 15, "POSITIVE");
+    // P15 follows the owner's decision: the owner could not have seen it.
+    b.before(resolve, p15);
+    b.before(resolve, clear);
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(wait_eligibility_matches(state, &v, "sess-new-wait")? == 1, "P15's wait is open");
+        ensure!(turn_state(&v, "sess-new-wait", "t1")? == TurnState::Waiting, "WAITING again");
+        Ok(())
+    })
+}
+
+/// t1 waits, clears and completes; t2 then waits. Each wait belongs to its
+/// own turn, whatever arrived first.
+pub fn wait_turn_ownership() -> Scenario {
+    let mut b = Builder::new("wait-turn-ownership", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-turn-wait");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    input_wait(&mut b, &s, Some("t1"), 3, "POSITIVE");
+    input_wait(&mut b, &s, Some("t1"), 4, "CLEARED");
+    b.obs(Some(&s), "turn.complete").turn("t1").sequence(5).payload(json!({ "reason": "answer" })).push();
+    b.obs(Some(&s), "turn.start").turn("t2").sequence(6).push();
+    input_wait(&mut b, &s, Some("t2"), 7, "POSITIVE");
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(turn_state(&v, "sess-turn-wait", "t1")? == TurnState::Completed, "t1 COMPLETED");
+        ensure!(turn_state(&v, "sess-turn-wait", "t2")? == TurnState::Waiting, "t2 WAITING");
+        let t2 = v.turn("sess-turn-wait", None, "t2").ok_or("t2")?;
+        let open: Vec<_> = v.wait_items("sess-turn-wait").into_iter().filter(|i| !i.resolved()).collect();
+        ensure!(open.len() == 1 && open[0].turn_id.as_deref() == Some(t2.id.as_str()), "the open wait is t2's");
+        Ok(())
+    })
+}
+
+/// A wait with no turn identity (an inventory wait) stays session-scoped:
+/// it is never guessed onto the running turn.
+pub fn wait_session_scoped() -> Scenario {
+    let mut b = Builder::new("wait-session-scoped", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-scoped-wait");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    input_wait(&mut b, &s, None, 3, "POSITIVE");
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(turn_state(&v, "sess-scoped-wait", "t1")? == TurnState::Working, "t1 not WAITING");
+        let items = v.wait_items("sess-scoped-wait");
+        ensure!(items.len() == 1 && items[0].turn_id.is_none(), "a session-scoped item");
+        ensure!(wait_eligibility_matches(state, &v, "sess-scoped-wait")? == 1, "open and notifiable");
         Ok(())
     })
 }
@@ -753,6 +897,12 @@ pub fn catalog() -> Vec<Scenario> {
         waiting(),
         delayed_positive_wait(),
         delayed_clear_wait(),
+        wait_reappears(),
+        wait_uncertain_reopens(),
+        wait_owner_resolution_kept(),
+        wait_new_after_resolution(),
+        wait_turn_ownership(),
+        wait_session_scoped(),
         wait_generations(),
         followup_witnessed(),
         followup_claude(),

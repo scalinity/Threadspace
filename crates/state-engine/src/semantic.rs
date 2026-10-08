@@ -16,9 +16,10 @@ use std::collections::BTreeMap;
 
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::keys::NativeActorRef;
-use threadspace_contracts::canonical::records::{AttentionScope, CanonicalState, OutboxState};
+use threadspace_contracts::canonical::records::{AttentionScope, CanonicalState, OutboxState, WaitScopeRecord};
 
 use crate::hash::{canonical_json, sha256_hex};
+use crate::wait;
 
 struct Names<'a> {
     state: &'a CanonicalState,
@@ -111,6 +112,7 @@ impl<'a> Names<'a> {
                 self.session(&w.session_id),
                 w.actor_id.as_deref().map(|a| self.actor(a)),
                 w.execution_id.as_deref().map(|e| self.execution(e)),
+                w.turn_id.as_deref().map(|t| self.turn(t)),
                 w.category,
                 w.generation,
             ])
@@ -155,6 +157,21 @@ where
 fn sorted(mut values: Vec<Value>) -> Value {
     values.sort_by_key(text);
     Value::Array(values)
+}
+
+fn owner_decisions(scope: &WaitScopeRecord) -> Value {
+    let episodes = wait::partition(scope);
+    scope
+        .owner_decisions
+        .iter()
+        .map(|d| {
+            json!({
+                "command": d.command_id,
+                "action": d.action,
+                "governs": episodes.iter().filter(|(_, e)| wait::covers(d, e)).map(|(i, _)| *i).collect::<Vec<_>>(),
+            })
+        })
+        .collect()
 }
 
 #[allow(clippy::too_many_lines)]
@@ -244,6 +261,8 @@ pub fn projection(state: &CanonicalState) -> Value {
             "episodes": w.episodes.iter().map(|e| json!({
                 "index": e.index, "active": e.active, "uncertain": e.uncertain,
             })).collect::<Vec<_>>(),
+            // Durable owner decisions, by the episodes their evidence is in now.
+            "ownerDecisions": owner_decisions(w),
         })))),
         "requests": map(state.requests.values().map(|r| (n.request(&r.key), json!({
             "turn": r.turn_id.as_deref().map(|t| n.turn(t)),
@@ -275,8 +294,14 @@ pub fn projection(state: &CanonicalState) -> Value {
         "coverage": map(state.coverage.values().map(|c| (json!([c.source_id, c.source_epoch]), json!({
             "meaning": c.meaning, "seen": c.seen, "gaps": c.gaps, "reportedGaps": c.reported_gaps,
         })))),
+        // A command on a wait item is compared as its scope's owner decision
+        // (above): which item showed that evidence depended on arrival.
         "commands": map(state.commands.values().map(|c| (json!(c.command_id), json!({
-            "attention": n.attention(&c.attention_id), "action": c.action,
+            "attention": match state.attention.get(&c.attention_id).map(|a| &a.scope) {
+                Some(AttentionScope::SessionWaitCategory { .. }) => json!("WAIT_DECISION"),
+                _ => n.attention(&c.attention_id),
+            },
+            "action": c.action,
         })))),
     })
 }

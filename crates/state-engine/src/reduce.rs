@@ -23,8 +23,9 @@ use threadspace_contracts::canonical::records::{
     InventoryObservation, NamespaceRecord, OutboxRecord, OutboxState, OwnerActionKind,
     ProcessImage, ProcessRecord, ResolutionCause, ResolutionKind, RouteRecord, SequenceRange, SessionRecord,
     SourceCoverage, SourceSurfaceRecord, SummaryAuthority, SurfaceBindingRecord,
-    TurnIdentityKind, TurnRecord, WaitEpisode, WaitScopeRecord,
+    TurnIdentityKind, TurnRecord, WaitEpisode, WaitOwnerDecision, WaitScopeRecord,
 };
+use threadspace_contracts::canonical::command::OwnerAction;
 use threadspace_contracts::cursor::{format_cursor, parse_cursor};
 use threadspace_contracts::projection::{
     AttentionCategory, ExecutionPresence, NotificationState, ObservationState, TurnState,
@@ -34,7 +35,7 @@ use crate::causal::compare;
 use crate::engine::{Before, Engine, Index, Note, ReduceOutput, settle, settle_plain, snap};
 use crate::ids::derived_id;
 use crate::profiles;
-use crate::{FIXTURE_PROFILES, FIXTURE_PROVIDER, keys};
+use crate::{FIXTURE_PROFILES, FIXTURE_PROVIDER, keys, wait};
 
 const PRIORITY_ERROR: u8 = 90;
 const PRIORITY_BLOCKED: u8 = 90;
@@ -126,6 +127,7 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> R
     tx.finish()
 }
 
+const SUPPRESSED_BEFORE_SUBMISSION: &str = "ineligible before submission";
 const WAIT_SUPERSEDED: &str = "wait episode superseded by an earlier clear";
 
 fn severity(outcome: TurnOutcome) -> u8 {
@@ -1022,10 +1024,12 @@ impl Tx<'_> {
             }
             FactPayload::AttentionAcknowledged { command_id, at_ms } => {
                 if let Some(id) = &refs.attention_id {
-                    self.touch_attention(id);
-                    if let Some(item) = self.state.attention.get_mut(id) {
-                        item.acknowledgements.insert(command_id.clone());
-                        item.acknowledged_at_ms.get_or_insert(*at_ms);
+                    if !self.wait_decision(id, command_id, OwnerAction::Acknowledge, *at_ms) {
+                        self.touch_attention(id);
+                        if let Some(item) = self.state.attention.get_mut(id) {
+                            item.acknowledgements.insert(command_id.clone());
+                            item.acknowledged_at_ms.get_or_insert(*at_ms);
+                        }
                     }
                     self.command(command_id, id, OwnerActionKind::Acknowledge);
                 }
@@ -1036,26 +1040,32 @@ impl Tx<'_> {
                 reason,
             } => {
                 if let Some(id) = &refs.attention_id {
-                    self.touch_attention(id);
-                    if let Some(item) = self.state.attention.get_mut(id) {
-                        item.resolutions.insert(ResolutionCause {
-                            kind: ResolutionKind::Owner,
-                            detail: reason.clone(),
-                        });
-                        item.resolved_at_ms.get_or_insert(*at_ms);
+                    let action = OwnerAction::Resolve { reason: reason.clone() };
+                    if !self.wait_decision(id, command_id, action, *at_ms) {
+                        self.touch_attention(id);
+                        if let Some(item) = self.state.attention.get_mut(id) {
+                            item.resolutions.insert(ResolutionCause {
+                                kind: ResolutionKind::Owner,
+                                detail: reason.clone(),
+                            });
+                            item.resolved_at_ms.get_or_insert(*at_ms);
+                        }
                     }
                     self.command(command_id, id, OwnerActionKind::Resolve);
                 }
             }
             FactPayload::AttentionSnoozed {
                 command_id,
+                at_ms,
                 until_ms,
-                ..
             } => {
                 if let Some(id) = &refs.attention_id {
-                    self.touch_attention(id);
-                    if let Some(item) = self.state.attention.get_mut(id) {
-                        item.snoozed_until_ms = Some(*until_ms);
+                    let action = OwnerAction::Snooze { until_ms: *until_ms };
+                    if !self.wait_decision(id, command_id, action, *at_ms) {
+                        self.touch_attention(id);
+                        if let Some(item) = self.state.attention.get_mut(id) {
+                            item.snoozed_until_ms = Some(*until_ms);
+                        }
                     }
                     self.command(command_id, id, OwnerActionKind::Snooze);
                 }
@@ -1168,6 +1178,7 @@ impl Tx<'_> {
             &session_id,
             refs.actor_id.as_deref(),
             refs.execution_id.as_deref(),
+            refs.turn_id.as_deref(),
             wait_kind(category),
             generation.map(String::as_str),
         );
@@ -1193,6 +1204,7 @@ impl Tx<'_> {
                     unordered_positives: 0,
                     unordered_clears: 0,
                     episodes: Vec::new(),
+                    owner_decisions: Vec::new(),
                     created_cursor: cursor,
                     revision: cursor,
                 },
@@ -1449,48 +1461,15 @@ impl Tx<'_> {
         let Some(scope) = self.state.waits.get(key) else { return };
         let previous: Vec<(u32, Option<String>)> =
             scope.episodes.iter().map(|e| (e.index, e.attention_id.clone())).collect();
-        let mut episodes: BTreeMap<u32, (bool, bool, bool)> = BTreeMap::new(); // (any, open, uncertain)
-        for positive in &scope.positives {
-            let index = scope
-                .clears
-                .iter()
-                .filter(|clear| compare(clear, positive) == CausalOrder::Before)
-                .count() as u32;
-            let cleared = scope.clears.iter().any(|clear| {
-                matches!(compare(positive, clear), CausalOrder::Before | CausalOrder::Equal)
-            });
-            let incomparable = scope.unordered_clears > 0
-                || scope
-                    .clears
-                    .iter()
-                    .any(|clear| compare(positive, clear) == CausalOrder::Incomparable);
-            let slot = episodes.entry(index).or_insert((false, false, false));
-            slot.0 = true;
-            if !cleared {
-                if incomparable {
-                    slot.2 = true;
-                } else {
-                    slot.1 = true;
-                }
-            }
-        }
-        if scope.unordered_positives > 0 {
-            let any_clear = !scope.clears.is_empty() || scope.unordered_clears > 0;
-            let slot = episodes.entry(0).or_insert((false, false, false));
-            slot.0 = true;
-            if any_clear {
-                slot.2 = true;
-            } else {
-                slot.1 = true;
-            }
-        }
+        let episodes = wait::partition(scope);
+        let decisions = scope.owner_decisions.clone();
         let session_id = scope.session_id.clone();
         let actor_id = scope.actor_id.clone();
         let turn_id = scope.turn_id.clone();
         let category = scope.category;
         let trigger = self.trigger.get(key).cloned();
         let mut derived = Vec::new();
-        for (index, (_, open, uncertain)) in episodes {
+        for (index, episode) in episodes {
             let episode_id = derived_id(&format!("{key}#{index}"));
             let (attention_category, priority) = wait_attention(category);
             let scope_value = AttentionScope::SessionWaitCategory {
@@ -1507,7 +1486,7 @@ impl Tx<'_> {
                 trigger.clone(),
                 None,
             );
-            let ended = !open && !uncertain;
+            let ended = !episode.open && !episode.uncertain;
             self.set_native_resolution(
                 &attention_id,
                 ResolutionKind::WaitEnded,
@@ -1515,26 +1494,92 @@ impl Tx<'_> {
                 "native wait cleared",
             );
             self.set_native_resolution(&attention_id, ResolutionKind::WaitEnded, false, WAIT_SUPERSEDED);
+            let governing: Vec<&WaitOwnerDecision> =
+                decisions.iter().filter(|d| wait::covers(d, &episode)).collect();
+            self.apply_owner_decisions(&attention_id, &governing);
             derived.push(WaitEpisode {
                 index,
                 episode_id,
-                active: open || uncertain,
-                uncertain,
+                active: episode.open || episode.uncertain,
+                uncertain: episode.uncertain,
                 attention_id: Some(attention_id),
             });
         }
         // A late, earlier clear moves an episode's positives into a later
-        // episode, which now carries the wait; the emptied episode's item
-        // stops claiming an open wait (it never existed had the clear come
-        // first, so semantic equality leaves it out).
+        // episode, which now carries the wait and the owner decisions made
+        // on that evidence; the emptied episode's item stops claiming an
+        // open wait (it never existed had the clear come first, so semantic
+        // equality leaves it out).
         for (index, attention_id) in previous {
             if let Some(id) = attention_id.filter(|_| !derived.iter().any(|e| e.index == index)) {
                 self.set_native_resolution(&id, ResolutionKind::WaitEnded, true, WAIT_SUPERSEDED);
+                self.apply_owner_decisions(&id, &[]);
             }
         }
         if let Some(scope) = self.state.waits.get_mut(key) {
             scope.episodes = derived;
         }
+    }
+
+    /// A wait item's owner state is derived from the scope's owner decisions
+    /// that govern its episode's evidence (D-0007 §4).
+    fn apply_owner_decisions(&mut self, id: &str, decisions: &[&WaitOwnerDecision]) {
+        self.touch_attention(id);
+        let Some(item) = self.state.attention.get_mut(id) else { return };
+        item.acknowledgements.clear();
+        item.acknowledged_at_ms = None;
+        item.resolutions.retain(|cause| cause.kind != ResolutionKind::Owner);
+        item.snoozed_until_ms = None;
+        for decision in decisions {
+            match &decision.action {
+                OwnerAction::Acknowledge => {
+                    item.acknowledgements.insert(decision.command_id.clone());
+                    item.acknowledged_at_ms =
+                        Some(item.acknowledged_at_ms.map_or(decision.at_ms, |at| at.min(decision.at_ms)));
+                }
+                OwnerAction::Resolve { reason } => {
+                    item.resolutions.insert(ResolutionCause {
+                        kind: ResolutionKind::Owner,
+                        detail: reason.clone(),
+                    });
+                }
+                OwnerAction::Snooze { until_ms } => {
+                    item.snoozed_until_ms = Some(item.snoozed_until_ms.map_or(*until_ms, |u| u.max(*until_ms)));
+                }
+            }
+        }
+    }
+
+    /// Keeps an owner command on a wait item with the evidence of the episode
+    /// it was made on; false for any other item. An item whose episode a
+    /// late clear already emptied records a decision covering nothing.
+    fn wait_decision(&mut self, id: &str, command_id: &str, action: OwnerAction, at_ms: i64) -> bool {
+        let Some(item) = self.state.attention.get(id) else { return false };
+        let AttentionScope::SessionWaitCategory { episode_id, .. } = &item.scope else { return false };
+        let session_id = item.session_id.clone();
+        let found = self.state.waits.iter().find_map(|(key, scope)| {
+            if scope.session_id != session_id {
+                return None;
+            }
+            (0..=u32::try_from(scope.clears.len()).unwrap_or(u32::MAX))
+                .find(|index| derived_id(&format!("{key}#{index}")) == *episode_id)
+                .map(|index| (key.clone(), index))
+        });
+        let Some((key, index)) = found else { return false };
+        self.touch_wait(&key);
+        let Some(scope) = self.state.waits.get_mut(&key) else { return false };
+        let episode = wait::partition(scope).remove(&index).unwrap_or_default();
+        if !scope.owner_decisions.iter().any(|d| d.command_id == command_id) {
+            scope.owner_decisions.push(WaitOwnerDecision {
+                command_id: command_id.to_owned(),
+                action,
+                at_ms,
+                positives: episode.positives,
+                unordered: episode.unordered,
+            });
+            scope.owner_decisions.sort_by(|a, b| a.command_id.cmp(&b.command_id));
+        }
+        true
     }
 
     fn derive_request(&mut self, key: &str) {
@@ -1834,20 +1879,50 @@ impl Tx<'_> {
                 self.touch_outbox(request_id);
                 if let Some(outbox) = self.state.outbox.get_mut(request_id) {
                     outbox.state = OutboxState::Suppressed;
-                    outbox.detail = Some("ineligible before submission".to_owned());
+                    outbox.detail = Some(SUPPRESSED_BEFORE_SUBMISSION.to_owned());
                     outbox.updated_at_ms = at;
                 }
                 if let Some(item) = self.state.attention.get_mut(id) {
                     item.notification_state = NotificationState::NotRequested;
                 }
             }
-        } else if recorded.is_empty() && self.entry.delivery != Delivery::Bootstrap {
-            let request_id = derived_id(&format!("outbox|{id}"));
+        } else if self.entry.delivery != Delivery::Bootstrap {
             let state = if self.entry.delivery == Delivery::Live {
                 OutboxState::Pending
             } else {
                 OutboxState::Held
             };
+            // An intent this reducer suppressed before submission is current
+            // eligibility, not history: it re-arms once its item is eligible
+            // again. Submitted intents and migrated M0 ones are history.
+            let suppressed: Vec<String> = recorded
+                .iter()
+                .filter(|request_id| {
+                    self.state.outbox.get(*request_id).is_some_and(|o| {
+                        o.state == OutboxState::Suppressed
+                            && o.detail.as_deref() == Some(SUPPRESSED_BEFORE_SUBMISSION)
+                    })
+                })
+                .cloned()
+                .collect();
+            for request_id in suppressed {
+                self.touch_outbox(&request_id);
+                if let Some(outbox) = self.state.outbox.get_mut(&request_id) {
+                    outbox.state = state;
+                    outbox.detail = None;
+                    outbox.updated_at_ms = at;
+                }
+                if let Some(item) = self.state.attention.get_mut(id) {
+                    item.notification_state = NotificationState::Pending;
+                }
+                if state == OutboxState::Pending {
+                    self.new_outbox.push(request_id);
+                }
+            }
+            if !recorded.is_empty() {
+                return;
+            }
+            let request_id = derived_id(&format!("outbox|{id}"));
             self.touch_outbox(&request_id);
             self.index.link_outbox(id, &request_id);
             self.state.outbox.insert(

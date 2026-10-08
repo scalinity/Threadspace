@@ -36,6 +36,14 @@ pub enum Target {
         session: NativeSessionRef,
         request: String,
     },
+    /// The item now showing the wait witnessed by the positive at `witness`
+    /// (its capture sequence): the item the owner sees for that condition.
+    Wait {
+        session: NativeSessionRef,
+        turn: Option<String>,
+        category: String,
+        witness: u64,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

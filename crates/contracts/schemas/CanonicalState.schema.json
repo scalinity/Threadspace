@@ -1045,6 +1045,57 @@
         }
       ]
     },
+    "OwnerAction": {
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "ACKNOWLEDGE",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "\"Mark handled\": explicit resolution, always with a reason.",
+          "properties": {
+            "kind": {
+              "const": "RESOLVE",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Presentation/notification eligibility only; never provider state.",
+          "properties": {
+            "kind": {
+              "const": "SNOOZE",
+              "type": "string"
+            },
+            "untilMs": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "untilMs"
+          ],
+          "type": "object"
+        }
+      ]
+    },
     "OwnerActionKind": {
       "enum": [
         "ACKNOWLEDGE",
@@ -1809,6 +1860,40 @@
       ],
       "type": "object"
     },
+    "WaitOwnerDecision": {
+      "description": "An owner command on a wait item, kept with the evidence it was made on:\nthe positive witnesses of the episode the owner acted on. A late clear\nthat repartitions the episodes moves the decision with that evidence,\nnever onto a positive it did not cover (D-0007 §4).",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/OwnerAction"
+        },
+        "atMs": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string"
+        },
+        "positives": {
+          "items": {
+            "$ref": "#/$defs/CausalPoint"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "unordered": {
+          "description": "The episode also held positives without a causal point.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "commandId",
+        "action",
+        "atMs",
+        "positives",
+        "unordered"
+      ],
+      "type": "object"
+    },
     "WaitScopeRecord": {
       "description": "An aggregate native wait scope (SPEC §7.1): namespace/Session, known\nactor or execution, category and native generation.",
       "properties": {
@@ -1852,6 +1937,13 @@
         },
         "key": {
           "type": "string"
+        },
+        "ownerDecisions": {
+          "description": "Ordered by command ID.",
+          "items": {
+            "$ref": "#/$defs/WaitOwnerDecision"
+          },
+          "type": "array"
         },
         "positives": {
           "items": {
@@ -1902,6 +1994,7 @@
         "unorderedPositives",
         "unorderedClears",
         "episodes",
+        "ownerDecisions",
         "createdCursor",
         "revision"
       ],
