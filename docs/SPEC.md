@@ -1,7 +1,7 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a`. The final C-02B consumption-completion defect and C-02 are CLOSED; G01–G17 PASS under their accepted scopes, including the unchanged C-11/G08 and H-10–H-12 closures. M1 is authorized; M0C remains unmerged and M1 has not started. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls current gate status.
+**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`; G01–G17 PASS under their accepted scopes. **M1 is in progress** on branch `m1`: the canonical engine, journal, capture relay and synthetic evidence are in place ([evidence](../evidence/M1/README.md), [D-0007](decisions/D-0007-m1-canonical-engine.md)); C-04 and the native M0B regression on the M1 build remain before review. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls platform gate status.  
 
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.
@@ -17,7 +17,7 @@ Two provider reference points materially inform the design:
 - Claude Code **2.1.290**, released October 5, was the researched candidate; M0C qualifies the installed **2.1.291** observer profile under [D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md). The researched release-pinned public declaration snapshot identifies **2.1.277**. Generated declarations from the exact installed build and recorded runtime fixtures control compatibility; a larger version number is not automatic certification. [Claude release][C9] [Mod reference][C7] [Release-pinned declarations][C8_PIN] [Public declarations][C8]
 - Codex **0.160.1**, release commit **d27764b82f7118f674371e6d6e76271d9d606edb**, is the researched release. Some generic documentation lagged that release. Where they conflict, this document cites the released schema and implementation, with actual installed CLI and desktop runtimes qualified separately. [Codex release][O1] [Released hook schema][O2]
 
-The original research was not native certification. Committed M0A/M0B evidence now establishes the accepted substrate and real Claude/Terminal identity-and-return path. M0C reviews reliability on the target Mac; its successful native runs do not override a code defect or missing required evidence. The final one-defect acceptance review closes the consumption-completion defect; G17 is PASS and M1 is authorized, but has not started.
+The original research was not native certification. Committed M0A/M0B evidence establishes the accepted substrate and real Claude/Terminal identity-and-return path; M0C establishes platform reliability on the target Mac (G17 PASS). M1 makes the canonical journal, contracts and reducer the store's only write path and qualifies them with deterministic synthetic evidence; its candidate awaits independent review.
 
 ### 0.1 Frozen decisions
 
@@ -632,6 +632,8 @@ Exact replay of the same admitted journal/checkpoint reproduces recorded canonic
 
 Projection changes, attention changes, outbox entries and the applied journal cursor commit atomically. OS side effects run after commit and record their outcome separately. The reducer never calls provider controls, launches a model, or performs focus itself.
 
+The reducer keeps each record's evidence as sets (outcomes, end reasons, wait positives and clear barriers, resolution causes) and re-derives every displayed state from that evidence, so arrival order cannot decide a state that the evidence decides; an execution's attach mode/presence and the human follow-up frontier remain last-observation fields until M2 gives them more than one producer. Admission alone allocates identities for never-seen native keys and records them; records the reducer derives (attention items, wait episodes, outbox intents) take name-based UUIDs of their canonical scope. In the semantic comparison, presentation metadata includes display names, summaries, route records and surface status, the outbox is compared by its still-eligible intents, and a wait item whose episode a late, earlier clear emptied (resolved as superseded) is omitted. One row builder per record both writes and hashes the materialized projection, so the tables are checkable against the state at any time ([D-0007](decisions/D-0007-m1-canonical-engine.md)).
+
 
 ## 6. Lifecycle and presence semantics
 
@@ -837,7 +839,7 @@ The control endpoint accepts typed application operations from the registered UI
 
 ### 8.2 Capture sequence
 
-1. Generate a stable observation UUID; capture minimal native IDs and process context.
+1. Generate a stable observation UUID in canonical lowercase hyphenated form (receipts name it as given); capture minimal native IDs and process context.
 2. Parse only allowlisted metadata with bounded input size/depth/time. Never echo raw provider input.
 3. Attempt the current private endpoint with a bounded connect/write/receipt budget.
 4. Receive `COMMITTED` or `ALREADY_COMMITTED` only after the journal transaction commits.
@@ -869,7 +871,7 @@ capture-spool/
   quarantine/<reason>/<observation-uuid>.json
 ~~~
 
-Write a complete bounded record, flush according to the selected platform policy, close it, and atomically rename into ready. The reader ignores temporary/partial files. Normal replay removes a ready record only after a durable journal receipt. The explicit local-spool age/quota cleanup below is an exception for records not yet accepted by the companion: it records an expiry/coverage loss where possible, not successful delivery. ACK loss safely causes duplicate transport delivery.
+Write a complete bounded record, flush according to the selected platform policy, close it, and atomically rename into ready. The reader ignores temporary/partial files. Normal replay removes a ready record only after a durable journal receipt. The explicit local-spool age/quota cleanup below is an exception for records not yet accepted by the companion: the expiry/coverage loss is journaled before the record leaves ready or a saturation marker is removed, and it is a loss, not successful delivery. A record the journal refuses on its own (`NOT_ACCEPTED`) moves to quarantine, so it cannot hold back the records around it. ACK loss safely causes duplicate transport delivery.
 
 **Durability domains:**
 
@@ -911,12 +913,17 @@ Use prepared statements and versioned migrations. Materialize bounded snapshots/
 | executions | UUID, session/actor, activation, runtime mode/native ID, lifecycle |
 | execution_processes | many-to-many execution/process links with role and validity |
 | inputs / turns / activities | native IDs and scopes; acceptance/outcomes/provenance |
-| source_surfaces / surface_bindings | native locator, endpoint/app generation, proof, revision, validity |
+| source_surfaces / surface_bindings | native locator, endpoint/app and surface generation, proof, revision, validity |
+| actors / actor_relations / inputs / activities | the corresponding canonical records |
 | observation_sources | adapter/profile, source epoch, sequence/coverage, diagnostics |
 | observations | UUID, ingest cursor, source/native metadata, sanitized payload |
-| facts | UUID, observation FK, kind, object refs, optional native occurrence key |
+| facts | UUID, observation FK, kind, canonical and native object refs, resolved fact JSON |
+| identity_assignments | native key → canonical ID, entity, allocating cursor; one row per native key |
+| admission_diagnostics | bounded unresolved-draft and unsupported-event records; never state |
 | session_projection / actor_projection | current materialized view, revision, evidence quality |
 | attention_items | durable scope/key, reason/priority, ack/resolve/snooze |
+| wait_scopes | aggregate wait scope, category, generation and derived episodes |
+| source_coverage | per source epoch: seen sequence ranges, gaps and reported gaps |
 | attention_commands | command UUID, target, verb, actor, causal/receipt metadata |
 | semantic_annotations | session scope, typed content, self-report/user provenance |
 | notification_outbox / notification_attempts | stable request ID, attention refs, delivery uncertainty |
@@ -2061,7 +2068,7 @@ The following decisions control implementation at the failure boundaries:
 
 ### 22.2 External boundaries that remain explicit
 
-- **Native qualification:** M0A/M0B/M0C are accepted; the final M0C disposition is G17 PASS in its checklist. Built-in-display qualification does not certify physical external-monitor disconnect/reconnect, deferred to M15 by D-0006. M1 is authorized and has not started; it begins from accepted main after the separate branch closeout.
+- **Native qualification:** M0A/M0B/M0C are accepted; the final M0C disposition is G17 PASS in its checklist. Built-in-display qualification does not certify physical external-monitor disconnect/reconnect, deferred to M15 by D-0006. M1 builds on accepted `main` (`cd9e376`); its candidate is pending independent review.
 - **Tauri prerelease drift:** current source supports the architecture, but later alphas may change APIs. Exact locks and the native boundary contain that risk; changes require deliberate regression.
 - **Claude mod compatibility:** the public snapshot and exact installed runtime may differ. Generate/pin installed declarations and qualify callback semantics. Original human-input acceptance and positive original causal order are different capabilities; absent a sufficient order witness, automatic follow-up resolution stays disabled and explicit Mark handled remains available without blocking otherwise qualified native observation.
 - **Codex shared-daemon routing:** the researched public interface lacks a live TUI-client→thread→TTY registry. Preserve lifecycle visibility and explicit pairing/last-known routes; do not claim current-session verification.
