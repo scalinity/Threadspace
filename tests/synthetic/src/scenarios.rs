@@ -168,6 +168,24 @@ pub fn outcomes() -> Scenario {
     })
 }
 
+pub fn latest_turn_outcome() -> Scenario {
+    let mut b = Builder::new("latest-turn-outcome", "completion");
+    let s = session(CLAUDE_LIKE, "sess-latest");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    // Captured order: t1 completes (2, 3), then t2 is interrupted (4, 5).
+    // Built (the reference delivery) t2 first: t1 arrives late.
+    b.obs(Some(&s), "turn.start").turn("t2").sequence(4).push();
+    b.obs(Some(&s), "turn.complete").turn("t2").sequence(5).payload(json!({ "reason": "aborted" })).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    b.obs(Some(&s), "turn.complete").turn("t1").sequence(3).payload(json!({ "reason": "answer" })).push();
+    b.build(|state| {
+        let v = View::new(state);
+        let session = v.session("sess-latest").ok_or("session")?;
+        ensure!(session.turn_state == TurnState::Interrupted, "the causally latest turn sets the session's state, got {:?}", session.turn_state);
+        Ok(())
+    })
+}
+
 // ------------------------------------------------------------------ duplicates
 
 pub fn duplicate_deliveries() -> Scenario {
@@ -223,6 +241,26 @@ pub fn child_actors() -> Scenario {
     })
 }
 
+pub fn shared_native_turn_id() -> Scenario {
+    let mut b = Builder::new("shared-native-turn-id", "actor-events");
+    let s = session(CLAUDE_LIKE, "sess-shared-turn");
+    b.obs(Some(&s), "session.start").push();
+    b.obs(Some(&s), "turn.start").turn("t1").push();
+    b.obs(Some(&s), "agent.spawn").agent("a1").payload(json!({ "agentType": "general" })).push();
+    // Native turn IDs are scoped to their actor: the subagent's "t1" is its own.
+    b.obs(Some(&s), "turn.start").agent("a1").turn("t1").push();
+    b.obs(Some(&s), "turn.complete").agent("a1").turn("t1").payload(json!({ "reason": "error" })).push();
+    complete(&mut b, &s, "t1", "answer");
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(state.turns.len() == 2, "one turn per actor, got {}", state.turns.len());
+        ensure!(turn_state(&v, "sess-shared-turn", "t1")? == TurnState::Completed, "principal t1");
+        let child = v.turn("sess-shared-turn", Some("a1"), "t1").ok_or("child t1")?;
+        ensure!(child.state == TurnState::Failed, "child t1");
+        Ok(())
+    })
+}
+
 // ------------------------------------------------------------------ waits
 
 pub fn waiting() -> Scenario {
@@ -265,6 +303,28 @@ pub fn delayed_positive_wait() -> Scenario {
         ensure!(waits.len() == 1 && resolved_by(waits[0], ResolutionKind::WaitEnded), "historical positive cannot reopen attention");
         ensure!(turn_state(&v, "sess-delayed-wait", "t1")? == TurnState::Working, "not WAITING");
         ensure!(state.outbox.values().all(|o| o.state != threadspace_contracts::canonical::records::OutboxState::Pending), "no live banner for a historical wait");
+        Ok(())
+    })
+}
+
+pub fn delayed_clear_wait() -> Scenario {
+    let mut b = Builder::new("delayed-clear-wait", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-delayed-clear");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    // Captured order: clear (3), positive (5), clear (7). Built (and so, in the
+    // reference delivery) positive first: the earlier clear arrives late and
+    // moves the positive into the next episode.
+    b.obs(Some(&s), "wait").turn("t1").sequence(5).payload(json!({ "category": "INPUT", "signal": "POSITIVE" })).push();
+    b.obs(Some(&s), "wait").turn("t1").sequence(3).payload(json!({ "category": "INPUT", "signal": "CLEARED" })).push();
+    b.obs(Some(&s), "wait").turn("t1").sequence(7).payload(json!({ "category": "INPUT", "signal": "CLEARED" })).push();
+    b.obs(Some(&s), "turn.step").turn("t1").sequence(8).push();
+    b.build(|state| {
+        let v = View::new(state);
+        let waits = v.wait_items("sess-delayed-clear");
+        ensure!(!waits.is_empty(), "the wait raised an item");
+        ensure!(waits.iter().all(|w| resolved_by(w, ResolutionKind::WaitEnded)), "no wait item stays open after the last clear");
+        ensure!(turn_state(&v, "sess-delayed-clear", "t1")? == TurnState::Working, "not WAITING");
         Ok(())
     })
 }
@@ -475,6 +535,24 @@ pub fn executable_replaced() -> Scenario {
     })
 }
 
+/// After a determinable replacement, an image with no causal point (as
+/// reconciliation reports) cannot make the lost proof valid again.
+pub fn replaced_then_unordered_image() -> Scenario {
+    let mut b = Builder::new("replaced-then-unordered-image", "activation-changes");
+    let s = session(CLAUDE_LIKE, "sess-exec-unordered");
+    b.obs(Some(&s), "session.start").push();
+    attach(&mut b, &s, "act-1", 820, 1000, 16_777_252);
+    bind(&mut b, &s, "act-1", "/dev/ttys032", 16_777_252, "820:1000");
+    b.obs(Some(&s), "process.exec").provider(process(820, 1000), "/bin/zsh", None).push();
+    b.obs(Some(&s), "process.exec").provider(process(820, 1000), "/usr/bin/env", None).unordered().push();
+    b.build(|state| {
+        let v = View::new(state);
+        let execution = v.execution("sess-exec-unordered", "act-1").ok_or("act-1")?;
+        ensure!(v.bindings(execution).iter().all(|b| !b.valid && b.invalidation_reason.as_deref() == Some("EXECUTABLE_REPLACED")), "a lost proof stays lost");
+        Ok(())
+    })
+}
+
 /// The provider re-execs a new image in place; a fresh activation proven with
 /// the new image requalifies, while the old proof stays invalid.
 pub fn executable_requalified() -> Scenario {
@@ -668,10 +746,13 @@ pub fn catalog() -> Vec<Scenario> {
         normal_session(),
         parallel_tools(),
         outcomes(),
+        latest_turn_outcome(),
         duplicate_deliveries(),
         child_actors(),
+        shared_native_turn_id(),
         waiting(),
         delayed_positive_wait(),
+        delayed_clear_wait(),
         wait_generations(),
         followup_witnessed(),
         followup_claude(),
@@ -679,6 +760,7 @@ pub fn catalog() -> Vec<Scenario> {
         resume(),
         pid_tty_reuse(),
         executable_replaced(),
+        replaced_then_unordered_image(),
         executable_requalified(),
         routing_ambiguity(),
         execution_end_retained(),

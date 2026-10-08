@@ -168,6 +168,7 @@ pub fn projection(state: &CanonicalState) -> Value {
             "inventory": s.inventory.as_ref().map(|i| json!({ "present": i.present, "row": i.row })),
             "executionPresence": s.execution_presence,
             "observation": s.observation,
+            "turnState": s.turn_state,
         })))),
         "actors": map(state.actors.values().map(|a| (n.actor(&a.id), json!({
             "role": a.role,
@@ -250,7 +251,12 @@ pub fn projection(state: &CanonicalState) -> Value {
             "positive": r.positive,
             "resolved": r.resolved,
         })))),
-        "attention": map(state.attention.values().map(|a| (n.attention(&a.id), json!({
+        // An item whose wait episode a late clear emptied is delivery history:
+        // it exists only because the clear arrived after the positive.
+        "attention": map(state.attention.values().filter(|a| match &a.scope {
+            AttentionScope::SessionWaitCategory { episode_id, .. } => n.episodes.contains_key(episode_id),
+            _ => true,
+        }).map(|a| (n.attention(&a.id), json!({
             "actor": a.actor_id.as_deref().map(|x| n.actor(x)),
             "turn": a.turn_id.as_deref().map(|t| n.turn(t)),
             "category": a.category,

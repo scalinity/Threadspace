@@ -28,6 +28,9 @@ pub struct Index {
     pub turn_waits: BTreeMap<String, BTreeSet<String>>,
     pub turn_requests: BTreeMap<String, BTreeSet<String>>,
     pub session_frontiers: BTreeMap<String, BTreeSet<String>>,
+    /// Every intent recorded for an item, whatever its request ID (a migrated
+    /// M0 intent keeps its own).
+    pub attention_outbox: BTreeMap<String, BTreeSet<String>>,
 }
 
 fn link(map: &mut BTreeMap<String, BTreeSet<String>>, from: &str, to: &str) {
@@ -59,6 +62,9 @@ impl Index {
         for frontier in state.frontiers.values() {
             link(&mut index.session_frontiers, &frontier.session_id, &frontier.key);
         }
+        for outbox in state.outbox.values() {
+            link(&mut index.attention_outbox, &outbox.attention_id, &outbox.request_id);
+        }
         index
     }
 
@@ -88,6 +94,10 @@ impl Index {
 
     pub(crate) fn link_frontier(&mut self, session: &str, frontier: &str) {
         link(&mut self.session_frontiers, session, frontier);
+    }
+
+    pub(crate) fn link_outbox(&mut self, attention: &str, request: &str) {
+        link(&mut self.attention_outbox, attention, request);
     }
 }
 

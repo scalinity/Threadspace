@@ -126,6 +126,8 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> R
     tx.finish()
 }
 
+const WAIT_SUPERSEDED: &str = "wait episode superseded by an earlier clear";
+
 fn severity(outcome: TurnOutcome) -> u8 {
     match outcome {
         TurnOutcome::Completed => 0,
@@ -133,6 +135,29 @@ fn severity(outcome: TurnOutcome) -> u8 {
         TurnOutcome::Refused => 2,
         TurnOutcome::Failed => 3,
     }
+}
+
+/// The state of the causally latest terminal turn: one whose evidence no
+/// other terminal turn's evidence follows. Turns that cannot be ordered
+/// (other sources, no sequence) settle by severity, so the result never
+/// depends on arrival order.
+fn latest_settled_state(turns: &[&TurnRecord]) -> TurnState {
+    let settled: Vec<&TurnRecord> = turns.iter().copied().filter(|t| !t.outcomes.is_empty()).collect();
+    let followed = |t: &TurnRecord| {
+        settled.iter().any(|u| {
+            u.id != t.id
+                && t.output_points
+                    .iter()
+                    .any(|p| u.output_points.iter().any(|q| compare(p, q) == CausalOrder::Before))
+        })
+    };
+    let latest: Vec<&TurnRecord> = settled.iter().copied().filter(|t| !followed(t)).collect();
+    let candidates = if latest.is_empty() { &settled } else { &latest };
+    candidates
+        .iter()
+        .flat_map(|t| t.outcomes.iter().copied())
+        .max_by_key(|o| severity(*o))
+        .map_or(TurnState::Unknown, outcome_state)
 }
 
 fn outcome_state(outcome: TurnOutcome) -> TurnState {
@@ -162,6 +187,17 @@ fn wait_kind(category: WaitCategory) -> &'static str {
 
 fn is_native_resolution(kind: ResolutionKind) -> bool {
     !matches!(kind, ResolutionKind::Owner)
+}
+
+/// True when an observation of `proven` causally precedes one of another
+/// image. Monotone in the evidence, so a lost proof is never revived.
+fn followed_by_another(images: &BTreeSet<ProcessImage>, proven: &str) -> bool {
+    images.iter().filter(|a| a.executable == proven).any(|a| {
+        images.iter().any(|b| {
+            b.executable != proven
+                && matches!((&a.point, &b.point), (Some(p), Some(q)) if compare(p, q) == CausalOrder::Before)
+        })
+    })
 }
 
 /// The image of the one observation every other observation precedes; with
@@ -1248,14 +1284,18 @@ impl Tx<'_> {
         for id in &bindings {
             let Some(binding) = self.state.bindings.get(id) else { continue };
             let execution = self.state.executions.get(&binding.execution_id);
-            // In-place exec invalidates a proof only when the current image
-            // is determinable and is not the one the binding was proven with.
+            // In-place exec invalidates a proof when the current image is
+            // determinable and is not the one the binding was proven with, or
+            // once the proven image is causally followed by another: later
+            // evidence without a causal point cannot undo that.
             let replaced = execution
                 .and_then(|e| e.process_id.as_ref())
                 .and_then(|p| self.state.processes.get(p))
-                .and_then(|p| p.current_executable.as_ref())
                 .zip(binding.executable_identity.as_ref())
-                .is_some_and(|(current, proven)| current != proven);
+                .is_some_and(|(process, proven)| {
+                    process.current_executable.as_ref().is_some_and(|current| current != proven)
+                        || followed_by_another(&process.images, proven)
+                });
             let ended = execution.is_some_and(|e| e.presence == ExecutionPresence::Ended);
             let reason = if let Some(reason) = binding.invalidations.iter().next() {
                 Some(reason.clone())
@@ -1407,6 +1447,8 @@ impl Tx<'_> {
     /// clears before them, and settles each episode from its evidence.
     fn derive_wait(&mut self, key: &str) {
         let Some(scope) = self.state.waits.get(key) else { return };
+        let previous: Vec<(u32, Option<String>)> =
+            scope.episodes.iter().map(|e| (e.index, e.attention_id.clone())).collect();
         let mut episodes: BTreeMap<u32, (bool, bool, bool)> = BTreeMap::new(); // (any, open, uncertain)
         for positive in &scope.positives {
             let index = scope
@@ -1472,6 +1514,7 @@ impl Tx<'_> {
                 ended,
                 "native wait cleared",
             );
+            self.set_native_resolution(&attention_id, ResolutionKind::WaitEnded, false, WAIT_SUPERSEDED);
             derived.push(WaitEpisode {
                 index,
                 episode_id,
@@ -1479,6 +1522,15 @@ impl Tx<'_> {
                 uncertain,
                 attention_id: Some(attention_id),
             });
+        }
+        // A late, earlier clear moves an episode's positives into a later
+        // episode, which now carries the wait; the emptied episode's item
+        // stops claiming an open wait (it never existed had the clear come
+        // first, so semantic equality leaves it out).
+        for (index, attention_id) in previous {
+            if let Some(id) = attention_id.filter(|_| !derived.iter().any(|e| e.index == index)) {
+                self.set_native_resolution(&id, ResolutionKind::WaitEnded, true, WAIT_SUPERSEDED);
+            }
         }
         if let Some(scope) = self.state.waits.get_mut(key) {
             scope.episodes = derived;
@@ -1763,14 +1815,24 @@ impl Tx<'_> {
     fn derive_outbox(&mut self, id: &str) {
         let Some(item) = self.state.attention.get(id) else { return };
         let eligible = !item.resolved() && !item.acknowledged();
-        let request_id = derived_id(&format!("outbox|{id}"));
-        let existing = self.state.outbox.get(&request_id).map(|o| o.state);
+        let recorded: Vec<String> = self
+            .index
+            .attention_outbox
+            .get(id)
+            .map(|requests| requests.iter().cloned().collect())
+            .unwrap_or_default();
         let at = self.entry.captured_wall_ms;
         let cursor = self.cursor();
-        match existing {
-            Some(OutboxState::Pending | OutboxState::Held) if !eligible => {
-                self.touch_outbox(&request_id);
-                if let Some(outbox) = self.state.outbox.get_mut(&request_id) {
+        if !eligible {
+            for request_id in &recorded {
+                if !matches!(
+                    self.state.outbox.get(request_id).map(|o| o.state),
+                    Some(OutboxState::Pending | OutboxState::Held)
+                ) {
+                    continue;
+                }
+                self.touch_outbox(request_id);
+                if let Some(outbox) = self.state.outbox.get_mut(request_id) {
                     outbox.state = OutboxState::Suppressed;
                     outbox.detail = Some("ineligible before submission".to_owned());
                     outbox.updated_at_ms = at;
@@ -1779,34 +1841,34 @@ impl Tx<'_> {
                     item.notification_state = NotificationState::NotRequested;
                 }
             }
-            None if eligible && self.entry.delivery != Delivery::Bootstrap => {
-                let state = if self.entry.delivery == Delivery::Live {
-                    OutboxState::Pending
-                } else {
-                    OutboxState::Held
-                };
-                self.touch_outbox(&request_id);
-                self.state.outbox.insert(
-                    request_id.clone(),
-                    OutboxRecord {
-                        request_id: request_id.clone(),
-                        attention_id: id.to_owned(),
-                        state,
-                        detail: None,
-                        created_at_ms: at,
-                        updated_at_ms: at,
-                        created_cursor: cursor,
-                        revision: cursor,
-                    },
-                );
-                if let Some(item) = self.state.attention.get_mut(id) {
-                    item.notification_state = NotificationState::Pending;
-                }
-                if state == OutboxState::Pending {
-                    self.new_outbox.push(request_id);
-                }
+        } else if recorded.is_empty() && self.entry.delivery != Delivery::Bootstrap {
+            let request_id = derived_id(&format!("outbox|{id}"));
+            let state = if self.entry.delivery == Delivery::Live {
+                OutboxState::Pending
+            } else {
+                OutboxState::Held
+            };
+            self.touch_outbox(&request_id);
+            self.index.link_outbox(id, &request_id);
+            self.state.outbox.insert(
+                request_id.clone(),
+                OutboxRecord {
+                    request_id: request_id.clone(),
+                    attention_id: id.to_owned(),
+                    state,
+                    detail: None,
+                    created_at_ms: at,
+                    updated_at_ms: at,
+                    created_cursor: cursor,
+                    revision: cursor,
+                },
+            );
+            if let Some(item) = self.state.attention.get_mut(id) {
+                item.notification_state = NotificationState::Pending;
             }
-            _ => {}
+            if state == OutboxState::Pending {
+                self.new_outbox.push(request_id);
+            }
         }
     }
 
@@ -1855,10 +1917,7 @@ impl Tx<'_> {
         } else if turns.iter().any(|t| t.state == TurnState::Queued) {
             TurnState::Queued
         } else {
-            turns
-                .iter()
-                .max_by_key(|t| (t.created_cursor, t.id.clone()))
-                .map_or(TurnState::Unknown, |t| t.state.clone())
+            latest_settled_state(&turns)
         };
         if let Some(session) = self.state.sessions.get_mut(id) {
             session.execution_presence = presence;
