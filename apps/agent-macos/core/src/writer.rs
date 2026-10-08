@@ -266,8 +266,9 @@ struct Writer {
     commands: SyncSender<WriterCommand>,
     identity: ProcessIdentity,
     store_dir: PathBuf,
-    // In M0A only qualification attention reaches the outbox; provider-derived
-    // attention feeds it once the canonical reducer exists (M1/M5).
+    // Only qualification attention is submitted to the OS here. Canonical
+    // attention creates durable outbox intents in its own transaction; their
+    // OS delivery belongs to the notification product (M5).
     #[cfg_attr(not(feature = "qualification"), allow(dead_code))]
     notifier: SyncSender<NotificationIntent>,
 }
