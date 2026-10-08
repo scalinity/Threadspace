@@ -674,13 +674,16 @@ fn digest(rows: impl Iterator<Item = (&'static str, Vec<Sql>)>) -> String {
     hasher.finalize().iter().map(|b| format!("{b:02x}")).collect()
 }
 
-/// Per table, rows the state implies that SQLite lacks and rows SQLite holds
-/// that the state does not imply (canonical JSON of each row), for
-/// diagnosing a digest mismatch.
+/// One table's rows the state implies that SQLite lacks, and rows SQLite
+/// holds that the state does not imply (canonical JSON of each row).
+pub type TableDifference = (String, Vec<String>, Vec<String>);
+
+/// Per-table differences between the state and SQLite, for diagnosing a
+/// digest mismatch.
 pub(crate) fn differences(
     state: &CanonicalState,
     conn: &Connection,
-) -> Result<Vec<(String, Vec<String>, Vec<String>)>, JournalError> {
+) -> Result<Vec<TableDifference>, JournalError> {
     let render = |values: &[Sql]| {
         serde_json::to_string(&values.iter().map(sql_json).collect::<Vec<_>>()).unwrap_or_default()
     };

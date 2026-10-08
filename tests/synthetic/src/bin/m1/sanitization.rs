@@ -154,7 +154,11 @@ pub fn run(root: &Path, hook: &Path) -> Result<Value, String> {
             .filter_map(Result::ok)
             .map(|(kind, fact)| {
                 let fact: Value = serde_json::from_str(&fact).unwrap_or(Value::Null);
-                json!({ "kind": kind, "payload": fact["payload"], "native": fact["native"] })
+                let mut native = fact["native"].clone();
+                if native["session"].is_object() {
+                    native["session"]["profileRef"] = json!("claude-cli:<home>/.claude");
+                }
+                json!({ "kind": kind, "payload": fact["payload"], "native": native })
             })
             .collect();
         (observations, facts)

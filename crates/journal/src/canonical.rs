@@ -1027,7 +1027,7 @@ impl Journal {
 
     /// Per projection table, rows the state implies that SQLite lacks and
     /// rows SQLite holds that the state does not imply.
-    pub fn projection_differences(&self) -> Result<Vec<(String, Vec<String>, Vec<String>)>, JournalError> {
+    pub fn projection_differences(&self) -> Result<Vec<materialize::TableDifference>, JournalError> {
         materialize::differences(&self.engine.state, &self.conn)
     }
 

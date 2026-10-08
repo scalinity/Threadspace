@@ -62,6 +62,7 @@ pub use canonical::{
     ReplayDigest, validate_envelope,
 };
 pub use lock::{LockError, WriterLock};
+pub use materialize::TableDifference;
 pub use schema::{SCHEMA_VERSION, catalog as migration_catalog};
 
 pub const REQUIRED_SQLITE_VERSION: &str = "3.53.4";
