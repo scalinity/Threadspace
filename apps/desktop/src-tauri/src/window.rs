@@ -16,6 +16,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use objc2::msg_send;
+use objc2::runtime::AnyObject;
 use serde_json::json;
 use tauri::webview::{NewWindowResponse, PageLoadEvent};
 use tauri::window::Color;
@@ -270,6 +272,7 @@ pub fn recover<R: Runtime>(
             if let Some(window) = app.get_webview_window(OFFICE_LABEL) {
                 #[cfg(feature = "qualification")]
                 shells::track(&window, incarnation);
+                release_window_on_close(&window);
                 let _ = window.destroy();
             }
             let removal = Instant::now();
@@ -320,6 +323,37 @@ pub fn recover<R: Runtime>(
             #[cfg(feature = "qualification")]
             shells::report(&app, incarnation);
         });
+}
+
+/// Has AppKit release the retiring office window once, when it closes
+/// (C-04). tao 0.37.0's `create_window` keeps the +1 window that
+/// `alloc`/`initWithContentRect:` returns and retains it again for its own
+/// handle, so one reference has no owner and a closed office window was never
+/// deallocated: every recovery left its window-server window behind as an
+/// off-screen shell. `releasedWhenClosed` is AppKit's documented ownership of
+/// a window that frees itself on close; here it takes that ownerless
+/// reference. It is correct only while tao over-retains, so
+/// `tests::tao_is_the_version_whose_window_retain_is_balanced` fails on any
+/// other tao and the view-recovery shell gate must be rerun before it moves.
+/// The pointer is borrowed for one main-thread call; this code never retains
+/// or releases it.
+fn release_window_on_close<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    let (done, wait) = std::sync::mpsc::channel();
+    let sent = window.with_webview(move |platform| {
+        if let Some(webview) = platform.downcast_ref::<tauri_runtime_wry::Webview>() {
+            // SAFETY: the live view's window, borrowed on the main thread for
+            // this call only.
+            if let Some(ns_window) = unsafe { webview.ns_window().cast::<AnyObject>().as_ref() } {
+                // SAFETY: NSWindow's `releasedWhenClosed` setter, on the main
+                // thread, before the window's only close.
+                let () = unsafe { msg_send![ns_window, setReleasedWhenClosed: true] };
+            }
+        }
+        let _ = done.send(());
+    });
+    if sent.is_ok() {
+        let _ = wait.recv_timeout(REMOVAL_WAIT);
+    }
 }
 
 /// Qualification-only (C-04): weak references to each retired office
@@ -490,5 +524,29 @@ fn keep_web_focus<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
     if window.is_focused().unwrap_or(false) {
         let webview: &tauri::Webview<R> = window.as_ref();
         let _ = webview.set_focus();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// `release_window_on_close` balances a reference tao 0.37.0 never
+    /// releases. A tao that does release it would turn AppKit's release
+    /// into a double release, so the pin moves only with a rerun of the
+    /// view-recovery shell gate (C-04).
+    #[test]
+    fn tao_is_the_version_whose_window_retain_is_balanced() {
+        let lock =
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../Cargo.lock"))
+                .unwrap_or_default();
+        let tao: Vec<&str> = lock
+            .split("[[package]]")
+            .filter(|package| package.contains("\nname = \"tao\"\n"))
+            .filter_map(|package| {
+                package
+                    .lines()
+                    .find_map(|line| line.strip_prefix("version = "))
+            })
+            .collect();
+        assert_eq!(tao, ["\"0.37.0\""]);
     }
 }
