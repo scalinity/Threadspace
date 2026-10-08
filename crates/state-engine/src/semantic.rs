@@ -159,8 +159,15 @@ fn sorted(mut values: Vec<Value>) -> Value {
     Value::Array(values)
 }
 
+/// Each owner decision by the evidence it covered (native causal points and
+/// the count of positives without one: what the owner was shown) and the
+/// episodes whose items it applies to now. Episode ordinals alone would
+/// equate decisions made on different evidence.
 fn owner_decisions(scope: &WaitScopeRecord) -> Value {
-    let episodes = wait::partition(scope);
+    let owner: Vec<(u32, wait::OwnerState<'_>)> = wait::partition(scope)
+        .iter()
+        .map(|(index, episode)| (*index, wait::owner_state(&scope.owner_decisions, episode)))
+        .collect();
     scope
         .owner_decisions
         .iter()
@@ -168,7 +175,9 @@ fn owner_decisions(scope: &WaitScopeRecord) -> Value {
             json!({
                 "command": d.command_id,
                 "action": d.action,
-                "governs": episodes.iter().filter(|(_, e)| wait::covers(d, e)).map(|(i, _)| *i).collect::<Vec<_>>(),
+                "covers": d.positives,
+                "coversUnordered": d.unordered,
+                "governs": owner.iter().filter(|(_, state)| state.applies(d)).map(|(i, _)| *i).collect::<Vec<_>>(),
             })
         })
         .collect()
@@ -261,7 +270,7 @@ pub fn projection(state: &CanonicalState) -> Value {
             "episodes": w.episodes.iter().map(|e| json!({
                 "index": e.index, "active": e.active, "uncertain": e.uncertain,
             })).collect::<Vec<_>>(),
-            // Durable owner decisions, by the episodes their evidence is in now.
+            // Durable owner decisions, by their covered evidence.
             "ownerDecisions": owner_decisions(w),
         })))),
         "requests": map(state.requests.values().map(|r| (n.request(&r.key), json!({
