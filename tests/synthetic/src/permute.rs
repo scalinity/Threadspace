@@ -38,7 +38,8 @@ pub fn linear_extension(len: usize, constraints: &[(usize, usize)], seed: u64) -
 
 /// A delivery order for `seed`: a linear extension of the scenario's
 /// constraints, with 1–3 duplicate redeliveries inserted when the seed says
-/// so (a retry of an observation can arrive at any time). Returns the order
+/// so (a retry of an observation can arrive at any time after the steps it
+/// must follow, since no delivery precedes its capture). Returns the order
 /// and the number of duplicates injected.
 pub fn order_for(scenario: &Scenario, seed: u64) -> (Vec<usize>, usize) {
     let mut order = linear_extension(scenario.steps.len(), &scenario.constraints, seed);
@@ -50,7 +51,14 @@ pub fn order_for(scenario: &Scenario, seed: u64) -> (Vec<usize>, usize) {
     if rng.chance(1, 2) && !observations.is_empty() {
         for _ in 0..=rng.below(3) {
             let step = observations[rng.below(observations.len())];
-            let at = rng.below(order.len() + 1);
+            let earliest = scenario
+                .constraints
+                .iter()
+                .filter(|&&(_, b)| b == step)
+                .filter_map(|&(a, _)| order.iter().position(|&o| o == a).map(|p| p + 1))
+                .max()
+                .unwrap_or(0);
+            let at = earliest + rng.below(order.len() + 1 - earliest);
             order.insert(at, step);
             injected += 1;
         }
