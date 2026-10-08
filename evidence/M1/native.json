@@ -54,11 +54,19 @@
       },
       "retiredSubscription": "28e42137-3598-42fc-a67e-c04b4bd3270e"
     },
-    "history": "evidence/M1/c04/NOTE.md"
+    "history": "evidence/M1/c04/NOTE.md",
+    "retiredNativeOracle": {
+      "recomputedBy": "threadspace-m0c c04-verdict",
+      "record": "evidence/M1/remediation/c04-oracle/retained-runs.json",
+      "pass": true,
+      "recoveries": 63,
+      "retired": 63
+    },
+    "buildNote": "C-04 qualified on build 73636ec; the remediation changed no window-lifecycle code (window.rs comments, a build-time guard and qualification-only harness code only)."
   },
   "m0b": {
     "runner": "threadspace-m0c g08-terminal prod",
-    "run": "evidence/M1/g08-terminal/20261008T020830Z-prod",
+    "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
     "pass": true,
     "wrongTargets": 0,
     "cases": {
@@ -75,7 +83,41 @@
       "terminal-restart": false
     },
     "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
-    "terminalIncarnationUnchanged": true
+    "terminalIncarnationUnchanged": true,
+    "build": {
+      "sourceCommit": "5944c81228f163e2583a8418369450ba5f1a0829",
+      "sourceTreeDirty": false,
+      "executableSha256": "bda614c9cd223d024ea96fc435033de114b4ea45e11dd47aa1346c96f3ea681d",
+      "companionSha256": "2f234495a9b0d0ad8f9d41a0c33f9bcdaadf38655bdb5326ee473d25af040a41",
+      "buildInfoFrom": "evidence/M1/remediation/native-install.json (installer readback)"
+    },
+    "previousRun": "evidence/M1/g08-terminal/20261008T020830Z-prod (build 73636ec)",
+    "runs": [
+      "evidence/M1/g08-terminal/20261008T032951Z-prod",
+      "evidence/M1/g08-terminal/20261008T033839Z-prod"
+    ],
+    "selectionReadbackRace": {
+      "observation": "On the remediated build the race routes were refused (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window); the first candidate's run focused all five. 0 wrong targets either way; the focus script, surface adapter and osascript worker are unchanged since that run; cause not established.",
+      "runs": [
+        {
+          "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
+          "casePass": true,
+          "routes": 5,
+          "exact": 1,
+          "refused": 4,
+          "wrongTargets": 0
+        },
+        {
+          "run": "evidence/M1/g08-terminal/20261008T033839Z-prod",
+          "casePass": true,
+          "routes": 5,
+          "exact": 0,
+          "refused": 5,
+          "wrongTargets": 0
+        }
+      ],
+      "previous": "evidence/M1/g08-terminal/20261008T020830Z-prod: 5 of 5 exact"
+    }
   },
   "pass": true
 }

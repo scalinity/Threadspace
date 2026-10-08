@@ -23,11 +23,12 @@ M1 makes the canonical engine the store's only write path. Every observation, re
 | Replay | Per scenario through the real SQLite journal: journal, checkpoint, state, projection, table and semantic digests; repeated replay, restart and replay from genesis identical; journal exports replayable with `threadspace-m1 verify` | [`replay/summary.json`](replay/summary.json) |
 | Permutations | ≥10,000 seeded valid partial-order permutations over the eight required families (plus duplicates and robustness), duplicate redeliveries injected into half, every 10th also through SQLite with tables checked against state after every step | [`permutations/summary.json`](permutations/summary.json), [`permutations/failing-seeds.json`](permutations/failing-seeds.json) |
 | Crash | 100 SIGKILL injections: five admission positions × twenty admissions; acknowledged records, store consistency, convergence after retry, duplicate facts, owner-command retry stability | [`crash/summary.json`](crash/summary.json) |
-| Capture | The release `threadspace-hook` spawned per capture against the real writer and event socket (fixture companion): wall-time percentiles, every fail-open path, saturation | [`capture/summary.json`](capture/summary.json), [`capture/saturation.json`](capture/saturation.json) |
+| Capture | The release `threadspace-hook` spawned per capture against the real writer and event socket (fixture companion): wall-time percentiles, every fail-open path, saturation measured in real on-disk bytes; cross-process quota races in relay `spool_capacity` | [`capture/summary.json`](capture/summary.json), [`capture/saturation.json`](capture/saturation.json) |
 | Sanitization | Planted bodies, paths and messages in every Claude hook event, through the journal path and the spool path; stored-row snapshots; every store and spool file scanned | [`sanitization/summary.json`](sanitization/summary.json), [`sanitization/snapshots.json`](sanitization/snapshots.json) |
-| Migration | The schema-2 store written by the accepted M0C journal (`fixtures/m1/m0-store-v2`) upgrades deterministically, preserves identities, bindings, commands and routes, keeps M0B routing, and a newer schema or reducer checkpoint is refused without writing | [`migration/summary.json`](migration/summary.json) |
+| Migration | The schema-2 store written by the accepted M0C journal (`fixtures/m1/m0-store-v2`) upgrades deterministically, preserves identities, bindings, commands and routes, keeps M0B routing, and a newer schema or reducer checkpoint is refused with every store file, sidecar and header byte unchanged (rollback and WAL shapes) | [`migration/summary.json`](migration/summary.json) |
 | C-12, C-13 | Renderer asset outcome accounting; companion log framing under SIGKILL | [`c12/README.md`](c12/README.md), [`c13/README.md`](c13/README.md) |
-| C-04, M0B | Native, on the M1 build `73636ec`: view recovery over 60 recoveries under D-0008 (office shells 1 → 1, retired windows freed, no sustained footprint growth, bounds, intents and incarnation rejection preserved); G08 Terminal identity and Return with real Claude sessions (0 wrong targets) | [`native.json`](native.json), [`c04/NOTE.md`](c04/NOTE.md) |
+| C-04, M0B | Native. C-04 on build `73636ec`: view recovery over 60 recoveries under D-0008 (office shells 1 → 1, all 63 retired native objects released by the hard oracle, no sustained footprint growth, bounds, intents and incarnation rejection preserved). M0B on the remediated build `5944c81`: G08 Terminal identity and Return with real Claude sessions (0 wrong targets) | [`native.json`](native.json), [`c04/NOTE.md`](c04/NOTE.md) |
+| Remediation | The first independent review's eight groups: counterexamples, fixes, tests, negative controls; D-0008 guard controls; retired-native verdicts for every retained run; the first candidate's evidence kept unchanged | [`remediation/README.md`](remediation/README.md), [`history/d93b0fb/`](history/d93b0fb/README.md) |
 
 ## Found and fixed during M1
 
@@ -42,6 +43,8 @@ M1 makes the canonical engine the store's only write path. Every observation, re
   - spool loss was deleted before it was recorded (companion `spool_loss`);
   - a live batch reported suppressed intents, a no-op command reported a revision the item never had, uppercase observation IDs missed their receipts, and an unordered image revived a lost binding (SQLite tests, `replaced-then-unordered-image`).
 
+- The first independent review found eight groups of remaining defects (public session state, the wait model, fresh proofs after A → B → A, migrated M0 command retries, future-schema refusal writes, cross-process spool capacity, D-0008 safeguards and the M2 conversion contract). Their fixes, tests and negative controls are in [`remediation/README.md`](remediation/README.md); the evidence above was regenerated on the remediated source.
+
 ## Reproduce
 
 From the repository root:
@@ -53,6 +56,8 @@ cargo build --release -p threadspace-synthetic --bin threadspace-m1 -p threadspa
 M=target/aarch64-apple-darwin/release/threadspace-m1; H=target/aarch64-apple-darwin/release/threadspace-hook
 $M fixtures && $M contracts && $M replay && $M permutations 10000 && $M crash && $M migration
 $M capture $H 1000 && $M sanitization $H && $M manifest
+tests/native/d0008-guard.sh evidence/M1/remediation/d0008-guard
+target/aarch64-apple-darwin/debug/threadspace-m0c c04-verdict prod evidence/M1/view-recovery/20261008T015231Z-prod
 ```
 
 Synthetic areas are deterministic in their seeds; the capture timings and native areas are measurements of this machine.

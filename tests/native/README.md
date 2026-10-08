@@ -79,7 +79,7 @@ stale-epoch and retired-subscription refusal in the recreated view. It needs a
 freshly launched qualification build of the UI, since the account lives as
 long as the UI process. Run it, without the containment, before any Tauri,
 tao or Wry update lands; `build.rs` refuses every desktop build until the
-qualified set in `apps/desktop/src-tauri/d0008_guard.rs` is changed.
+qualified set in `apps/desktop/src-tauri/d0008_guard.rs` is changed. `tests/native/d0008-guard.sh <dir>` runs the guard's positive and changed-pin negative controls; `$M c04-verdict prod <run dir>` recomputes the retired-native verdict of a retained run.
 
 M0C remediation runners (evidence under `evidence/M0C/remediation/`):
 

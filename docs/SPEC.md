@@ -1,7 +1,7 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`; G01–G17 PASS under their accepted scopes. **M1 is a PASS candidate** on branch `m1`, pending independent review ([manifest](../evidence/M1/manifest.json), [D-0007](decisions/D-0007-m1-canonical-engine.md), [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md)). Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls platform gate status.  
+**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`; G01–G17 PASS under their accepted scopes. **M1 is a remediation candidate** on branch `m1`: the first independent review required remediation of eight groups of findings, which are closed there pending independent re-review ([manifest](../evidence/M1/manifest.json), [remediation](../evidence/M1/remediation/README.md), [D-0007](decisions/D-0007-m1-canonical-engine.md), [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md)). Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls platform gate status.  
 
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.
