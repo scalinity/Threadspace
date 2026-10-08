@@ -9,6 +9,12 @@
 //!   cargo test -p threadspace-synthetic --test emit_reducer1_store -- --nocapture
 //! ```
 //!
+//! With `REDUCER1_CHECKPOINT_AFTER=<n>` it also checkpoints after the first
+//! `n` histories, writing the same history with one more checkpoint. With
+//! `REDUCER1_HISTORIES=unordered-pair` it writes `wait-owner-unordered-pair`
+//! instead: one owner decision over P3 and two positives without a causal
+//! point, which reducer 1 records as a flag.
+//!
 //! The histories are built with exactly the builder calls of the current
 //! catalog's `wait-owner-partial-coverage`, `wait-owner-merge-keeps-coverage`,
 //! `wait-owner-partial-actions` and `wait-owner-unordered-coverage`, so the
@@ -103,19 +109,40 @@ fn wait_owner_unordered_coverage() -> Scenario {
     b.build(|_| Ok(()))
 }
 
+fn wait_owner_unordered_pair() -> Scenario {
+    let mut b = Builder::new("wait-owner-unordered-pair", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-unordered-pair");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p3 = input_wait(&mut b, &s, Some("t1"), 3, "POSITIVE");
+    let unordered = json!({ "category": "INPUT", "signal": "POSITIVE" });
+    let u1 = b.obs(Some(&s), "wait").turn("t1").unordered().payload(unordered.clone()).push();
+    let u2 = b.obs(Some(&s), "wait").turn("t1").unordered().payload(unordered).push();
+    b.owner("cmd-resolve-pair", wait_target(&s, Some("t1"), 3), OwnerAction::Resolve { reason: "handled all three".into() }, &[p3, u1, u2]);
+    b.build(|_| Ok(()))
+}
+
 #[test]
 fn emit() {
     let out = std::env::var("REDUCER1_OUT").expect("REDUCER1_OUT");
+    let after: Option<usize> = std::env::var("REDUCER1_CHECKPOINT_AFTER").ok().map(|n| n.parse().expect("count"));
     let mut sqlite = SqliteRunner::open(TempStore::new("reducer1-emit"), 31).expect("open");
-    for scenario in [
-        wait_owner_partial_coverage(),
-        wait_owner_merge_keeps_coverage(),
-        wait_owner_partial_actions(),
-        wait_owner_unordered_coverage(),
-    ] {
+    let histories = match std::env::var("REDUCER1_HISTORIES").as_deref() {
+        Ok("unordered-pair") => vec![wait_owner_unordered_pair()],
+        _ => vec![
+            wait_owner_partial_coverage(),
+            wait_owner_merge_keeps_coverage(),
+            wait_owner_partial_actions(),
+            wait_owner_unordered_coverage(),
+        ],
+    };
+    for (done, scenario) in histories.into_iter().enumerate() {
         let order: Vec<usize> = (0..scenario.steps.len()).collect();
         let report = run(&scenario, &order, &mut sqlite);
         assert!(report.owner_failures.is_empty(), "{}: {:?}", scenario.name, report.owner_failures);
+        if after == Some(done + 1) {
+            sqlite.journal.checkpoint("FIXTURE", VirtualClock::EPOCH_MS + 500_000).expect("checkpoint");
+        }
     }
     sqlite.journal.checkpoint("FIXTURE", VirtualClock::EPOCH_MS + 1_000_000).expect("checkpoint");
     let state = sqlite.state().clone();
