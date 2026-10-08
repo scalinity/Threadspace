@@ -134,6 +134,8 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "Durability is qualified against ordinary process crashes (SIGKILL) under WAL with synchronous=FULL; power-loss durability is not claimed.",
             "The capture benchmark runs the release hook against the fixture companion (real writer and event socket, disposable store), not against an installed identity's store.",
             "A single-write log record narrows, but does not eliminate, a torn record on a mid-write kill; readers skip and count torn lines (C-13).",
+            "C-04 closes under D-0008, a containment scoped to tao 0.37.0: any Tauri, tao or Wry update first removes it and requalifies view recovery without it.",
+            "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
         ],
     });
     area.json("manifest.json", &manifest)?;

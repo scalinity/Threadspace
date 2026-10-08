@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "build": {
+    "executableSha256": "3b6a4e795212dd1abd6f9131fb73a0995994b26b834be63dc31b1c8c1e0f485a",
+    "companionSha256": "510daaa0b1e3c64d6ed11dc4ed71fec7439a0c99966d64590935a90fcc4ce9a4",
+    "sourceCommit": "73636ec2482313f3507f32b378fb64cd3ef082de",
+    "sourceTreeDirty": false,
+    "qualificationBuild": true,
+    "buildInfoFrom": "evidence/M1/native-install.json (installer readback)"
+  },
+  "c04": {
+    "status": "CLOSED",
+    "decision": "docs/decisions/D-0008-tao-0.37.0-window-release-containment.md",
+    "run": "evidence/M1/view-recovery/20261008T015231Z-prod",
+    "pass": true,
+    "cases": [
+      64,
+      64
+    ],
+    "recoveries": 60,
+    "officeShells": {
+      "before": 1,
+      "afterImmediate": 1,
+      "after": 1
+    },
+    "retiredNative": {
+      "contentViewsAlive": 0,
+      "delegatesAlive": 0,
+      "retired": 63,
+      "webviewsAlive": 0,
+      "windowsAlive": 0
+    },
+    "webContentProcesses": [
+      1,
+      1
+    ],
+    "footprintSlopeBytesPerRecovery": {
+      "wholeRun": 78719.2246735204,
+      "secondHalf": 17980.48320355951,
+      "max": 104857.6
+    },
+    "boundsAndVisibilityPreserved": true,
+    "pendingIntentsPreserved": true,
+    "incarnationRejection": {
+      "ipcSuite": {
+        "passed": 27,
+        "roundTripsOk": true,
+        "total": 27
+      },
+      "pass": true,
+      "retiredProbe": {
+        "code": "UNKNOWN_SUBSCRIPTION",
+        "ok": false
+      },
+      "retiredSubscription": "28e42137-3598-42fc-a67e-c04b4bd3270e"
+    },
+    "history": "evidence/M1/c04/NOTE.md"
+  },
+  "m0b": {
+    "runner": "threadspace-m0c g08-terminal prod",
+    "run": "evidence/M1/g08-terminal/20261008T020830Z-prod",
+    "pass": true,
+    "wrongTargets": 0,
+    "cases": {
+      "baseline-exact": true,
+      "reorder": true,
+      "move": true,
+      "minimize-then-return": true,
+      "fullscreen-space-then-return": true,
+      "foreground-process-mismatch": true,
+      "selection-readback-race": true,
+      "target-closed": true,
+      "stale-tty-pathname": true,
+      "target-closed-during-route": true,
+      "terminal-restart": false
+    },
+    "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+    "terminalIncarnationUnchanged": true
+  },
+  "pass": true
+}

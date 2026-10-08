@@ -2,7 +2,7 @@
 
 **Architecture date:** October 5, 2026, America/New_York  
 **Normative architecture:** [SPEC.md](SPEC.md)  
-**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`. G01–G17 PASS under their accepted scopes; Codex live ancestry/handshake stays M6 and the two environment/hardware facets stay M15. **M1 is in progress** on branch `m1` ([evidence](../evidence/M1/README.md)); C-12 and C-13 are closed there, while C-04 and the native M0B regression on the M1 build remain. M2 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the platform evidence and final acceptance.  
+**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`. G01–G17 PASS under their accepted scopes; Codex live ancestry/handshake stays M6 and the two environment/hardware facets stay M15. **M1 is a PASS candidate** on branch `m1` pending independent review ([manifest](../evidence/M1/manifest.json)); C-04 (under [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md)), C-12 and C-13 are closed there. M2 has not started. The [M0C checklist](../evidence/M0C/gate-checklist.md) records the platform evidence and final acceptance.  
 
 **Target:** Daniel's Apple Silicon Mac, macOS 26 or later; Tauri 3, Rust, React/TypeScript, Three.js WebGPU/TSL, independently supervised native companion and SQLite.
 
@@ -205,7 +205,7 @@ Synthetic scenarios cover every canonical transition and all requested failures:
 
 **Required evidence/artifacts.** Versioned schemas/migrations; generated types; fixtures and seeds; reducer invariant catalog; journal/receipt crash matrix; sanitized-record snapshots; replay hashes; saturation and capture timings.
 
-**Status.** In progress on branch `m1`: [evidence](../evidence/M1/README.md), [reducer invariant catalog](../evidence/M1/reducer-invariants.md), [D-0007](decisions/D-0007-m1-canonical-engine.md). C-12 and C-13 are closed; C-04 and the native M0B regression on the M1 build remain.
+**Status.** PASS candidate on branch `m1`, pending independent review: [manifest](../evidence/M1/manifest.json), [reducer invariant catalog](../evidence/M1/reducer-invariants.md), [D-0007](decisions/D-0007-m1-canonical-engine.md), [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md). C-04, C-12 and C-13 are closed.
 
 **Exit gate.** All canonical states and owner commands reconstruct deterministically, ingress remains bounded/fail-open, and no known invariant failure remains. C-04 is mandatory M1 exit work, either a local destruction-path repair or a requalified dependency update: repeated retired-view destruction must yield `nativeWindowShells.after == nativeWindowShells.before` after quiescence, bounded WebContent/cache resources and preserved projection, intents and incarnation rejection (D-0006). M1 also owns C-12 renderer diagnostics: account for assets retired before scene application, with complete outcome accounting after quiescence and exactly-once texture/bitmap disposal. M1 also owns C-13: write each companion log record and its newline in one write, so a process killed mid-record cannot join the next record to its line.
 

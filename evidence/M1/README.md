@@ -27,7 +27,7 @@ M1 makes the canonical engine the store's only write path. Every observation, re
 | Sanitization | Planted bodies, paths and messages in every Claude hook event, through the journal path and the spool path; stored-row snapshots; every store and spool file scanned | [`sanitization/summary.json`](sanitization/summary.json), [`sanitization/snapshots.json`](sanitization/snapshots.json) |
 | Migration | The schema-2 store written by the accepted M0C journal (`fixtures/m1/m0-store-v2`) upgrades deterministically, preserves identities, bindings, commands and routes, keeps M0B routing, and a newer schema or reducer checkpoint is refused without writing | [`migration/summary.json`](migration/summary.json) |
 | C-12, C-13 | Renderer asset outcome accounting; companion log framing under SIGKILL | [`c12/README.md`](c12/README.md), [`c13/README.md`](c13/README.md) |
-| C-04, M0B | Native: retired-view window shells; the real Claude/Terminal identity and Return path on the M1 build | [`native.json`](native.json) |
+| C-04, M0B | Native, on the M1 build `73636ec`: view recovery over 60 recoveries under D-0008 (office shells 1 → 1, retired windows freed, no sustained footprint growth, bounds, intents and incarnation rejection preserved); G08 Terminal identity and Return with real Claude sessions (0 wrong targets) | [`native.json`](native.json), [`c04/NOTE.md`](c04/NOTE.md) |
 
 ## Found and fixed during M1
 

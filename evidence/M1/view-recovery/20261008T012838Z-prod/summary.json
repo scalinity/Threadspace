@@ -1,0 +1,1460 @@
+{
+  "area": "view-recovery",
+  "cases": [
+    {
+      "case": "document-replacement",
+      "pass": true
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "pass": true
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-01",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-02",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-03",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-04",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-05",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-06",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-07",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-08",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-09",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-10",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-11",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-12",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-13",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-14",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-15",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-16",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-17",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-18",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-19",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-20",
+      "pass": true
+    },
+    {
+      "case": "bootstrap-with-companion-unavailable",
+      "pass": true
+    }
+  ],
+  "companionSha256": "510daaa0b1e3c64d6ed11dc4ed71fec7439a0c99966d64590935a90fcc4ce9a4",
+  "executableSha256": "3b6a4e795212dd1abd6f9131fb73a0995994b26b834be63dc31b1c8c1e0f485a",
+  "nativeWindowShells": {
+    "after": 1,
+    "afterImmediate": 1,
+    "afterSettle": {
+      "count": 1,
+      "layer0": 6,
+      "seen": [
+        [
+          1,
+          6
+        ]
+      ],
+      "settled": true,
+      "titlesReadable": true,
+      "waitedMs": 5401
+    },
+    "before": 1,
+    "beforeSettle": {
+      "count": 1,
+      "layer0": 6,
+      "seen": [
+        [
+          1,
+          6
+        ]
+      ],
+      "settled": true,
+      "titlesReadable": true,
+      "waitedMs": 5464
+    },
+    "layer0": {
+      "after": 6,
+      "afterImmediate": 6,
+      "before": 6
+    },
+    "pass": true,
+    "recoveries": 20,
+    "retiredNative": {
+      "contentViewsAlive": 0,
+      "delegatesAlive": 0,
+      "retired": 27,
+      "webviewsAlive": 0,
+      "windowsAlive": 0
+    },
+    "sameUiIncarnation": true,
+    "uiPid": 49367
+  },
+  "pass": false,
+  "passed": 24,
+  "preserved": {
+    "incarnationRejection": {
+      "ipcSuite": {
+        "passed": 27,
+        "roundTripsOk": true,
+        "total": 27
+      },
+      "pass": true,
+      "retiredProbe": {
+        "code": "UNKNOWN_SUBSCRIPTION",
+        "ok": false
+      },
+      "retiredSubscription": "e1940c4a-d746-4d3a-8fd3-e3695acc1a35"
+    },
+    "office": {
+      "after": {
+        "frame": {
+          "height": 651,
+          "width": 1000,
+          "x": 82,
+          "y": 66
+        },
+        "visible": true
+      },
+      "before": {
+        "frame": {
+          "height": 651,
+          "width": 1000,
+          "x": 82,
+          "y": 66
+        },
+        "visible": true
+      },
+      "pass": true
+    },
+    "pendingIntents": {
+      "after": [],
+      "before": [],
+      "pass": true
+    }
+  },
+  "recoveryDelays": [
+    {
+      "case": "document-replacement",
+      "delayMs": 0
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "delayMs": 0
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-01",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-02",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-03",
+      "delayMs": 15000
+    },
+    {
+      "case": "repeated-replacement-04",
+      "delayMs": 15000
+    },
+    {
+      "case": "repeated-replacement-05",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-06",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-07",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-08",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-09",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-10",
+      "delayMs": 15000
+    },
+    {
+      "case": "repeated-replacement-11",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-12",
+      "delayMs": 5000
+    },
+    {
+      "case": "repeated-replacement-13",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-14",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-15",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-16",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-17",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-18",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-19",
+      "delayMs": 10000
+    },
+    {
+      "case": "repeated-replacement-20",
+      "delayMs": 10000
+    }
+  ],
+  "total": 24,
+  "uiResources": {
+    "after": {
+      "footprintBytes": 36160664,
+      "layer0Windows": 6,
+      "webContentPids": [
+        83907
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 1,
+      "windows": [
+        [
+          22432,
+          true,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22384,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22375,
+          false,
+          500,
+          500,
+          ""
+        ],
+        [
+          22383,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22381,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22382,
+          false,
+          1168,
+          26,
+          ""
+        ]
+      ]
+    },
+    "before": {
+      "footprintBytes": 29967488,
+      "layer0Windows": 6,
+      "webContentPids": [
+        75139
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 1,
+      "windows": [
+        [
+          22384,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22375,
+          false,
+          500,
+          500,
+          ""
+        ],
+        [
+          22383,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22381,
+          false,
+          1168,
+          26,
+          ""
+        ],
+        [
+          22397,
+          true,
+          1000,
+          651,
+          "Threadspace"
+        ],
+        [
+          22382,
+          false,
+          1168,
+          26,
+          ""
+        ]
+      ]
+    },
+    "footprintGrowthMaxBytes": 4194304,
+    "pass": false,
+    "perRecovery": [
+      {
+        "footprintBytes": 35390592,
+        "layer0Windows": 6,
+        "webContentPids": [
+          80429
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22399,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 34227328,
+        "layer0Windows": 6,
+        "webContentPids": [
+          85377
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22400,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 33834112,
+        "layer0Windows": 6,
+        "webContentPids": [
+          92149
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22402,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 31458432,
+        "layer0Windows": 6,
+        "webContentPids": [
+          98885
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22403,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 34063488,
+        "layer0Windows": 6,
+        "webContentPids": [
+          5046
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22404,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32162944,
+        "layer0Windows": 6,
+        "webContentPids": [
+          8777
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22406,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 33031296,
+        "layer0Windows": 6,
+        "webContentPids": [
+          12609
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22407,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32294016,
+        "layer0Windows": 6,
+        "webContentPids": [
+          18349
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22411,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32769152,
+        "layer0Windows": 6,
+        "webContentPids": [
+          23903
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22414,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32261248,
+        "layer0Windows": 6,
+        "webContentPids": [
+          31298
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22417,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36406424,
+        "layer0Windows": 6,
+        "webContentPids": [
+          36531
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22419,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 35308696,
+        "layer0Windows": 6,
+        "webContentPids": [
+          39902
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22421,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36013208,
+        "layer0Windows": 6,
+        "webContentPids": [
+          45116
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22425,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36291736,
+        "layer0Windows": 6,
+        "webContentPids": [
+          50412
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22426,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36439192,
+        "layer0Windows": 6,
+        "webContentPids": [
+          56096
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22427,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36455576,
+        "layer0Windows": 6,
+        "webContentPids": [
+          61782
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22428,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 35505304,
+        "layer0Windows": 6,
+        "webContentPids": [
+          66856
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22429,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36406424,
+        "layer0Windows": 6,
+        "webContentPids": [
+          72688
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22430,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 37815448,
+        "layer0Windows": 6,
+        "webContentPids": [
+          78317
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22431,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 36373656,
+        "layer0Windows": 6,
+        "webContentPids": [
+          83907
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 1,
+        "windows": [
+          [
+            22432,
+            true,
+            1000,
+            651,
+            "Threadspace"
+          ],
+          [
+            22384,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22375,
+            false,
+            500,
+            500,
+            ""
+          ],
+          [
+            22383,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22381,
+            false,
+            1168,
+            26,
+            ""
+          ],
+          [
+            22382,
+            false,
+            1168,
+            26,
+            ""
+          ]
+        ]
+      }
+    ]
+  }
+}

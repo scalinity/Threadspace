@@ -1,0 +1,1110 @@
+{
+  "baseCommit": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54",
+  "branch": "m1",
+  "capture": {
+    "failurePaths": {
+      "admissionClosed": {
+        "drainedAfterReopen": 25,
+        "journalCountAfterDrain": 1045,
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 17065,
+            "minUs": 9958,
+            "p50Us": 11948,
+            "p95Us": 14825,
+            "p99Us": 17065
+          },
+          "withinWallBudget": true
+        },
+        "spoolEmptyAfterDrain": true,
+        "spooledWhileClosed": 25
+      },
+      "companionUnavailable": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 12977,
+            "minUs": 9108,
+            "p50Us": 11208,
+            "p95Us": 12512,
+            "p99Us": 12977
+          },
+          "withinWallBudget": true
+        },
+        "spooled": 25
+      },
+      "emptyInput": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 3316,
+            "minUs": 2088,
+            "p50Us": 2367,
+            "p95Us": 3306,
+            "p99Us": 3316
+          },
+          "withinWallBudget": true
+        }
+      },
+      "lossRecorded": {
+        "dropMarkers": 105,
+        "gapFactsInJournal": 1,
+        "pass": true
+      },
+      "malformedJson": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 3904,
+            "minUs": 2205,
+            "p50Us": 3206,
+            "p95Us": 3727,
+            "p99Us": 3904
+          },
+          "withinWallBudget": true
+        }
+      },
+      "oversized": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 5,
+          "wall": {
+            "count": 5,
+            "maxUs": 8291,
+            "minUs": 7697,
+            "p50Us": 8221,
+            "p95Us": 8291,
+            "p99Us": 8291
+          },
+          "withinWallBudget": true
+        }
+      },
+      "tooDeep": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 4805,
+            "minUs": 2629,
+            "p50Us": 3168,
+            "p95Us": 4402,
+            "p99Us": 4805
+          },
+          "withinWallBudget": true
+        }
+      },
+      "unsafeIdentifier": {
+        "pass": true,
+        "result": {
+          "exit0AndSilent": true,
+          "runs": 25,
+          "wall": {
+            "count": 25,
+            "maxUs": 4254,
+            "minUs": 2320,
+            "p50Us": 2624,
+            "p95Us": 3306,
+            "p99Us": 4254
+          },
+          "withinWallBudget": true
+        }
+      }
+    },
+    "hookSha256": "415ca5a088e03357a4ab1f2fc30fd8dafccf8edbd7037bf87e6e55b141054f97",
+    "normal": {
+      "committedInJournal": 1020,
+      "exit0AndSilent": true,
+      "inputBytes": {
+        "max": 3380,
+        "median": 1204,
+        "min": 171
+      },
+      "pass": true,
+      "runs": 1000,
+      "spool": {
+        "droppedMarkers": 0,
+        "pendingFiles": 0,
+        "quarantined": 0,
+        "readyBytes": 0,
+        "readyRecords": 0
+      },
+      "storedEnvelopeBytes": {
+        "max": 2593,
+        "median": 2583,
+        "min": 2568
+      },
+      "wall": {
+        "count": 1000,
+        "maxUs": 8571,
+        "minUs": 2474,
+        "p50Us": 4013,
+        "p95Us": 6183,
+        "p99Us": 7176
+      },
+      "warmup": 20
+    },
+    "pass": true,
+    "saturation": "evidence/M1/capture/saturation.json",
+    "targets": {
+      "p95Us": 25000,
+      "wallBudgetUs": 250000
+    }
+  },
+  "carryovers": {
+    "C-04": {
+      "boundsAndVisibilityPreserved": true,
+      "cases": [
+        64,
+        64
+      ],
+      "decision": "docs/decisions/D-0008-tao-0.37.0-window-release-containment.md",
+      "footprintSlopeBytesPerRecovery": {
+        "max": 104857.6,
+        "secondHalf": 17980.48320355951,
+        "wholeRun": 78719.2246735204
+      },
+      "history": "evidence/M1/c04/NOTE.md",
+      "incarnationRejection": {
+        "ipcSuite": {
+          "passed": 27,
+          "roundTripsOk": true,
+          "total": 27
+        },
+        "pass": true,
+        "retiredProbe": {
+          "code": "UNKNOWN_SUBSCRIPTION",
+          "ok": false
+        },
+        "retiredSubscription": "28e42137-3598-42fc-a67e-c04b4bd3270e"
+      },
+      "officeShells": {
+        "after": 1,
+        "afterImmediate": 1,
+        "before": 1
+      },
+      "pass": true,
+      "pendingIntentsPreserved": true,
+      "recoveries": 60,
+      "retiredNative": {
+        "contentViewsAlive": 0,
+        "delegatesAlive": 0,
+        "retired": 63,
+        "webviewsAlive": 0,
+        "windowsAlive": 0
+      },
+      "run": "evidence/M1/view-recovery/20261008T015231Z-prod",
+      "status": "CLOSED",
+      "webContentProcesses": [
+        1,
+        1
+      ]
+    },
+    "C-12": {
+      "evidence": "evidence/M1/c12/README.md",
+      "status": "CLOSED"
+    },
+    "C-13": {
+      "evidence": "evidence/M1/c13/README.md",
+      "status": "CLOSED"
+    }
+  },
+  "crashInjection": {
+    "acknowledgedLost": 0,
+    "duplicateFacts": 0,
+    "injections": 100,
+    "pass": true,
+    "points": [
+      "before-transaction",
+      "in-transaction",
+      "after-facts",
+      "after-reduce",
+      "after-commit-before-receipt"
+    ]
+  },
+  "decision": "docs/decisions/D-0007-m1-canonical-engine.md",
+  "deterministicSeeds": {
+    "families": {
+      "activation-changes": {
+        "duplicateDeliveriesInjected": 1272,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "resume",
+          "pid-tty-reuse",
+          "executable-replaced",
+          "replaced-then-unordered-image",
+          "executable-requalified",
+          "routing-ambiguity",
+          "execution-end-retained"
+        ],
+        "seedRanges": [
+          {
+            "from": 8400000,
+            "scenario": "resume",
+            "to": 8400178
+          },
+          {
+            "from": 8500000,
+            "scenario": "pid-tty-reuse",
+            "to": 8500178
+          },
+          {
+            "from": 8600000,
+            "scenario": "executable-replaced",
+            "to": 8600178
+          },
+          {
+            "from": 8700000,
+            "scenario": "replaced-then-unordered-image",
+            "to": 8700178
+          },
+          {
+            "from": 8800000,
+            "scenario": "executable-requalified",
+            "to": 8800177
+          },
+          {
+            "from": 8900000,
+            "scenario": "routing-ambiguity",
+            "to": 8900177
+          },
+          {
+            "from": 9000000,
+            "scenario": "execution-end-retained",
+            "to": 9000177
+          }
+        ]
+      },
+      "actor-events": {
+        "duplicateDeliveriesInjected": 1232,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "child-actors",
+          "shared-native-turn-id"
+        ],
+        "seedRanges": [
+          {
+            "from": 1500000,
+            "scenario": "child-actors",
+            "to": 1500624
+          },
+          {
+            "from": 1600000,
+            "scenario": "shared-native-turn-id",
+            "to": 1600624
+          }
+        ]
+      },
+      "completion": {
+        "duplicateDeliveriesInjected": 1264,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "normal-session",
+          "parallel-tools",
+          "outcomes",
+          "latest-turn-outcome"
+        ],
+        "seedRanges": [
+          {
+            "from": 3000000,
+            "scenario": "normal-session",
+            "to": 3000312
+          },
+          {
+            "from": 3100000,
+            "scenario": "parallel-tools",
+            "to": 3100312
+          },
+          {
+            "from": 3200000,
+            "scenario": "outcomes",
+            "to": 3200311
+          },
+          {
+            "from": 3300000,
+            "scenario": "latest-turn-outcome",
+            "to": 3300311
+          }
+        ]
+      },
+      "delayed-callbacks": {
+        "duplicateDeliveriesInjected": 1256,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "a-b-a-delayed"
+        ],
+        "seedRanges": [
+          {
+            "from": 6100000,
+            "scenario": "a-b-a-delayed",
+            "to": 6101249
+          }
+        ]
+      },
+      "duplicates": {
+        "duplicateDeliveriesInjected": 209,
+        "failures": 0,
+        "permutations": 200,
+        "scenarios": [
+          "duplicate-deliveries"
+        ],
+        "seedRanges": [
+          {
+            "from": 8400000,
+            "scenario": "duplicate-deliveries",
+            "to": 8400199
+          }
+        ]
+      },
+      "output-input": {
+        "duplicateDeliveriesInjected": 1246,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "followup-witnessed",
+          "followup-claude"
+        ],
+        "seedRanges": [
+          {
+            "from": 1100000,
+            "scenario": "followup-witnessed",
+            "to": 1100624
+          },
+          {
+            "from": 1200000,
+            "scenario": "followup-claude",
+            "to": 1200624
+          }
+        ]
+      },
+      "owner-commands": {
+        "duplicateDeliveriesInjected": 1252,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "owner-commands"
+        ],
+        "seedRanges": [
+          {
+            "from": 6300000,
+            "scenario": "owner-commands",
+            "to": 6301249
+          }
+        ]
+      },
+      "robustness": {
+        "duplicateDeliveriesInjected": 198,
+        "failures": 0,
+        "permutations": 200,
+        "scenarios": [
+          "unknown-and-malformed",
+          "sensitive-payload"
+        ],
+        "seedRanges": [
+          {
+            "from": 11400000,
+            "scenario": "unknown-and-malformed",
+            "to": 11400099
+          },
+          {
+            "from": 11500000,
+            "scenario": "sensitive-payload",
+            "to": 11500099
+          }
+        ]
+      },
+      "snapshot-live": {
+        "duplicateDeliveriesInjected": 1259,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "stale-snapshot",
+          "dropped-observation"
+        ],
+        "seedRanges": [
+          {
+            "from": 8200000,
+            "scenario": "stale-snapshot",
+            "to": 8200624
+          },
+          {
+            "from": 8300000,
+            "scenario": "dropped-observation",
+            "to": 8300624
+          }
+        ]
+      },
+      "wait-events": {
+        "duplicateDeliveriesInjected": 1243,
+        "failures": 0,
+        "permutations": 1250,
+        "scenarios": [
+          "waiting",
+          "delayed-positive-wait",
+          "delayed-clear-wait",
+          "wait-generations"
+        ],
+        "seedRanges": [
+          {
+            "from": 2700000,
+            "scenario": "waiting",
+            "to": 2700312
+          },
+          {
+            "from": 2800000,
+            "scenario": "delayed-positive-wait",
+            "to": 2800312
+          },
+          {
+            "from": 2900000,
+            "scenario": "delayed-clear-wait",
+            "to": 2900311
+          },
+          {
+            "from": 3000000,
+            "scenario": "wait-generations",
+            "to": 3000311
+          }
+        ]
+      }
+    },
+    "replaySeed": 19761,
+    "scheme": "seed = familyIndex * 1000000 + scenarioIndex * 100000 + index; duplicates injected when Rng(seed ^ 0xD0D0D0D0) draws 1/2"
+  },
+  "fixtures": {
+    "catalog": "evidence/M1/fixtures/catalog.json",
+    "m0StoreV2Sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
+    "regressionSeedsSha256": "363cfebd793cabac32f4c304452ac81db0b283ca537fb43e437f3bf0d39deb89",
+    "scenarios": 26
+  },
+  "generatedArtifacts": {
+    "instanceValidation": {
+      "CanonicalState.schema.json": {
+        "errors": 0,
+        "firstErrors": [],
+        "instances": 26
+      },
+      "JournalEntry.schema.json": {
+        "errors": 0,
+        "firstErrors": [],
+        "instances": 200
+      },
+      "NativeFactDraft.schema.json": {
+        "errors": 0,
+        "firstErrors": [],
+        "instances": 238
+      },
+      "ObservationEnvelope.schema.json": {
+        "errors": 0,
+        "firstErrors": [],
+        "instances": 223
+      },
+      "OwnerCommand.schema.json": {
+        "errors": 0,
+        "firstErrors": [],
+        "instances": 3
+      }
+    },
+    "jsonSchema": {
+      "aggregateSha256": "26cc8b9f6ab892943edbd6e32583f3f9991a1a3960013eeb0372da31172dcb06",
+      "files": 8,
+      "freshAgainstRust": {
+        "CanonicalState.schema.json": true,
+        "CaptureBatch.schema.json": true,
+        "CaptureReply.schema.json": true,
+        "JournalEntry.schema.json": true,
+        "ModBatchReceipt.schema.json": true,
+        "NativeFactDraft.schema.json": true,
+        "ObservationEnvelope.schema.json": true,
+        "OwnerCommand.schema.json": true
+      }
+    },
+    "typescript": {
+      "aggregateSha256": "9bb2e74dc2864ad6169c7244f4fe59caf18697345e41464743d7652c04d6f918",
+      "files": 156
+    }
+  },
+  "knownLimitations": [
+    "Canonical attention creates durable outbox intents; their OS delivery is M5 (D-0007 §8).",
+    "Claude inventory waiting/waitingFor stay display metadata until M2 maps them to session-scoped wait episodes (D-0007 §8).",
+    "Claude conventional hooks are interpreted at the classic-limited profile only; native turn identity and outcomes from the observer mod are M2 (D-0007 §7).",
+    "Durability is qualified against ordinary process crashes (SIGKILL) under WAL with synchronous=FULL; power-loss durability is not claimed.",
+    "The capture benchmark runs the release hook against the fixture companion (real writer and event socket, disposable store), not against an installed identity's store.",
+    "A single-write log record narrows, but does not eliminate, a torn record on a mid-write kill; readers skip and count torn lines (C-13).",
+    "C-04 closes under D-0008, a containment scoped to tao 0.37.0: any Tauri, tao or Wry update first removes it and requalifies view recovery without it.",
+    "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15)."
+  ],
+  "m0bCompatibility": {
+    "cases": {
+      "baseline-exact": true,
+      "foreground-process-mismatch": true,
+      "fullscreen-space-then-return": true,
+      "minimize-then-return": true,
+      "move": true,
+      "reorder": true,
+      "selection-readback-race": true,
+      "stale-tty-pathname": true,
+      "target-closed": true,
+      "target-closed-during-route": true,
+      "terminal-restart": false
+    },
+    "pass": true,
+    "run": "evidence/M1/g08-terminal/20261008T020830Z-prod",
+    "runner": "threadspace-m0c g08-terminal prod",
+    "terminalIncarnationUnchanged": true,
+    "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+    "wrongTargets": 0
+  },
+  "migration": {
+    "area": "migration",
+    "baselineCheckpointOrigin": "M0_BASELINE",
+    "deterministicUpgrade": {
+      "pass": true,
+      "upgrades": [
+        {
+          "allocator": "random",
+          "projectionMatchesTables": true,
+          "sessionIdsPreserved": true,
+          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "upgrade": "a"
+        },
+        {
+          "allocator": "random",
+          "projectionMatchesTables": true,
+          "sessionIdsPreserved": true,
+          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "upgrade": "b"
+        },
+        {
+          "allocator": "seeded",
+          "projectionMatchesTables": true,
+          "sessionIdsPreserved": true,
+          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "upgrade": "c"
+        }
+      ]
+    },
+    "fixture": {
+      "path": "fixtures/m1/m0-store-v2/journal.sqlite3",
+      "schemaVersion": 2,
+      "sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
+      "writtenBy": "accepted M0C journal at cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54 (fixtures/m1/m0-store-v2/generator.rs)"
+    },
+    "futureSchemaRefused": {
+      "pass": true,
+      "storeUnchanged": true
+    },
+    "migrations": [
+      {
+        "id": 1,
+        "name": "m0-fixture-schema",
+        "sha256": "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8"
+      },
+      {
+        "id": 2,
+        "name": "m0b-identity-and-routes",
+        "sha256": "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2"
+      },
+      {
+        "id": 3,
+        "name": "m1-canonical-journal",
+        "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
+      }
+    ],
+    "newerReducerCheckpointRefused": true,
+    "operatesAfterUpgrade": {
+      "ownerCommandThenRestartSameState": true
+    },
+    "pass": true,
+    "preserved": {
+      "acknowledgedItems": 1,
+      "inventoryAbsenceStale": true,
+      "m0bRouteBoundAfterPidReuse": true,
+      "m0bUnprovenSurfaceKept": true,
+      "ownerResolvedItems": 1
+    },
+    "reducerVersion": 1,
+    "targetSchemaVersion": 3
+  },
+  "migrations": [
+    {
+      "id": 1,
+      "name": "m0-fixture-schema",
+      "sha256": "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8"
+    },
+    {
+      "id": 2,
+      "name": "m0b-identity-and-routes",
+      "sha256": "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2"
+    },
+    {
+      "id": 3,
+      "name": "m1-canonical-journal",
+      "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
+    }
+  ],
+  "milestone": "M1",
+  "nativeBuild": {
+    "buildInfoFrom": "evidence/M1/native-install.json (installer readback)",
+    "companionSha256": "510daaa0b1e3c64d6ed11dc4ed71fec7439a0c99966d64590935a90fcc4ce9a4",
+    "executableSha256": "3b6a4e795212dd1abd6f9131fb73a0995994b26b834be63dc31b1c8c1e0f485a",
+    "qualificationBuild": true,
+    "sourceCommit": "73636ec2482313f3507f32b378fb64cd3ef082de",
+    "sourceTreeDirty": false
+  },
+  "platform": {
+    "hardware": "Apple M5 Pro",
+    "os": "macOS 27.2 (26B5091g)",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "sqlite": "3.53.4"
+  },
+  "propertyTests": {
+    "failures": 0,
+    "pass": true,
+    "preservedFailingSeeds": "fixtures/m1/regression-seeds.json",
+    "requiredFamilyPermutations": 10000,
+    "sqliteStepwiseCrossChecks": 1040,
+    "totalPermutations": 10400
+  },
+  "reducerInvariantCatalog": "evidence/M1/reducer-invariants.md",
+  "replay": {
+    "contract": "Exact: the same admitted journal (or checkpoint plus later entries) replays to identical state, projection and table digests, repeatedly, across restart and from genesis. Semantic: the SQLite path's native-key projection equals the pure path's.",
+    "pass": true,
+    "repeats": 3,
+    "scenarios": [
+      {
+        "checkpointSha256": "95aac14e339b331061979f3f5c25fb4ff6299ce2d109a67403e4b30b6355b28c",
+        "entries": 14,
+        "facts": 15,
+        "journalRange": [
+          1,
+          14
+        ],
+        "journalSha256": "1790e1019ad9caab5289e0af57b5c6e2bebb4ee5f4657dda350bc931cbc7a875",
+        "projectionSha256": "221fa7139a5cb200e564b87cb0a385987493321db1176d477e18855056d1f4e2",
+        "scenario": "normal-session",
+        "semanticSha256": "ce6da2a8c21c7e0ad83b3d41c389bba1c14bf99fac767a912728b3bfa212e406",
+        "stateSha256": "95aac14e339b331061979f3f5c25fb4ff6299ce2d109a67403e4b30b6355b28c"
+      },
+      {
+        "checkpointSha256": "7e5957250b21a61575ce190aa7f8ac1804bed281f29ce8e6ae0cfd6868de2011",
+        "entries": 13,
+        "facts": 13,
+        "journalRange": [
+          1,
+          13
+        ],
+        "journalSha256": "3340f77a0ed4bc7eb7bf67913238801c6b52b01c185bf852c01be87ae8983fbd",
+        "projectionSha256": "b061765ee7582e5aa38682acc2b18c135687d0c5d4eec0256386216458d23577",
+        "scenario": "parallel-tools",
+        "semanticSha256": "b8b5b93c7810702f1e9c4f12fc66321c3d0b7392e8a9c15ad4c738c3155bb174",
+        "stateSha256": "7e5957250b21a61575ce190aa7f8ac1804bed281f29ce8e6ae0cfd6868de2011"
+      },
+      {
+        "checkpointSha256": "e0ec310465073684fa4546bd9b97be82e839db30de3d11f4c1d69a25e10b9b36",
+        "entries": 10,
+        "facts": 10,
+        "journalRange": [
+          1,
+          10
+        ],
+        "journalSha256": "d786bd431ad5133d8351c2fe10dd5438eea95706c1a2a553bb91d4bcb729a5c3",
+        "projectionSha256": "0b0b06246a509eebf0ddff879715fa87ae4a3f0772d085eb057bc971bfd8d52e",
+        "scenario": "outcomes",
+        "semanticSha256": "5538bea6cccd6506f6ef876545a61e705cfe19f36b5a7c74062330947c75ac1f",
+        "stateSha256": "e0ec310465073684fa4546bd9b97be82e839db30de3d11f4c1d69a25e10b9b36"
+      },
+      {
+        "checkpointSha256": "c55e7a20eebab01f7f85d11b877127b6963ac4b5c92bbcbd8362760b894ca3ab",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "f7416d676482b57212601c11d2f7251d5394dc4234df039b52f64af77b3571cd",
+        "projectionSha256": "01760f997709d5f59d9488ccb1fb0cc05a981108f83f70082f655f85b30bfaea",
+        "scenario": "latest-turn-outcome",
+        "semanticSha256": "e0ead851f6aeb01701590984ea08964fba91c0b7c46fa1e7b996f7b8ce6938c3",
+        "stateSha256": "c55e7a20eebab01f7f85d11b877127b6963ac4b5c92bbcbd8362760b894ca3ab"
+      },
+      {
+        "checkpointSha256": "1c14ea5bbc643088190408064eea05408557e39f2f3eb263c888025871e3f3f0",
+        "entries": 3,
+        "facts": 3,
+        "journalRange": [
+          1,
+          3
+        ],
+        "journalSha256": "8f257c10153b7678856df10ba4eba0b7b70679d43b23d0c12db73d57134a12b4",
+        "projectionSha256": "d96bbccaff7fbc548ec29cbfcb0f5cbb45acb531d4c30d7803a21461714e2d12",
+        "scenario": "duplicate-deliveries",
+        "semanticSha256": "7ae64a374240390f6e1ca9f9a6c2126bd80fbce9511304dbfba3214816e939fb",
+        "stateSha256": "1c14ea5bbc643088190408064eea05408557e39f2f3eb263c888025871e3f3f0"
+      },
+      {
+        "checkpointSha256": "b90cf7ba6b23c15f020eeb121226f30d74899c6f51d3a36d46a9520f2a4228e4",
+        "entries": 11,
+        "facts": 13,
+        "journalRange": [
+          1,
+          11
+        ],
+        "journalSha256": "fbd69d1831af784b36be3b5d4e9408ed61dbfe71e37243188dd7be9527415eb1",
+        "projectionSha256": "3a711962122bee919696b9c060ccba96d9134d761e93f6b3d4f9b687236f4278",
+        "scenario": "child-actors",
+        "semanticSha256": "f2bc504496f5da0580df550c2e0b8427944e535c44b628a7756584d8f50eaa97",
+        "stateSha256": "b90cf7ba6b23c15f020eeb121226f30d74899c6f51d3a36d46a9520f2a4228e4"
+      },
+      {
+        "checkpointSha256": "8aca141a29f313c3130bb4ec3196da9f169e22d34a71bff4963af29c24a6fb1b",
+        "entries": 6,
+        "facts": 7,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "bfc70f0c61d7a23f541c9ba583756d586c083e10ff382cd626d66862726d617b",
+        "projectionSha256": "771816fe171d12979323b3d3c22f9fabff5de58b6cfc2b77eecb5cebe8ec5e8e",
+        "scenario": "shared-native-turn-id",
+        "semanticSha256": "4a05dee4465661d59ac326bcbd200267e0ebfa88c1f45b1db29e917fb29210ce",
+        "stateSha256": "8aca141a29f313c3130bb4ec3196da9f169e22d34a71bff4963af29c24a6fb1b"
+      },
+      {
+        "checkpointSha256": "c789e67d761d81a4aafe6277f8784d76af464ef364c6ef9e1e1147724ede0909",
+        "entries": 7,
+        "facts": 7,
+        "journalRange": [
+          1,
+          7
+        ],
+        "journalSha256": "7f3c0a1cd4b962a98a6e11b62bcaaa10e957104580e1b62e3d977e151fa6ffd8",
+        "projectionSha256": "774ac419e9ad4d9778a5cd6145601b495e648333d98b1834bcd62d2699eb2a79",
+        "scenario": "waiting",
+        "semanticSha256": "3f6df44b62bee560c61e6e7bfecb42e47c13679b668cbeafed9c7452b00dc263",
+        "stateSha256": "c789e67d761d81a4aafe6277f8784d76af464ef364c6ef9e1e1147724ede0909"
+      },
+      {
+        "checkpointSha256": "a7a3b05ef57f0a2fdfd624471e4bc83f23b82b8165ba354c30560fb3a48df695",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "6f685447c2ba7ee5cd2da12900abdfd8eb72cc091e274fd0d17f8a7570e6eb34",
+        "projectionSha256": "f9d4f0c64ee6197213944c7d0ffdbaccef2f04d97a61fa2be3ca7e268aba7018",
+        "scenario": "delayed-positive-wait",
+        "semanticSha256": "0959b533e524e69a1099b4d136a8ef24be4608e3b7f311dedc3c026f3ef961e4",
+        "stateSha256": "a7a3b05ef57f0a2fdfd624471e4bc83f23b82b8165ba354c30560fb3a48df695"
+      },
+      {
+        "checkpointSha256": "5f7d15e65fa84447bf2ccca5a01d5bba6a6a6838068a59941ef5efee7b364380",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "361a5749fa661a6f1375c36c1cc134fe17f212743fd2481babb5a44f0bde2a3d",
+        "projectionSha256": "77e088863e3bdb5c0f4d38735bca28e9ad9296db22d61d901b33bf0c5cea81de",
+        "scenario": "delayed-clear-wait",
+        "semanticSha256": "e0be7fd993c01443b62f756b8fe2989c3229300100af69669bbecc1e787419c8",
+        "stateSha256": "5f7d15e65fa84447bf2ccca5a01d5bba6a6a6838068a59941ef5efee7b364380"
+      },
+      {
+        "checkpointSha256": "c412317c2f5f3fd24e0302a142fe0defcd9ec5755ae52e4a9834c1fcfde8e722",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "d66e30af67162f141dee7ca2a6683b0b017f805d0e40c070d8341b0624dc9829",
+        "projectionSha256": "febd4153aa8c4b61b59bcbdee74822e531bd375d51181dcf290c0b2f49cc62fd",
+        "scenario": "wait-generations",
+        "semanticSha256": "418209ad93428266495f87ec7b04de496ec56a62330cc23cc5ccfcab04ed1253",
+        "stateSha256": "c412317c2f5f3fd24e0302a142fe0defcd9ec5755ae52e4a9834c1fcfde8e722"
+      },
+      {
+        "checkpointSha256": "e1ab8cdb4d982cc3837fbc3195c12367394f9568afb7e86e11537214ad459f64",
+        "entries": 15,
+        "facts": 15,
+        "journalRange": [
+          1,
+          15
+        ],
+        "journalSha256": "e13b470a571fc01d05b7ef04336cf3af761b6774402f1aee3ffce29d86f20c83",
+        "projectionSha256": "ec6af64d49bbcd6b149e1508fe53d5c254a296167fe59b8c742f831cb5f7cd81",
+        "scenario": "followup-witnessed",
+        "semanticSha256": "2c404878172e8d8ed90c69822d89ecf7ea94e13e87b9ddc18904274802910dfe",
+        "stateSha256": "e1ab8cdb4d982cc3837fbc3195c12367394f9568afb7e86e11537214ad459f64"
+      },
+      {
+        "checkpointSha256": "8993bb25936a5ef6ad363e8d63e3a772505cc0875495531e844e28f78b87acad",
+        "entries": 16,
+        "facts": 16,
+        "journalRange": [
+          1,
+          16
+        ],
+        "journalSha256": "7f70e4366752b8f9ee233798f1359561497de904a11ea89f669467945e5568fa",
+        "projectionSha256": "d199503dd411726557bbdf15ae86f346199d46f12721975e9300320e1bd6c21a",
+        "scenario": "followup-claude",
+        "semanticSha256": "4dbd63ffb00d59c8ba4db4b37b96840269f25afb2a38ad6494d350d7e641bf18",
+        "stateSha256": "8993bb25936a5ef6ad363e8d63e3a772505cc0875495531e844e28f78b87acad"
+      },
+      {
+        "checkpointSha256": "66da5984885fc4c86b961b8f7739dd9fd93b3327d541bf61ca43a137f08ab4b2",
+        "entries": 8,
+        "facts": 8,
+        "journalRange": [
+          1,
+          8
+        ],
+        "journalSha256": "67fbf5a45121cfa5d3897c3c40569c027d2d3b7f6cc5d1f9501ddf7c57dfe0e9",
+        "projectionSha256": "f2ba4ca12ff97f6f392bbe8bcea8bb9bebb88e52455f2fe04876c842b5a7a2ee",
+        "scenario": "owner-commands",
+        "semanticSha256": "9827101e3fada6bae69e79340383c11934163af3b5b8090f60c874c6ec0477c4",
+        "stateSha256": "66da5984885fc4c86b961b8f7739dd9fd93b3327d541bf61ca43a137f08ab4b2"
+      },
+      {
+        "checkpointSha256": "d1aa62a6e020150df7c125650b8281d98b4e25d4c899b7a47f5e9a3f5530aece",
+        "entries": 11,
+        "facts": 13,
+        "journalRange": [
+          1,
+          11
+        ],
+        "journalSha256": "1f932b024755fe35b34958197a284cfa817d5b192b8daa16cd86e4046c4220d2",
+        "projectionSha256": "6119e76bfb0acee835688329d50a73cd599e256a2cbedc4c0d2a8abe2f335a15",
+        "scenario": "resume",
+        "semanticSha256": "368b9916ae5dbb1f4c565767f9d5739b8ce7d47768cdd83fefcd052fbb82f6ed",
+        "stateSha256": "d1aa62a6e020150df7c125650b8281d98b4e25d4c899b7a47f5e9a3f5530aece"
+      },
+      {
+        "checkpointSha256": "2ca9b3d93ed9377859ebc43e25f7ec3b6cc370f62ce56a0e913cb3256d62fefe",
+        "entries": 9,
+        "facts": 12,
+        "journalRange": [
+          1,
+          9
+        ],
+        "journalSha256": "6bff45c9ac516f39f620cb103eb096035fe0dfbaf04943ab42543133e700135e",
+        "projectionSha256": "3b5c4853861b8a1e6987af46b3304de17821e4c30d1896c4b3b0c91f55e73e73",
+        "scenario": "pid-tty-reuse",
+        "semanticSha256": "2ab136750d157e5bdf52577ab5208196ba3f993c485b03a5bb37a5051e6783d6",
+        "stateSha256": "2ca9b3d93ed9377859ebc43e25f7ec3b6cc370f62ce56a0e913cb3256d62fefe"
+      },
+      {
+        "checkpointSha256": "c8c5c55b3f37d984f20d74541cce350301e42fefe79cc745ebb92e55c3099990",
+        "entries": 4,
+        "facts": 5,
+        "journalRange": [
+          1,
+          4
+        ],
+        "journalSha256": "2dff2109f08e6e0a79e7f6cc89c8ec0b0c810070f2b1f9ba7f62de4dd0636c21",
+        "projectionSha256": "8f5fc3e9f12e9c052f334472c6c49e22279c3b1e3080a0a78a1f32b8d0f15e71",
+        "scenario": "executable-replaced",
+        "semanticSha256": "560e9557cf8b61106bc46830f62e03cb66eb345cde407eb104e7326ffea2b95d",
+        "stateSha256": "c8c5c55b3f37d984f20d74541cce350301e42fefe79cc745ebb92e55c3099990"
+      },
+      {
+        "checkpointSha256": "2292ce1dd42e547b679d70f78e5dc6743dedf1edab697d1d1f741e6baab264ec",
+        "entries": 5,
+        "facts": 6,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "cbc4aa2d5a544e990c3ec5c725e8cf6e91d2d92861e213a61e75f11e600b1150",
+        "projectionSha256": "6d6ac8fa3b445bacc545e52e526655384507a47b183505d77f2e7841bd136c23",
+        "scenario": "replaced-then-unordered-image",
+        "semanticSha256": "473330dc1232cc35ad766d006fa298c70f5f31f13ae055fc7250add59f7d5f8b",
+        "stateSha256": "2292ce1dd42e547b679d70f78e5dc6743dedf1edab697d1d1f741e6baab264ec"
+      },
+      {
+        "checkpointSha256": "5e54e06abd6286823a0a2a57bbf265155b3861738170491315ef9dda36457b31",
+        "entries": 6,
+        "facts": 8,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "3f232a7557e835f6524a5522efa89281f4e51088c86b9fe850373fd8621844cb",
+        "projectionSha256": "ed5368fff6b33162b79c167029e6a5b9c5a05073f09a8f02d17c59a3876985f1",
+        "scenario": "executable-requalified",
+        "semanticSha256": "ab50ddf183f652ce55a5a4dd5fee6fe114b45b5889f5447d425444560428e429",
+        "stateSha256": "5e54e06abd6286823a0a2a57bbf265155b3861738170491315ef9dda36457b31"
+      },
+      {
+        "checkpointSha256": "66aba42f52a2c32ceffc8156bd5e7de2216fec12f5a3c5bdbe3e0c9156793a44",
+        "entries": 5,
+        "facts": 7,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "071f4bbce5b28ac776dabb67af734ff9fffc18707185fd16cd696f8b4eb8023a",
+        "projectionSha256": "8ecf5cb9dd07fa284e05da9ec07f6eb3ec0d42b3bde97a834aa785b54618a13f",
+        "scenario": "routing-ambiguity",
+        "semanticSha256": "1ff85a7b81fc5926ed0ab07561fc3efbd664a7c63dafc18db4a3ba7c2935094b",
+        "stateSha256": "66aba42f52a2c32ceffc8156bd5e7de2216fec12f5a3c5bdbe3e0c9156793a44"
+      },
+      {
+        "checkpointSha256": "a9fc43648aa0808e5da39d24d58f7a27eac8c7c2fc80d65692847d7d7c0f7300",
+        "entries": 5,
+        "facts": 6,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "a4cdf95116ee711368adf7abae830a4ebcf10a00a416efa2ed56301e0372f5c8",
+        "projectionSha256": "f07e65312c237dfbf047d19ada5a4845ea5c4e438c6a4e7b0362bacf6533e11b",
+        "scenario": "execution-end-retained",
+        "semanticSha256": "15715b7d34f1555a3735674a281b28dda40aa02e91ff474e690c7390fd472567",
+        "stateSha256": "a9fc43648aa0808e5da39d24d58f7a27eac8c7c2fc80d65692847d7d7c0f7300"
+      },
+      {
+        "checkpointSha256": "abedd1038fac29a04effff8b7f6d632d512f82938c460bc41e3f4ae8c0fd5d35",
+        "entries": 12,
+        "facts": 15,
+        "journalRange": [
+          1,
+          12
+        ],
+        "journalSha256": "c5b51bdf8f66453d366b708a061ba0586d0e229ccf7d4948144266c2e8d7de59",
+        "projectionSha256": "9e6024e3cc87305510bad11c907983257497114ca1d3bed08c2601c2bece6c7b",
+        "scenario": "a-b-a-delayed",
+        "semanticSha256": "24f70a9ac360379a56b73f39641dce37997217860ec2d084b2005ed4632d04a9",
+        "stateSha256": "abedd1038fac29a04effff8b7f6d632d512f82938c460bc41e3f4ae8c0fd5d35"
+      },
+      {
+        "checkpointSha256": "6f1f2c23e63f995b4823b3d96142cc1ddb18d7c6cb7d02868ab7d20b8b5d4f99",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "995741caab6475278b24c8fb049bebb950e7425662006783cc652fa75be04b75",
+        "projectionSha256": "aca2aa5572b526574e0fdd6471beb90b035ad81ef21c8955b02cfa99a9fdf1c0",
+        "scenario": "stale-snapshot",
+        "semanticSha256": "89ac01ec082875311d7d2eefee8fdf4665c9e967afdd9f52b8737748e8ded8e1",
+        "stateSha256": "6f1f2c23e63f995b4823b3d96142cc1ddb18d7c6cb7d02868ab7d20b8b5d4f99"
+      },
+      {
+        "checkpointSha256": "1755b5aee08c6c18b27ab5f4cffe3241865cb5a0639e0d0ece5f78b6f6934d8a",
+        "entries": 4,
+        "facts": 4,
+        "journalRange": [
+          1,
+          4
+        ],
+        "journalSha256": "3a5039a84a515cd1294f40531c70c56b5c47a130700aab70d30b2db1d5bd872e",
+        "projectionSha256": "ec3b9946a2e6198224cd0c3f97afe32829010ddce07892063e4fb4ae3320a8b0",
+        "scenario": "dropped-observation",
+        "semanticSha256": "6dd0ff6722de3399ef72b5d69a758b8f8d49c2fb75847fde8c15da767ce57cc1",
+        "stateSha256": "1755b5aee08c6c18b27ab5f4cffe3241865cb5a0639e0d0ece5f78b6f6934d8a"
+      },
+      {
+        "checkpointSha256": "742ee59d372a6926d113c189f8cf72db24bccbfbf95dc7d1bb2dda3c59a4aa1a",
+        "entries": 6,
+        "facts": 1,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "c4c23c5b58036fcb35ae11b796599e51e611e6be0d92ae867fca6b0e4e22cec5",
+        "projectionSha256": "0213fb60c3278ec275d1313bc70c86a969060bcef4d170080584193a360087b2",
+        "scenario": "unknown-and-malformed",
+        "semanticSha256": "85e75dfbefc53e21dd15da69a633b514a5ce1ca5a4824558e9314de67c143fdc",
+        "stateSha256": "742ee59d372a6926d113c189f8cf72db24bccbfbf95dc7d1bb2dda3c59a4aa1a"
+      },
+      {
+        "checkpointSha256": "7a9879c5f4c94b4581a7d59bb98f34e3ac619856ab193d26af1416d188ac7437",
+        "entries": 3,
+        "facts": 3,
+        "journalRange": [
+          1,
+          3
+        ],
+        "journalSha256": "39e5967c02b11097d71a34d6e1147c8e3d29545a7126528c5be1c5be2c55fbb9",
+        "projectionSha256": "615da6022a48a4d3f7dd520cbdab2a25c9a254f1726f75f707ba9cb4cd1ad19d",
+        "scenario": "sensitive-payload",
+        "semanticSha256": "01ef18496e2530e13f3c78f6c835442859bf8f784705f84fd0406355a19ff0b9",
+        "stateSha256": "7a9879c5f4c94b4581a7d59bb98f34e3ac619856ab193d26af1416d188ac7437"
+      }
+    ]
+  },
+  "sanitization": {
+    "pass": true,
+    "spoolPath": {
+      "drainedAfterReopen": 14,
+      "filesScanned": 14,
+      "plantedValuesFound": [],
+      "spooled": 14
+    },
+    "storeScan": {
+      "filesScanned": 6,
+      "includes": "journal.sqlite3, -wal, -shm, capture-spool/**, logs/**",
+      "plantedValuesFound": []
+    }
+  },
+  "schema": 1,
+  "sourceCommit": "a940b43ac8d56bec310d813bc9d3e9198bc6abc5",
+  "testCommands": [
+    "cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification",
+    "npx vitest run",
+    "THREADSPACE_CHECK_SCHEMAS=1 cargo test -p threadspace-contracts --test schemas",
+    "cargo build --release -p threadspace-synthetic --bin threadspace-m1 -p threadspace-relay --bin threadspace-hook",
+    "target/aarch64-apple-darwin/release/threadspace-m1 fixtures|replay|permutations 10000|crash|migration|contracts",
+    "target/aarch64-apple-darwin/release/threadspace-m1 capture target/aarch64-apple-darwin/release/threadspace-hook 1000",
+    "target/aarch64-apple-darwin/release/threadspace-m1 sanitization target/aarch64-apple-darwin/release/threadspace-hook"
+  ],
+  "title": "Journal, Contracts and Deterministic Synthetic Harness",
+  "verdict": "M1 PASS CANDIDATE — pending independent review",
+  "versions": {
+    "contracts": [
+      {
+        "name": "observationEnvelope",
+        "version": 1
+      },
+      {
+        "name": "factPayload",
+        "version": 1
+      },
+      {
+        "name": "captureProtocol",
+        "version": 1
+      },
+      {
+        "name": "modBatchReceipt",
+        "version": 1
+      }
+    ],
+    "journalSchema": 3,
+    "reducer": 1,
+    "runtimeLocator": 1
+  }
+}

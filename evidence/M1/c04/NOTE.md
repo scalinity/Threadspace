@@ -60,3 +60,21 @@ Earlier runs on a busy machine recorded some recoveries as
 in-flight, 01, 05). Each of those views was still recreated, hydrated and
 projection-equal; the reason depends on unconsumed data at the moment of the
 reload, not on window destruction.
+
+## On the M1 build (`73636ec`, D-0008)
+
+The containment above, merged into `m1` and kept under D-0008, qualified on
+the M1 application build (app `3b6a4e79…`, companion `510daaa0…`, store
+upgraded to schema 3). These runs stay where the runner wrote them, in
+`evidence/M1/view-recovery/`; each later one follows a runner change made
+after the one before it:
+
+| Run | N | Outcome | What changed next |
+| --- | --- | --- | --- |
+| `20261008T012315Z-prod` | 20 | Aborted at case 3: its recovery came 110 s after the trigger, past the 60 s window, while another application was in front | Each case raises the office window behind the idle gate: WebKit suspends a covered page's timers and with them the view's stall watchdog |
+| `20261008T012838Z-prod` | 20 | 24/24 cases, shells 1 → 1, everything held except footprint before → after +5.9 MiB against a 4 MiB bound | Footprint judged by its least-squares trend, each sample taken with the window raised for a second |
+| `20261008T013530Z-prod` | 60 | 64/64 cases, shells 1 → 1; whole-run slope 0.116 MiB per recovery against 0.1: one step from about 28 to 32 MiB at recovery 14, then flat for 46 recoveries (medians by third 29.1, 32.6, 32.6; second-half slope 0.07) | The gate became the second-half slope, since a leak costs every recovery alike (the pre-repair leak measures 0.567 there) |
+| `20261008T015231Z-prod` | 60 | **PASS**: 64/64 cases; office shells 1 → 1 → 1; all 63 retired windows, delegates, content views and web views freed; WebContent 1 → 1; footprint slope 0.075 MiB per recovery over the whole run and 0.017 over the second half (medians 29.7, 32.1, 32.1); bounds and visibility kept; durable intent backlog unchanged; IPC suite 27/27 and the retired view's subscription refused (`UNKNOWN_SUBSCRIPTION`) in the recreated view | — |
+
+The four extra layer-0 windows in the passing run (2 → 6) are AppKit's
+off-screen 1168×26 menu-bar strips described above, not office windows.
