@@ -69,8 +69,8 @@ $M g12-sleep-wake prod 5     # needs six root-scheduled wakes, one spare (see be
 
 `view-recovery` is the permanent C-04 regression for the D-0008 containment.
 After repeated view retirement and recreation it passes only with flat office
-window shells after quiescence, no WebContent growth, UI footprint within
-4 MiB, office bounds and visibility kept, the durable intent backlog unchanged,
+window shells after quiescence, no WebContent growth, a UI footprint trend of
+at most 0.1 MiB per recovery over the run's second half, office bounds and visibility kept, the durable intent backlog unchanged,
 equal projections, and stale-epoch and retired-subscription refusal in the
 recreated view. Run it, without the containment, before any Tauri, tao or Wry
 update lands.

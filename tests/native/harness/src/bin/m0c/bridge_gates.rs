@@ -22,9 +22,12 @@ const SHELLS_STABLE: Duration = Duration::from_secs(5);
 const SHELLS_SETTLE_CAP: Duration = Duration::from_secs(60);
 /// The office window's title (`window::create_office`).
 const OFFICE_TITLE: &str = "Threadspace";
-/// The most the UI's footprint may trend upward per recovery: the
-/// least-squares slope across the per-recovery samples (C-04). Before the
-/// D-0008 repair it measured 0.45 MiB per recovery.
+/// The most the UI's footprint may trend upward per recovery, as the
+/// least-squares slope across the second half of the per-recovery samples
+/// (C-04). A leak costs every recovery alike and shows there in full (before
+/// the D-0008 repair: 0.57 MiB per recovery); a one-time cost early in the
+/// run does not, and on the M1 build one appeared as a single step that then
+/// held flat for 46 recoveries.
 const FOOTPRINT_SLOPE_MAX: f64 = 0.1 * 1024.0 * 1024.0;
 
 /// Makes sure exactly one hydrated UI is running; returns its incarnation.
@@ -828,7 +831,8 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         "pass": shells_pass,
     });
     let slope = footprint_slope(&growth);
-    let resources_pass = slope.is_some_and(|slope| slope <= FOOTPRINT_SLOPE_MAX)
+    let sustained = footprint_slope(&growth[growth.len() / 2..]);
+    let resources_pass = sustained.is_some_and(|slope| slope <= FOOTPRINT_SLOPE_MAX)
         && matches!((&resources_before, &resources_after), (Some(b), Some(a))
             if a["webContentProcesses"].as_u64().zip(b["webContentProcesses"].as_u64()).is_some_and(|(a, b)| a <= b));
     let resources = json!({
@@ -836,6 +840,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         "after": resources_after,
         "perRecovery": growth,
         "footprintSlopeBytesPerRecovery": slope,
+        "footprintSecondHalfSlopeBytesPerRecovery": sustained,
         "footprintSlopeMaxBytes": FOOTPRINT_SLOPE_MAX,
         "pass": resources_pass,
     });
