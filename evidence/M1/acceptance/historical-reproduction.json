@@ -1,0 +1,591 @@
+{
+  "classification": "Independently executed portable historical reducer-1 fixture producer; no native macOS application qualification",
+  "sourceIdentities": {
+    "classification": "Portable historical fixture-producer cross-check; not native macOS qualification",
+    "producerCommit": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
+    "emitterSourceCommit": "01a215ddb55c3214a7d669b040f84886ede0be58",
+    "emitterSourcePath": "fixtures/m1/reducer-1-store/emit_reducer1_store.rs",
+    "emitterSha256": "60c36018ed854d71ecfd739f3a61f292225c61a6c18343eae0d9890759046c60",
+    "emitterGitBlob": "ca1a349332c7bb95eea7d0610c2477063c0c5a35",
+    "sourceFiles": [
+      {
+        "path": "crates/journal/src/canonical.rs",
+        "gitBlob": "b4c0ef8d9c3d70a09c87f68f3cee9c344c4e43fa",
+        "sha256": "b2252bc64ffe297635c94e3f87cb57af1d24107babc5ba133d149394e85cc681"
+      },
+      {
+        "path": "crates/journal/src/materialize.rs",
+        "gitBlob": "7f9fff0a2817dce516a728dcc17c65b268fe642d",
+        "sha256": "1c9dde677837dd1a9f432749132b1908636c0be389062bba0075353051840ed3"
+      },
+      {
+        "path": "crates/journal/src/lib.rs",
+        "gitBlob": "5657881f1d9b8cbbf60b7ed50fc59afdfe12bd44",
+        "sha256": "afb607c233defd54f74a078b9b0f84c0402f99d861d44a17d7c122676abfd1f6"
+      },
+      {
+        "path": "crates/state-engine/src/engine.rs",
+        "gitBlob": "aeb3bd0fd8ce7748c106c589b17dacc5fbb8bb95",
+        "sha256": "3231ca4b33a9be2c62751d7d4ea84389db45efb898cff5967efdfc6bade7423c"
+      },
+      {
+        "path": "crates/state-engine/src/reduce.rs",
+        "gitBlob": "19301f15e9bcd3aa09fa744e1225c2663575a2da",
+        "sha256": "807b668b38d2f3a82cfac6cd80f588614d67ea988922885ebf708364c21dd93e"
+      },
+      {
+        "path": "tests/synthetic/src/builder.rs",
+        "gitBlob": "38bd151ad83943ac15fcd83aadf4781f8eea8f7c",
+        "sha256": "b68713c1e4988116c7add67826cf7adf47626fe62d677809d0c6bbb13c6c3c22"
+      },
+      {
+        "path": "tests/synthetic/src/runner.rs",
+        "gitBlob": "dc3a4fe4a9fa6d877dbd14562196d9415962d1f7",
+        "sha256": "222e4efd68a4d8c562518e4fc475f4197af1d6a0ea1c3c666128391ebb876f0d"
+      },
+      {
+        "path": "tests/synthetic/src/sqlite.rs",
+        "gitBlob": "4e4bf716ae69a3cfe44c3f6b9c13179de9c44a73",
+        "sha256": "598593641c15c3975db68078bba9abfe922d7fb8e02d20c94372e94c9d5a3685"
+      },
+      {
+        "path": "tests/synthetic/src/rng.rs",
+        "gitBlob": "b8d5eb80d4c6b6a371e91d57ba26dbf31b9e338c",
+        "sha256": "ba99b7b1ab57f3771cec09874f6ad2530d0ee691cb22b0ecbfb20dbdf69d72a3"
+      }
+    ],
+    "scaffoldChange": "Only synthetic Cargo manifest omits unused macOS agent and relay dependencies, removes explicit threadspace-m1 binary, disables automatic binaries; candidate emitter copied into historical integration-test directory. Production Rust and harness modules unchanged."
+  },
+  "executions": [
+    {
+      "run": 1,
+      "command": [
+        "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "threadspace-synthetic",
+        "--test",
+        "emit_reducer1_store",
+        "--",
+        "--nocapture"
+      ],
+      "envOverrides": {
+        "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<review-root>/review-cargo",
+        "CARGO_TARGET_DIR": "<review-root>/review-target-historical",
+        "CARGO_NET_OFFLINE": "true",
+        "REDUCER1_HISTORIES": "resolved-at",
+        "REDUCER1_CHECKPOINT_STEP": "4",
+        "REDUCER1_OUT": "<review-root>/review-runs/historical/journal-resolved-at-run-1.sqlite3"
+      },
+      "startedAtUtc": "2026-10-08T23:37:44.995367+00:00",
+      "elapsedSeconds": 18.327,
+      "exitCode": 0,
+      "databaseExists": true
+    },
+    {
+      "run": 2,
+      "command": [
+        "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "threadspace-synthetic",
+        "--test",
+        "emit_reducer1_store",
+        "--",
+        "--nocapture"
+      ],
+      "envOverrides": {
+        "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+        "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "CARGO_HOME": "<review-root>/review-cargo",
+        "CARGO_TARGET_DIR": "<review-root>/review-target-historical",
+        "CARGO_NET_OFFLINE": "true",
+        "REDUCER1_HISTORIES": "resolved-at",
+        "REDUCER1_CHECKPOINT_STEP": "4",
+        "REDUCER1_OUT": "<review-root>/review-runs/historical/journal-resolved-at-run-2.sqlite3"
+      },
+      "startedAtUtc": "2026-10-08T23:38:03.323229+00:00",
+      "elapsedSeconds": 0.133,
+      "exitCode": 0,
+      "databaseExists": true
+    }
+  ],
+  "fixtureChecks": {
+    "expectedFixtureSha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+    "classification": "Independent portable historical fixture-producer cross-check, not native macOS qualification",
+    "databaseChecks": [
+      {
+        "file": "journal-resolved-at.sqlite3",
+        "bytes": 299008,
+        "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+        "matchesExpectedFileSha256": true,
+        "allTableLogicalSha256": "fba250e86abb5132d64f522fbccae3cfc06bef565337d0dc90146a1ba9da53ec",
+        "tableRowCounts": {
+          "activities": 0,
+          "actor_relations": 0,
+          "actors": 1,
+          "admission_diagnostics": 0,
+          "attention_commands": 1,
+          "attention_items": 1,
+          "execution_processes": 0,
+          "executions": 0,
+          "facts": 6,
+          "identity_assignments": 4,
+          "inputs": 0,
+          "notification_outbox": 1,
+          "observations": 6,
+          "process_incarnations": 0,
+          "projection_checkpoints": 3,
+          "provider_namespaces": 1,
+          "route_results": 0,
+          "schema_migrations": 3,
+          "sessions": 1,
+          "source_coverage": 1,
+          "source_surfaces": 0,
+          "sqlite_sequence": 2,
+          "store_meta": 3,
+          "surface_bindings": 0,
+          "turns": 1,
+          "wait_scopes": 1
+        },
+        "observations": [
+          {
+            "ingest_seq": 1,
+            "native_event": "session.start",
+            "captured_wall_ms": 1791000000010,
+            "source_sequence": "1",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 2,
+            "native_event": "turn.start",
+            "captured_wall_ms": 1791000000020,
+            "source_sequence": "2",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 3,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000030,
+            "source_sequence": "3",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 4,
+            "native_event": "OWNER_COMMAND",
+            "captured_wall_ms": 1791000000040,
+            "source_sequence": null,
+            "source_id": "owner",
+            "source_epoch": "synthetic-core-1"
+          },
+          {
+            "ingest_seq": 5,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000050,
+            "source_sequence": "4",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 6,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000060,
+            "source_sequence": "5",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          }
+        ],
+        "attentionRows": [
+          {
+            "id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "resolved_at_ms": 1791000000040,
+            "revision": 6,
+            "resolution_reason": "handled P3"
+          }
+        ],
+        "outboxRows": [
+          {
+            "request_id": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "state": "SUPPRESSED",
+            "created_at_ms": 1791000000030,
+            "updated_at_ms": 1791000000040,
+            "outcome_detail": "ineligible before submission",
+            "revision": 4
+          }
+        ],
+        "ownerCommands": [
+          {
+            "command_id": "cmd-resolve-p3",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "action": "ResolveAttention",
+            "payload_json": "{\"action\":{\"kind\":\"RESOLVE\",\"reason\":\"handled P3\"},\"attentionId\":\"663fb032-fef5-812b-9104-b15bd1135349\",\"commandId\":\"cmd-resolve-p3\",\"expectedRevision\":null}",
+            "payload_fingerprint": "06cf3b0db39dc020c57a592950c5a193539e8a9535fd0adadae39f42cb389484",
+            "result_json": "{\"commandId\":\"cmd-resolve-p3\",\"status\":\"COMMITTED\",\"cursor\":\"4\",\"targetRevision\":\"4\"}",
+            "observation_id": "ef5f4c2c-ca28-4e2f-b1b6-7f35297e902d"
+          }
+        ],
+        "checkpoints": [
+          {
+            "id": 1,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 0,
+            "origin": "EMPTY",
+            "state_sha256": "001baffb8450a8d8d32b2df9b7221c985a2b1a49905f5a5f7656800a953a66de",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {}
+          },
+          {
+            "id": 2,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 4,
+            "origin": "FIXTURE",
+            "state_sha256": "edaefa2223a7bb9e4534011fd11cd8fbc1374029593fc670585e1b6f6b68fd23",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          },
+          {
+            "id": 3,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 6,
+            "origin": "FIXTURE",
+            "state_sha256": "1ae530686eb06cca12bfa6cf5b137834ca75ff80afc09081f905761a2c7ad031",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          }
+        ],
+        "kind": "committed candidate fixture"
+      },
+      {
+        "file": "journal-resolved-at-run-1.sqlite3",
+        "bytes": 299008,
+        "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+        "matchesExpectedFileSha256": true,
+        "allTableLogicalSha256": "fba250e86abb5132d64f522fbccae3cfc06bef565337d0dc90146a1ba9da53ec",
+        "tableRowCounts": {
+          "activities": 0,
+          "actor_relations": 0,
+          "actors": 1,
+          "admission_diagnostics": 0,
+          "attention_commands": 1,
+          "attention_items": 1,
+          "execution_processes": 0,
+          "executions": 0,
+          "facts": 6,
+          "identity_assignments": 4,
+          "inputs": 0,
+          "notification_outbox": 1,
+          "observations": 6,
+          "process_incarnations": 0,
+          "projection_checkpoints": 3,
+          "provider_namespaces": 1,
+          "route_results": 0,
+          "schema_migrations": 3,
+          "sessions": 1,
+          "source_coverage": 1,
+          "source_surfaces": 0,
+          "sqlite_sequence": 2,
+          "store_meta": 3,
+          "surface_bindings": 0,
+          "turns": 1,
+          "wait_scopes": 1
+        },
+        "observations": [
+          {
+            "ingest_seq": 1,
+            "native_event": "session.start",
+            "captured_wall_ms": 1791000000010,
+            "source_sequence": "1",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 2,
+            "native_event": "turn.start",
+            "captured_wall_ms": 1791000000020,
+            "source_sequence": "2",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 3,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000030,
+            "source_sequence": "3",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 4,
+            "native_event": "OWNER_COMMAND",
+            "captured_wall_ms": 1791000000040,
+            "source_sequence": null,
+            "source_id": "owner",
+            "source_epoch": "synthetic-core-1"
+          },
+          {
+            "ingest_seq": 5,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000050,
+            "source_sequence": "4",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 6,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000060,
+            "source_sequence": "5",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          }
+        ],
+        "attentionRows": [
+          {
+            "id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "resolved_at_ms": 1791000000040,
+            "revision": 6,
+            "resolution_reason": "handled P3"
+          }
+        ],
+        "outboxRows": [
+          {
+            "request_id": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "state": "SUPPRESSED",
+            "created_at_ms": 1791000000030,
+            "updated_at_ms": 1791000000040,
+            "outcome_detail": "ineligible before submission",
+            "revision": 4
+          }
+        ],
+        "ownerCommands": [
+          {
+            "command_id": "cmd-resolve-p3",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "action": "ResolveAttention",
+            "payload_json": "{\"action\":{\"kind\":\"RESOLVE\",\"reason\":\"handled P3\"},\"attentionId\":\"663fb032-fef5-812b-9104-b15bd1135349\",\"commandId\":\"cmd-resolve-p3\",\"expectedRevision\":null}",
+            "payload_fingerprint": "06cf3b0db39dc020c57a592950c5a193539e8a9535fd0adadae39f42cb389484",
+            "result_json": "{\"commandId\":\"cmd-resolve-p3\",\"status\":\"COMMITTED\",\"cursor\":\"4\",\"targetRevision\":\"4\"}",
+            "observation_id": "ef5f4c2c-ca28-4e2f-b1b6-7f35297e902d"
+          }
+        ],
+        "checkpoints": [
+          {
+            "id": 1,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 0,
+            "origin": "EMPTY",
+            "state_sha256": "001baffb8450a8d8d32b2df9b7221c985a2b1a49905f5a5f7656800a953a66de",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {}
+          },
+          {
+            "id": 2,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 4,
+            "origin": "FIXTURE",
+            "state_sha256": "edaefa2223a7bb9e4534011fd11cd8fbc1374029593fc670585e1b6f6b68fd23",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          },
+          {
+            "id": 3,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 6,
+            "origin": "FIXTURE",
+            "state_sha256": "1ae530686eb06cca12bfa6cf5b137834ca75ff80afc09081f905761a2c7ad031",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          }
+        ],
+        "kind": "independent historical producer run 1",
+        "allTablesExactlyEqualCommittedFixture": true,
+        "differingTables": []
+      },
+      {
+        "file": "journal-resolved-at-run-2.sqlite3",
+        "bytes": 299008,
+        "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+        "matchesExpectedFileSha256": true,
+        "allTableLogicalSha256": "fba250e86abb5132d64f522fbccae3cfc06bef565337d0dc90146a1ba9da53ec",
+        "tableRowCounts": {
+          "activities": 0,
+          "actor_relations": 0,
+          "actors": 1,
+          "admission_diagnostics": 0,
+          "attention_commands": 1,
+          "attention_items": 1,
+          "execution_processes": 0,
+          "executions": 0,
+          "facts": 6,
+          "identity_assignments": 4,
+          "inputs": 0,
+          "notification_outbox": 1,
+          "observations": 6,
+          "process_incarnations": 0,
+          "projection_checkpoints": 3,
+          "provider_namespaces": 1,
+          "route_results": 0,
+          "schema_migrations": 3,
+          "sessions": 1,
+          "source_coverage": 1,
+          "source_surfaces": 0,
+          "sqlite_sequence": 2,
+          "store_meta": 3,
+          "surface_bindings": 0,
+          "turns": 1,
+          "wait_scopes": 1
+        },
+        "observations": [
+          {
+            "ingest_seq": 1,
+            "native_event": "session.start",
+            "captured_wall_ms": 1791000000010,
+            "source_sequence": "1",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 2,
+            "native_event": "turn.start",
+            "captured_wall_ms": 1791000000020,
+            "source_sequence": "2",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 3,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000030,
+            "source_sequence": "3",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 4,
+            "native_event": "OWNER_COMMAND",
+            "captured_wall_ms": 1791000000040,
+            "source_sequence": null,
+            "source_id": "owner",
+            "source_epoch": "synthetic-core-1"
+          },
+          {
+            "ingest_seq": 5,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000050,
+            "source_sequence": "4",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          },
+          {
+            "ingest_seq": 6,
+            "native_event": "wait",
+            "captured_wall_ms": 1791000000060,
+            "source_sequence": "5",
+            "source_id": "synthetic.mod",
+            "source_epoch": "mod-epoch-1"
+          }
+        ],
+        "attentionRows": [
+          {
+            "id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "resolved_at_ms": 1791000000040,
+            "revision": 6,
+            "resolution_reason": "handled P3"
+          }
+        ],
+        "outboxRows": [
+          {
+            "request_id": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "state": "SUPPRESSED",
+            "created_at_ms": 1791000000030,
+            "updated_at_ms": 1791000000040,
+            "outcome_detail": "ineligible before submission",
+            "revision": 4
+          }
+        ],
+        "ownerCommands": [
+          {
+            "command_id": "cmd-resolve-p3",
+            "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+            "action": "ResolveAttention",
+            "payload_json": "{\"action\":{\"kind\":\"RESOLVE\",\"reason\":\"handled P3\"},\"attentionId\":\"663fb032-fef5-812b-9104-b15bd1135349\",\"commandId\":\"cmd-resolve-p3\",\"expectedRevision\":null}",
+            "payload_fingerprint": "06cf3b0db39dc020c57a592950c5a193539e8a9535fd0adadae39f42cb389484",
+            "result_json": "{\"commandId\":\"cmd-resolve-p3\",\"status\":\"COMMITTED\",\"cursor\":\"4\",\"targetRevision\":\"4\"}",
+            "observation_id": "ef5f4c2c-ca28-4e2f-b1b6-7f35297e902d"
+          }
+        ],
+        "checkpoints": [
+          {
+            "id": 1,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 0,
+            "origin": "EMPTY",
+            "state_sha256": "001baffb8450a8d8d32b2df9b7221c985a2b1a49905f5a5f7656800a953a66de",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {}
+          },
+          {
+            "id": 2,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 4,
+            "origin": "FIXTURE",
+            "state_sha256": "edaefa2223a7bb9e4534011fd11cd8fbc1374029593fc670585e1b6f6b68fd23",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          },
+          {
+            "id": 3,
+            "reducer_version": 1,
+            "schema_version": 3,
+            "through_cursor": 6,
+            "origin": "FIXTURE",
+            "state_sha256": "1ae530686eb06cca12bfa6cf5b137834ca75ff80afc09081f905761a2c7ad031",
+            "stateDigestMatches": true,
+            "attentionResolvedAtMs": {
+              "663fb032-fef5-812b-9104-b15bd1135349": 1791000000040
+            }
+          }
+        ],
+        "kind": "independent historical producer run 2",
+        "allTablesExactlyEqualCommittedFixture": true,
+        "differingTables": []
+      }
+    ],
+    "result": "PASS"
+  },
+  "toolchain": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc --version --verbose\nrustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n\n<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo --version --verbose\ncargo 1.99.0 (5f94df478 2026-08-27)\nrelease: 1.99.0\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n\nuname -sm\nLinux x86_64\n",
+  "productionSourcePreservation": "git diff --exit-code HEAD -- crates apps tests/synthetic/src third_party\nexit: 0\n",
+  "scaffold": "historical-scaffold.patch"
+}

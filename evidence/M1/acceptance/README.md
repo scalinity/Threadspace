@@ -6,6 +6,8 @@ This review preserves all previously accepted M1 findings. It does not merge M1,
 
 Machine-readable records: [review.json](review.json), [execution.json](execution.json), and [validation.json](validation.json). New execution output is in [portable-execution.txt](portable-execution.txt); the disposable build adaptations are in [portable-scaffolds.txt](portable-scaffolds.txt).
 
+A [supplemental independent review](independent-review.md) preserves a separate set of [portable executions](portable-results.json), [two historical reproductions](historical-reproduction.json), [source/fixture checks](verification.json), and [consistency checks](consistency.json). These records supplement the executions in `execution.json`; their run counts and transcript hashes are not interchangeable.
+
 ## Exact identities
 
 | Role | Commit |

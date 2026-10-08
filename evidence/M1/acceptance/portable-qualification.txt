@@ -1,0 +1,327 @@
+# Independent portable focused execution
+# Absolute review-workspace prefixes are normalized to <review-root>; captured output is otherwise unchanged.
+# Commands, source identities, executable hashes, exit codes and report comparisons: portable-results.json.
+
+# Direct decoder on the unchanged candidate checkout
+   Compiling threadspace-contracts v0.1.0 (<review-root>/Threadspace/crates/contracts)
+   Compiling threadspace-state-engine v0.1.0 (<review-root>/Threadspace/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.21s
+     Running unittests src/lib.rs (<review-root>/review-target/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+# Stage: candidate; captured stream: synthetic.log
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.190
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling getrandom v0.4.3
+   Compiling serde v1.0.229
+   Compiling ref-cast v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling thiserror v2.0.21
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling cc v1.6.0
+   Compiling pkg-config v0.3.34
+   Compiling syn v3.0.6
+   Compiling hybrid-array v0.4.15
+   Compiling syn v2.0.119
+   Compiling termcolor v1.4.1
+   Compiling vcpkg v0.2.15
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling const-oid v0.10.2
+   Compiling dyn-clone v1.0.20
+   Compiling foldhash v0.2.0
+   Compiling cpufeatures v0.3.1
+   Compiling hashbrown v0.17.1
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling bitflags v2.13.2
+   Compiling digest v0.11.3
+   Compiling hashlink v0.12.2
+   Compiling sha2 v0.11.0
+   Compiling smallvec v1.16.2
+   Compiling serde_derive_internals v0.30.0
+   Compiling uuid v1.27.0
+   Compiling libsqlite3-sys v0.38.2 (<review-root>/Threadspace-controls/third_party/libsqlite3-sys)
+   Compiling ref-cast-impl v1.0.27
+   Compiling thiserror-impl v2.0.21
+   Compiling serde_derive v1.0.229
+   Compiling schemars_derive v1.2.2
+   Compiling ts-rs-macros v12.0.1
+   Compiling ts-rs v12.0.1
+   Compiling schemars v1.2.2
+   Compiling threadspace-contracts v0.1.0 (<review-root>/Threadspace-controls/crates/contracts)
+   Compiling rusqlite v0.40.2
+   Compiling threadspace-state-engine v0.1.0 (<review-root>/Threadspace-controls/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.16s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/reducer_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/reducer_upgrade-55b415ac71f39e56)
+
+running 1 test
+test a_reducer_1_store_is_upgraded_not_reinterpreted ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+
+# Stage: candidate; captured stream: journal.log
+   Compiling threadspace-contracts v0.1.0 (<review-root>/Threadspace-controls/crates/contracts)
+   Compiling threadspace-state-engine v0.1.0 (<review-root>/Threadspace-controls/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.99s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+# Stage: timestamp-restoration-removed; captured stream: synthetic.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+warning: function `nullable_integer` is never used
+   --> crates/journal/src/canonical.rs:643:4
+    |
+643 | fn nullable_integer(row: &materialize::Named, column: &str) -> Option<Option<i64>> {
+    |    ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+warning: `threadspace-journal` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.55s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+
+thread 'a_malformed_committed_resolution_time_refuses_the_upgrade' (517) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:626:9:
+text: None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... FAILED
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+
+thread 'a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits' (516) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:513:9:
+assertion `left == right` failed: variant B: state
+  left: Some(1791000000060)
+ right: Some(1791000000040)
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... FAILED
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+failures:
+
+failures:
+    a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits
+    a_malformed_committed_resolution_time_refuses_the_upgrade
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:
+    `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+
+# Stage: timestamp-restoration-removed; captured stream: journal.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+# Stage: committed-time-always-kept; captured stream: synthetic.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.15s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+
+thread 'an_item_this_reducer_reopens_keeps_no_resolution_time' (1124) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:585:9:
+assertion `left == right` failed: variant A: state
+  left: {"38cc3ee8-5b0f-8db0-b9f9-5009640eba9c": None, "3e47b2b0-a74f-827a-97d8-ce9cae31767e": Some(1791000000050), "663fb032-fef5-812b-9104-b15bd1135349": Some(1791000000040), "7b5efbc8-620e-8af7-b38a-5933656372eb": Some(1791000000050), "9c14d766-ad73-835e-ae27-ff21b71c0222": None, "d3561f2e-346b-8bf7-a15f-48d9d2563591": Some(1791000000070)}
+ right: {"38cc3ee8-5b0f-8db0-b9f9-5009640eba9c": None, "3e47b2b0-a74f-827a-97d8-ce9cae31767e": None, "663fb032-fef5-812b-9104-b15bd1135349": None, "7b5efbc8-620e-8af7-b38a-5933656372eb": None, "9c14d766-ad73-835e-ae27-ff21b71c0222": None, "d3561f2e-346b-8bf7-a15f-48d9d2563591": Some(1791000000070)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... FAILED
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+failures:
+
+failures:
+    an_item_this_reducer_reopens_keeps_no_resolution_time
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:
+    `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+
+# Stage: committed-time-always-kept; captured stream: journal.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.42s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+# Stage: null-read-as-zero; captured stream: synthetic.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.59s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+
+# Stage: null-read-as-zero; captured stream: journal.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.41s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+
+thread 'canonical::tests::a_nullable_integer_reads_null_as_none' (1813) panicked at crates/journal/src/canonical.rs:1236:9:
+assertion `left == right` failed
+  left: Some(Some(0))
+ right: Some(None)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test canonical::tests::a_nullable_integer_reads_null_as_none ... FAILED
+
+failures:
+
+failures:
+    canonical::tests::a_nullable_integer_reads_null_as_none
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p threadspace-journal --lib`
+
+# Stage: other-type-read-as-null; captured stream: synthetic.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+
+thread 'a_malformed_committed_resolution_time_refuses_the_upgrade' (2332) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:626:9:
+text: None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... FAILED
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+failures:
+
+failures:
+    a_malformed_committed_resolution_time_refuses_the_upgrade
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:
+    `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+
+# Stage: other-type-read-as-null; captured stream: journal.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.31s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+
+thread 'canonical::tests::a_nullable_integer_reads_null_as_none' (2418) panicked at crates/journal/src/canonical.rs:1243:13:
+assertion `left == right` failed
+  left: Some(None)
+ right: None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test canonical::tests::a_nullable_integer_reads_null_as_none ... FAILED
+
+failures:
+
+failures:
+    canonical::tests::a_nullable_integer_reads_null_as_none
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p threadspace-journal --lib`
+
+# Stage: restored; captured stream: synthetic.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (<review-root>/Threadspace-controls/tests/synthetic)
+warning: failed to garbage collect invalid incremental compilation session directory `<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/incremental/threadspace_journal-2hkom72b6eewn/s-hn18zfu1uv-0o9p4y3-0n6gn307fla3wva7ebkha5q6d`: Directory not empty (os error 39)
+
+warning: failed to garbage collect invalid incremental compilation session directory `<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/incremental/threadspace_journal-2hkom72b6eewn/s-hn18zhl797-1y0yuk3-f5egknkp4hinalfvhtap08c4n`: Directory not empty (os error 39)
+
+warning: `threadspace-journal` (lib) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.01s
+     Running tests/checkpoint_tail_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e)
+
+running 5 tests
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/reducer_upgrade.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/reducer_upgrade-55b415ac71f39e56)
+
+running 1 test
+test a_reducer_1_store_is_upgraded_not_reinterpreted ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+# Stage: restored; captured stream: journal.log
+   Compiling threadspace-journal v0.1.0 (<review-root>/Threadspace-controls/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.31s
+     Running unittests src/lib.rs (<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67)
+
+running 1 test
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,967 @@
+{
+  "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+  "executionScope": "Independently executed portable focused harness on Linux; original production/test Rust unchanged except each specified control; original macOS workspace/native qualification not rerun.",
+  "completedUtc": "2026-10-08T23:39:14.585638+00:00",
+  "stages": [
+    {
+      "stage": "candidate",
+      "exitCodes": [
+        0,
+        0
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 5,
+              "failed": 0
+            },
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        }
+      ]
+    },
+    {
+      "stage": "timestamp-restoration-removed",
+      "exitCodes": [
+        101,
+        0
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "FAILED",
+              "passed": 3,
+              "failed": 2
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "dae7cfbc623fa4a0e3c4d8fd21556d824dd8f8660cbecc6b1310129f7f3fec49"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000060,
+            "state": 1791000000060
+          },
+          "differences": [
+            ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolvedAtMs: 1791000000040 | 1791000000060"
+          ],
+          "stateSha256": "32237eb2cfc47a017c82dc771b37866b98d74952f07c82a9196fd65fd4f18464",
+          "tablesSha256": "bd1782a6156bde6d08e0a48e2e914ad5f05f463626378cc29beedb110e1fa98d"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000060,
+            "state": 1791000000060
+          },
+          "differences": [
+            ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolvedAtMs: 1791000000040 | 1791000000060"
+          ],
+          "stateSha256": "32237eb2cfc47a017c82dc771b37866b98d74952f07c82a9196fd65fd4f18464",
+          "tablesSha256": "bd1782a6156bde6d08e0a48e2e914ad5f05f463626378cc29beedb110e1fa98d"
+        }
+      ]
+    },
+    {
+      "stage": "committed-time-always-kept",
+      "exitCodes": [
+        101,
+        0
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "FAILED",
+              "passed": 4,
+              "failed": 1
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "f427cce23b52c21211c2e30e755153b622991947eb04e03d3bf4dd6431b14881"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "5b13f694fb482b4a43cea69659e3178f9fa1735167b881bff5b70fd30ae25ce6"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        }
+      ]
+    },
+    {
+      "stage": "null-read-as-zero",
+      "exitCodes": [
+        0,
+        101
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 5,
+              "failed": 0
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "FAILED",
+              "passed": 0,
+              "failed": 1
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        }
+      ]
+    },
+    {
+      "stage": "other-type-read-as-null",
+      "exitCodes": [
+        101,
+        101
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "FAILED",
+              "passed": 4,
+              "failed": 1
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "FAILED",
+              "passed": 0,
+              "failed": 1
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        }
+      ]
+    },
+    {
+      "stage": "restored",
+      "exitCodes": [
+        0,
+        0
+      ],
+      "tests": [
+        {
+          "target": "synthetic",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 5,
+              "failed": 0
+            },
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        },
+        {
+          "target": "journal",
+          "results": [
+            {
+              "status": "ok",
+              "passed": 1,
+              "failed": 0
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "file": "resolved-at.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "946db64facb6ac6fdbcfed1ff3f856e40075aa2ba53185806fbbf774ceca4b64"
+        },
+        {
+          "file": "checkpoint-tail.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+        },
+        {
+          "file": "unordered-pair.json",
+          "byteIdenticalToRetained": true,
+          "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+        }
+      ],
+      "resolvedAt": [
+        {
+          "variant": "A",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "B",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        },
+        {
+          "variant": "C",
+          "timestamp": {
+            "row": 1791000000040,
+            "state": 1791000000040
+          },
+          "differences": [],
+          "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+          "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+        }
+      ]
+    }
+  ],
+  "allRustFilesRestoredAndUnchanged": 197,
+  "finalWorktreeDiff": "Cargo.lock                 | 2 --\n tests/synthetic/Cargo.toml | 7 +------\n 2 files changed, 1 insertion(+), 8 deletions(-)",
+  "all18GeneratedReportsByteIdenticalToRetained": true,
+  "independentAssertionsVerified": true,
+  "rootCheckoutStatus": "",
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+  },
+  "executionReceipts": {
+    "candidate": {
+      "stage": "candidate",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {},
+      "canonicalSha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--test",
+            "reducer_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/candidate"
+          },
+          "startedUtc": "2026-10-08T23:37:55.039389+00:00",
+          "endedUtc": "2026-10-08T23:38:13.587069+00:00",
+          "exitCode": 0,
+          "logSha256": "a30e49b0f405107c5f0eaf9d66edb504c5dfaaed4bd3b593945dfc750486eecd"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/candidate"
+          },
+          "startedUtc": "2026-10-08T23:38:13.600065+00:00",
+          "endedUtc": "2026-10-08T23:38:23.611152+00:00",
+          "exitCode": 0,
+          "logSha256": "c5b0c9d36dfa0cd50982bdd90735a0e9a4a75b75189a46ce8e2b72f97ee109a3"
+        }
+      ]
+    },
+    "timestamp-restoration-removed": {
+      "stage": "timestamp-restoration-removed",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "c9627b215901e0d4a80b3ba951239d96f4ab2418ffe601c0c6ab415d439e7be3"
+      },
+      "canonicalSha256": "c9627b215901e0d4a80b3ba951239d96f4ab2418ffe601c0c6ab415d439e7be3",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/timestamp-restoration-removed"
+          },
+          "startedUtc": "2026-10-08T23:38:30.105433+00:00",
+          "endedUtc": "2026-10-08T23:38:31.959307+00:00",
+          "exitCode": 101,
+          "logSha256": "7e2d142c52810ba789b6d728ea7df74953920afb883e2b858cde6af8ddbbdf7a"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/timestamp-restoration-removed"
+          },
+          "startedUtc": "2026-10-08T23:38:31.971773+00:00",
+          "endedUtc": "2026-10-08T23:38:32.427794+00:00",
+          "exitCode": 0,
+          "logSha256": "8e82d883874538292751ef250d9abf00a10714b2cb74981fb1ba51f4d18f37d0"
+        }
+      ]
+    },
+    "committed-time-always-kept": {
+      "stage": "committed-time-always-kept",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "389c9bc3096f4fd96e3caacd30551fa9770d6f60785dc17b61095d70af18e3e6"
+      },
+      "canonicalSha256": "389c9bc3096f4fd96e3caacd30551fa9770d6f60785dc17b61095d70af18e3e6",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/committed-time-always-kept"
+          },
+          "startedUtc": "2026-10-08T23:38:32.476986+00:00",
+          "endedUtc": "2026-10-08T23:38:34.926945+00:00",
+          "exitCode": 101,
+          "logSha256": "cef36598022a7c8d7643793b8305a17ceb68dcf8be073e1bd45fc8c699f54af6"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/committed-time-always-kept"
+          },
+          "startedUtc": "2026-10-08T23:38:34.939312+00:00",
+          "endedUtc": "2026-10-08T23:38:35.376362+00:00",
+          "exitCode": 0,
+          "logSha256": "156666f2b11f1f4a42a41d0c735f8f8b6c880121d50b03d10921dd2f716076bb"
+        }
+      ]
+    },
+    "null-read-as-zero": {
+      "stage": "null-read-as-zero",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "c225ff818bc30d1ba4fb47926cc80f98c8cdba501e71642cc801eb73cdcef8cb"
+      },
+      "canonicalSha256": "c225ff818bc30d1ba4fb47926cc80f98c8cdba501e71642cc801eb73cdcef8cb",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/null-read-as-zero"
+          },
+          "startedUtc": "2026-10-08T23:38:35.425029+00:00",
+          "endedUtc": "2026-10-08T23:38:37.320383+00:00",
+          "exitCode": 0,
+          "logSha256": "7582b1d769b8baf72ef3ba0701755139d71d57a929223e75c09ba675f85a3945"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/null-read-as-zero"
+          },
+          "startedUtc": "2026-10-08T23:38:37.334201+00:00",
+          "endedUtc": "2026-10-08T23:38:37.767588+00:00",
+          "exitCode": 101,
+          "logSha256": "af3e3244764f1289cefb63c5cd84dae565b8319f99dbf30429cb933b49b4c0d0"
+        }
+      ]
+    },
+    "other-type-read-as-null": {
+      "stage": "other-type-read-as-null",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {
+        "crates/journal/src/canonical.rs": "a9648ed91bec5ef8e70546e058486fafb1b3c6f7d313836ecd414bf2fa60cc7d"
+      },
+      "canonicalSha256": "a9648ed91bec5ef8e70546e058486fafb1b3c6f7d313836ecd414bf2fa60cc7d",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/other-type-read-as-null"
+          },
+          "startedUtc": "2026-10-08T23:38:37.826570+00:00",
+          "endedUtc": "2026-10-08T23:38:39.089600+00:00",
+          "exitCode": 101,
+          "logSha256": "b3499f99e50fb76f982c1cf02345ed2578895b3877056907c49c242658466d20"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/other-type-read-as-null"
+          },
+          "startedUtc": "2026-10-08T23:38:39.103701+00:00",
+          "endedUtc": "2026-10-08T23:38:39.428418+00:00",
+          "exitCode": 101,
+          "logSha256": "97d77462ee576400bdda991cc712822850a82b80f1d9537fa9f1cc6ee41ddab9"
+        }
+      ]
+    },
+    "restored": {
+      "stage": "restored",
+      "candidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+      "platform": "x86_64-unknown-linux-gnu",
+      "scope": "Portable focused harness with only Cargo scaffold changes. Production and test Rust unchanged except the specified control patch.",
+      "rustSourceChanges": {},
+      "canonicalSha256": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+      "focusedTestSha256": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+      "toolchain": {
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+      },
+      "commands": [
+        {
+          "name": "synthetic",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "--no-fail-fast",
+            "-p",
+            "threadspace-synthetic",
+            "--test",
+            "checkpoint_tail_upgrade",
+            "--test",
+            "reducer_upgrade",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/restored"
+          },
+          "startedUtc": "2026-10-08T23:38:39.468228+00:00",
+          "endedUtc": "2026-10-08T23:38:40.865104+00:00",
+          "exitCode": 0,
+          "logSha256": "51569465c18f0af2f4d2a94318c17baaa683191c772ec1d7ef935d3564c12770"
+        },
+        {
+          "name": "journal",
+          "command": [
+            "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "--offline",
+            "test",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "--locked",
+            "-p",
+            "threadspace-journal",
+            "--lib",
+            "canonical::tests",
+            "--",
+            "--nocapture"
+          ],
+          "environment": {
+            "RUSTC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+            "RUSTDOC": "<review-root>/review-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustdoc",
+            "CARGO_HOME": "<review-root>/review-cargo",
+            "CARGO_TARGET_DIR": "<review-root>/review-target-portable",
+            "THREADSPACE_WRITE_CHECKPOINT_TAIL": "<review-root>/review-runs/portable-controls/restored"
+          },
+          "startedUtc": "2026-10-08T23:38:40.877215+00:00",
+          "endedUtc": "2026-10-08T23:38:41.202517+00:00",
+          "exitCode": 0,
+          "logSha256": "c6654713e11f7f4837b1344708a41e2f953bac59b8eabb7d32ad19663de554aa"
+        }
+      ]
+    }
+  },
+  "sourceSha256": {
+    "crates/journal/src/canonical.rs": "ceeb8f2b5109ea61da2f55e2b8e386168ed55676c7c2afe5eaaeb96b284504ac",
+    "crates/journal/src/materialize.rs": "b437a35ac64360c32cb7569e70e90d715efd18bb75ff4dc180e358499a657d2f",
+    "crates/state-engine/src/engine.rs": "40c81b1ff97a8c83688ab7dda95afe07de7f90e9d7827db937a593c3522076b7",
+    "crates/state-engine/src/reduce.rs": "dc55a2962a32fa6e9d6116fd21a157854ca34e1f86cb626a35cb59b317e37f24",
+    "crates/state-engine/src/wait.rs": "08662f51a03e453d439500a6955f15a8cfd952cadf1b58ce61d2469cf7bcaf09",
+    "tests/synthetic/tests/checkpoint_tail_upgrade.rs": "836a4b7e8a1700de2e49a87174094fb0b2c87469448bc5cae723c2f6ea81fcf4",
+    "tests/synthetic/tests/reducer_upgrade.rs": "c57d6616ec0e53c84512b36656e6ceab46e07ff19bff0451d079027394da0908",
+    "tests/synthetic/src/sqlite.rs": "598593641c15c3975db68078bba9abfe922d7fb8e02d20c94372e94c9d5a3685"
+  },
+  "restoredTestExecutableSha256": {
+    "<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-5776817f1d0f2e0e": {
+      "sha256": "adf2865b0479cef9243b0ffebca41aa0086600c3de360d0ce0f5b4851366b85d",
+      "size": 83207888
+    },
+    "<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/reducer_upgrade-55b415ac71f39e56": {
+      "sha256": "edf0a544a487fa55d608883a59a2b86259b958a38195b6c390518e61aeab2378",
+      "size": 81624272
+    },
+    "<review-root>/review-target-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-42e651a077c37d67": {
+      "sha256": "c0a6a0e92d5214e496b1f3fe473eebea8d434488b24e3f77178d37c01b2afe02",
+      "size": 43574880
+    }
+  },
+  "scaffold": "portable-scaffold.patch"
+}

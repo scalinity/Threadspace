@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "reviewDate": "2026-10-08",
+  "reviewedCandidate": "01a215ddb55c3214a7d669b040f84886ede0be58",
+  "acceptedMain": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54",
+  "qualificationSource": "80df8b09c04c13c7b527d8913eb890858da3a606",
+  "originRefsMatch": true,
+  "mainIsAncestor": true,
+  "remediationCommits": [
+    "7fe5539c97a47e0d223d30b43550bdc51570c366",
+    "80df8b09c04c13c7b527d8913eb890858da3a606",
+    "0ef472c48616cd3692b0f83269249f1e31301a5b",
+    "787a3d42ec053a4d0d47555382458c01e61de0ad",
+    "01a215ddb55c3214a7d669b040f84886ede0be58"
+  ],
+  "productionDiff": [
+    "crates/journal/src/canonical.rs"
+  ],
+  "qualifiedProductionAndFocusedTestsUnchanged": true,
+  "fixture": {
+    "path": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3",
+    "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47",
+    "sqliteReadRuntime": "3.53.1",
+    "journal": [
+      {
+        "ingest_seq": 1,
+        "native_event": "session.start",
+        "captured_wall_ms": 1791000000010
+      },
+      {
+        "ingest_seq": 2,
+        "native_event": "turn.start",
+        "captured_wall_ms": 1791000000020
+      },
+      {
+        "ingest_seq": 3,
+        "native_event": "wait",
+        "captured_wall_ms": 1791000000030
+      },
+      {
+        "ingest_seq": 4,
+        "native_event": "OWNER_COMMAND",
+        "captured_wall_ms": 1791000000040
+      },
+      {
+        "ingest_seq": 5,
+        "native_event": "wait",
+        "captured_wall_ms": 1791000000050
+      },
+      {
+        "ingest_seq": 6,
+        "native_event": "wait",
+        "captured_wall_ms": 1791000000060
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": 1,
+        "reducer_version": 1,
+        "origin": "EMPTY",
+        "through_cursor": 0,
+        "state_sha256": "001baffb8450a8d8d32b2df9b7221c985a2b1a49905f5a5f7656800a953a66de"
+      },
+      {
+        "id": 2,
+        "reducer_version": 1,
+        "origin": "FIXTURE",
+        "through_cursor": 4,
+        "state_sha256": "edaefa2223a7bb9e4534011fd11cd8fbc1374029593fc670585e1b6f6b68fd23"
+      },
+      {
+        "id": 3,
+        "reducer_version": 1,
+        "origin": "FIXTURE",
+        "through_cursor": 6,
+        "state_sha256": "1ae530686eb06cca12bfa6cf5b137834ca75ff80afc09081f905761a2c7ad031"
+      }
+    ],
+    "attention": [
+      {
+        "id": "663fb032-fef5-812b-9104-b15bd1135349",
+        "resolved_at_ms": 1791000000040,
+        "revision": 6,
+        "resolution_reason": "handled P3"
+      }
+    ],
+    "ownerCommands": [
+      {
+        "command_id": "cmd-resolve-p3",
+        "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+        "result_json": "{\"commandId\":\"cmd-resolve-p3\",\"status\":\"COMMITTED\",\"cursor\":\"4\",\"targetRevision\":\"4\"}"
+      }
+    ],
+    "outbox": [
+      {
+        "request_id": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+        "attention_id": "663fb032-fef5-812b-9104-b15bd1135349",
+        "state": "SUPPRESSED",
+        "updated_at_ms": 1791000000040,
+        "revision": 4
+      }
+    ]
+  },
+  "independentHashCrossChecks": {
+    "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+    "stateMethod": "Static conversion of actual reducer-1 cursor-6 checkpoint: reducerVersion 2 and historical owner-decision bool to count. This is not production reducer execution.",
+    "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+    "tableCount": 16,
+    "tablesMethod": "Read actual committed fixture rows in production TABLES column order and recompute documented table digest. No database writes."
+  },
+  "retainedExecutionRecords": {
+    "sixEntryVariants": [
+      {
+        "variant": "A",
+        "checkpoint": 6,
+        "suffix": 0,
+        "resolvedAtMs": {
+          "row": 1791000000040,
+          "state": 1791000000040
+        },
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "canonicalDifferences": 0,
+        "restartStable": true
+      },
+      {
+        "variant": "B",
+        "checkpoint": 0,
+        "suffix": 6,
+        "resolvedAtMs": {
+          "row": 1791000000040,
+          "state": 1791000000040
+        },
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "canonicalDifferences": 0,
+        "restartStable": true
+      },
+      {
+        "variant": "C",
+        "checkpoint": 4,
+        "suffix": 2,
+        "resolvedAtMs": {
+          "row": 1791000000040,
+          "state": 1791000000040
+        },
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "canonicalDifferences": 0,
+        "restartStable": true
+      }
+    ],
+    "qualificationSuites": 53,
+    "qualificationTestsPassed": 440,
+    "qualificationTestsFailed": 0,
+    "note": "Runtime outcomes in these records were executed by the implementation agent; independent portable executions, if successful, are recorded separately."
+  },
+  "preservedReports": {
+    "checkpoint-tail.json": {
+      "byteIdenticalToRemediation3": true,
+      "sha256": "4be7d7843c92361ffd9197fd895d4160fc111e43d2528b14b9a2b6712587c549"
+    },
+    "unordered-pair.json": {
+      "byteIdenticalToRemediation3": true,
+      "sha256": "a2c599ff63ad699895ceedb26096e8c7ce9f991645d9b879e651d1c91c1bd994"
+    }
+  },
+  "rejectedManifestArchiveSha256": "909fea443da96f24324e3044345a6bf4d1adb01c4e0c2d8fd6c8b03779843877",
+  "privacyScan": {
+    "changedFiles": 44,
+    "matches": [],
+    "scope": "Personal absolute paths, email addresses, private-key headers and common token patterns; not an exhaustive proof of secret absence."
+  },
+  "status": "PASS"
+}
