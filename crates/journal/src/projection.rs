@@ -29,15 +29,17 @@ type SessionRow = (
     i64,
     Option<String>,
     Option<String>,
-    Option<String>,
-    i64,
+    String,
+    String,
+    String,
 );
 
 pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, JournalError> {
     let row: Option<SessionRow> = conn
         .query_row(
             "SELECT n.provider, s.native_session_id, s.display_name, s.fixture, s.revision,
-                    s.provider_kind, s.provider_status, s.provider_waiting_for, s.inventory_present
+                    s.provider_status, s.provider_waiting_for,
+                    s.turn_state, s.execution_presence, s.observation
                FROM sessions s JOIN provider_namespaces n ON n.id = s.namespace_id
               WHERE s.id = ?1",
             params![session_id],
@@ -52,6 +54,7 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
                     row.get(6)?,
                     row.get(7)?,
                     row.get(8)?,
+                    row.get(9)?,
                 ))
             },
         )
@@ -62,10 +65,11 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
         display_name,
         fixture,
         revision,
-        provider_kind,
         provider_status,
         provider_waiting_for,
-        inventory_present,
+        turn_state,
+        execution_presence,
+        observation,
     )) = row
     else {
         return Err(JournalError::NotFound {
@@ -74,23 +78,28 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
         });
     };
 
-    // The displayed activation: the newest live one, else the newest.
-    let execution: Option<(String, i64, String)> = conn
+    // Lifecycle state is the canonical session's, as materialized (D-0007 §6):
+    // never re-derived here from activation or turn arrival order.
+    let turn_state: TurnState = parse_enum(turn_state)?;
+    let execution_presence: ExecutionPresence = parse_enum(execution_presence)?;
+    let observation: ObservationState = parse_enum(observation)?;
+
+    // The displayed activation (its process and binding): the newest live
+    // one, else the newest.
+    let execution: Option<(String, i64)> = conn
         .query_row(
-            "SELECT id, activation, presence FROM executions WHERE session_id = ?1
+            "SELECT id, activation FROM executions WHERE session_id = ?1
               ORDER BY presence = 'LIVE' DESC, activation DESC LIMIT 1",
             params![session_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            |row| Ok((row.get(0)?, row.get(1)?)),
         )
         .optional()?;
 
     let mut activation = None;
-    let mut execution_presence = ExecutionPresence::Unknown;
     let mut process = None;
     let mut binding = None;
-    if let Some((execution_id, activation_value, presence)) = execution {
+    if let Some((execution_id, activation_value)) = execution {
         activation = Some(activation_value.to_string());
-        execution_presence = parse_enum(presence)?;
         process = conn
             .query_row(
                 "SELECT p.pid, p.boot_id, p.start_seconds, p.start_microseconds, p.executable_identity
@@ -178,29 +187,6 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
             })
         }
         None => None,
-    };
-
-    let turn_state: Option<String> = conn
-        .query_row(
-            "SELECT state FROM turns WHERE session_id = ?1 ORDER BY created_cursor DESC LIMIT 1",
-            params![session_id],
-            |row| row.get(0),
-        )
-        .optional()?;
-    let turn_state = match turn_state {
-        Some(text) => parse_enum(text)?,
-        None => TurnState::Unknown,
-    };
-
-    // A fixture is never observed. A provider session is CURRENT while its
-    // row is in the latest applied inventory and STALE once it is not: the
-    // record persists either way (SPEC §3.2, §4.15).
-    let observation = if fixture || provider_kind.is_none() && inventory_present == 0 {
-        ObservationState::Unknown
-    } else if inventory_present == 1 {
-        ObservationState::Current
-    } else {
-        ObservationState::Stale
     };
 
     Ok(SessionView {
