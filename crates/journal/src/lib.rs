@@ -216,11 +216,16 @@ pub fn verify_engine(conn: &Connection) -> Result<(String, String), JournalError
 /// Refuses an existing store this binary cannot run (SPEC §9.4) before the
 /// writable open, whose WAL pragma, migrations and bootstrap would otherwise
 /// change it first. The connection that reads the versions depends on the
-/// sidecars present, so that it writes nothing and creates no file:
-/// - a `-wal` may hold the only copy of committed rows, so it is read with
-///   `readonly_shm`, which indexes it in private memory instead of
-///   rebuilding the `-shm` (with no `-shm`, SQLite must create one to read
-///   the WAL at all);
+/// sidecars present, so that it writes nothing and creates no file in the
+/// store directory:
+/// - a `-wal` may hold the only copy of committed rows, so it is always
+///   read, and never with `immutable`, which ignores it. Beside a `-shm`, it
+///   is read with `readonly_shm`, which indexes it in private memory instead
+///   of rebuilding the `-shm`. With no `-shm`, SQLite must create one to read
+///   the WAL at all (`readonly_shm` then fails to open, and an exclusive
+///   lock fails on a read-only descriptor), so the main file and `-wal` are
+///   read from an `InspectionCopy` in a private temporary directory, where
+///   that `-shm` lands instead;
 /// - a `-journal` may be hot (a crash in rollback mode, as while a restored
 ///   backup converts to WAL). SQLite rolls it back before any reader sees
 ///   committed rows, and a read-only connection would fail on every start,
@@ -237,16 +242,25 @@ fn preflight(path: &Path) -> Result<(), JournalError> {
         name.push(suffix);
         Path::new(&name).exists()
     };
+    let mut target = path.to_path_buf();
+    // Declared before the connection, so that it is removed only after the
+    // connection has closed, on every path out of this function.
+    let copy;
     let (access, query) = if sidecar("-wal") {
-        let query = if sidecar("-shm") { "?readonly_shm=1" } else { "" };
-        (OpenFlags::SQLITE_OPEN_READ_ONLY, query)
+        if sidecar("-shm") {
+            (OpenFlags::SQLITE_OPEN_READ_ONLY, "?readonly_shm=1")
+        } else {
+            copy = InspectionCopy::new(path, &std::env::temp_dir())?;
+            target = copy.main();
+            (OpenFlags::SQLITE_OPEN_READ_ONLY, "")
+        }
     } else if sidecar("-journal") {
         (OpenFlags::SQLITE_OPEN_READ_WRITE, "")
     } else {
         (OpenFlags::SQLITE_OPEN_READ_ONLY, "?immutable=1")
     };
     let mut uri = String::from("file:");
-    for ch in path.to_string_lossy().chars() {
+    for ch in target.to_string_lossy().chars() {
         match ch {
             '%' | '?' | '#' => uri.push_str(&format!("%{:02X}", u32::from(ch))),
             _ => uri.push(ch),
@@ -261,6 +275,47 @@ fn preflight(path: &Path) -> Result<(), JournalError> {
     conn.set_db_config(DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE, true)?;
     verify_engine(&conn)?;
     schema::refuse_newer(&conn)
+}
+
+/// A store's main file and `-wal`, copied into a new directory of mode 0700
+/// under `parent`, so that a preflight read of a WAL with no `-shm` creates
+/// its `-shm` there rather than beside the store. The directory and
+/// everything SQLite created in it are removed when this is dropped.
+struct InspectionCopy(PathBuf);
+
+impl InspectionCopy {
+    /// The caller of `Journal::open` holds the store's `WriterLock`, so no
+    /// writer changes the main file or `-wal` while they are copied, and the
+    /// two copies are one committed state. Where the temporary directory
+    /// shares the store's APFS volume, `std::fs::copy` clones each file.
+    fn new(main: &Path, parent: &Path) -> Result<Self, JournalError> {
+        use std::os::unix::fs::DirBuilderExt;
+        let failed = |step: &str, error: std::io::Error| JournalError::Invalid {
+            detail: format!("preflight inspection copy: {step}: {error}"),
+        };
+        let mut wal = main.as_os_str().to_owned();
+        wal.push("-wal");
+        let dir = parent.join(format!("threadspace-preflight-{}", Uuid::new_v4()));
+        std::fs::DirBuilder::new()
+            .mode(0o700)
+            .create(&dir)
+            .map_err(|error| failed("create directory", error))?;
+        let copy = Self(dir);
+        std::fs::copy(main, copy.main()).map_err(|error| failed("copy main file", error))?;
+        std::fs::copy(&wal, copy.0.join("journal.sqlite3-wal"))
+            .map_err(|error| failed("copy -wal", error))?;
+        Ok(copy)
+    }
+
+    fn main(&self) -> PathBuf {
+        self.0.join("journal.sqlite3")
+    }
+}
+
+impl Drop for InspectionCopy {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
 }
 
 fn enum_text<T: Serialize>(value: &T) -> String {

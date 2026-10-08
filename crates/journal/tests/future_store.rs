@@ -458,16 +458,19 @@ fn open_without_writing(label: &str, store: &TempStore) -> Result<Journal, Journ
 }
 
 /// A `-wal` of garbage and no `-shm` beside a store whose main file holds
-/// schema 99.
+/// schema 99. SQLite treats a WAL without a valid header as empty, so the
+/// main file's schema is read and refused.
 #[test]
 fn a_garbage_wal_beside_a_future_store_is_refused_without_writing() {
     let store = store_in(Shape::Wal, FUTURE_SCHEMA);
     std::fs::write(sidecar(&store.db(), "-wal"), garbage(8192)).expect("garbage -wal");
     let result = open_without_writing("garbage -wal", &store);
-    assert!(result.is_err(), "garbage -wal: a future store must not open");
+    assert!(matches!(result, Err(JournalError::SchemaTooNew { found: 99 })), "garbage -wal");
 }
 
-/// A `-shm` of garbage beside a WAL holding schema 99.
+/// A `-shm` of garbage beside a WAL holding schema 99. With `readonly_shm`
+/// and no live writer, SQLite does not trust the `-shm` and indexes the WAL
+/// in private memory, so the WAL's schema is read and refused.
 #[test]
 fn a_garbage_shm_beside_a_future_wal_is_refused_without_writing() {
     let store = store_in(Shape::WalSidecars, FUTURE_SCHEMA);
@@ -475,7 +478,7 @@ fn a_garbage_shm_beside_a_future_wal_is_refused_without_writing() {
     let len = std::fs::metadata(&shm).expect("shm").len();
     std::fs::write(&shm, garbage(len as usize)).expect("garbage -shm");
     let result = open_without_writing("garbage -shm", &store);
-    assert!(result.is_err(), "garbage -shm: a future store must not open");
+    assert!(matches!(result, Err(JournalError::SchemaTooNew { found: 99 })), "garbage -shm");
 }
 
 const CHILD_STORE_ENV: &str = "THREADSPACE_FUTURE_STORE_CHILD_DB";
@@ -533,7 +536,10 @@ fn an_inspection_copy_that_cannot_be_made_fails_without_writing() {
     let result = open_in_child(&store, &tmp.0);
     set_mode(&tmp.0, 0o700);
     eprintln!("inspection copy not writable: {result}");
-    assert!(result.starts_with("Err("), "a store the preflight cannot inspect must not open: {result}");
+    assert!(
+        result.starts_with("Err(Invalid") && result.contains("preflight inspection copy: create directory"),
+        "a store the preflight cannot inspect must not open: {result}"
+    );
     assert_eq!(disk(&store.0), before, "the failed open wrote to the store");
     assert_eq!(entries(&tmp.0), 0);
 }
