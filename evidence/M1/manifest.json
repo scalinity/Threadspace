@@ -650,6 +650,7 @@
     "A store left with a hot rollback journal is opened writable by the preflight, so SQLite rolls it back even if it is then refused as too new; the rollback restores its last committed bytes. This is an accepted exception, not a necessity: refusing such a store from a private copy would also be possible.",
     "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
     "On build 5944c81, 9 of G08's 10 selection-readback-race routes over two runs were refused conservatively (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) and 1 was focused exactly: 0 wrong targets, and ordinary exact Return passed. The race setup and its overlap with each route are not fully attested; the cause is not established; M5 owns the investigation.",
+    "A reducer-1 wait owner decision kept only whether it covered positives without a causal point; the upgrade reads it as covering one, in the checkpoint or replayed after it, so an item whose owner covered two or more such positives in one reducer-1 decision is shown again after the upgrade.",
     "G08's fullscreen-space-then-return case recorded null fullscreen entry and exit witnesses on build 5944c81: it is not a fresh fullscreen-transition qualification; the accepted M0C H-10 evidence stays authoritative."
   ],
   "m0bCompatibility": {
@@ -900,11 +901,11 @@
               },
               "journal.sqlite3-shm": {
                 "bytes": 32768,
-                "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+                "sha256": "25aa85b01420538a9daf286bd38b9d92463a58825c14d72b6c43e9fe77519923"
               },
               "journal.sqlite3-wal": {
                 "bytes": 4152,
-                "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+                "sha256": "e297528e3f1ec3c046868a6c3781dfdaec6b37b3169d31b26bee6fc47500aabb"
               }
             },
             "present": {
@@ -922,11 +923,11 @@
               },
               "journal.sqlite3-shm": {
                 "bytes": 32768,
-                "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+                "sha256": "25aa85b01420538a9daf286bd38b9d92463a58825c14d72b6c43e9fe77519923"
               },
               "journal.sqlite3-wal": {
                 "bytes": 4152,
-                "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+                "sha256": "e297528e3f1ec3c046868a6c3781dfdaec6b37b3169d31b26bee6fc47500aabb"
               }
             },
             "present": {
@@ -989,7 +990,7 @@
               },
               "journal.sqlite3-wal": {
                 "bytes": 4152,
-                "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+                "sha256": "b612a6ea973f337c403e5de5ea2c5a6dd929b2bb7c9ce8d8e467cc42442b4c76"
               }
             },
             "present": {
@@ -1007,7 +1008,7 @@
               },
               "journal.sqlite3-wal": {
                 "bytes": 4152,
-                "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+                "sha256": "b612a6ea973f337c403e5de5ea2c5a6dd929b2bb7c9ce8d8e467cc42442b4c76"
               }
             },
             "present": {
@@ -1234,11 +1235,11 @@
               },
               "journal.sqlite3-shm": {
                 "bytes": 32768,
-                "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+                "sha256": "07af7a890993a3b263344ac7072ad789f94eef5b737e2c5bc70c22c31c03a81d"
               },
               "journal.sqlite3-wal": {
                 "bytes": 8272,
-                "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+                "sha256": "ab9d7b9e7d9ab8eede2079224f5535c3f76920e3132483c5844a1891b418bf6a"
               }
             },
             "present": {
@@ -1256,11 +1257,11 @@
               },
               "journal.sqlite3-shm": {
                 "bytes": 32768,
-                "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+                "sha256": "07af7a890993a3b263344ac7072ad789f94eef5b737e2c5bc70c22c31c03a81d"
               },
               "journal.sqlite3-wal": {
                 "bytes": 8272,
-                "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+                "sha256": "ab9d7b9e7d9ab8eede2079224f5535c3f76920e3132483c5844a1891b418bf6a"
               }
             },
             "present": {
@@ -1323,7 +1324,7 @@
               },
               "journal.sqlite3-wal": {
                 "bytes": 8272,
-                "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+                "sha256": "6b6e6c1ad52f484eb279b84d484d417dfd5fd869594bdd48e1fad8cff857ca2c"
               }
             },
             "present": {
@@ -1341,7 +1342,7 @@
               },
               "journal.sqlite3-wal": {
                 "bytes": 8272,
-                "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+                "sha256": "6b6e6c1ad52f484eb279b84d484d417dfd5fd869594bdd48e1fad8cff857ca2c"
               }
             },
             "present": {
@@ -1528,6 +1529,112 @@
       "negativeControls": "evidence/M1/remediation-2/negative-controls/",
       "previousEvidence": "evidence/M1/history/f7e9a6c/",
       "record": "evidence/M1/remediation-2/README.md"
+    },
+    "third": {
+      "base": "85d188e221c24a4e91a533d0ab743fa0e1184c80",
+      "checkpointTail": {
+        "pass": true,
+        "unorderedPair": {
+          "X": {
+            "HELD": 1
+          },
+          "Y": {
+            "HELD": 1
+          },
+          "stateDifferencesXY": []
+        },
+        "variants": [
+          {
+            "newestCheckpointBefore": {
+              "id": 2,
+              "origin": "FIXTURE",
+              "reducerVersion": 1,
+              "throughCursor": 30
+            },
+            "outbox": {
+              "HELD": 4,
+              "PENDING": 1,
+              "SUPPRESSED": 1
+            },
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateDifferencesFromA": 0,
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "suffixEntriesReplayed": 0,
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "variant": "A"
+          },
+          {
+            "newestCheckpointBefore": {
+              "id": 1,
+              "origin": "EMPTY",
+              "reducerVersion": 1,
+              "throughCursor": 0
+            },
+            "outbox": {
+              "HELD": 4,
+              "PENDING": 1,
+              "SUPPRESSED": 1
+            },
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateDifferencesFromA": 0,
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "suffixEntriesReplayed": 30,
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "variant": "B"
+          },
+          {
+            "newestCheckpointBefore": {
+              "id": 2,
+              "origin": "FIXTURE",
+              "reducerVersion": 1,
+              "throughCursor": 6
+            },
+            "outbox": {
+              "HELD": 4,
+              "PENDING": 1,
+              "SUPPRESSED": 1
+            },
+            "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+            "stateDifferencesFromA": 0,
+            "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+            "suffixEntriesReplayed": 24,
+            "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+            "variant": "C"
+          }
+        ]
+      },
+      "defect": "a reducer-1 store whose newest checkpoint was followed by journal entries upgraded with fresh PENDING intents for attention reducer 2 first derived while replaying them",
+      "evidenceSources": {
+        "regenerated": {
+          "areas": [
+            "migration"
+          ],
+          "note": "every field reproduced except the per-run file SHA-256 of fresh stores",
+          "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3"
+        },
+        "reproduced": {
+          "areas": [
+            "contracts",
+            "fixtures",
+            "replay",
+            "crash"
+          ],
+          "note": "files byte-identical to those regenerated at 05a9a2e",
+          "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3"
+        },
+        "retained": {
+          "areas": [
+            "permutations"
+          ],
+          "reason": "reducer and admission unchanged; every permutation store is written by reducer 2, so its load takes the unchanged same-reducer branch",
+          "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a"
+        }
+      },
+      "negativeControls": "evidence/M1/remediation-3/negative-controls/",
+      "previousEvidence": "evidence/M1/history/85d188e/",
+      "record": "evidence/M1/remediation-3/README.md",
+      "repair": "6ed18f0b11856120c956b42f620001127fa3b66b",
+      "tests": "2e42561c339ea42955151af4219c295fb5984db3"
     }
   },
   "replay": {
@@ -2112,7 +2219,7 @@
     }
   },
   "schema": 1,
-  "sourceCommit": "32bde63e7c7139472fad887ce1e4096506de0728",
+  "sourceCommit": "ad87eef6092d57f91533285b3131dd929d72f54e",
   "testCommands": [
     "cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification",
     "npx vitest run",
