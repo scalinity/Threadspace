@@ -95,6 +95,30 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
                 && v["stateSha256"] == tail_rows[0]["stateSha256"]
         })
         && pair["stateDifferencesXY"] == json!([]);
+    // The committed resolution time wherever the reducer-1 checkpoint sits.
+    let resolved = evidence("remediation-4/resolved-at.json");
+    let resolved_rows: Vec<Value> = resolved["variants"]
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .map(|v| {
+                    json!({
+                        "variant": v["variant"], "newestCheckpointBefore": v["checkpointsBefore"].as_array().and_then(|c| c.last()),
+                        "suffixEntriesReplayed": v["suffixEntriesReplayed"], "resolvedAtMs": v["resolvedAtMs"],
+                        "stateSha256": v["digest"]["stateSha256"], "tablesSha256": v["digest"]["tablesSha256"],
+                        "stateDifferencesFromA": v["stateDifferencesFromA"].as_array().map(Vec::len),
+                    })
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let resolved_pass = resolved_rows.len() == 3
+        && resolved_rows.iter().all(|v| {
+            v["resolvedAtMs"] == json!({ "state": 1_791_000_000_040_i64, "row": 1_791_000_000_040_i64 })
+                && v["stateDifferencesFromA"] == json!(0)
+                && v["stateSha256"] == resolved_rows[0]["stateSha256"]
+        });
+    let tail_preserved = evidence("remediation-4/checkpoint-tail.json") == tail && evidence("remediation-4/unordered-pair.json") == pair;
     let oracle: Vec<Value> = std::fs::read_to_string(root.join("remediation/c04-oracle/retained-runs.json"))
         .ok()
         .and_then(|t| serde_json::from_str(&t).ok())
@@ -108,7 +132,9 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
     let areas_pass = [&contracts, &replay, &permutations, &crash, &capture, &migration, &sanitization, &guard, &c04_oracle]
         .iter()
         .all(|summary| summary["pass"] == true)
-        && tail_pass;
+        && tail_pass
+        && resolved_pass
+        && tail_preserved;
     let manifest = json!({
         "schema": 1,
         "milestone": "M1",
@@ -142,6 +168,22 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
                     "regenerated": { "areas": ["migration"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "every field reproduced except the per-run file SHA-256 of fresh stores" },
                     "reproduced": { "areas": ["contracts", "fixtures", "replay", "crash"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "files byte-identical to those regenerated at 05a9a2e" },
                     "retained": { "areas": ["permutations"], "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a", "reason": "reducer and admission unchanged; every permutation store is written by reducer 2, so its load takes the unchanged same-reducer branch" },
+                },
+            },
+            "fourth": {
+                "base": "579df5b7902396f706095a28b455f9189513daa5",
+                "record": "evidence/M1/remediation-4/README.md",
+                "defect": "the reducer-1 upgrade's rebase restored an attention item's committed revision but not its committed resolved_at_ms, so an item reducer 2 reopened and resolved again while replaying a journal suffix upgraded with the later time",
+                "repair": "7fe5539c97a47e0d223d30b43550bdc51570c366",
+                "tests": "80df8b09c04c13c7b527d8913eb890858da3a606",
+                "fixture": { "path": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3", "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47", "producer": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01" },
+                "resolvedAt": { "pass": resolved_pass, "attentionId": "663fb032-fef5-812b-9104-b15bd1135349", "variants": resolved_rows },
+                "checkpointTailPreserved": tail_preserved,
+                "negativeControls": "evidence/M1/remediation-4/negative-controls/",
+                "previousEvidence": "evidence/M1/history/579df5b/",
+                "evidenceSources": {
+                    "reproduced": { "areas": ["contracts", "fixtures", "replay", "crash"], "sourceCommit": "80df8b09c04c13c7b527d8913eb890858da3a606", "note": "files byte-identical to those committed; migration reproduced every field except the per-run file SHA-256 of fresh stores, so its summary from 2e42561 is kept" },
+                    "retained": { "areas": ["migration", "permutations", "capture", "sanitization"], "reason": "the change is limited to the earlier-reducer upgrade's rebase, which no store in those areas reaches" },
                 },
             },
         },

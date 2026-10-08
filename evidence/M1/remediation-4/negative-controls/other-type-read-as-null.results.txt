@@ -1,0 +1,23 @@
+# source 80df8b09c04c13c7b527d8913eb890858da3a606 with other-type-read-as-null.patch applied
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-4/negative-controls/other-type-read-as-null cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade -- --nocapture
+thread 'a_malformed_committed_resolution_time_refuses_the_upgrade' (76303168) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:626:9:
+text: None
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... FAILED
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:
+exit status: 101
+
+# cargo test -p threadspace-journal --lib canonical::tests
+test canonical::tests::a_nullable_integer_reads_null_as_none ... FAILED
+thread 'canonical::tests::a_nullable_integer_reads_null_as_none' (76304230) panicked at crates/journal/src/canonical.rs:1243:13:
+assertion `left == right` failed
+  left: Some(None)
+ right: None
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+error: test failed, to rerun pass `-p threadspace-journal --lib`
+exit status: 101

@@ -1,0 +1,79 @@
+# source 80df8b09c04c13c7b527d8913eb890858da3a606, run 2026-10-08T18:21Z
+
+## cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification
+unittests src/lib.rs: 23 passed, 0 failed
+tests/log_framing.rs: 2 passed, 0 failed
+tests/spool_drain.rs: 1 passed, 0 failed
+tests/spool_loss.rs: 1 passed, 0 failed
+unittests src/main.rs: 9 passed, 0 failed
+unittests src/lib.rs: 173 passed, 0 failed
+tests/canonical_compat.rs: 2 passed, 0 failed
+tests/schemas.rs: 3 passed, 0 failed
+unittests src/lib.rs: 18 passed, 0 failed
+unittests src/main.rs: 0 passed, 0 failed
+unittests src/lib.rs: 3 passed, 0 failed
+unittests src/bin/m0c/main.rs: 4 passed, 0 failed
+unittests src/main.rs: 0 passed, 0 failed
+unittests src/lib.rs: 1 passed, 0 failed
+tests/durability.rs: 11 passed, 0 failed
+tests/future_store.rs: 18 passed, 0 failed
+tests/identity.rs: 8 passed, 0 failed
+tests/journal.rs: 8 passed, 0 failed
+tests/m0c_views.rs: 6 passed, 0 failed
+unittests src/main.rs: 0 passed, 0 failed
+unittests src/lib.rs: 20 passed, 0 failed
+unittests src/main.rs: 0 passed, 0 failed
+unittests src/lib.rs: 19 passed, 0 failed
+unittests src/bin/threadspace-hook.rs: 0 passed, 0 failed
+tests/mod_batch.rs: 1 passed, 0 failed
+tests/spool_capacity.rs: 5 passed, 0 failed
+unittests src/lib.rs: 5 passed, 0 failed
+tests/purity.rs: 2 passed, 0 failed
+unittests src/lib.rs: 29 passed, 0 failed
+unittests src/lib.rs: 25 passed, 0 failed
+unittests src/lib.rs: 1 passed, 0 failed
+unittests src/bin/m1/main.rs: 0 passed, 0 failed
+tests/checkpoint_tail_upgrade.rs: 5 passed, 0 failed
+tests/generator_history.rs: 1 passed, 0 failed
+tests/migrated_commands.rs: 1 passed, 0 failed
+tests/migrated_outbox.rs: 1 passed, 0 failed
+tests/public_read_model.rs: 6 passed, 0 failed
+tests/reducer_upgrade.rs: 1 passed, 0 failed
+tests/scenarios.rs: 4 passed, 0 failed
+tests/sqlite.rs: 10 passed, 0 failed
+tests/wait_counterexamples.rs: 5 passed, 0 failed
+tests/wait_owner_coverage.rs: 8 passed, 0 failed
+threadspace_agent: 0 passed, 0 failed
+threadspace_contracts: 0 passed, 0 failed
+threadspace_desktop: 0 passed, 0 failed
+threadspace_harness: 0 passed, 0 failed
+threadspace_journal: 0 passed, 0 failed
+threadspace_provider_claude: 0 passed, 0 failed
+threadspace_relay: 0 passed, 0 failed
+threadspace_state_engine: 0 passed, 0 failed
+threadspace_surfaces: 0 passed, 0 failed
+threadspace_surfaces_macos: 0 passed, 0 failed
+threadspace_synthetic: 0 passed, 0 failed
+TOTAL: 53 suites, 440 passed, 0 failed
+exit status: 0
+
+## cargo clippy --workspace --all-targets --features threadspace-journal/qualification,threadspace-agent/qualification
+warnings or errors: 0; exit status: 0
+
+## THREADSPACE_CHECK_SCHEMAS=1 cargo test -p threadspace-contracts --test schemas
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+## npx vitest run
+ Test Files  3 passed (3)
+      Tests  43 passed (43)
+
+## M1 evidence areas, reproduced in a disposable detached worktree at 80df8b0
+## cargo build --release -p threadspace-synthetic --bin threadspace-m1, then threadspace-m1 <area>
+fixtures: exit 0 (0s)
+contracts: exit 0 (1s)
+replay: exit 0 (0s)
+crash: exit 0 (7s)
+migration: exit 0 (0s)
+git status in that worktree afterwards: only evidence/M1/migration/summary.json modified;
+its diff is 12 lines, each a per-run store file "sha256" (fresh stores each run); every other field identical.
+fixtures, contracts, replay and crash: files byte-identical to those committed.

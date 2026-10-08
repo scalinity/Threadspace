@@ -1,0 +1,14 @@
+# source 80df8b09c04c13c7b527d8913eb890858da3a606, unchanged (every patch reverted)
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-4/negative-controls/restored cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade -- --nocapture
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+exit status: 0
+
+# cargo test -p threadspace-journal --lib canonical::tests
+test canonical::tests::a_nullable_integer_reads_null_as_none ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit status: 0

@@ -1,0 +1,395 @@
+{
+  "fixture": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3",
+  "reducer1": {
+    "outbox": {
+      "SUPPRESSED": 1
+    },
+    "resolvedAtMs": 1791000000040
+  },
+  "variants": [
+    {
+      "attention": {
+        "createdCursor": 3,
+        "resolutionReason": "handled P3",
+        "resolutions": [
+          {
+            "detail": "handled P3",
+            "kind": "OWNER"
+          },
+          {
+            "detail": "native wait cleared",
+            "kind": "WAIT_ENDED"
+          }
+        ],
+        "revision": 6
+      },
+      "attentionItems": [
+        1,
+        1
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 4
+        },
+        {
+          "id": 3,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 6
+        },
+        {
+          "id": 4,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 6
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 4
+        },
+        {
+          "id": 3,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 6
+        }
+      ],
+      "counts": {
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 6,
+        "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "entries": 6,
+        "facts": 6,
+        "firstCursor": 1,
+        "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+        "lastCursor": 6,
+        "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+      },
+      "historySha256": "ae1fd3dd4d66162c1a6714f1cf5e8f96ecfcef98cf699136d16036f5d76aa6b7",
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-resolved-at t1 episode 0",
+          "upgraded": "SUPPRESSED"
+        }
+      ],
+      "ownerCommands": [
+        1,
+        1
+      ],
+      "ownerDecisions": [
+        {
+          "action": {
+            "kind": "RESOLVE",
+            "reason": "handled P3"
+          },
+          "atMs": 1791000000040,
+          "commandId": "cmd-resolve-p3",
+          "positives": [
+            {
+              "nativeKey": null,
+              "nativePredecessorKeys": [],
+              "orderDomain": "capture",
+              "sequence": "3",
+              "sourceEpoch": "mod-epoch-1",
+              "sourceId": "synthetic.mod"
+            }
+          ],
+          "unordered": 0
+        }
+      ],
+      "projectionDifferences": 0,
+      "resolvedAtMs": {
+        "row": 1791000000040,
+        "state": 1791000000040
+      },
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 2,
+            "origin": "FIXTURE",
+            "reducerVersion": 1,
+            "throughCursor": 4
+          },
+          {
+            "id": 3,
+            "origin": "FIXTURE",
+            "reducerVersion": 1,
+            "throughCursor": 6
+          },
+          {
+            "id": 4,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 6
+          }
+        ],
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 0,
+      "variant": "A"
+    },
+    {
+      "attention": {
+        "createdCursor": 3,
+        "resolutionReason": "handled P3",
+        "resolutions": [
+          {
+            "detail": "handled P3",
+            "kind": "OWNER"
+          },
+          {
+            "detail": "native wait cleared",
+            "kind": "WAIT_ENDED"
+          }
+        ],
+        "revision": 6
+      },
+      "attentionItems": [
+        1,
+        1
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 4,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 6
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        }
+      ],
+      "counts": {
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 6,
+        "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "entries": 6,
+        "facts": 6,
+        "firstCursor": 1,
+        "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+        "lastCursor": 6,
+        "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+      },
+      "historySha256": "ae1fd3dd4d66162c1a6714f1cf5e8f96ecfcef98cf699136d16036f5d76aa6b7",
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-resolved-at t1 episode 0",
+          "upgraded": "SUPPRESSED"
+        }
+      ],
+      "ownerCommands": [
+        1,
+        1
+      ],
+      "ownerDecisions": [
+        {
+          "action": {
+            "kind": "RESOLVE",
+            "reason": "handled P3"
+          },
+          "atMs": 1791000000040,
+          "commandId": "cmd-resolve-p3",
+          "positives": [
+            {
+              "nativeKey": null,
+              "nativePredecessorKeys": [],
+              "orderDomain": "capture",
+              "sequence": "3",
+              "sourceEpoch": "mod-epoch-1",
+              "sourceId": "synthetic.mod"
+            }
+          ],
+          "unordered": 0
+        }
+      ],
+      "projectionDifferences": 0,
+      "resolvedAtMs": {
+        "row": 1791000000040,
+        "state": 1791000000040
+      },
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 4,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 6
+          }
+        ],
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 6,
+      "variant": "B"
+    },
+    {
+      "attention": {
+        "createdCursor": 3,
+        "resolutionReason": "handled P3",
+        "resolutions": [
+          {
+            "detail": "handled P3",
+            "kind": "OWNER"
+          },
+          {
+            "detail": "native wait cleared",
+            "kind": "WAIT_ENDED"
+          }
+        ],
+        "revision": 6
+      },
+      "attentionItems": [
+        1,
+        1
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 4
+        },
+        {
+          "id": 4,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 6
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 4
+        }
+      ],
+      "counts": {
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 6,
+        "checkpointSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "entries": 6,
+        "facts": 6,
+        "firstCursor": 1,
+        "journalSha256": "9a167320e9ade221d808412062f35ab7f5805cc2da8a33ab17fa40733a1a649c",
+        "lastCursor": 6,
+        "projectionSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "82e25cf752585b29a36b29735e559decffefa2e2f68295b89d8f7cd38937673e",
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+        "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008"
+      },
+      "historySha256": "ae1fd3dd4d66162c1a6714f1cf5e8f96ecfcef98cf699136d16036f5d76aa6b7",
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-resolved-at t1 episode 0",
+          "upgraded": "SUPPRESSED"
+        }
+      ],
+      "ownerCommands": [
+        1,
+        1
+      ],
+      "ownerDecisions": [
+        {
+          "action": {
+            "kind": "RESOLVE",
+            "reason": "handled P3"
+          },
+          "atMs": 1791000000040,
+          "commandId": "cmd-resolve-p3",
+          "positives": [
+            {
+              "nativeKey": null,
+              "nativePredecessorKeys": [],
+              "orderDomain": "capture",
+              "sequence": "3",
+              "sourceEpoch": "mod-epoch-1",
+              "sourceId": "synthetic.mod"
+            }
+          ],
+          "unordered": 0
+        }
+      ],
+      "projectionDifferences": 0,
+      "resolvedAtMs": {
+        "row": 1791000000040,
+        "state": 1791000000040
+      },
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 2,
+            "origin": "FIXTURE",
+            "reducerVersion": 1,
+            "throughCursor": 4
+          },
+          {
+            "id": 4,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 6
+          }
+        ],
+        "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 2,
+      "variant": "C"
+    }
+  ]
+}

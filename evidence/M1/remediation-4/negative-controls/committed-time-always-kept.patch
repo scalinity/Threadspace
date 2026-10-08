@@ -1,0 +1,18 @@
+diff --git a/crates/journal/src/canonical.rs b/crates/journal/src/canonical.rs
+index 48b2493..679ff71 100644
+--- a/crates/journal/src/canonical.rs
++++ b/crates/journal/src/canonical.rs
+@@ -576,6 +576,13 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
+         keep_committed(conn, &mut state)?;
+         engine = Engine::new(state);
+         engine.upgrade(endpoint_id);
++        for row in materialize::committed_rows(conn, "attention_items")?.values() {
++            if let (Some(Sql::Text(id)), Some(Sql::Integer(at))) = (row.get("id"), row.get("resolved_at_ms"))
++                && let Some(item) = engine.state.attention.get_mut(id)
++            {
++                item.resolved_at_ms = Some(*at);
++            }
++        }
+     } else {
+         for entry in &entries {
+             engine.apply(entry);

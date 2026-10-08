@@ -1,0 +1,444 @@
+{
+  "fixtures": {
+    "journal-checkpoint-6.sqlite3": "3bea2963fc57acb0e746a2b4f5f43873bf88b3c13f0a29d90aa8a918d83e7d9e",
+    "journal.sqlite3": "26ad5fdfcd5c9b33d88b09e7eaeca066e17e68c6c73a14db0e974b51a579454f"
+  },
+  "reducer1Outbox": {
+    "PENDING": 1,
+    "SUPPRESSED": 4
+  },
+  "variants": [
+    {
+      "attentionItems": [
+        6,
+        6
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 30
+        },
+        {
+          "id": 3,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 30
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 30
+        }
+      ],
+      "counts": {
+        "HELD": 4,
+        "PENDING": 1,
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 30,
+        "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "entries": 30,
+        "facts": 30,
+        "firstCursor": 1,
+        "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+        "lastCursor": 30,
+        "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+      },
+      "historySha256": "400aab1b1d218a04d5fa03886afcad7df38b3b4fc9106ca9401e7e3dbbaa102b",
+      "liveAfterUpgrade": {
+        "counts": {
+          "HELD": 4,
+          "PENDING": 2,
+          "SUPPRESSED": 1
+        },
+        "newIntentState": "PENDING",
+        "notified": [
+          "78ff7f31-3ee7-88e5-9b7e-d519939fe1fc"
+        ],
+        "restartStateSha256": "05f884d1fe3410835c5a280ac1946a45d812493046bccb23d787fd635c27b26d"
+      },
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-partial t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "38cc3ee8-5b0f-8db0-b9f9-5009640eba9c",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "60b47679-b35e-8713-8a93-887e332d3f23",
+          "scope": "sess-partial-actions t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "9c14d766-ad73-835e-ae27-ff21b71c0222",
+          "detail": null,
+          "reducer1": "PENDING",
+          "requestId": "62917481-141c-8b01-9f08-8b9039b114d2",
+          "scope": "sess-partial-actions t2 episode 0",
+          "upgraded": "PENDING"
+        },
+        {
+          "attentionId": "7b5efbc8-620e-8af7-b38a-5933656372eb",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "c225bdd2-c3d5-8948-8fb9-777919d8656d",
+          "scope": "sess-unordered-wait t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "d3561f2e-346b-8bf7-a15f-48d9d2563591",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "d2f458a7-c106-8216-938e-665fa5b6d380",
+          "scope": "sess-merge t1 superseded",
+          "upgraded": "SUPPRESSED"
+        },
+        {
+          "attentionId": "3e47b2b0-a74f-827a-97d8-ce9cae31767e",
+          "detail": null,
+          "reducer1": null,
+          "requestId": "e976fef2-0ab9-86de-86e5-5eb61c2cadc1",
+          "scope": "sess-merge t1 episode 1",
+          "upgraded": "HELD"
+        }
+      ],
+      "ownerCommands": [
+        5,
+        5
+      ],
+      "projectionDifferences": 0,
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 1,
+            "origin": "EMPTY",
+            "reducerVersion": 1,
+            "throughCursor": 0
+          },
+          {
+            "id": 2,
+            "origin": "FIXTURE",
+            "reducerVersion": 1,
+            "throughCursor": 30
+          },
+          {
+            "id": 3,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 30
+          }
+        ],
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 0,
+      "variant": "A"
+    },
+    {
+      "attentionItems": [
+        6,
+        6
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 3,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 30
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        }
+      ],
+      "counts": {
+        "HELD": 4,
+        "PENDING": 1,
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 30,
+        "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "entries": 30,
+        "facts": 30,
+        "firstCursor": 1,
+        "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+        "lastCursor": 30,
+        "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+      },
+      "historySha256": "400aab1b1d218a04d5fa03886afcad7df38b3b4fc9106ca9401e7e3dbbaa102b",
+      "liveAfterUpgrade": {
+        "counts": {
+          "HELD": 4,
+          "PENDING": 2,
+          "SUPPRESSED": 1
+        },
+        "newIntentState": "PENDING",
+        "notified": [
+          "78ff7f31-3ee7-88e5-9b7e-d519939fe1fc"
+        ],
+        "restartStateSha256": "05f884d1fe3410835c5a280ac1946a45d812493046bccb23d787fd635c27b26d"
+      },
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-partial t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "38cc3ee8-5b0f-8db0-b9f9-5009640eba9c",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "60b47679-b35e-8713-8a93-887e332d3f23",
+          "scope": "sess-partial-actions t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "9c14d766-ad73-835e-ae27-ff21b71c0222",
+          "detail": null,
+          "reducer1": "PENDING",
+          "requestId": "62917481-141c-8b01-9f08-8b9039b114d2",
+          "scope": "sess-partial-actions t2 episode 0",
+          "upgraded": "PENDING"
+        },
+        {
+          "attentionId": "7b5efbc8-620e-8af7-b38a-5933656372eb",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "c225bdd2-c3d5-8948-8fb9-777919d8656d",
+          "scope": "sess-unordered-wait t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "d3561f2e-346b-8bf7-a15f-48d9d2563591",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "d2f458a7-c106-8216-938e-665fa5b6d380",
+          "scope": "sess-merge t1 superseded",
+          "upgraded": "SUPPRESSED"
+        },
+        {
+          "attentionId": "3e47b2b0-a74f-827a-97d8-ce9cae31767e",
+          "detail": null,
+          "reducer1": null,
+          "requestId": "e976fef2-0ab9-86de-86e5-5eb61c2cadc1",
+          "scope": "sess-merge t1 episode 1",
+          "upgraded": "HELD"
+        }
+      ],
+      "ownerCommands": [
+        5,
+        5
+      ],
+      "projectionDifferences": 0,
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 1,
+            "origin": "EMPTY",
+            "reducerVersion": 1,
+            "throughCursor": 0
+          },
+          {
+            "id": 3,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 30
+          }
+        ],
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 30,
+      "variant": "B"
+    },
+    {
+      "attentionItems": [
+        6,
+        6
+      ],
+      "checkpointsAfter": [
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 6
+        },
+        {
+          "id": 4,
+          "origin": "REDUCER_UPGRADE",
+          "reducerVersion": 2,
+          "throughCursor": 30
+        }
+      ],
+      "checkpointsBefore": [
+        {
+          "id": 1,
+          "origin": "EMPTY",
+          "reducerVersion": 1,
+          "throughCursor": 0
+        },
+        {
+          "id": 2,
+          "origin": "FIXTURE",
+          "reducerVersion": 1,
+          "throughCursor": 6
+        }
+      ],
+      "counts": {
+        "HELD": 4,
+        "PENDING": 1,
+        "SUPPRESSED": 1
+      },
+      "digest": {
+        "checkpointCursor": 30,
+        "checkpointSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "entries": 30,
+        "facts": 30,
+        "firstCursor": 1,
+        "journalSha256": "933dd91a8b5635af44775339dfe65519313693f7cff3e7d5c73f93854e313557",
+        "lastCursor": 30,
+        "projectionSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349",
+        "reducerVersion": 2,
+        "schemaVersion": 3,
+        "semanticSha256": "72b804a67e676edbddd572b8df82cae1779679a89957f2fd64bcf6b728c69b63",
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a",
+        "tablesSha256": "3402b1305815e9d52c0f50e0ed6fb795d2e9c6546b23e7c672895ae109e65349"
+      },
+      "historySha256": "400aab1b1d218a04d5fa03886afcad7df38b3b4fc9106ca9401e7e3dbbaa102b",
+      "liveAfterUpgrade": {
+        "counts": {
+          "HELD": 4,
+          "PENDING": 2,
+          "SUPPRESSED": 1
+        },
+        "newIntentState": "PENDING",
+        "notified": [
+          "78ff7f31-3ee7-88e5-9b7e-d519939fe1fc"
+        ],
+        "restartStateSha256": "05f884d1fe3410835c5a280ac1946a45d812493046bccb23d787fd635c27b26d"
+      },
+      "outbox": [
+        {
+          "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "4d9804b6-303f-81f5-b80d-c997326b6dc8",
+          "scope": "sess-partial t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "38cc3ee8-5b0f-8db0-b9f9-5009640eba9c",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "60b47679-b35e-8713-8a93-887e332d3f23",
+          "scope": "sess-partial-actions t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "9c14d766-ad73-835e-ae27-ff21b71c0222",
+          "detail": null,
+          "reducer1": "PENDING",
+          "requestId": "62917481-141c-8b01-9f08-8b9039b114d2",
+          "scope": "sess-partial-actions t2 episode 0",
+          "upgraded": "PENDING"
+        },
+        {
+          "attentionId": "7b5efbc8-620e-8af7-b38a-5933656372eb",
+          "detail": null,
+          "reducer1": "SUPPRESSED",
+          "requestId": "c225bdd2-c3d5-8948-8fb9-777919d8656d",
+          "scope": "sess-unordered-wait t1 episode 0",
+          "upgraded": "HELD"
+        },
+        {
+          "attentionId": "d3561f2e-346b-8bf7-a15f-48d9d2563591",
+          "detail": "ineligible before submission",
+          "reducer1": "SUPPRESSED",
+          "requestId": "d2f458a7-c106-8216-938e-665fa5b6d380",
+          "scope": "sess-merge t1 superseded",
+          "upgraded": "SUPPRESSED"
+        },
+        {
+          "attentionId": "3e47b2b0-a74f-827a-97d8-ce9cae31767e",
+          "detail": null,
+          "reducer1": null,
+          "requestId": "e976fef2-0ab9-86de-86e5-5eb61c2cadc1",
+          "scope": "sess-merge t1 episode 1",
+          "upgraded": "HELD"
+        }
+      ],
+      "ownerCommands": [
+        5,
+        5
+      ],
+      "projectionDifferences": 0,
+      "restart": {
+        "checkpoints": [
+          {
+            "id": 2,
+            "origin": "FIXTURE",
+            "reducerVersion": 1,
+            "throughCursor": 6
+          },
+          {
+            "id": 4,
+            "origin": "REDUCER_UPGRADE",
+            "reducerVersion": 2,
+            "throughCursor": 30
+          }
+        ],
+        "stateSha256": "4b5745d927bae69e46dfa414af0d4a04ffda9875b1c5f855210b5b178431654a"
+      },
+      "stateDifferencesFromA": [],
+      "suffixEntriesReplayed": 24,
+      "variant": "C"
+    }
+  ]
+}

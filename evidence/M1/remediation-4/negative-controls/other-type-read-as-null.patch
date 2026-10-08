@@ -1,0 +1,13 @@
+diff --git a/crates/journal/src/canonical.rs b/crates/journal/src/canonical.rs
+index 48b2493..8a640d6 100644
+--- a/crates/journal/src/canonical.rs
++++ b/crates/journal/src/canonical.rs
+@@ -647,7 +647,7 @@ fn nullable_integer(row: &materialize::Named, column: &str) -> Option<Option<i64
+     match row.get(column) {
+         Some(Sql::Integer(value)) => Some(Some(*value)),
+         Some(Sql::Null) => Some(None),
+-        _ => None,
++        _ => Some(None),
+     }
+ }
+ 

@@ -1,0 +1,9 @@
+# source 80df8b09c04c13c7b527d8913eb890858da3a606; sqlite3 3.54.0 2026-04-09
+# Each variant: a VACUUM INTO copy of fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3, with only reducer-1 checkpoint rows removed.
+#   B: DELETE FROM projection_checkpoints WHERE reducer_version = 1 AND through_cursor IN (4, 6)
+#   C: DELETE FROM projection_checkpoints WHERE reducer_version = 1 AND through_cursor = 6
+# history = SHA-256 of every table but projection_checkpoints (and its sqlite_sequence row),
+#   each table as '== <name>' then its rows in sqlite3 .mode quote, sorted (LC_ALL=C).
+A: history ece5d7a06f2e4be04548dc479e4a80713a07d68252ea6520eabd2198309525eb; checkpoints (reducer, origin, cursor) 1 EMPTY 0; 1 FIXTURE 4; 1 FIXTURE 6; attention resolved_at_ms/revision 1791000000040/6; journal entries 6; owner commands 1; outbox 4d9804b6-303f-81f5-b80d-c997326b6dc8 SUPPRESSED
+B: history ece5d7a06f2e4be04548dc479e4a80713a07d68252ea6520eabd2198309525eb; checkpoints (reducer, origin, cursor) 1 EMPTY 0; attention resolved_at_ms/revision 1791000000040/6; journal entries 6; owner commands 1; outbox 4d9804b6-303f-81f5-b80d-c997326b6dc8 SUPPRESSED
+C: history ece5d7a06f2e4be04548dc479e4a80713a07d68252ea6520eabd2198309525eb; checkpoints (reducer, origin, cursor) 1 EMPTY 0; 1 FIXTURE 4; attention resolved_at_ms/revision 1791000000040/6; journal entries 6; owner commands 1; outbox 4d9804b6-303f-81f5-b80d-c997326b6dc8 SUPPRESSED
