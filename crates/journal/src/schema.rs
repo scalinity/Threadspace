@@ -3,8 +3,9 @@
 //! admission diagnostics) and promotes the M0 tables to the canonical
 //! reducer's materialized projections, adding the records M0 lacked.
 
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, OptionalExtension, params};
 use sha2::{Digest, Sha256};
+use threadspace_state_engine::REDUCER_VERSION;
 
 use crate::JournalError;
 
@@ -405,6 +406,42 @@ pub fn catalog() -> Vec<(u32, &'static str, String)> {
 fn checksum(sql: &str) -> String {
     let digest = Sha256::digest(sql.as_bytes());
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+/// Refuses, by reading only, a store whose applied schema or newest
+/// checkpoint is newer than this binary's (SPEC §9.4). Tables the store
+/// does not have yet count as version 0.
+pub(crate) fn refuse_newer(conn: &Connection) -> Result<(), JournalError> {
+    let has = |table: &str| -> Result<bool, rusqlite::Error> {
+        conn.query_row(
+            "SELECT COUNT(*) > 0 FROM sqlite_schema WHERE type = 'table' AND name = ?1",
+            [table],
+            |row| row.get(0),
+        )
+    };
+    if has("schema_migrations")? {
+        let applied: u32 = conn.query_row(
+            "SELECT COALESCE(MAX(id), 0) FROM schema_migrations",
+            [],
+            |row| row.get(0),
+        )?;
+        if applied > SCHEMA_VERSION {
+            return Err(JournalError::SchemaTooNew { found: applied });
+        }
+    }
+    if has("projection_checkpoints")? {
+        let reducer: Option<u32> = conn
+            .query_row(
+                "SELECT reducer_version FROM projection_checkpoints ORDER BY id DESC LIMIT 1",
+                [],
+                |row| row.get(0),
+            )
+            .optional()?;
+        if let Some(found) = reducer.filter(|version| *version > REDUCER_VERSION) {
+            return Err(JournalError::SchemaTooNew { found });
+        }
+    }
+    Ok(())
 }
 
 /// Applies pending migrations inside one immediate transaction each, refusing

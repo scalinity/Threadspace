@@ -23,6 +23,7 @@ mod schema;
 
 use std::path::{Path, PathBuf};
 
+use rusqlite::config::DbConfig;
 use rusqlite::{Connection, OpenFlags, OptionalExtension, TransactionBehavior, params};
 use serde::Serialize;
 use threadspace_contracts::canonical::command::{OwnerAction, OwnerCommand};
@@ -212,6 +213,56 @@ pub fn verify_engine(conn: &Connection) -> Result<(String, String), JournalError
     Ok((version, source_id))
 }
 
+/// Refuses an existing store this binary cannot run (SPEC §9.4) before the
+/// writable open, whose WAL pragma, migrations and bootstrap would otherwise
+/// change it first. The connection that reads the versions depends on the
+/// sidecars present, so that it writes nothing and creates no file:
+/// - a `-wal` may hold the only copy of committed rows, so it is read with
+///   `readonly_shm`, which indexes it in private memory instead of
+///   rebuilding the `-shm` (with no `-shm`, SQLite must create one to read
+///   the WAL at all);
+/// - a `-journal` may be hot (a crash in rollback mode, as while a restored
+///   backup converts to WAL). SQLite rolls it back before any reader sees
+///   committed rows, and a read-only connection would fail on every start,
+///   so this one case opens writable: the rollback restores the last
+///   committed bytes and is the only write the preflight can make;
+/// - with neither, the main file is the whole store, and `immutable` keeps a
+///   WAL-mode header from creating a `-wal` and `-shm`.
+fn preflight(path: &Path) -> Result<(), JournalError> {
+    if !std::fs::metadata(path).is_ok_and(|meta| meta.len() > 0) {
+        return Ok(());
+    }
+    let sidecar = |suffix: &str| {
+        let mut name = path.as_os_str().to_owned();
+        name.push(suffix);
+        Path::new(&name).exists()
+    };
+    let (access, query) = if sidecar("-wal") {
+        let query = if sidecar("-shm") { "?readonly_shm=1" } else { "" };
+        (OpenFlags::SQLITE_OPEN_READ_ONLY, query)
+    } else if sidecar("-journal") {
+        (OpenFlags::SQLITE_OPEN_READ_WRITE, "")
+    } else {
+        (OpenFlags::SQLITE_OPEN_READ_ONLY, "?immutable=1")
+    };
+    let mut uri = String::from("file:");
+    for ch in path.to_string_lossy().chars() {
+        match ch {
+            '%' | '?' | '#' => uri.push_str(&format!("%{:02X}", u32::from(ch))),
+            _ => uri.push(ch),
+        }
+    }
+    uri.push_str(query);
+    let conn = Connection::open_with_flags(
+        uri,
+        access | OpenFlags::SQLITE_OPEN_URI | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+    )?;
+    // Closing must never copy the WAL into the main file.
+    conn.set_db_config(DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE, true)?;
+    verify_engine(&conn)?;
+    schema::refuse_newer(&conn)
+}
+
 fn enum_text<T: Serialize>(value: &T) -> String {
     match serde_json::to_value(value) {
         Ok(serde_json::Value::String(text)) => text,
@@ -239,6 +290,7 @@ impl Journal {
     ) -> Result<Self, JournalError> {
         #[cfg(feature = "qualification")]
         let crash = crash::CrashState::from_env()?;
+        preflight(path)?;
         let mut conn = Connection::open_with_flags(
             path,
             OpenFlags::SQLITE_OPEN_READ_WRITE
