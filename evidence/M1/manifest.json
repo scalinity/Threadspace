@@ -12,11 +12,11 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 17065,
-            "minUs": 9958,
-            "p50Us": 11948,
-            "p95Us": 14825,
-            "p99Us": 17065
+            "maxUs": 12914,
+            "minUs": 8898,
+            "p50Us": 10846,
+            "p95Us": 12583,
+            "p99Us": 12914
           },
           "withinWallBudget": true
         },
@@ -30,11 +30,11 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 12977,
-            "minUs": 9108,
-            "p50Us": 11208,
-            "p95Us": 12512,
-            "p99Us": 12977
+            "maxUs": 13012,
+            "minUs": 8982,
+            "p50Us": 10959,
+            "p95Us": 12162,
+            "p99Us": 13012
           },
           "withinWallBudget": true
         },
@@ -47,11 +47,11 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 3316,
-            "minUs": 2088,
-            "p50Us": 2367,
-            "p95Us": 3306,
-            "p99Us": 3316
+            "maxUs": 5772,
+            "minUs": 2469,
+            "p50Us": 2901,
+            "p95Us": 5126,
+            "p99Us": 5772
           },
           "withinWallBudget": true
         }
@@ -68,11 +68,11 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 3904,
-            "minUs": 2205,
-            "p50Us": 3206,
-            "p95Us": 3727,
-            "p99Us": 3904
+            "maxUs": 4228,
+            "minUs": 2411,
+            "p50Us": 2763,
+            "p95Us": 4223,
+            "p99Us": 4228
           },
           "withinWallBudget": true
         }
@@ -84,11 +84,11 @@
           "runs": 5,
           "wall": {
             "count": 5,
-            "maxUs": 8291,
-            "minUs": 7697,
-            "p50Us": 8221,
-            "p95Us": 8291,
-            "p99Us": 8291
+            "maxUs": 7264,
+            "minUs": 5405,
+            "p50Us": 5929,
+            "p95Us": 7264,
+            "p99Us": 7264
           },
           "withinWallBudget": true
         }
@@ -100,11 +100,11 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 4805,
-            "minUs": 2629,
-            "p50Us": 3168,
-            "p95Us": 4402,
-            "p99Us": 4805
+            "maxUs": 5276,
+            "minUs": 2724,
+            "p50Us": 4056,
+            "p95Us": 4753,
+            "p99Us": 5276
           },
           "withinWallBudget": true
         }
@@ -116,17 +116,17 @@
           "runs": 25,
           "wall": {
             "count": 25,
-            "maxUs": 4254,
-            "minUs": 2320,
-            "p50Us": 2624,
-            "p95Us": 3306,
-            "p99Us": 4254
+            "maxUs": 4712,
+            "minUs": 2714,
+            "p50Us": 3953,
+            "p95Us": 4616,
+            "p99Us": 4712
           },
           "withinWallBudget": true
         }
       }
     },
-    "hookSha256": "415ca5a088e03357a4ab1f2fc30fd8dafccf8edbd7037bf87e6e55b141054f97",
+    "hookSha256": "831525737e59a11bf360117aadf6ede150c052f3eb325e7bacb2be5fad847b98",
     "normal": {
       "committedInJournal": 1020,
       "exit0AndSilent": true,
@@ -145,17 +145,17 @@
         "readyRecords": 0
       },
       "storedEnvelopeBytes": {
-        "max": 2593,
-        "median": 2583,
-        "min": 2568
+        "max": 2597,
+        "median": 2587,
+        "min": 2574
       },
       "wall": {
         "count": 1000,
-        "maxUs": 8571,
-        "minUs": 2474,
-        "p50Us": 4013,
-        "p95Us": 6183,
-        "p99Us": 7176
+        "maxUs": 9260,
+        "minUs": 2590,
+        "p50Us": 4444,
+        "p95Us": 6310,
+        "p99Us": 6951
       },
       "warmup": 20
     },
@@ -169,6 +169,7 @@
   "carryovers": {
     "C-04": {
       "boundsAndVisibilityPreserved": true,
+      "buildNote": "C-04 qualified on build 73636ec; the remediation changed no window-lifecycle code (window.rs comments, a build-time guard and qualification-only harness code only).",
       "cases": [
         64,
         64
@@ -208,6 +209,13 @@
         "webviewsAlive": 0,
         "windowsAlive": 0
       },
+      "retiredNativeOracle": {
+        "pass": true,
+        "recomputedBy": "threadspace-m0c c04-verdict",
+        "record": "evidence/M1/remediation/c04-oracle/retained-runs.json",
+        "recoveries": 63,
+        "retired": 63
+      },
       "run": "evidence/M1/view-recovery/20261008T015231Z-prod",
       "status": "CLOSED",
       "webContentProcesses": [
@@ -241,7 +249,7 @@
   "deterministicSeeds": {
     "families": {
       "activation-changes": {
-        "duplicateDeliveriesInjected": 1272,
+        "duplicateDeliveriesInjected": 1203,
         "failures": 0,
         "permutations": 1250,
         "scenarios": [
@@ -255,39 +263,39 @@
         ],
         "seedRanges": [
           {
-            "from": 8400000,
-            "scenario": "resume",
-            "to": 8400178
-          },
-          {
-            "from": 8500000,
-            "scenario": "pid-tty-reuse",
-            "to": 8500178
-          },
-          {
-            "from": 8600000,
-            "scenario": "executable-replaced",
-            "to": 8600178
-          },
-          {
-            "from": 8700000,
-            "scenario": "replaced-then-unordered-image",
-            "to": 8700178
-          },
-          {
-            "from": 8800000,
-            "scenario": "executable-requalified",
-            "to": 8800177
-          },
-          {
-            "from": 8900000,
-            "scenario": "routing-ambiguity",
-            "to": 8900177
-          },
-          {
             "from": 9000000,
+            "scenario": "resume",
+            "to": 9000178
+          },
+          {
+            "from": 9100000,
+            "scenario": "pid-tty-reuse",
+            "to": 9100178
+          },
+          {
+            "from": 9200000,
+            "scenario": "executable-replaced",
+            "to": 9200178
+          },
+          {
+            "from": 9300000,
+            "scenario": "replaced-then-unordered-image",
+            "to": 9300178
+          },
+          {
+            "from": 9400000,
+            "scenario": "executable-requalified",
+            "to": 9400177
+          },
+          {
+            "from": 9500000,
+            "scenario": "routing-ambiguity",
+            "to": 9500177
+          },
+          {
+            "from": 9600000,
             "scenario": "execution-end-retained",
-            "to": 9000177
+            "to": 9600177
           }
         ]
       },
@@ -346,7 +354,7 @@
         ]
       },
       "delayed-callbacks": {
-        "duplicateDeliveriesInjected": 1256,
+        "duplicateDeliveriesInjected": 1292,
         "failures": 0,
         "permutations": 1250,
         "scenarios": [
@@ -354,9 +362,9 @@
         ],
         "seedRanges": [
           {
-            "from": 6100000,
+            "from": 6700000,
             "scenario": "a-b-a-delayed",
-            "to": 6101249
+            "to": 6701249
           }
         ]
       },
@@ -376,7 +384,7 @@
         ]
       },
       "output-input": {
-        "duplicateDeliveriesInjected": 1246,
+        "duplicateDeliveriesInjected": 1197,
         "failures": 0,
         "permutations": 1250,
         "scenarios": [
@@ -385,19 +393,19 @@
         ],
         "seedRanges": [
           {
-            "from": 1100000,
+            "from": 1700000,
             "scenario": "followup-witnessed",
-            "to": 1100624
+            "to": 1700624
           },
           {
-            "from": 1200000,
+            "from": 1800000,
             "scenario": "followup-claude",
-            "to": 1200624
+            "to": 1800624
           }
         ]
       },
       "owner-commands": {
-        "duplicateDeliveriesInjected": 1252,
+        "duplicateDeliveriesInjected": 1247,
         "failures": 0,
         "permutations": 1250,
         "scenarios": [
@@ -405,9 +413,9 @@
         ],
         "seedRanges": [
           {
-            "from": 6300000,
+            "from": 6900000,
             "scenario": "owner-commands",
-            "to": 6301249
+            "to": 6901249
           }
         ]
       },
@@ -421,14 +429,14 @@
         ],
         "seedRanges": [
           {
-            "from": 11400000,
+            "from": 12000000,
             "scenario": "unknown-and-malformed",
-            "to": 11400099
+            "to": 12000099
           },
           {
-            "from": 11500000,
+            "from": 12100000,
             "scenario": "sensitive-payload",
-            "to": 11500099
+            "to": 12100099
           }
         ]
       },
@@ -442,47 +450,83 @@
         ],
         "seedRanges": [
           {
-            "from": 8200000,
+            "from": 8800000,
             "scenario": "stale-snapshot",
-            "to": 8200624
+            "to": 8800624
           },
           {
-            "from": 8300000,
+            "from": 8900000,
             "scenario": "dropped-observation",
-            "to": 8300624
+            "to": 8900624
           }
         ]
       },
       "wait-events": {
-        "duplicateDeliveriesInjected": 1243,
+        "duplicateDeliveriesInjected": 1199,
         "failures": 0,
         "permutations": 1250,
         "scenarios": [
           "waiting",
           "delayed-positive-wait",
           "delayed-clear-wait",
+          "wait-reappears",
+          "wait-uncertain-reopens",
+          "wait-owner-resolution-kept",
+          "wait-new-after-resolution",
+          "wait-turn-ownership",
+          "wait-session-scoped",
           "wait-generations"
         ],
         "seedRanges": [
           {
             "from": 2700000,
             "scenario": "waiting",
-            "to": 2700312
+            "to": 2700124
           },
           {
             "from": 2800000,
             "scenario": "delayed-positive-wait",
-            "to": 2800312
+            "to": 2800124
           },
           {
             "from": 2900000,
             "scenario": "delayed-clear-wait",
-            "to": 2900311
+            "to": 2900124
           },
           {
             "from": 3000000,
+            "scenario": "wait-reappears",
+            "to": 3000124
+          },
+          {
+            "from": 3100000,
+            "scenario": "wait-uncertain-reopens",
+            "to": 3100124
+          },
+          {
+            "from": 3200000,
+            "scenario": "wait-owner-resolution-kept",
+            "to": 3200124
+          },
+          {
+            "from": 3300000,
+            "scenario": "wait-new-after-resolution",
+            "to": 3300124
+          },
+          {
+            "from": 3400000,
+            "scenario": "wait-turn-ownership",
+            "to": 3400124
+          },
+          {
+            "from": 3500000,
+            "scenario": "wait-session-scoped",
+            "to": 3500124
+          },
+          {
+            "from": 3600000,
             "scenario": "wait-generations",
-            "to": 3000311
+            "to": 3600124
           }
         ]
       }
@@ -494,29 +538,29 @@
     "catalog": "evidence/M1/fixtures/catalog.json",
     "m0StoreV2Sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
     "regressionSeedsSha256": "363cfebd793cabac32f4c304452ac81db0b283ca537fb43e437f3bf0d39deb89",
-    "scenarios": 26
+    "scenarios": 32
   },
   "generatedArtifacts": {
     "instanceValidation": {
       "CanonicalState.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 26
+        "instances": 32
       },
       "JournalEntry.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 200
+        "instances": 234
       },
       "NativeFactDraft.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 238
+        "instances": 270
       },
       "ObservationEnvelope.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 223
+        "instances": 255
       },
       "OwnerCommand.schema.json": {
         "errors": 0,
@@ -525,7 +569,7 @@
       }
     },
     "jsonSchema": {
-      "aggregateSha256": "26cc8b9f6ab892943edbd6e32583f3f9991a1a3960013eeb0372da31172dcb06",
+      "aggregateSha256": "654849373d1b2cdb6845fdba1a726804b4e877eef07a1b63f9b69094afc869dc",
       "files": 8,
       "freshAgainstRust": {
         "CanonicalState.schema.json": true,
@@ -539,8 +583,8 @@
       }
     },
     "typescript": {
-      "aggregateSha256": "9bb2e74dc2864ad6169c7244f4fe59caf18697345e41464743d7652c04d6f918",
-      "files": 156
+      "aggregateSha256": "ae218738f4ed8d479f8ee071be65c656a1cc5cba88a4da773273d14548680c2c",
+      "files": 157
     }
   },
   "knownLimitations": [
@@ -551,9 +595,22 @@
     "The capture benchmark runs the release hook against the fixture companion (real writer and event socket, disposable store), not against an installed identity's store.",
     "A single-write log record narrows, but does not eliminate, a torn record on a mid-write kill; readers skip and count torn lines (C-13).",
     "C-04 closes under D-0008, a containment scoped to tao 0.37.0: any Tauri, tao or Wry update first removes it and requalifies view recovery without it.",
-    "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15)."
+    "C-04's memory criterion is bounded-run evidence (second-half footprint slope over 60 recoveries): it does not exclude a leak that starts late, grows intermittently or stays under the bound.",
+    "Three fields stay last-observation until M2 converts them (D-0007 §10): execution attach mode/presence, the human follow-up frontier and the observer link state; no M1 producer emits conflicting observations of them.",
+    "Near the spool's record bound one publication's listing and size pass take hundreds of milliseconds, so a capture can reach the 250 ms watchdog and be lost without a marker; mod-batch publishes its records in sequence and a large batch can do the same (the observer mod, M2, sizes its batches).",
+    "In a simultaneous burst of 16 capture processes about 1% were refused as spoolbusy (debug build, loaded machine): a recorded loss, not a stall.",
+    "A store left with a hot rollback journal is rolled back by SQLite when opened, even if it is then refused as too new; the rollback restores its last committed bytes.",
+    "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
+    "On the remediated build G08's selection-readback-race routes were refused (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) in both runs, where the first candidate's run focused all five: 0 wrong targets, focus path unchanged, cause not established."
   ],
   "m0bCompatibility": {
+    "build": {
+      "buildInfoFrom": "evidence/M1/remediation/native-install.json (installer readback)",
+      "companionSha256": "2f234495a9b0d0ad8f9d41a0c33f9bcdaadf38655bdb5326ee473d25af040a41",
+      "executableSha256": "bda614c9cd223d024ea96fc435033de114b4ea45e11dd47aa1346c96f3ea681d",
+      "sourceCommit": "5944c81228f163e2583a8418369450ba5f1a0829",
+      "sourceTreeDirty": false
+    },
     "cases": {
       "baseline-exact": true,
       "foreground-process-mismatch": true,
@@ -568,8 +625,35 @@
       "terminal-restart": false
     },
     "pass": true,
-    "run": "evidence/M1/g08-terminal/20261008T020830Z-prod",
+    "previousRun": "evidence/M1/g08-terminal/20261008T020830Z-prod (build 73636ec)",
+    "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
     "runner": "threadspace-m0c g08-terminal prod",
+    "runs": [
+      "evidence/M1/g08-terminal/20261008T032951Z-prod",
+      "evidence/M1/g08-terminal/20261008T033839Z-prod"
+    ],
+    "selectionReadbackRace": {
+      "observation": "On the remediated build the race routes were refused (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window); the first candidate's run focused all five. 0 wrong targets either way; the focus script, surface adapter and osascript worker are unchanged since that run; cause not established.",
+      "previous": "evidence/M1/g08-terminal/20261008T020830Z-prod: 5 of 5 exact",
+      "runs": [
+        {
+          "casePass": true,
+          "exact": 1,
+          "refused": 4,
+          "routes": 5,
+          "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
+          "wrongTargets": 0
+        },
+        {
+          "casePass": true,
+          "exact": 0,
+          "refused": 5,
+          "routes": 5,
+          "run": "evidence/M1/g08-terminal/20261008T033839Z-prod",
+          "wrongTargets": 0
+        }
+      ]
+    },
     "terminalIncarnationUnchanged": true,
     "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
     "wrongTargets": 0
@@ -584,21 +668,21 @@
           "allocator": "random",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
           "upgrade": "a"
         },
         {
           "allocator": "random",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
           "upgrade": "b"
         },
         {
           "allocator": "seeded",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
           "upgrade": "c"
         }
       ]
@@ -611,7 +695,38 @@
     },
     "futureSchemaRefused": {
       "pass": true,
-      "storeUnchanged": true
+      "storeUnchanged": true,
+      "stores": [
+        {
+          "fileFormatBytes18To19": "0101",
+          "files": [
+            "journal.sqlite3"
+          ],
+          "refused": true,
+          "shape": "rollback",
+          "unchanged": true
+        },
+        {
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3"
+          ],
+          "refused": true,
+          "shape": "wal",
+          "unchanged": true
+        },
+        {
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3",
+            "journal.sqlite3-shm",
+            "journal.sqlite3-wal"
+          ],
+          "refused": true,
+          "shape": "walSidecars",
+          "unchanged": true
+        }
+      ]
     },
     "migrations": [
       {
@@ -630,7 +745,41 @@
         "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
       }
     ],
-    "newerReducerCheckpointRefused": true,
+    "newerReducerCheckpointRefused": {
+      "pass": true,
+      "storeUnchanged": true,
+      "stores": [
+        {
+          "fileFormatBytes18To19": "0101",
+          "files": [
+            "journal.sqlite3"
+          ],
+          "refused": true,
+          "shape": "rollback",
+          "unchanged": true
+        },
+        {
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3"
+          ],
+          "refused": true,
+          "shape": "wal",
+          "unchanged": true
+        },
+        {
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3",
+            "journal.sqlite3-shm",
+            "journal.sqlite3-wal"
+          ],
+          "refused": true,
+          "shape": "walSidecars",
+          "unchanged": true
+        }
+      ]
+    },
     "operatesAfterUpgrade": {
       "ownerCommandThenRestartSameState": true
     },
@@ -686,13 +835,36 @@
     "totalPermutations": 10400
   },
   "reducerInvariantCatalog": "evidence/M1/reducer-invariants.md",
+  "remediation": {
+    "base": "d93b0fb2f7fafd97a0a7fc9ad5a19267800c51fd",
+    "c04RetiredNative": {
+      "extra": [],
+      "missing": [],
+      "pass": true,
+      "recoveries": 63,
+      "retired": 63,
+      "run": "evidence/M1/view-recovery/20261008T015231Z-prod",
+      "unreleased": []
+    },
+    "d0008Guard": {
+      "area": "d0008-guard",
+      "desktopArtifactsProduced": 0,
+      "negativeBuildExit": 101,
+      "negativeD0008Message": true,
+      "negativeLockTao": "0.37.1",
+      "pass": true,
+      "positiveBuildExit": 0,
+      "sourceCommit": "5483afd9860e047c9308e5821c269e1b7349e023"
+    },
+    "record": "evidence/M1/remediation/README.md"
+  },
   "replay": {
     "contract": "Exact: the same admitted journal (or checkpoint plus later entries) replays to identical state, projection and table digests, repeatedly, across restart and from genesis. Semantic: the SQLite path's native-key projection equals the pure path's.",
     "pass": true,
     "repeats": 3,
     "scenarios": [
       {
-        "checkpointSha256": "95aac14e339b331061979f3f5c25fb4ff6299ce2d109a67403e4b30b6355b28c",
+        "checkpointSha256": "b025c437698c148e76f27cd79403aa4ee1ba95eef5855bdc3a8651c92a4164fe",
         "entries": 14,
         "facts": 15,
         "journalRange": [
@@ -703,7 +875,7 @@
         "projectionSha256": "221fa7139a5cb200e564b87cb0a385987493321db1176d477e18855056d1f4e2",
         "scenario": "normal-session",
         "semanticSha256": "ce6da2a8c21c7e0ad83b3d41c389bba1c14bf99fac767a912728b3bfa212e406",
-        "stateSha256": "95aac14e339b331061979f3f5c25fb4ff6299ce2d109a67403e4b30b6355b28c"
+        "stateSha256": "b025c437698c148e76f27cd79403aa4ee1ba95eef5855bdc3a8651c92a4164fe"
       },
       {
         "checkpointSha256": "7e5957250b21a61575ce190aa7f8ac1804bed281f29ce8e6ae0cfd6868de2011",
@@ -790,7 +962,7 @@
         "stateSha256": "8aca141a29f313c3130bb4ec3196da9f169e22d34a71bff4963af29c24a6fb1b"
       },
       {
-        "checkpointSha256": "c789e67d761d81a4aafe6277f8784d76af464ef364c6ef9e1e1147724ede0909",
+        "checkpointSha256": "c06f893924443bb6e2cb4948c42bc9ec86d780ab2a8c49a672fd421cb8942d4d",
         "entries": 7,
         "facts": 7,
         "journalRange": [
@@ -798,13 +970,13 @@
           7
         ],
         "journalSha256": "7f3c0a1cd4b962a98a6e11b62bcaaa10e957104580e1b62e3d977e151fa6ffd8",
-        "projectionSha256": "774ac419e9ad4d9778a5cd6145601b495e648333d98b1834bcd62d2699eb2a79",
+        "projectionSha256": "96309430a7bd18c495ee3df8734c5575b41ca802b0fd2d8a33d8a79e8ff45091",
         "scenario": "waiting",
-        "semanticSha256": "3f6df44b62bee560c61e6e7bfecb42e47c13679b668cbeafed9c7452b00dc263",
-        "stateSha256": "c789e67d761d81a4aafe6277f8784d76af464ef364c6ef9e1e1147724ede0909"
+        "semanticSha256": "a6402f57f5a475c6979ca0f1fe91ce9ecf60b88b0ea48979b8f15d6c2d6d5508",
+        "stateSha256": "c06f893924443bb6e2cb4948c42bc9ec86d780ab2a8c49a672fd421cb8942d4d"
       },
       {
-        "checkpointSha256": "a7a3b05ef57f0a2fdfd624471e4bc83f23b82b8165ba354c30560fb3a48df695",
+        "checkpointSha256": "04078ceb8932f31e4619065dd8723b3744ce9797c67eecbbaa1a0632ec08b601",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -812,13 +984,13 @@
           5
         ],
         "journalSha256": "6f685447c2ba7ee5cd2da12900abdfd8eb72cc091e274fd0d17f8a7570e6eb34",
-        "projectionSha256": "f9d4f0c64ee6197213944c7d0ffdbaccef2f04d97a61fa2be3ca7e268aba7018",
+        "projectionSha256": "612d1ed8165041c245858effff796b52eee660fa4f8cbb9ed4bed36093ff6724",
         "scenario": "delayed-positive-wait",
-        "semanticSha256": "0959b533e524e69a1099b4d136a8ef24be4608e3b7f311dedc3c026f3ef961e4",
-        "stateSha256": "a7a3b05ef57f0a2fdfd624471e4bc83f23b82b8165ba354c30560fb3a48df695"
+        "semanticSha256": "5f4c32d51db765df893e6f73bee4a49902e48dd90787d61321495d28ab582776",
+        "stateSha256": "04078ceb8932f31e4619065dd8723b3744ce9797c67eecbbaa1a0632ec08b601"
       },
       {
-        "checkpointSha256": "5f7d15e65fa84447bf2ccca5a01d5bba6a6a6838068a59941ef5efee7b364380",
+        "checkpointSha256": "56e237d86434f0de9ac86b38395f8ed0f32298fc91a232093bed93d9315da174",
         "entries": 6,
         "facts": 6,
         "journalRange": [
@@ -826,13 +998,97 @@
           6
         ],
         "journalSha256": "361a5749fa661a6f1375c36c1cc134fe17f212743fd2481babb5a44f0bde2a3d",
-        "projectionSha256": "77e088863e3bdb5c0f4d38735bca28e9ad9296db22d61d901b33bf0c5cea81de",
+        "projectionSha256": "a4e7f01af9b6dd9ff062ae8ce53336643db30edaa2c2c87752a41130a3e3e4fe",
         "scenario": "delayed-clear-wait",
-        "semanticSha256": "e0be7fd993c01443b62f756b8fe2989c3229300100af69669bbecc1e787419c8",
-        "stateSha256": "5f7d15e65fa84447bf2ccca5a01d5bba6a6a6838068a59941ef5efee7b364380"
+        "semanticSha256": "9f4c1f8cec8d3a383bfb222546291bf50e42617537b1ea8c4315ac41d4b3b303",
+        "stateSha256": "56e237d86434f0de9ac86b38395f8ed0f32298fc91a232093bed93d9315da174"
       },
       {
-        "checkpointSha256": "c412317c2f5f3fd24e0302a142fe0defcd9ec5755ae52e4a9834c1fcfde8e722",
+        "checkpointSha256": "b3f8f219a1fda6c5ee16b99e58b1f9d8b5945ed69741fbe0ec998c4669ae0b20",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "0a28ef9e8d4949b8eedb2c9bb5ae8adc622c6fc1bf75f676285ebe027687eb32",
+        "projectionSha256": "8849408464ffa3923f10476eef02e8fae16f60922031b679d0ce4b16eb466e6e",
+        "scenario": "wait-reappears",
+        "semanticSha256": "4e2c1c0cd677dce32f574e1502eafea6f238eeaeebc3ef4abd5ca8be42f849eb",
+        "stateSha256": "b3f8f219a1fda6c5ee16b99e58b1f9d8b5945ed69741fbe0ec998c4669ae0b20"
+      },
+      {
+        "checkpointSha256": "2e77d65c483559412b6088ddcc13cc112c8969b0591a055427337cfc755b6b44",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "cd3bafcfce61e0ceb0319c4ecdeadb9844362b3cb496f48537704813e433b1d3",
+        "projectionSha256": "00007508b90c15cf615ad754257fbde232e85f25f0382946b78f49026ade91ff",
+        "scenario": "wait-uncertain-reopens",
+        "semanticSha256": "047c62bae6ec5f10495e81e5e8333f51f130231d8ba9435fb878680e18ad5e15",
+        "stateSha256": "2e77d65c483559412b6088ddcc13cc112c8969b0591a055427337cfc755b6b44"
+      },
+      {
+        "checkpointSha256": "0d4764d4a9c5f44ec9da391c08fa7df98e5fc46097b873b13b96538835e210e7",
+        "entries": 5,
+        "facts": 5,
+        "journalRange": [
+          1,
+          5
+        ],
+        "journalSha256": "756a79be59b006d7c67f13421f0ddca4cc700bae1ab5878010603c1f5af5f3d5",
+        "projectionSha256": "53a08d245d806cd8976c98f5f3e59ba26a05aa11b96653ff390ee16ab54a3588",
+        "scenario": "wait-owner-resolution-kept",
+        "semanticSha256": "fbfa43192607d0bd4ccf864a0034552b2296babd279896b02a60341fb16934c7",
+        "stateSha256": "0d4764d4a9c5f44ec9da391c08fa7df98e5fc46097b873b13b96538835e210e7"
+      },
+      {
+        "checkpointSha256": "5c60064b78a5eb0d9858c63f61eb4264159dc065ead652ebf2e531df02d49052",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "d1a15561ff4770d44b70cb045f92aef905b8671b3b989172a061bad877bfcca3",
+        "projectionSha256": "7d673c923b56b5a2c43309d3dd716a5a89c9f65323ce0d58c3575805c2411cf7",
+        "scenario": "wait-new-after-resolution",
+        "semanticSha256": "a1026ba4704a6c9c38172691d6fb139c659cd197cb46419f4a800e10860de23b",
+        "stateSha256": "5c60064b78a5eb0d9858c63f61eb4264159dc065ead652ebf2e531df02d49052"
+      },
+      {
+        "checkpointSha256": "3c7337ad1d614a1aee47991be711b788857583d45e62f8f9ec2de8fa0a98befd",
+        "entries": 7,
+        "facts": 7,
+        "journalRange": [
+          1,
+          7
+        ],
+        "journalSha256": "5d9adfbc52dec87838942e6dbc40691f8714e8a349de2b8ec25862d7dc4f18c1",
+        "projectionSha256": "9c80743152ee1cf46a68ed4281b1e601f0a45de854995d3273a000013a5ef6e3",
+        "scenario": "wait-turn-ownership",
+        "semanticSha256": "6d8133da4d6d0e8fc9d47759fb2253965e00eedcc90ce9ac86d5fab4cb3e3282",
+        "stateSha256": "3c7337ad1d614a1aee47991be711b788857583d45e62f8f9ec2de8fa0a98befd"
+      },
+      {
+        "checkpointSha256": "e46ba8eb5a637c6889d9080ff8e3056b5de3a46438479a9f1dceb08a666002e0",
+        "entries": 3,
+        "facts": 3,
+        "journalRange": [
+          1,
+          3
+        ],
+        "journalSha256": "f1a1e7cd94eed105ad098840b94873a7cd79b07b37f5bfc48e3cc60edd301197",
+        "projectionSha256": "2fdb6ec8b29fe6318b1d8472425d7e19f53ceafa8b1da135becc80d628bb7b0a",
+        "scenario": "wait-session-scoped",
+        "semanticSha256": "2d7a6d9236856422d96e339da1fc254d60342b352875e1bf0e409955868239c3",
+        "stateSha256": "e46ba8eb5a637c6889d9080ff8e3056b5de3a46438479a9f1dceb08a666002e0"
+      },
+      {
+        "checkpointSha256": "e8ae5e14f789eea95a227ec752aeb398f7b19ee73f7ffdd438b71216b6fcd2f7",
         "entries": 6,
         "facts": 6,
         "journalRange": [
@@ -840,10 +1096,10 @@
           6
         ],
         "journalSha256": "d66e30af67162f141dee7ca2a6683b0b017f805d0e40c070d8341b0624dc9829",
-        "projectionSha256": "febd4153aa8c4b61b59bcbdee74822e531bd375d51181dcf290c0b2f49cc62fd",
+        "projectionSha256": "e9f8ffd979ba31513be52653542872087c400c4f9cc2533c116429248d0d4069",
         "scenario": "wait-generations",
-        "semanticSha256": "418209ad93428266495f87ec7b04de496ec56a62330cc23cc5ccfcab04ed1253",
-        "stateSha256": "c412317c2f5f3fd24e0302a142fe0defcd9ec5755ae52e4a9834c1fcfde8e722"
+        "semanticSha256": "e46c9890dc762782a24c8b4b2f22773474eca96762a64c198297787c310b53b5",
+        "stateSha256": "e8ae5e14f789eea95a227ec752aeb398f7b19ee73f7ffdd438b71216b6fcd2f7"
       },
       {
         "checkpointSha256": "e1ab8cdb4d982cc3837fbc3195c12367394f9568afb7e86e11537214ad459f64",
@@ -888,7 +1144,7 @@
         "stateSha256": "66da5984885fc4c86b961b8f7739dd9fd93b3327d541bf61ca43a137f08ab4b2"
       },
       {
-        "checkpointSha256": "d1aa62a6e020150df7c125650b8281d98b4e25d4c899b7a47f5e9a3f5530aece",
+        "checkpointSha256": "da60cf20efb7802a75d5a95874da7f625b9d9b45d19b7aac22969e929af4c3e3",
         "entries": 11,
         "facts": 13,
         "journalRange": [
@@ -899,10 +1155,10 @@
         "projectionSha256": "6119e76bfb0acee835688329d50a73cd599e256a2cbedc4c0d2a8abe2f335a15",
         "scenario": "resume",
         "semanticSha256": "368b9916ae5dbb1f4c565767f9d5739b8ce7d47768cdd83fefcd052fbb82f6ed",
-        "stateSha256": "d1aa62a6e020150df7c125650b8281d98b4e25d4c899b7a47f5e9a3f5530aece"
+        "stateSha256": "da60cf20efb7802a75d5a95874da7f625b9d9b45d19b7aac22969e929af4c3e3"
       },
       {
-        "checkpointSha256": "2ca9b3d93ed9377859ebc43e25f7ec3b6cc370f62ce56a0e913cb3256d62fefe",
+        "checkpointSha256": "a07f64c34b9d418b5457df65d6e3fe5317918df9188a9b522b1184bc8a8dc7dd",
         "entries": 9,
         "facts": 12,
         "journalRange": [
@@ -913,10 +1169,10 @@
         "projectionSha256": "3b5c4853861b8a1e6987af46b3304de17821e4c30d1896c4b3b0c91f55e73e73",
         "scenario": "pid-tty-reuse",
         "semanticSha256": "2ab136750d157e5bdf52577ab5208196ba3f993c485b03a5bb37a5051e6783d6",
-        "stateSha256": "2ca9b3d93ed9377859ebc43e25f7ec3b6cc370f62ce56a0e913cb3256d62fefe"
+        "stateSha256": "a07f64c34b9d418b5457df65d6e3fe5317918df9188a9b522b1184bc8a8dc7dd"
       },
       {
-        "checkpointSha256": "c8c5c55b3f37d984f20d74541cce350301e42fefe79cc745ebb92e55c3099990",
+        "checkpointSha256": "1d80103c94458c4eb9092d84baed46453ab94cda1ea0b4ac6c03ddbc08ca424a",
         "entries": 4,
         "facts": 5,
         "journalRange": [
@@ -927,10 +1183,10 @@
         "projectionSha256": "8f5fc3e9f12e9c052f334472c6c49e22279c3b1e3080a0a78a1f32b8d0f15e71",
         "scenario": "executable-replaced",
         "semanticSha256": "560e9557cf8b61106bc46830f62e03cb66eb345cde407eb104e7326ffea2b95d",
-        "stateSha256": "c8c5c55b3f37d984f20d74541cce350301e42fefe79cc745ebb92e55c3099990"
+        "stateSha256": "1d80103c94458c4eb9092d84baed46453ab94cda1ea0b4ac6c03ddbc08ca424a"
       },
       {
-        "checkpointSha256": "2292ce1dd42e547b679d70f78e5dc6743dedf1edab697d1d1f741e6baab264ec",
+        "checkpointSha256": "8b72cd995328d5db7b22a5df1bfaca565dd7eb4ec30a160256f389f619c06d6a",
         "entries": 5,
         "facts": 6,
         "journalRange": [
@@ -941,24 +1197,24 @@
         "projectionSha256": "6d6ac8fa3b445bacc545e52e526655384507a47b183505d77f2e7841bd136c23",
         "scenario": "replaced-then-unordered-image",
         "semanticSha256": "473330dc1232cc35ad766d006fa298c70f5f31f13ae055fc7250add59f7d5f8b",
-        "stateSha256": "2292ce1dd42e547b679d70f78e5dc6743dedf1edab697d1d1f741e6baab264ec"
+        "stateSha256": "8b72cd995328d5db7b22a5df1bfaca565dd7eb4ec30a160256f389f619c06d6a"
       },
       {
-        "checkpointSha256": "5e54e06abd6286823a0a2a57bbf265155b3861738170491315ef9dda36457b31",
-        "entries": 6,
-        "facts": 8,
+        "checkpointSha256": "d2cd1809b1312cd2e9f6e3ff9b8fb0a0fa21bc093a48e3239977570239501ac2",
+        "entries": 9,
+        "facts": 11,
         "journalRange": [
           1,
-          6
+          9
         ],
-        "journalSha256": "3f232a7557e835f6524a5522efa89281f4e51088c86b9fe850373fd8621844cb",
-        "projectionSha256": "ed5368fff6b33162b79c167029e6a5b9c5a05073f09a8f02d17c59a3876985f1",
+        "journalSha256": "7251be46ca30aeaa46987a9bfd7a25d35b92e8186020c7ddc1659e9c88aec514",
+        "projectionSha256": "1670d6e673aea33f1962fda26e66329602eca0b62be564cdcfdcfc8848fc24ae",
         "scenario": "executable-requalified",
-        "semanticSha256": "ab50ddf183f652ce55a5a4dd5fee6fe114b45b5889f5447d425444560428e429",
-        "stateSha256": "5e54e06abd6286823a0a2a57bbf265155b3861738170491315ef9dda36457b31"
+        "semanticSha256": "8224e3e9d7425c5e39a54bba3e33affdfe998717a1dc8eac0649db06be134b6d",
+        "stateSha256": "d2cd1809b1312cd2e9f6e3ff9b8fb0a0fa21bc093a48e3239977570239501ac2"
       },
       {
-        "checkpointSha256": "66aba42f52a2c32ceffc8156bd5e7de2216fec12f5a3c5bdbe3e0c9156793a44",
+        "checkpointSha256": "2b897a11de582ee62dba997a7829cc3e3d13dbe04d47973750d4706612721e6f",
         "entries": 5,
         "facts": 7,
         "journalRange": [
@@ -969,7 +1225,7 @@
         "projectionSha256": "8ecf5cb9dd07fa284e05da9ec07f6eb3ec0d42b3bde97a834aa785b54618a13f",
         "scenario": "routing-ambiguity",
         "semanticSha256": "1ff85a7b81fc5926ed0ab07561fc3efbd664a7c63dafc18db4a3ba7c2935094b",
-        "stateSha256": "66aba42f52a2c32ceffc8156bd5e7de2216fec12f5a3c5bdbe3e0c9156793a44"
+        "stateSha256": "2b897a11de582ee62dba997a7829cc3e3d13dbe04d47973750d4706612721e6f"
       },
       {
         "checkpointSha256": "a9fc43648aa0808e5da39d24d58f7a27eac8c7c2fc80d65692847d7d7c0f7300",
@@ -1061,18 +1317,18 @@
     "pass": true,
     "spoolPath": {
       "drainedAfterReopen": 14,
-      "filesScanned": 14,
+      "filesScanned": 15,
       "plantedValuesFound": [],
       "spooled": 14
     },
     "storeScan": {
-      "filesScanned": 6,
+      "filesScanned": 7,
       "includes": "journal.sqlite3, -wal, -shm, capture-spool/**, logs/**",
       "plantedValuesFound": []
     }
   },
   "schema": 1,
-  "sourceCommit": "a940b43ac8d56bec310d813bc9d3e9198bc6abc5",
+  "sourceCommit": "cbb8cfab8fea9eb876152d8775b8737804d0f988",
   "testCommands": [
     "cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification",
     "npx vitest run",
@@ -1083,7 +1339,7 @@
     "target/aarch64-apple-darwin/release/threadspace-m1 sanitization target/aarch64-apple-darwin/release/threadspace-hook"
   ],
   "title": "Journal, Contracts and Deterministic Synthetic Harness",
-  "verdict": "M1 PASS CANDIDATE — pending independent review",
+  "verdict": "M1 REMEDIATION CANDIDATE — pending independent re-review",
   "versions": {
     "contracts": [
       {
