@@ -1473,6 +1473,99 @@
       "positiveBuildExit": 0,
       "sourceCommit": "5483afd9860e047c9308e5821c269e1b7349e023"
     },
+    "fourth": {
+      "base": "579df5b7902396f706095a28b455f9189513daa5",
+      "checkpointTailPreserved": true,
+      "defect": "the reducer-1 upgrade's rebase restored an attention item's committed revision but not its committed resolved_at_ms, so an item reducer 2 reopened and resolved again while replaying a journal suffix upgraded with the later time",
+      "evidenceSources": {
+        "reproduced": {
+          "areas": [
+            "contracts",
+            "fixtures",
+            "replay",
+            "crash"
+          ],
+          "note": "files byte-identical to those committed; migration reproduced every field except the per-run file SHA-256 of fresh stores, so its summary from 2e42561 is kept",
+          "sourceCommit": "80df8b09c04c13c7b527d8913eb890858da3a606"
+        },
+        "retained": {
+          "areas": [
+            "migration",
+            "permutations",
+            "capture",
+            "sanitization"
+          ],
+          "reason": "the change is limited to the earlier-reducer upgrade's rebase, which no store in those areas reaches"
+        }
+      },
+      "fixture": {
+        "path": "fixtures/m1/reducer-1-store/journal-resolved-at.sqlite3",
+        "producer": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
+        "sha256": "92d8666a16e5f478f74c4d1bf5da3ae2ecec456c841e85d71030d543ceb6bc47"
+      },
+      "negativeControls": "evidence/M1/remediation-4/negative-controls/",
+      "previousEvidence": "evidence/M1/history/579df5b/",
+      "record": "evidence/M1/remediation-4/README.md",
+      "repair": "7fe5539c97a47e0d223d30b43550bdc51570c366",
+      "resolvedAt": {
+        "attentionId": "663fb032-fef5-812b-9104-b15bd1135349",
+        "pass": true,
+        "variants": [
+          {
+            "newestCheckpointBefore": {
+              "id": 3,
+              "origin": "FIXTURE",
+              "reducerVersion": 1,
+              "throughCursor": 6
+            },
+            "resolvedAtMs": {
+              "row": 1791000000040,
+              "state": 1791000000040
+            },
+            "stateDifferencesFromA": 0,
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "suffixEntriesReplayed": 0,
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "variant": "A"
+          },
+          {
+            "newestCheckpointBefore": {
+              "id": 1,
+              "origin": "EMPTY",
+              "reducerVersion": 1,
+              "throughCursor": 0
+            },
+            "resolvedAtMs": {
+              "row": 1791000000040,
+              "state": 1791000000040
+            },
+            "stateDifferencesFromA": 0,
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "suffixEntriesReplayed": 6,
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "variant": "B"
+          },
+          {
+            "newestCheckpointBefore": {
+              "id": 2,
+              "origin": "FIXTURE",
+              "reducerVersion": 1,
+              "throughCursor": 4
+            },
+            "resolvedAtMs": {
+              "row": 1791000000040,
+              "state": 1791000000040
+            },
+            "stateDifferencesFromA": 0,
+            "stateSha256": "bc0267a00066420911ea43b05ed0371f28ce9c3758400451dd1ce6e5da225c88",
+            "suffixEntriesReplayed": 2,
+            "tablesSha256": "223353b4c02f1688cbfad04d5db64941787e41d6ab2002c3e875fff0eab7e008",
+            "variant": "C"
+          }
+        ]
+      },
+      "tests": "80df8b09c04c13c7b527d8913eb890858da3a606"
+    },
     "record": "evidence/M1/remediation/README.md",
     "second": {
       "base": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
@@ -2219,7 +2312,7 @@
     }
   },
   "schema": 1,
-  "sourceCommit": "ad87eef6092d57f91533285b3131dd929d72f54e",
+  "sourceCommit": "787a3d42ec053a4d0d47555382458c01e61de0ad",
   "testCommands": [
     "cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification",
     "npx vitest run",
