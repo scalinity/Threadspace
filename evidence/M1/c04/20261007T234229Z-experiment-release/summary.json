@@ -1,0 +1,414 @@
+{
+  "area": "view-recovery",
+  "cases": [
+    {
+      "case": "document-replacement",
+      "pass": true
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "pass": false
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-01",
+      "pass": false
+    },
+    {
+      "case": "repeated-replacement-02",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-03",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-04",
+      "pass": true
+    },
+    {
+      "case": "repeated-replacement-05",
+      "pass": false
+    },
+    {
+      "case": "bootstrap-with-companion-unavailable",
+      "pass": true
+    }
+  ],
+  "companionSha256": "b8e8d4a86c6cab05c114ce983bdd4d2d2d51be352bc914abc40ac2d3d5f4c7f1",
+  "executableSha256": "0006df7b64d70d780297eea9649e9f45c22183e1b3561859b36ced8c58cd02fb",
+  "nativeWindowShells": {
+    "after": 6,
+    "afterImmediate": 6,
+    "afterSettle": {
+      "count": 6,
+      "seen": [
+        6
+      ],
+      "settled": true,
+      "waitedMs": 5564
+    },
+    "before": 2,
+    "beforeSettle": {
+      "count": 2,
+      "seen": [
+        2
+      ],
+      "settled": true,
+      "waitedMs": 5500
+    },
+    "pass": false,
+    "recoveries": 5,
+    "retiredNative": {
+      "contentViewsAlive": 0,
+      "delegatesAlive": 0,
+      "retired": 8,
+      "webviewsAlive": 0,
+      "windowsAlive": 0
+    },
+    "sameUiIncarnation": true,
+    "uiPid": 33762
+  },
+  "pass": false,
+  "passed": 6,
+  "recoveryDelays": [
+    {
+      "case": "document-replacement",
+      "delayMs": 0
+    },
+    {
+      "case": "replacement-with-request-in-flight",
+      "delayMs": 0
+    },
+    {
+      "case": "retired-with-unconsumed-cached-frames",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-01",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-02",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-03",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-04",
+      "delayMs": 0
+    },
+    {
+      "case": "repeated-replacement-05",
+      "delayMs": 0
+    }
+  ],
+  "total": 9,
+  "uiResources": {
+    "after": {
+      "footprintBytes": 31868080,
+      "webContentPids": [
+        54819
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 6,
+      "windows": [
+        [
+          21728,
+          true,
+          1000,
+          651
+        ],
+        [
+          21691,
+          false,
+          1168,
+          26
+        ],
+        [
+          21689,
+          false,
+          1168,
+          26
+        ],
+        [
+          21667,
+          false,
+          500,
+          500
+        ],
+        [
+          21690,
+          false,
+          1168,
+          26
+        ],
+        [
+          21688,
+          false,
+          1168,
+          26
+        ]
+      ]
+    },
+    "before": {
+      "footprintBytes": 28312728,
+      "webContentPids": [
+        40723
+      ],
+      "webContentProcesses": 1,
+      "windowShells": 2,
+      "windows": [
+        [
+          21681,
+          true,
+          1000,
+          651
+        ],
+        [
+          21667,
+          false,
+          500,
+          500
+        ]
+      ]
+    },
+    "perRecovery": [
+      {
+        "footprintBytes": 32834712,
+        "webContentPids": [
+          41646
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            21692,
+            true,
+            1000,
+            651
+          ],
+          [
+            21691,
+            false,
+            1168,
+            26
+          ],
+          [
+            21689,
+            false,
+            1168,
+            26
+          ],
+          [
+            21667,
+            false,
+            500,
+            500
+          ],
+          [
+            21690,
+            false,
+            1168,
+            26
+          ],
+          [
+            21688,
+            false,
+            1168,
+            26
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 31130800,
+        "webContentPids": [
+          50989
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            21691,
+            false,
+            1168,
+            26
+          ],
+          [
+            21689,
+            false,
+            1168,
+            26
+          ],
+          [
+            21667,
+            false,
+            500,
+            500
+          ],
+          [
+            21716,
+            true,
+            1000,
+            651
+          ],
+          [
+            21690,
+            false,
+            1168,
+            26
+          ],
+          [
+            21688,
+            false,
+            1168,
+            26
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32146608,
+        "webContentPids": [
+          52405
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            21726,
+            true,
+            1000,
+            651
+          ],
+          [
+            21691,
+            false,
+            1168,
+            26
+          ],
+          [
+            21689,
+            false,
+            1168,
+            26
+          ],
+          [
+            21667,
+            false,
+            500,
+            500
+          ],
+          [
+            21690,
+            false,
+            1168,
+            26
+          ],
+          [
+            21688,
+            false,
+            1168,
+            26
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32162992,
+        "webContentPids": [
+          53753
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            21727,
+            true,
+            1000,
+            651
+          ],
+          [
+            21691,
+            false,
+            1168,
+            26
+          ],
+          [
+            21689,
+            false,
+            1168,
+            26
+          ],
+          [
+            21667,
+            false,
+            500,
+            500
+          ],
+          [
+            21690,
+            false,
+            1168,
+            26
+          ],
+          [
+            21688,
+            false,
+            1168,
+            26
+          ]
+        ]
+      },
+      {
+        "footprintBytes": 32097456,
+        "webContentPids": [
+          54819
+        ],
+        "webContentProcesses": 1,
+        "windowShells": 6,
+        "windows": [
+          [
+            21728,
+            true,
+            1000,
+            651
+          ],
+          [
+            21691,
+            false,
+            1168,
+            26
+          ],
+          [
+            21689,
+            false,
+            1168,
+            26
+          ],
+          [
+            21667,
+            false,
+            500,
+            500
+          ],
+          [
+            21690,
+            false,
+            1168,
+            26
+          ],
+          [
+            21688,
+            false,
+            1168,
+            26
+          ]
+        ]
+      }
+    ]
+  }
+}

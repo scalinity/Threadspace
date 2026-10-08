@@ -15,6 +15,7 @@ pub struct Ctx {
     pub repo: PathBuf,
     pub id: Identity,
     pub native: Native,
+    milestone: String,
 }
 
 impl Ctx {
@@ -24,13 +25,31 @@ impl Ctx {
         if !repo.join("docs/MILESTONES.md").exists() {
             return Err("run from the repository root".into());
         }
+        // An invalid value is refused rather than defaulted, so a later
+        // milestone's run never lands in accepted M0C evidence by mistake.
+        let milestone = match std::env::var("THREADSPACE_EVIDENCE_MILESTONE") {
+            Ok(milestone) if valid_milestone(&milestone) => milestone,
+            Ok(milestone) => {
+                return Err(format!(
+                    "THREADSPACE_EVIDENCE_MILESTONE={milestone:?} must match ^M[0-9][A-Z0-9]*$"
+                ));
+            }
+            Err(_) => "M0C".to_owned(),
+        };
         let id = Identity::installed(channel).ok_or("identity paths unavailable")?;
         let native = Native::ensure(&repo)?;
-        Ok(Self { repo, id, native })
+        Ok(Self {
+            repo,
+            id,
+            native,
+            milestone,
+        })
     }
 
+    /// `evidence/<milestone>`: `THREADSPACE_EVIDENCE_MILESTONE` names a later
+    /// milestone's run of an M0C runner; unset, it is `M0C`.
     pub fn evidence_root(&self) -> PathBuf {
-        self.repo.join("evidence/M0C")
+        self.repo.join("evidence").join(&self.milestone)
     }
 
     /// Holds the machine-wide GUI automation lock for one short segment.
@@ -73,5 +92,31 @@ impl Ctx {
             })),
             "idleSeconds": self.native.idle_seconds(),
         })
+    }
+}
+
+/// `^M[0-9][A-Z0-9]*$`, so the value is one directory name under `evidence/`.
+fn valid_milestone(milestone: &str) -> bool {
+    let bytes = milestone.as_bytes();
+    bytes.len() >= 2
+        && bytes[0] == b'M'
+        && bytes[1].is_ascii_digit()
+        && bytes[2..]
+            .iter()
+            .all(|b| b.is_ascii_digit() || b.is_ascii_uppercase())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::valid_milestone;
+
+    #[test]
+    fn milestone_names_one_evidence_directory() {
+        for good in ["M0C", "M1", "M15", "M0A"] {
+            assert!(valid_milestone(good), "{good}");
+        }
+        for bad in ["", "M", "m1", "MX", "M1a", "M1 ", "M1/c04", "../M1"] {
+            assert!(!valid_milestone(bad), "{bad}");
+        }
     }
 }

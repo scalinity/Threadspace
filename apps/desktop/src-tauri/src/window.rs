@@ -16,6 +16,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use objc2::msg_send;
+use objc2::runtime::AnyObject;
 use serde_json::json;
 use tauri::webview::{NewWindowResponse, PageLoadEvent};
 use tauri::window::Color;
@@ -268,6 +270,9 @@ pub fn recover<R: Runtime>(
                 .get_webview_window(OFFICE_LABEL)
                 .and_then(|window| native_state(&window).ok());
             if let Some(window) = app.get_webview_window(OFFICE_LABEL) {
+                #[cfg(feature = "qualification")]
+                shells::track(&window, incarnation);
+                release_window_on_close(&window);
                 let _ = window.destroy();
             }
             let removal = Instant::now();
@@ -315,7 +320,200 @@ pub fn recover<R: Runtime>(
                     "elapsedMs": started.elapsed().as_millis() as u64,
                 }),
             );
+            #[cfg(feature = "qualification")]
+            shells::report(&app, incarnation);
         });
+}
+
+/// Has AppKit release the retiring office window once, when it closes
+/// (C-04). tao 0.37.0's `create_window` keeps the +1 window that
+/// `alloc`/`initWithContentRect:` returns and retains it again for its own
+/// handle, so one reference has no owner and a closed office window was never
+/// deallocated: every recovery left its window-server window behind as an
+/// off-screen shell. `releasedWhenClosed` is AppKit's documented ownership of
+/// a window that frees itself on close; here it takes that ownerless
+/// reference. It is correct only while tao over-retains, so
+/// `tests::tao_is_the_version_whose_window_retain_is_balanced` fails on any
+/// other tao and the view-recovery shell gate must be rerun before it moves.
+/// The pointer is borrowed for one main-thread call; this code never retains
+/// or releases it.
+fn release_window_on_close<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    let (done, wait) = std::sync::mpsc::channel();
+    let sent = window.with_webview(move |platform| {
+        if let Some(webview) = platform.downcast_ref::<tauri_runtime_wry::Webview>() {
+            // SAFETY: the live view's window, borrowed on the main thread for
+            // this call only.
+            if let Some(ns_window) = unsafe { webview.ns_window().cast::<AnyObject>().as_ref() } {
+                // SAFETY: NSWindow's `releasedWhenClosed` setter, on the main
+                // thread, before the window's only close.
+                let () = unsafe { msg_send![ns_window, setReleasedWhenClosed: true] };
+            }
+        }
+        let _ = done.send(());
+    });
+    if sent.is_ok() {
+        let _ = wait.recv_timeout(REMOVAL_WAIT);
+    }
+}
+
+/// Qualification-only (C-04): weak references to each retired office
+/// window's native objects, read back after its recovery to show which of
+/// them AppKit has released, beside AppKit's own window list. A weak
+/// reference neither retains nor owns; every pointer is borrowed from the
+/// live view on the main thread and only for the duration of that call.
+#[cfg(feature = "qualification")]
+mod shells {
+    use std::cell::RefCell;
+    use std::ffi::c_void;
+    use std::sync::mpsc;
+    use std::thread;
+    use std::time::Duration;
+
+    use objc2::rc::{Retained, Weak};
+    use objc2::runtime::AnyObject;
+    use objc2::{class, msg_send};
+    use serde_json::{Value, json};
+    use tauri::{AppHandle, Manager, Runtime, WebviewWindow};
+    use uuid::Uuid;
+
+    /// Long enough for the closed window's own deferred release.
+    const SETTLE: Duration = Duration::from_secs(1);
+
+    struct Retired {
+        incarnation: Uuid,
+        number: isize,
+        /// `retainCount` just before destruction, while the runtime still
+        /// holds the window.
+        retain_count_live: usize,
+        window: Weak<AnyObject>,
+        delegate: Option<Weak<AnyObject>>,
+        content_view: Option<Weak<AnyObject>>,
+        webview: Option<Weak<AnyObject>>,
+    }
+
+    thread_local! {
+        // Touched on the main thread only.
+        static RETIRED: RefCell<Vec<Retired>> = const { RefCell::new(Vec::new()) };
+    }
+
+    /// Before destruction: remembers the window, its delegate, its content
+    /// view and the web view, weakly.
+    pub fn track<R: Runtime>(window: &WebviewWindow<R>, incarnation: Uuid) {
+        let (done, wait) = mpsc::channel();
+        let sent = window.with_webview(move |platform| {
+            if let Some(webview) = platform.downcast_ref::<tauri_runtime_wry::Webview>() {
+                remember(incarnation, webview.ns_window(), webview.inner());
+            }
+            let _ = done.send(());
+        });
+        if sent.is_ok() {
+            let _ = wait.recv_timeout(Duration::from_secs(5));
+        }
+    }
+
+    fn remember(incarnation: Uuid, ns_window: *const c_void, webview: *const c_void) {
+        // SAFETY: both pointers come from the live view, on the main thread,
+        // and are borrowed only for this call.
+        let Some(window) = (unsafe { ns_window.cast::<AnyObject>().as_ref() }) else {
+            return;
+        };
+        // SAFETY: as above.
+        let webview = unsafe { webview.cast::<AnyObject>().as_ref() };
+        // SAFETY: NSWindow getters, on the main thread.
+        let number: isize = unsafe { msg_send![window, windowNumber] };
+        // SAFETY: as above.
+        let retain_count_live: usize = unsafe { msg_send![window, retainCount] };
+        // SAFETY: as above.
+        let delegate: Option<Retained<AnyObject>> = unsafe { msg_send![window, delegate] };
+        // SAFETY: as above.
+        let content_view: Option<Retained<AnyObject>> = unsafe { msg_send![window, contentView] };
+        RETIRED.with_borrow_mut(|retired| {
+            retired.push(Retired {
+                incarnation,
+                number,
+                retain_count_live,
+                window: Weak::new(window),
+                delegate: delegate.as_deref().map(Weak::new),
+                content_view: content_view.as_deref().map(Weak::new),
+                webview: webview.map(Weak::new),
+            });
+        });
+    }
+
+    /// After a recovery: logs `OFFICE_NATIVE_WINDOWS` once its retired
+    /// window has had time to be released.
+    pub fn report<R: Runtime>(app: &AppHandle<R>, retired_incarnation: Uuid) {
+        thread::sleep(SETTLE);
+        let logged = app.clone();
+        let _ = app.run_on_main_thread(move || {
+            let mut detail = snapshot();
+            detail["afterRecoveryOf"] = json!(retired_incarnation);
+            crate::prefs::log(&logged, "OFFICE_NATIVE_WINDOWS", detail);
+        });
+    }
+
+    fn alive(weak: Option<&Weak<AnyObject>>) -> Value {
+        weak.map_or(Value::Null, |weak| json!(weak.load().is_some()))
+    }
+
+    fn snapshot() -> Value {
+        let retired: Vec<Value> = RETIRED.with_borrow(|retired| {
+            retired
+                .iter()
+                .map(|r| {
+                    let window = r.window.load();
+                    // Retain count (including this probe's own reference) and
+                    // current window number (at most 0 once the window device
+                    // is freed), while the window is alive.
+                    let now = window.as_ref().map(|window| {
+                        // SAFETY: NSObject/NSWindow getters on a live window,
+                        // on the main thread.
+                        unsafe {
+                            let count: usize = msg_send![&**window, retainCount];
+                            let number: isize = msg_send![&**window, windowNumber];
+                            (count, number)
+                        }
+                    });
+                    json!({
+                        "incarnation": r.incarnation,
+                        "windowNumber": r.number,
+                        "windowAlive": window.is_some(),
+                        "windowRetainCountLive": r.retain_count_live,
+                        "windowRetainCount": now.map(|n| n.0),
+                        "windowNumberNow": now.map(|n| n.1),
+                        "delegateAlive": alive(r.delegate.as_ref()),
+                        "contentViewAlive": alive(r.content_view.as_ref()),
+                        "webviewAlive": alive(r.webview.as_ref()),
+                    })
+                })
+                .collect()
+        });
+        // SAFETY: NSApplication's shared instance and window list, on the
+        // main thread.
+        let windows: Retained<AnyObject> = unsafe {
+            let app: Retained<AnyObject> = msg_send![class!(NSApplication), sharedApplication];
+            msg_send![&app, windows]
+        };
+        // SAFETY: NSArray count.
+        let count: usize = unsafe { msg_send![&windows, count] };
+        let app_windows: Vec<Value> = (0..count)
+            .map(|index| {
+                // SAFETY: an index below the array's count; NSWindow getters.
+                let (number, visible, class) = unsafe {
+                    let window: Retained<AnyObject> = msg_send![&windows, objectAtIndex: index];
+                    let number: isize = msg_send![&window, windowNumber];
+                    let visible: bool = msg_send![&window, isVisible];
+                    (
+                        number,
+                        visible,
+                        window.class().name().to_string_lossy().into_owned(),
+                    )
+                };
+                json!({ "number": number, "visible": visible, "class": class })
+            })
+            .collect();
+        json!({ "retired": retired, "appWindows": app_windows })
+    }
 }
 
 /// Fullscreen and zoom transitions leave the window itself as first
@@ -326,5 +524,29 @@ fn keep_web_focus<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
     if window.is_focused().unwrap_or(false) {
         let webview: &tauri::Webview<R> = window.as_ref();
         let _ = webview.set_focus();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// `release_window_on_close` balances a reference tao 0.37.0 never
+    /// releases. A tao that does release it would turn AppKit's release
+    /// into a double release, so the pin moves only with a rerun of the
+    /// view-recovery shell gate (C-04).
+    #[test]
+    fn tao_is_the_version_whose_window_retain_is_balanced() {
+        let lock =
+            std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../Cargo.lock"))
+                .unwrap_or_default();
+        let tao: Vec<&str> = lock
+            .split("[[package]]")
+            .filter(|package| package.contains("\nname = \"tao\"\n"))
+            .filter_map(|package| {
+                package
+                    .lines()
+                    .find_map(|line| line.strip_prefix("version = "))
+            })
+            .collect();
+        assert_eq!(tao, ["\"0.37.0\""]);
     }
 }
