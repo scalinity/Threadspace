@@ -44,14 +44,16 @@ $M install dev  "$B/Threadspace Dev.app"
 ```
 
 Then, from the repository root (each prints a JSON summary and writes its run
-directory under `evidence/M0C/`):
+directory under `evidence/M0C/`, or under `evidence/<milestone>/` when
+`THREADSPACE_EVIDENCE_MILESTONE` names one, such as `M1`; an invalid value is
+refused at startup):
 
 ```sh
 $M g02-packaged prod 10      # ten packaged launches
 $M g02-dev dev 10            # ten tauri dev launches (development identity)
 $M g03-ipc prod 1000         # 1,000 round trips + negative cases + ACL/origin probes
 $M g04-stream prod 10000 60000
-$M view-recovery prod 10
+$M view-recovery prod 10      # C-04 regression (D-0008); M1 qualifies it with 20
 $M g05-denied dev            # notification denied path
 $M g06-notifications prod    # ≥10 real banner interactions
 $M g08-terminal prod         # Terminal negatives with disposable Claude sessions
@@ -64,6 +66,14 @@ $M g15-graphics prod 15      # fifteen minutes of packaged graphics
 $M g16-window prod           # window, display and accessibility matrix
 $M g12-sleep-wake prod 5     # needs six root-scheduled wakes, one spare (see below)
 ```
+
+`view-recovery` is the permanent C-04 regression for the D-0008 containment.
+After repeated view retirement and recreation it passes only with flat office
+window shells after quiescence, no WebContent growth, UI footprint within
+4 MiB, office bounds and visibility kept, the durable intent backlog unchanged,
+equal projections, and stale-epoch and retired-subscription refusal in the
+recreated view. Run it, without the containment, before any Tauri, tao or Wry
+update lands.
 
 M0C remediation runners (evidence under `evidence/M0C/remediation/`):
 

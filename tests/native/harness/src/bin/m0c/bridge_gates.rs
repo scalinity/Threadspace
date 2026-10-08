@@ -22,6 +22,9 @@ const SHELLS_STABLE: Duration = Duration::from_secs(5);
 const SHELLS_SETTLE_CAP: Duration = Duration::from_secs(60);
 /// The office window's title (`window::create_office`).
 const OFFICE_TITLE: &str = "Threadspace";
+/// The most the UI's footprint may grow across the repeated recoveries
+/// (C-04). Before the D-0008 repair it grew about 0.57 MB per recovery.
+const FOOTPRINT_GROWTH_MAX: i64 = 4 * 1024 * 1024;
 
 /// Makes sure exactly one hydrated UI is running; returns its incarnation.
 pub fn ensure_ui(ctx: &Ctx) -> Result<procs::Incarnation, String> {
@@ -564,6 +567,25 @@ fn settle_shells(ctx: &Ctx, pid: u32) -> Value {
     })
 }
 
+/// The live office window's frame (Accessibility) and whether an office
+/// window is on screen.
+fn office_window(ctx: &Ctx, pid: u32) -> Value {
+    let frame = ctx.native.ax_window(pid, Some(OFFICE_TITLE))["frame"].clone();
+    let visible = layer0_windows(ctx, pid)
+        .iter()
+        .any(|w| w[4] == OFFICE_TITLE && w[1] == true);
+    json!({ "frame": frame, "visible": visible })
+}
+
+/// Frames equal within 3 points.
+fn same_frame(a: &Value, b: &Value) -> bool {
+    ["x", "y", "width", "height"].iter().all(|k| {
+        a[k].as_f64()
+            .zip(b[k].as_f64())
+            .is_some_and(|(a, b)| (a - b).abs() <= 3.0)
+    })
+}
+
 /// One sample of the UI's native resources: office windows (shells and the
 /// live view), every layer-0 window, the WebContent processes serving it and
 /// its physical footprint.
@@ -695,6 +717,10 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let ui_pid = ui.as_ref().map(|ui| ui.pid as u32);
     let before = ui_pid.map(|pid| settle_shells(ctx, pid));
     let resources_before = ui_pid.map(|pid| ui_resources(ctx, pid));
+    // Preserved across the recoveries (D-0006): the office window's bounds
+    // and visibility, and the durable intent backlog.
+    let office_before = ui_pid.map(|pid| office_window(ctx, pid));
+    let intents_before = crate::handoff::durable(ctx);
     let mut growth = Vec::new();
     for index in 1..=repeats {
         let name = format!("repeated-replacement-{index:02}");
@@ -713,6 +739,22 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let immediate = ui_pid.map(|pid| shell_counts(&layer0_windows(ctx, pid)));
     let after = ui_pid.map(|pid| settle_shells(ctx, pid));
     let resources_after = ui_pid.map(|pid| ui_resources(ctx, pid));
+    let office_after = ui_pid.map(|pid| office_window(ctx, pid));
+    let intents_after = crate::handoff::durable(ctx);
+    // Incarnation rejection in the recreated view: the IPC suite's stale
+    // epoch, context and retired-subscription cases, and the subscription of
+    // the first case's view, which the recoveries retired.
+    let suite = app.view_command("ipc-suite", json!({ "rounds": 100 }), Duration::from_secs(300));
+    let retired_subscription = cases
+        .first()
+        .and_then(|c| c["hydratedSubscription"].as_str().map(str::to_owned));
+    let retired_probe = retired_subscription.as_ref().map(|id| {
+        app.view_command(
+            "retired-subscription-probe",
+            json!({ "subscriptionId": id }),
+            Duration::from_secs(20),
+        )
+    });
     let same_ui = ui.as_ref().is_some_and(procs::Incarnation::alive);
     let measured = |s: &Value| s["settled"] == true && s["titlesReadable"] == true;
     let shells_pass = same_ui
@@ -750,11 +792,45 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         "afterSettle": after,
         "pass": shells_pass,
     });
+    let resources_pass = matches!((&resources_before, &resources_after), (Some(b), Some(a))
+        if a["webContentProcesses"].as_u64().zip(b["webContentProcesses"].as_u64()).is_some_and(|(a, b)| a <= b)
+            && a["footprintBytes"].as_i64().zip(b["footprintBytes"].as_i64()).is_some_and(|(a, b)| a - b <= FOOTPRINT_GROWTH_MAX));
     let resources = json!({
         "before": resources_before,
         "after": resources_after,
         "perRecovery": growth,
+        "footprintGrowthMaxBytes": FOOTPRINT_GROWTH_MAX,
+        "pass": resources_pass,
     });
+    let office_pass = matches!((&office_before, &office_after), (Some(b), Some(a))
+        if b["visible"] == true && a["visible"] == true && same_frame(&b["frame"], &a["frame"]));
+    let intents_pass = intents_before["pendingIntents"] == intents_after["pendingIntents"]
+        && intents_after["backlogTemporaries"].as_array().is_some_and(Vec::is_empty);
+    let suite_ok = suite.as_ref().is_ok_and(|s| {
+        s["ok"] == true && s["result"]["roundTripsOk"] == true && s["result"]["passed"] == s["result"]["total"]
+    });
+    let probe_refused = retired_probe.as_ref().is_some_and(|probe| {
+        probe.as_ref().is_ok_and(|p| {
+            p["ok"] == true
+                && p["result"]["ok"] == false
+                && matches!(p["result"]["code"].as_str(), Some("UNKNOWN_SUBSCRIPTION" | "STALE_CONTEXT"))
+        })
+    });
+    let preserved = json!({
+        "office": { "before": office_before, "after": office_after, "pass": office_pass },
+        "pendingIntents": {
+            "before": intents_before["pendingIntents"],
+            "after": intents_after["pendingIntents"],
+            "pass": intents_pass,
+        },
+        "incarnationRejection": {
+            "ipcSuite": suite.as_ref().map(|s| json!({ "passed": s["result"]["passed"], "total": s["result"]["total"], "roundTripsOk": s["result"]["roundTripsOk"] })).unwrap_or_else(|e| json!(e)),
+            "retiredSubscription": retired_subscription,
+            "retiredProbe": retired_probe.map(|p| p.map(|p| p["result"].clone()).unwrap_or_else(|e| json!(e))),
+            "pass": suite_ok && probe_refused,
+        },
+    });
+    let c04_pass = shells_pass && resources_pass && office_pass && intents_pass && suite_ok && probe_refused;
     let delays: Vec<Value> = cases
         .iter()
         .filter_map(|c| {
@@ -769,7 +845,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let _gui = ctx.gui("view recovery: bootstrap with companion frozen")?;
     if std::env::var_os("THREADSPACE_HARNESS_ATTACHED_DEV_UI").is_some() {
         let passed = cases.iter().filter(|c| c["pass"] == true).count();
-        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len() && shells_pass, "passed": passed, "total": cases.len(), "recoveryDelays": delays, "nativeWindowShells": window_shells, "uiResources": resources });
+        let summary = json!({ "area": "view-recovery", "mode": "attached dev UI (bootstrap case skipped)", "pass": passed == cases.len() && c04_pass, "passed": passed, "total": cases.len(), "recoveryDelays": delays, "nativeWindowShells": window_shells, "uiResources": resources, "preserved": preserved });
         run.write_json("summary.json", &summary)
             .map_err(|e| e.to_string())?;
         return Ok(json!({ "summary": summary, "dir": run.dir }));
@@ -801,12 +877,13 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let passed = cases.iter().filter(|c| c["pass"] == true).count();
     let summary = json!({
         "area": "view-recovery",
-        "pass": passed == cases.len() && shells_pass,
+        "pass": passed == cases.len() && c04_pass,
         "passed": passed,
         "total": cases.len(),
         "recoveryDelays": delays,
         "nativeWindowShells": window_shells,
         "uiResources": resources,
+        "preserved": preserved,
         "cases": cases.iter().map(|c| json!({ "case": c["case"], "pass": c["pass"] })).collect::<Vec<_>>(),
         "executableSha256": environment["executableSha256"],
         "companionSha256": environment["companionSha256"],

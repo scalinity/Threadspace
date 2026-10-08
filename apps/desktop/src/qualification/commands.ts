@@ -270,6 +270,14 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
         const result = await client.action({ kind: "QualifyResourceHold", op, pathContains });
         return result.kind === "ResourceHold" ? { ...(result.state as Record<string, unknown>), atMs: Date.now() } : result;
       }
+      case "retired-subscription-probe": {
+        // C-04 (D-0006): the subscription of a view retired by recovery is
+        // refused in the view that replaced it.
+        const subscriptionId = typeof input.subscriptionId === "string" ? input.subscriptionId : "";
+        const outcome = await outcomeOf(() =>
+          ipc.query({ query: { kind: "Diagnostics" }, context: { ...client.context(), subscriptionId } }));
+        return { ok: outcome.ok, code: outcome.code };
+      }
       case "request-then-reload":
         // A slow native request is still in flight when the document is replaced.
         void client.action({ kind: "RefreshEvidence" }).catch(() => {});

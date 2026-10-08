@@ -97,6 +97,9 @@ pub fn renderer(ctx: &Ctx) -> Result<Value, String> {
     Ok(json!({ "summary": summary, "dir": run_dir.dir }))
 }
 
+/// One capture pass: phase, whether the view is live, the captures and the log.
+type Sampler<'s> = dyn FnMut(&str, bool, &mut Captures<'_>, &mut dyn FnMut(&str, Value)) + 's;
+
 pub(crate) struct Captures<'a> {
     pub(crate) ctx: &'a Ctx,
     pub(crate) run: &'a Run,
@@ -240,7 +243,7 @@ pub fn sustained(ctx: &Ctx, minutes: u64) -> Result<Value, String> {
         }
         log("capture", shot);
     };
-    let wait_live = |seconds: u64, phase: &str, captures: &mut Captures<'_>, log: &mut dyn FnMut(&str, Value), sample: &mut dyn FnMut(&str, bool, &mut Captures<'_>, &mut dyn FnMut(&str, Value))| {
+    let wait_live = |seconds: u64, phase: &str, captures: &mut Captures<'_>, log: &mut dyn FnMut(&str, Value), sample: &mut Sampler<'_>| {
         let until = Instant::now() + Duration::from_secs(seconds);
         while Instant::now() < until {
             threadspace_harness::pause_ms(5000);
