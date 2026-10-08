@@ -620,6 +620,12 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
                     expected: &str|
      -> Result<(), String> {
         let _gui = ctx.gui(&format!("view recovery: {name}"))?;
+        // WebKit suspends a covered page's timers, and with them the view's
+        // stall watchdog, so the office window is brought forward first.
+        let raised = app
+            .processes()
+            .first()
+            .map(|ui| ctx.native.ax_action(ui.pid as u32, "raise", Some(OFFICE_TITLE))["performed"].clone());
         let mut desktop = app.desktop_log();
         let mut companion = ctx.companion().log();
         let triggered = trigger()?;
@@ -666,6 +672,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         let record = json!({
             "case": name,
             "pass": ok,
+            "raised": raised,
             "trigger": triggered,
             "recovered": recovered,
             "newViewHydrated": hydrated.is_some(),
