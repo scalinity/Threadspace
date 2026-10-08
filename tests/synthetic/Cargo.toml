@@ -9,12 +9,20 @@ license.workspace = true
 
 [dependencies]
 threadspace-contracts.workspace = true
-threadspace-journal.workspace = true
+threadspace-journal = { workspace = true, features = ["qualification"] }
+threadspace-relay.workspace = true
+threadspace-agent = { path = "../../apps/agent-macos/core", features = ["qualification"] }
+rusqlite.workspace = true
+libc.workspace = true
 threadspace-state-engine = { workspace = true, features = ["synthetic"] }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
 uuid.workspace = true
+
+[[bin]]
+name = "threadspace-m1"
+path = "src/bin/m1/main.rs"
 
 [lints]
 workspace = true

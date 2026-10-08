@@ -666,6 +666,43 @@ fn digest(rows: impl Iterator<Item = (&'static str, Vec<Sql>)>) -> String {
     hasher.finalize().iter().map(|b| format!("{b:02x}")).collect()
 }
 
+/// Per table, rows the state implies that SQLite lacks and rows SQLite holds
+/// that the state does not imply (canonical JSON of each row), for
+/// diagnosing a digest mismatch.
+pub(crate) fn differences(
+    state: &CanonicalState,
+    conn: &Connection,
+) -> Result<Vec<(String, Vec<String>, Vec<String>)>, JournalError> {
+    let render = |values: &[Sql]| {
+        serde_json::to_string(&values.iter().map(sql_json).collect::<Vec<_>>()).unwrap_or_default()
+    };
+    let mut expected: std::collections::BTreeMap<&str, std::collections::BTreeSet<String>> =
+        std::collections::BTreeMap::new();
+    for row in all_rows(state) {
+        expected.entry(row.table).or_default().insert(render(&row.values));
+    }
+    let mut out = Vec::new();
+    for spec in TABLES {
+        let mut statement = conn.prepare(&format!("SELECT {} FROM {}", spec.columns.join(", "), spec.name))?;
+        let mut cursor = statement.query([])?;
+        let mut actual = std::collections::BTreeSet::new();
+        while let Some(row) = cursor.next()? {
+            let mut values = Vec::with_capacity(spec.columns.len());
+            for index in 0..spec.columns.len() {
+                values.push(row.get::<_, Sql>(index)?);
+            }
+            actual.insert(render(&values));
+        }
+        let wanted = expected.remove(spec.name).unwrap_or_default();
+        let missing: Vec<String> = wanted.difference(&actual).cloned().collect();
+        let extra: Vec<String> = actual.difference(&wanted).cloned().collect();
+        if !missing.is_empty() || !extra.is_empty() {
+            out.push((spec.name.to_owned(), missing, extra));
+        }
+    }
+    Ok(out)
+}
+
 /// The projection digest the reducer's state implies.
 pub(crate) fn hash_state(state: &CanonicalState) -> String {
     digest(all_rows(state).into_iter().map(|row| (row.table, row.values)))

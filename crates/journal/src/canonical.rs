@@ -1025,6 +1025,12 @@ impl Journal {
         Ok(engine.state)
     }
 
+    /// Per projection table, rows the state implies that SQLite lacks and
+    /// rows SQLite holds that the state does not imply.
+    pub fn projection_differences(&self) -> Result<Vec<(String, Vec<String>, Vec<String>)>, JournalError> {
+        materialize::differences(&self.engine.state, &self.conn)
+    }
+
     /// Admission diagnostics, newest first.
     pub fn admission_diagnostics(&self, limit: u32) -> Result<Vec<(String, String)>, JournalError> {
         let mut statement = self.conn.prepare(

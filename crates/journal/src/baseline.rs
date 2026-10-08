@@ -161,9 +161,13 @@ pub(crate) fn from_m0(conn: &Connection) -> Result<(CanonicalState, Vec<Assignme
         );
     }
 
+    // M0A's fixture linked its process only through execution_processes.
     let mut statement = conn.prepare(
-        "SELECT id, session_id, activation, mode, presence, process_id, device_number, started_cursor,
-                ended_cursor, end_reason, surface_status FROM executions",
+        "SELECT e.id, e.session_id, e.activation, e.mode, e.presence,
+                COALESCE(e.process_id, (SELECT ep.process_id FROM execution_processes ep
+                                         WHERE ep.execution_id = e.id ORDER BY ep.process_id LIMIT 1)),
+                e.device_number, e.started_cursor, e.ended_cursor, e.end_reason, e.surface_status
+           FROM executions e",
     )?;
     type ExecRow = (String, String, i64, String, String, Option<String>, Option<i64>, Option<i64>, Option<i64>, Option<String>, Option<String>);
     let rows: Vec<ExecRow> = statement
