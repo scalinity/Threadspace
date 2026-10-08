@@ -55,14 +55,29 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
                 .collect()
         })
         .unwrap_or_default();
-    let areas_pass = [&contracts, &replay, &permutations, &crash, &capture, &migration, &sanitization]
+    let guard = std::fs::read_to_string(root.join("remediation/d0008-guard/summary.json"))
+        .ok()
+        .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+        .unwrap_or(Value::Null);
+    let oracle: Vec<Value> = std::fs::read_to_string(root.join("remediation/c04-oracle/retained-runs.json"))
+        .ok()
+        .and_then(|t| serde_json::from_str(&t).ok())
+        .unwrap_or_default();
+    // The C-04 run native.json names must pass the retired-native oracle.
+    let c04_oracle = oracle
+        .iter()
+        .find(|row| native["c04"]["run"].as_str().is_some_and(|run| row["run"].as_str() == Some(run)))
+        .cloned()
+        .unwrap_or(Value::Null);
+    let areas_pass = [&contracts, &replay, &permutations, &crash, &capture, &migration, &sanitization, &guard, &c04_oracle]
         .iter()
         .all(|summary| summary["pass"] == true);
     let manifest = json!({
         "schema": 1,
         "milestone": "M1",
         "title": "Journal, Contracts and Deterministic Synthetic Harness",
-        "verdict": if areas_pass && native["pass"] == true { "M1 PASS CANDIDATE — pending independent review" } else { "M1 NOT READY" },
+        "verdict": if areas_pass && native["pass"] == true { "M1 REMEDIATION CANDIDATE — pending independent re-review" } else { "M1 NOT READY" },
+        "remediation": { "base": "d93b0fb2f7fafd97a0a7fc9ad5a19267800c51fd", "record": "evidence/M1/remediation/README.md", "d0008Guard": guard, "c04RetiredNative": c04_oracle },
         "branch": output("git", &["rev-parse", "--abbrev-ref", "HEAD"]),
         "baseCommit": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54",
         "sourceCommit": output("git", &["rev-parse", "HEAD"]),
@@ -135,6 +150,11 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "The capture benchmark runs the release hook against the fixture companion (real writer and event socket, disposable store), not against an installed identity's store.",
             "A single-write log record narrows, but does not eliminate, a torn record on a mid-write kill; readers skip and count torn lines (C-13).",
             "C-04 closes under D-0008, a containment scoped to tao 0.37.0: any Tauri, tao or Wry update first removes it and requalifies view recovery without it.",
+            "C-04's memory criterion is bounded-run evidence (second-half footprint slope over 60 recoveries): it does not exclude a leak that starts late, grows intermittently or stays under the bound.",
+            "Three fields stay last-observation until M2 converts them (D-0007 §10): execution attach mode/presence, the human follow-up frontier and the observer link state; no M1 producer emits conflicting observations of them.",
+            "Near the spool's record bound one publication's listing and size pass take hundreds of milliseconds, so a capture can reach the 250 ms watchdog and be lost without a marker; mod-batch publishes its records in sequence and a large batch can do the same (the observer mod, M2, sizes its batches).",
+            "In a simultaneous burst of 16 capture processes about 1% were refused as spoolbusy (debug build, loaded machine): a recorded loss, not a stall.",
+            "A store left with a hot rollback journal is rolled back by SQLite when opened, even if it is then refused as too new; the rollback restores its last committed bytes.",
             "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
         ],
     });
