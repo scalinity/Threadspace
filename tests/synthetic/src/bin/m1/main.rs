@@ -12,6 +12,7 @@
 //! threadspace-m1 migration                # M0 store upgrade, future-schema refusal
 //! threadspace-m1 sanitization <hook>      # planted secrets through hook, journal and spool
 //! threadspace-m1 contracts                # versions, digests, schema validation
+//! threadspace-m1 manifest                 # evidence/M1/manifest.json from every summary
 //! threadspace-m1 verify <journal.jsonl>   # replay a journal export from genesis
 //! ```
 
@@ -19,6 +20,7 @@ mod capture;
 mod contracts;
 mod crash;
 mod evidence;
+mod manifest;
 mod migration;
 mod permutations;
 mod replay;
@@ -68,8 +70,17 @@ fn main() -> ExitCode {
                 sanitization::run(&root, Path::new(hook))
             }
             Some("contracts") => contracts::run(&repo, &root),
+            Some("manifest") => {
+                // Native results (C-04, M0B) are summarized in native.json by
+                // the native runs' own evidence directories.
+                let native = std::fs::read_to_string(root.join("native.json"))
+                    .ok()
+                    .and_then(|t| serde_json::from_str(&t).ok())
+                    .unwrap_or(serde_json::Value::Null);
+                manifest::compose(&repo, &root, &native)
+            }
             Some("verify") => replay::verify(Path::new(args.get(2).ok_or("verify <journal.jsonl>")?)),
-            _ => Err("usage: threadspace-m1 fixtures|replay|permutations|crash|capture|migration|sanitization|contracts|verify".into()),
+            _ => Err("usage: threadspace-m1 fixtures|replay|permutations|crash|capture|migration|sanitization|contracts|manifest|verify".into()),
         }
     })();
     match result {
