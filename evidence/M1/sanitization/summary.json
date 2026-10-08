@@ -1,0 +1,47 @@
+{
+  "area": "sanitization",
+  "capturesPerPath": 14,
+  "exit0AndSilent": true,
+  "hookEvents": [
+    "SessionStart",
+    "UserPromptSubmit",
+    "PreToolUse",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "PermissionRequest",
+    "Stop",
+    "SubagentStart",
+    "SubagentStop",
+    "Notification",
+    "StopFailure",
+    "SessionEnd",
+    "Elicitation",
+    "ElicitationResult"
+  ],
+  "pass": true,
+  "plantedFields": [
+    "prompt",
+    "tool_input",
+    "tool_response",
+    "last_assistant_message",
+    "message",
+    "title",
+    "transcript_path",
+    "cwd",
+    "error",
+    "content",
+    "url"
+  ],
+  "snapshots": "evidence/M1/sanitization/snapshots.json",
+  "spoolPath": {
+    "drainedAfterReopen": 14,
+    "filesScanned": 14,
+    "plantedValuesFound": [],
+    "spooled": 14
+  },
+  "storeScan": {
+    "filesScanned": 6,
+    "includes": "journal.sqlite3, -wal, -shm, capture-spool/**, logs/**",
+    "plantedValuesFound": []
+  }
+}

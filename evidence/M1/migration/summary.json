@@ -1,0 +1,71 @@
+{
+  "area": "migration",
+  "baselineCheckpointOrigin": "M0_BASELINE",
+  "deterministicUpgrade": {
+    "pass": true,
+    "upgrades": [
+      {
+        "allocator": "random",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+        "upgrade": "a"
+      },
+      {
+        "allocator": "random",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+        "upgrade": "b"
+      },
+      {
+        "allocator": "seeded",
+        "projectionMatchesTables": true,
+        "sessionIdsPreserved": true,
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
+        "upgrade": "c"
+      }
+    ]
+  },
+  "fixture": {
+    "path": "fixtures/m1/m0-store-v2/journal.sqlite3",
+    "schemaVersion": 2,
+    "sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
+    "writtenBy": "accepted M0C journal at cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54 (fixtures/m1/m0-store-v2/generator.rs)"
+  },
+  "futureSchemaRefused": {
+    "pass": true,
+    "storeUnchanged": true
+  },
+  "migrations": [
+    {
+      "id": 1,
+      "name": "m0-fixture-schema",
+      "sha256": "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8"
+    },
+    {
+      "id": 2,
+      "name": "m0b-identity-and-routes",
+      "sha256": "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2"
+    },
+    {
+      "id": 3,
+      "name": "m1-canonical-journal",
+      "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
+    }
+  ],
+  "newerReducerCheckpointRefused": true,
+  "operatesAfterUpgrade": {
+    "ownerCommandThenRestartSameState": true
+  },
+  "pass": true,
+  "preserved": {
+    "acknowledgedItems": 1,
+    "inventoryAbsenceStale": true,
+    "m0bRouteBoundAfterPidReuse": true,
+    "m0bUnprovenSurfaceKept": true,
+    "ownerResolvedItems": 1
+  },
+  "reducerVersion": 1,
+  "targetSchemaVersion": 3
+}
