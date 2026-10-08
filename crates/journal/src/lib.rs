@@ -329,7 +329,10 @@ impl Journal {
         tx.commit()?;
 
         Self::bootstrap_canonical(&mut conn, now_ms)?;
-        let (engine, replayed) = canonical::load_engine(&conn, &endpoint_id)?;
+        let (engine, replayed, upgraded) = canonical::load_engine(&conn, &endpoint_id)?;
+        if upgraded {
+            canonical::persist_upgrade(&mut conn, &engine.state, now_ms)?;
+        }
         let index = canonical::load_index(&conn)?;
 
         let mut journal = Self {

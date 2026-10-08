@@ -1,0 +1,67 @@
+{
+  "reducerVersion": 1,
+  "waitItems": [
+    {
+      "acknowledged": false,
+      "eligible": false,
+      "resolutions": [
+        {
+          "detail": "handled P",
+          "kind": "OWNER"
+        }
+      ],
+      "session": "sess-partial",
+      "snoozedUntilMs": null
+    },
+    {
+      "acknowledged": false,
+      "eligible": false,
+      "resolutions": [
+        {
+          "detail": "handled P10",
+          "kind": "OWNER"
+        }
+      ],
+      "session": "sess-merge",
+      "snoozedUntilMs": null
+    },
+    {
+      "acknowledged": false,
+      "eligible": false,
+      "resolutions": [
+        {
+          "detail": "handled",
+          "kind": "OWNER"
+        }
+      ],
+      "session": "sess-unordered-wait",
+      "snoozedUntilMs": null
+    },
+    {
+      "acknowledged": false,
+      "eligible": false,
+      "resolutions": [
+        {
+          "detail": "wait episode superseded by an earlier clear",
+          "kind": "WAIT_ENDED"
+        }
+      ],
+      "session": "sess-merge",
+      "snoozedUntilMs": null
+    },
+    {
+      "acknowledged": false,
+      "eligible": true,
+      "resolutions": [],
+      "session": "sess-partial-actions",
+      "snoozedUntilMs": 4102444800000
+    },
+    {
+      "acknowledged": true,
+      "eligible": false,
+      "resolutions": [],
+      "session": "sess-partial-actions",
+      "snoozedUntilMs": null
+    }
+  ]
+}

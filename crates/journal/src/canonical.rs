@@ -465,8 +465,10 @@ fn entries_after(conn: &rusqlite::Connection, after: i64, endpoint_id: &str) -> 
     Ok(entries)
 }
 
-/// The newest verified checkpoint, refusing one from a newer reducer.
-fn latest_checkpoint(conn: &rusqlite::Connection) -> Result<Option<CanonicalState>, JournalError> {
+/// The newest verified checkpoint and the reducer version that wrote it,
+/// refusing one from a newer reducer. One from an earlier reducer is read
+/// through its version's representation (`upgrade_json`).
+fn latest_checkpoint(conn: &rusqlite::Connection) -> Result<Option<(CanonicalState, u32)>, JournalError> {
     let row: Option<(u32, String, String)> = conn
         .query_row(
             "SELECT reducer_version, state_json, state_sha256 FROM projection_checkpoints
@@ -486,11 +488,33 @@ fn latest_checkpoint(conn: &rusqlite::Connection) -> Result<Option<CanonicalStat
             detail: "checkpoint digest mismatch".into(),
         });
     }
-    serde_json::from_str(&json)
-        .map(Some)
-        .map_err(|e| JournalError::Invalid {
-            detail: format!("checkpoint: {e}"),
-        })
+    let invalid = |e: serde_json::Error| JournalError::Invalid {
+        detail: format!("checkpoint: {e}"),
+    };
+    let mut value: Value = serde_json::from_str(&json).map_err(invalid)?;
+    upgrade_json(version, &mut value);
+    serde_json::from_value(value).map(|state| Some((state, version))).map_err(invalid)
+}
+
+/// Rewrites a checkpoint from an earlier reducer into this reducer's
+/// representation. Reducer 1 recorded only whether a wait owner decision's
+/// episode held positives without a causal point; this reducer records how
+/// many the decision covered. `true` becomes 1, the fewest it can have
+/// covered, so a later such positive is never taken as handled.
+fn upgrade_json(version: u32, state: &mut Value) {
+    if version >= 2 {
+        return;
+    }
+    let Some(waits) = state.get_mut("waits").and_then(Value::as_object_mut) else { return };
+    let decisions = waits
+        .values_mut()
+        .filter_map(|wait| wait.get_mut("ownerDecisions").and_then(Value::as_array_mut))
+        .flatten();
+    for decision in decisions {
+        if let Some(held) = decision.get("unordered").and_then(Value::as_bool) {
+            decision["unordered"] = Value::from(u32::from(held));
+        }
+    }
 }
 
 pub(crate) fn load_index(conn: &rusqlite::Connection) -> Result<IdentityIndex, JournalError> {
@@ -504,8 +528,11 @@ pub(crate) fn load_index(conn: &rusqlite::Connection) -> Result<IdentityIndex, J
 }
 
 /// Rebuilds the engine: newest verified checkpoint, then every later entry.
-pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Result<(Engine, u64), JournalError> {
-    let state = latest_checkpoint(conn)?.unwrap_or_else(|| Engine::empty().state);
+/// A checkpoint from an earlier reducer is then re-derived under this one;
+/// `true` says so, and opening the store persists the result
+/// (`persist_upgrade`).
+pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Result<(Engine, u64, bool), JournalError> {
+    let (state, version) = latest_checkpoint(conn)?.unwrap_or_else(|| (Engine::empty().state, REDUCER_VERSION));
     let mut engine = Engine::new(state);
     let after = engine.state.through_cursor;
     let entries = entries_after(conn, after, endpoint_id)?;
@@ -513,7 +540,25 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
     for entry in &entries {
         engine.apply(entry);
     }
-    Ok((engine, replayed))
+    let upgraded = version < REDUCER_VERSION;
+    if upgraded {
+        engine.upgrade(endpoint_id);
+    }
+    Ok((engine, replayed, upgraded))
+}
+
+/// Persists a state upgraded from an earlier reducer's checkpoint: every
+/// materialized row rewritten from it and a checkpoint at this reducer, in
+/// one transaction.
+pub(crate) fn persist_upgrade(
+    conn: &mut rusqlite::Connection,
+    state: &CanonicalState,
+    now_ms: i64,
+) -> Result<(), JournalError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    initial_checkpoint(&tx, state, "REDUCER_UPGRADE", now_ms)?;
+    tx.commit()?;
+    Ok(())
 }
 
 /// Digests describing a journal and the state it reproduces (M1 evidence).
@@ -537,7 +582,7 @@ pub struct ReplayDigest {
 
 impl Journal {
     fn reload_engine(&mut self) {
-        match load_engine(&self.conn, &self.endpoint_id).and_then(|(engine, _)| {
+        match load_engine(&self.conn, &self.endpoint_id).and_then(|(engine, _, _)| {
             load_index(&self.conn).map(|index| (engine, index))
         }) {
             Ok((engine, index)) => {
@@ -1006,7 +1051,7 @@ impl Journal {
                 |row| Ok((row.get(0)?, row.get(1)?)),
             )
             .optional()?;
-        let (replayed, _) = load_engine(&self.conn, &self.endpoint_id)?;
+        let (replayed, _, _) = load_engine(&self.conn, &self.endpoint_id)?;
         Ok(ReplayDigest {
             reducer_version: REDUCER_VERSION,
             schema_version: crate::SCHEMA_VERSION,
