@@ -558,7 +558,15 @@ pub(crate) fn changed_rows(state: &CanonicalState, changed: &Changed) -> Vec<Row
     for id in pick(&changed.surfaces) {
         rows.extend(state.surfaces.get(&id).map(surface_row));
     }
-    for id in pick(&changed.bindings) {
+    // A binding's row shows its execution's process and its surface: rewrite
+    // it when either changed, not only when the binding record did.
+    let mut bindings = changed.bindings.clone();
+    for binding in state.bindings.values() {
+        if executions.contains(&binding.execution_id) || changed.surfaces.contains(&binding.surface_id) {
+            bindings.insert(binding.id.clone());
+        }
+    }
+    for id in pick(&bindings) {
         rows.extend(state.bindings.get(&id).map(|r| binding_row(state, r)));
     }
     for id in pick(&changed.turns) {

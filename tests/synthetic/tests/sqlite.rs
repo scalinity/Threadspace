@@ -173,3 +173,33 @@ fn sensitive_bodies_never_reach_the_store_files() {
     }
     assert!(!semantic_hash(sqlite.state()).is_empty());
 }
+
+/// The seeds that failed the first permutation run (fixtures/m1/
+/// regression-seeds.json), replayed through SQLite with the materialized
+/// tables checked against the state after every step.
+#[test]
+fn preserved_failing_seeds_now_keep_tables_equal_to_state_at_every_step() {
+    let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/m1/regression-seeds.json"))
+        .expect("regression seeds");
+    let fixture: serde_json::Value = serde_json::from_str(&text).expect("json");
+    let scenarios = catalog();
+    let seeds = fixture["seeds"].as_array().expect("seeds");
+    assert_eq!(seeds.len(), 17);
+    for entry in seeds {
+        let name = entry["scenario"].as_str().expect("scenario");
+        let seed = entry["seed"].as_u64().expect("seed");
+        let scenario = scenarios.iter().find(|s| s.name == name).expect("known scenario");
+        let (order, _) = threadspace_synthetic::permute::order_for(scenario, seed);
+        let mut sqlite = SqliteRunner::open(TempStore::new("regression"), seed).expect("open");
+        let report = threadspace_synthetic::runner::run_observed(scenario, &order, &mut sqlite, |runner| {
+            runner
+                .journal
+                .projection_differences()
+                .expect("diff")
+                .into_iter()
+                .map(|(table, _, _)| format!("{table} differs"))
+                .collect()
+        });
+        assert!(report.violations.is_empty(), "{name} seed {seed}: {:?}", report.violations);
+    }
+}

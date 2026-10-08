@@ -2,18 +2,18 @@
 //! permutation is a linear extension of its scenario's delivery constraints,
 //! half of them with duplicate redeliveries injected, admitted through the
 //! pure path and compared with the scenario's reference semantics, its own
-//! expectation and the per-step invariant monitor. Every 50th is also
-//! admitted through the real SQLite journal.
+//! expectation and the per-step invariant monitor. Every 10th is also
+//! admitted through the real SQLite journal, checking after every step that
+//! the materialized tables equal the reducer's state.
 
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::time::Instant;
 
 use serde_json::{Value, json};
-use threadspace_synthetic::builder::{Scenario, Step};
-use threadspace_synthetic::permute::{linear_extension, respects};
-use threadspace_synthetic::rng::Rng;
-use threadspace_synthetic::runner::{PureRunner, run};
+use threadspace_synthetic::builder::Scenario;
+use threadspace_synthetic::permute::{order_for, respects};
+use threadspace_synthetic::runner::{PureRunner, run, run_observed};
 use threadspace_synthetic::scenarios::catalog;
 use threadspace_synthetic::sqlite::{SqliteRunner, TempStore};
 
@@ -32,31 +32,11 @@ pub const REQUIRED_FAMILIES: &[&str] = &[
 ];
 const EXTRA_FAMILIES: &[&str] = &["duplicates", "robustness"];
 const EXTRA_PER_FAMILY: usize = 200;
-const SQLITE_EVERY: usize = 50;
+const SQLITE_EVERY: usize = 10;
 
 /// seed = family * 1_000_000 + scenario * 100_000 + index (documented scheme).
 pub fn seed(family: usize, scenario: usize, index: usize) -> u64 {
     (family * 1_000_000 + scenario * 100_000 + index) as u64
-}
-
-/// A delivery order with 1–3 duplicate redeliveries inserted when the seed
-/// says so (a retry of an observation can arrive at any time).
-pub fn order_for(scenario: &Scenario, seed: u64) -> (Vec<usize>, usize) {
-    let mut order = linear_extension(scenario.steps.len(), &scenario.constraints, seed);
-    let mut rng = Rng::new(seed ^ 0xD0D0_D0D0);
-    let observations: Vec<usize> = (0..scenario.steps.len())
-        .filter(|&i| matches!(scenario.steps[i], Step::Observe(_)))
-        .collect();
-    let mut injected = 0;
-    if rng.chance(1, 2) && !observations.is_empty() {
-        for _ in 0..=rng.below(3) {
-            let step = observations[rng.below(observations.len())];
-            let at = rng.below(order.len() + 1);
-            order.insert(at, step);
-            injected += 1;
-        }
-    }
-    (order, injected)
 }
 
 pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
@@ -114,14 +94,25 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
                     sqlite_checks += 1;
                     let store = TempStore::new("perm");
                     let mut sqlite = SqliteRunner::open(store, seed).map_err(|e| e.to_string())?;
-                    let sqlite_report = run(scenario, &order, &mut sqlite);
+                    // Tables must equal the state after every step, not only at the end.
+                    let sqlite_report = run_observed(scenario, &order, &mut sqlite, |runner| {
+                        runner
+                            .journal
+                            .projection_differences()
+                            .map(|differences| {
+                                differences
+                                    .into_iter()
+                                    .map(|(table, missing, extra)| {
+                                        format!("SQLite table {table} differs from state: {} missing, {} extra", missing.len(), extra.len())
+                                    })
+                                    .collect()
+                            })
+                            .unwrap_or_else(|e| vec![e.to_string()])
+                    });
                     if sqlite_report.semantic_hash != expected {
                         problems.push("SQLite semantic hash differs".to_owned());
                     }
-                    let digest = sqlite.journal.replay_digest().map_err(|e| e.to_string())?;
-                    if digest.projection_sha256 != digest.tables_sha256 {
-                        problems.push("SQLite tables differ from state".to_owned());
-                    }
+                    problems.extend(sqlite_report.violations);
                 }
                 if !problems.is_empty() {
                     family_failures += 1;

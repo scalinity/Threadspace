@@ -1,0 +1,92 @@
+{
+  "description": "Seeds that failed the first 10,400-permutation run at ce1a94f: on the SQLite path a binding delivered before its execution's attach kept a projection row without the process the attach later named (the binding record itself was unchanged). Semantics had converged; the materialized row was stale. Fixed by rewriting a binding's row whenever its execution or surface changes. Each seed is replayed through SQLite with tables checked against the state after every step.",
+  "foundAt": "ce1a94f",
+  "seedScheme": "seed = familyIndex * 1000000 + scenarioIndex * 100000 + index; order = permute::order_for(scenario, seed)",
+  "seeds": [
+    {
+      "scenario": "normal-session",
+      "family": "completion",
+      "seed": 3000049
+    },
+    {
+      "scenario": "normal-session",
+      "family": "completion",
+      "seed": 3000099
+    },
+    {
+      "scenario": "normal-session",
+      "family": "completion",
+      "seed": 3000249
+    },
+    {
+      "scenario": "normal-session",
+      "family": "completion",
+      "seed": 3000349
+    },
+    {
+      "scenario": "normal-session",
+      "family": "completion",
+      "seed": 3000399
+    },
+    {
+      "scenario": "resume",
+      "family": "activation-changes",
+      "seed": 8100049
+    },
+    {
+      "scenario": "resume",
+      "family": "activation-changes",
+      "seed": 8100099
+    },
+    {
+      "scenario": "pid-tty-reuse",
+      "family": "activation-changes",
+      "seed": 8200090
+    },
+    {
+      "scenario": "pid-tty-reuse",
+      "family": "activation-changes",
+      "seed": 8200140
+    },
+    {
+      "scenario": "pid-tty-reuse",
+      "family": "activation-changes",
+      "seed": 8200190
+    },
+    {
+      "scenario": "executable-requalified",
+      "family": "activation-changes",
+      "seed": 8400023
+    },
+    {
+      "scenario": "executable-requalified",
+      "family": "activation-changes",
+      "seed": 8400073
+    },
+    {
+      "scenario": "executable-requalified",
+      "family": "activation-changes",
+      "seed": 8400123
+    },
+    {
+      "scenario": "executable-requalified",
+      "family": "activation-changes",
+      "seed": 8400173
+    },
+    {
+      "scenario": "routing-ambiguity",
+      "family": "activation-changes",
+      "seed": 8500015
+    },
+    {
+      "scenario": "routing-ambiguity",
+      "family": "activation-changes",
+      "seed": 8500065
+    },
+    {
+      "scenario": "routing-ambiguity",
+      "family": "activation-changes",
+      "seed": 8500165
+    }
+  ]
+}

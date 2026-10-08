@@ -4,6 +4,7 @@
 //! command order); everything a spool replay, a racing hook or a delayed
 //! callback can reorder is free.
 
+use crate::builder::{Scenario, Step};
 use crate::rng::Rng;
 
 /// A uniformly chosen available step at each position; deterministic in seed.
@@ -33,6 +34,28 @@ pub fn linear_extension(len: usize, constraints: &[(usize, usize)], seed: u64) -
         available.sort_unstable();
     }
     order
+}
+
+/// A delivery order for `seed`: a linear extension of the scenario's
+/// constraints, with 1–3 duplicate redeliveries inserted when the seed says
+/// so (a retry of an observation can arrive at any time). Returns the order
+/// and the number of duplicates injected.
+pub fn order_for(scenario: &Scenario, seed: u64) -> (Vec<usize>, usize) {
+    let mut order = linear_extension(scenario.steps.len(), &scenario.constraints, seed);
+    let mut rng = Rng::new(seed ^ 0xD0D0_D0D0);
+    let observations: Vec<usize> = (0..scenario.steps.len())
+        .filter(|&i| matches!(scenario.steps[i], Step::Observe(_)))
+        .collect();
+    let mut injected = 0;
+    if rng.chance(1, 2) && !observations.is_empty() {
+        for _ in 0..=rng.below(3) {
+            let step = observations[rng.below(observations.len())];
+            let at = rng.below(order.len() + 1);
+            order.insert(at, step);
+            injected += 1;
+        }
+    }
+    (order, injected)
 }
 
 /// True when `order` respects every constraint.

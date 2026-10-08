@@ -326,6 +326,17 @@ pub struct RunReport {
 
 /// Delivers `order` (indices into the scenario's steps) through `runner`.
 pub fn run<R: Admit>(scenario: &Scenario, order: &[usize], runner: &mut R) -> RunReport {
+    run_observed(scenario, order, runner, |_| Vec::new())
+}
+
+/// As `run`, calling `after_step` after every delivered step; any problems
+/// it returns are reported as violations.
+pub fn run_observed<R: Admit>(
+    scenario: &Scenario,
+    order: &[usize],
+    runner: &mut R,
+    mut after_step: impl FnMut(&R) -> Vec<String>,
+) -> RunReport {
     let mut monitor = Monitor::default();
     let mut receipts = Vec::new();
     let mut owner_failures = Vec::new();
@@ -360,6 +371,7 @@ pub fn run<R: Admit>(scenario: &Scenario, order: &[usize], runner: &mut R) -> Ru
             },
         };
         monitor.after(step, &before, runner.state());
+        monitor.violations.extend(after_step(runner));
         receipts.push(receipt);
     }
     RunReport {
