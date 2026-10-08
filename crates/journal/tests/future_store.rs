@@ -4,7 +4,9 @@
 //! appears. Each case is a disposable SQLite file in a temp directory.
 
 use std::collections::BTreeMap;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use rusqlite::config::DbConfig;
 use rusqlite::{Connection, OpenFlags};
@@ -80,6 +82,9 @@ enum Shape {
     Wal,
     /// WAL left with its `-wal` and `-shm`; the tamper lives only in the WAL.
     WalSidecars,
+    /// WAL left with its `-wal` and no `-shm` (removed after the writer
+    /// closed); the tamper lives only in the WAL.
+    WalNoShm,
 }
 
 /// A current store, then `sql` applied by a raw connection that leaves it
@@ -96,7 +101,7 @@ fn store_in(shape: Shape, sql: &str) -> TempStore {
             assert_eq!(mode, "delete");
         }
         Shape::Wal => {}
-        Shape::WalSidecars => {
+        Shape::WalSidecars | Shape::WalNoShm => {
             conn.set_db_config(DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE, true)
                 .expect("no checkpoint on close");
             conn.pragma_update(None, "wal_autocheckpoint", 0)
@@ -105,6 +110,11 @@ fn store_in(shape: Shape, sql: &str) -> TempStore {
     }
     conn.execute_batch(sql).expect("tamper");
     drop(conn);
+    if let Shape::WalNoShm = shape {
+        std::fs::remove_file(sidecar(&store.db(), "-shm")).expect("remove -shm");
+        assert!(!sidecar(&store.db(), "-shm").exists(), "the -shm is gone");
+        assert!(sidecar(&store.db(), "-wal").exists(), "the -wal stays");
+    }
     store
 }
 
@@ -124,13 +134,17 @@ fn assert_refused_without_writing(label: &str, shape: Shape, sql: &str, probe: &
             assert_eq!(main_file_only(&store.db(), probe), 0, "{label}: the tamper is only in the WAL");
             vec!["journal.sqlite3", "journal.sqlite3-shm", "journal.sqlite3-wal"]
         }
+        Shape::WalNoShm => {
+            assert_eq!(main_file_only(&store.db(), probe), 0, "{label}: the tamper is only in the WAL");
+            vec!["journal.sqlite3", "journal.sqlite3-wal"]
+        }
         Shape::Rollback | Shape::Wal => vec!["journal.sqlite3"],
     };
     let before = disk(&store.0);
     assert_eq!(before.files.keys().map(String::as_str).collect::<Vec<_>>(), sidecars, "{label}: setup");
     let expected_header = match shape {
         Shape::Rollback => [1, 1],
-        Shape::Wal | Shape::WalSidecars => [2, 2],
+        Shape::Wal | Shape::WalSidecars | Shape::WalNoShm => [2, 2],
     };
     assert_eq!(before.header[18..20], expected_header, "{label}: file-format bytes");
 
@@ -189,6 +203,22 @@ fn newer_reducer_checkpoint_only_in_the_wal_is_refused_without_writing() {
     assert_refused_without_writing(
         "reducer/wal+sidecars",
         Shape::WalSidecars,
+        &future_reducer(),
+        FUTURE_REDUCER_PROBE,
+        REDUCER_VERSION + 1,
+    );
+}
+
+#[test]
+fn future_schema_only_in_a_wal_without_shm_is_seen_and_refused_without_writing() {
+    assert_refused_without_writing("schema99/wal-no-shm", Shape::WalNoShm, FUTURE_SCHEMA, FUTURE_SCHEMA_PROBE, 99);
+}
+
+#[test]
+fn newer_reducer_checkpoint_only_in_a_wal_without_shm_is_refused_without_writing() {
+    assert_refused_without_writing(
+        "reducer/wal-no-shm",
+        Shape::WalNoShm,
         &future_reducer(),
         FUTURE_REDUCER_PROBE,
         REDUCER_VERSION + 1,
@@ -306,4 +336,204 @@ fn supported_stores_still_open_after_the_preflight() {
     std::fs::write(empty.db(), b"").expect("empty store file");
     drop(Journal::open(&empty.db(), "epoch-a", NOW).expect("an empty file opens as a new store"));
     assert_eq!(applied_schema(&empty.db()), SCHEMA_VERSION);
+}
+
+#[test]
+fn a_supported_store_with_rows_only_in_a_wal_without_shm_opens_and_keeps_them() {
+    let probe = "SELECT COUNT(*) FROM store_meta WHERE key = 'wal-only'";
+    let store = store_in(Shape::WalNoShm, "INSERT INTO store_meta (key, value) VALUES ('wal-only', 'kept');");
+    assert_eq!(main_file_only(&store.db(), probe), 0, "the row is only in the WAL");
+    drop(Journal::open(&store.db(), "epoch-b", NOW).expect("a current store with a WAL and no -shm opens"));
+    let kept: String = Connection::open(store.db())
+        .and_then(|conn| conn.query_row("SELECT value FROM store_meta WHERE key = 'wal-only'", [], |row| row.get(0)))
+        .expect("the WAL-only row survives");
+    assert_eq!(kept, "kept");
+    assert_eq!(applied_schema(&store.db()), SCHEMA_VERSION);
+}
+
+/// The URI a read-only connection opens `db` by, with URI-significant
+/// characters escaped.
+fn file_uri(db: &Path) -> String {
+    let mut uri = String::from("file:");
+    for ch in db.to_string_lossy().chars() {
+        match ch {
+            '%' | '?' | '#' => uri.push_str(&format!("%{:02X}", u32::from(ch))),
+            _ => uri.push(ch),
+        }
+    }
+    uri
+}
+
+/// Negative control: a plain read-only connection must build a wal-index to
+/// read a `-wal`, so with no `-shm` beside it SQLite creates one in the store
+/// directory. This is the open a preflight must not make.
+#[test]
+fn a_plain_read_only_open_creates_a_shm_beside_a_wal_without_one() {
+    let store = store_in(Shape::WalNoShm, FUTURE_SCHEMA);
+    let before = disk(&store.0);
+    {
+        let conn = Connection::open_with_flags(
+            file_uri(&store.db()),
+            OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        )
+        .expect("read-only open");
+        conn.set_db_config(DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE, true)
+            .expect("no checkpoint on close");
+        let schema: u32 = conn
+            .query_row("SELECT MAX(id) FROM schema_migrations", [], |row| row.get(0))
+            .expect("read schema");
+        assert_eq!(schema, 99, "the read-only connection sees the WAL-only commit");
+    }
+    let after = disk(&store.0);
+    eprintln!("{}", describe("control/plain-read-only before", &before));
+    eprintln!("{}", describe("control/plain-read-only after ", &after));
+    assert_eq!(
+        after.files.get("journal.sqlite3-shm").map(|(len, _)| *len),
+        Some(32_768),
+        "a new 32,768-byte -shm appears"
+    );
+    assert_eq!(before.files.get("journal.sqlite3"), after.files.get("journal.sqlite3"));
+    assert_eq!(before.files.get("journal.sqlite3-wal"), after.files.get("journal.sqlite3-wal"));
+}
+
+fn set_mode(path: &Path, mode: u32) {
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(mode)).expect("set mode");
+}
+
+/// Makes a file unreadable until dropped.
+struct Unreadable(PathBuf, u32);
+
+impl Unreadable {
+    fn new(path: PathBuf) -> Self {
+        let mode = std::fs::metadata(&path).expect("mode").permissions().mode();
+        set_mode(&path, 0o000);
+        Self(path, mode)
+    }
+}
+
+impl Drop for Unreadable {
+    fn drop(&mut self) {
+        set_mode(&self.0, self.1);
+    }
+}
+
+/// A WAL-only future store whose `suffix` file cannot be read: the open
+/// fails, and once the mode is restored every file is as it was.
+fn assert_unreadable_fails_without_writing(label: &str, suffix: &str) {
+    let store = store_in(Shape::WalNoShm, FUTURE_SCHEMA);
+    let before = disk(&store.0);
+    let unreadable = Unreadable::new(sidecar(&store.db(), suffix));
+    let result = Journal::open(&store.db(), "epoch-b", NOW);
+    drop(unreadable);
+    let after = disk(&store.0);
+    eprintln!("{label}: {result:?}");
+    assert!(result.is_err(), "{label}: an unreadable store must not open");
+    assert_eq!(before, after, "{label}: the failed open wrote to the store");
+}
+
+#[test]
+fn an_unreadable_wal_fails_without_writing() {
+    assert_unreadable_fails_without_writing("unreadable -wal", "-wal");
+}
+
+#[test]
+fn an_unreadable_main_file_fails_without_writing() {
+    assert_unreadable_fails_without_writing("unreadable main", "");
+}
+
+fn garbage(len: usize) -> Vec<u8> {
+    (0..len).map(|i| (i.wrapping_mul(31) + 7) as u8).collect()
+}
+
+/// Opens `store` and returns the result, failing if any file changed.
+fn open_without_writing(label: &str, store: &TempStore) -> Result<Journal, JournalError> {
+    let before = disk(&store.0);
+    let result = Journal::open(&store.db(), "epoch-b", NOW);
+    let after = disk(&store.0);
+    eprintln!("{}", describe(&format!("{label} before"), &before));
+    eprintln!("{}", describe(&format!("{label} after "), &after));
+    eprintln!("{label}: {result:?}");
+    assert_eq!(before, after, "{label}: the open wrote to the store");
+    result
+}
+
+/// A `-wal` of garbage and no `-shm` beside a store whose main file holds
+/// schema 99.
+#[test]
+fn a_garbage_wal_beside_a_future_store_is_refused_without_writing() {
+    let store = store_in(Shape::Wal, FUTURE_SCHEMA);
+    std::fs::write(sidecar(&store.db(), "-wal"), garbage(8192)).expect("garbage -wal");
+    let result = open_without_writing("garbage -wal", &store);
+    assert!(result.is_err(), "garbage -wal: a future store must not open");
+}
+
+/// A `-shm` of garbage beside a WAL holding schema 99.
+#[test]
+fn a_garbage_shm_beside_a_future_wal_is_refused_without_writing() {
+    let store = store_in(Shape::WalSidecars, FUTURE_SCHEMA);
+    let shm = sidecar(&store.db(), "-shm");
+    let len = std::fs::metadata(&shm).expect("shm").len();
+    std::fs::write(&shm, garbage(len as usize)).expect("garbage -shm");
+    let result = open_without_writing("garbage -shm", &store);
+    assert!(result.is_err(), "garbage -shm: a future store must not open");
+}
+
+const CHILD_STORE_ENV: &str = "THREADSPACE_FUTURE_STORE_CHILD_DB";
+
+/// Runs only as a re-executed child of the tests below, whose TMPDIR is a
+/// directory of their own: opens the store and prints the result.
+#[test]
+fn preflight_child() {
+    let Ok(db) = std::env::var(CHILD_STORE_ENV) else {
+        return;
+    };
+    let result = Journal::open(Path::new(&db), "epoch-child", NOW).map(drop);
+    println!("RESULT {result:?}");
+}
+
+/// Opens `store` in a child test process whose TMPDIR alone is `tmp`, so no
+/// other test's temp directory moves, and returns the child's result.
+fn open_in_child(store: &TempStore, tmp: &Path) -> String {
+    let output = Command::new(std::env::current_exe().expect("test binary"))
+        .args(["--exact", "preflight_child", "--nocapture"])
+        .env(CHILD_STORE_ENV, store.db())
+        .env("TMPDIR", tmp)
+        .output()
+        .expect("run child");
+    assert!(output.status.success(), "child: {}", String::from_utf8_lossy(&output.stderr));
+    String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .find_map(|line| line.strip_prefix("RESULT "))
+        .expect("child result")
+        .to_owned()
+}
+
+fn entries(dir: &Path) -> usize {
+    std::fs::read_dir(dir).expect("list").count()
+}
+
+#[test]
+fn the_inspection_copy_is_removed_after_a_refusal() {
+    let store = store_in(Shape::WalNoShm, FUTURE_SCHEMA);
+    let tmp = TempStore::new();
+    let before = disk(&store.0);
+    let result = open_in_child(&store, &tmp.0);
+    eprintln!("inspection copy removed: {result}");
+    assert_eq!(result, "Err(SchemaTooNew { found: 99 })");
+    assert_eq!(disk(&store.0), before, "the refusal wrote to the store");
+    assert_eq!(entries(&tmp.0), 0, "the inspection copy is left behind");
+}
+
+#[test]
+fn an_inspection_copy_that_cannot_be_made_fails_without_writing() {
+    let store = store_in(Shape::WalNoShm, FUTURE_SCHEMA);
+    let tmp = TempStore::new();
+    set_mode(&tmp.0, 0o500);
+    let before = disk(&store.0);
+    let result = open_in_child(&store, &tmp.0);
+    set_mode(&tmp.0, 0o700);
+    eprintln!("inspection copy not writable: {result}");
+    assert!(result.starts_with("Err("), "a store the preflight cannot inspect must not open: {result}");
+    assert_eq!(disk(&store.0), before, "the failed open wrote to the store");
+    assert_eq!(entries(&tmp.0), 0);
 }
