@@ -69,11 +69,17 @@ $M g12-sleep-wake prod 5     # needs six root-scheduled wakes, one spare (see be
 
 `view-recovery` is the permanent C-04 regression for the D-0008 containment.
 After repeated view retirement and recreation it passes only with flat office
-window shells after quiescence, no WebContent growth, a UI footprint trend of
-at most 0.1 MiB per recovery over the run's second half, office bounds and visibility kept, the durable intent backlog unchanged,
-equal projections, and stale-epoch and retired-subscription refusal in the
-recreated view. Run it, without the containment, before any Tauri, tao or Wry
-update lands.
+window shells after quiescence; the desktop's account of every retired
+incarnation, each with its window, delegate, content view and web view
+released (missing data fails); no WebContent growth; a UI footprint trend of at
+most 0.1 MiB per recovery over the run's second half (bounded-run evidence of
+no steady leak, not a guarantee against every leak); office bounds and
+visibility kept; the durable intent backlog unchanged; equal projections; and
+stale-epoch and retired-subscription refusal in the recreated view. It needs a
+freshly launched qualification build of the UI, since the account lives as
+long as the UI process. Run it, without the containment, before any Tauri,
+tao or Wry update lands; `build.rs` refuses every desktop build until the
+qualified set in `apps/desktop/src-tauri/d0008_guard.rs` is changed.
 
 M0C remediation runners (evidence under `evidence/M0C/remediation/`):
 

@@ -11,6 +11,7 @@
 //!   threadspace-m0c g03-ipc <prod|dev> [rounds]
 //!   threadspace-m0c g04-stream <prod|dev> [count] [duration-ms]
 //!   threadspace-m0c view-recovery <prod|dev> [repeats]
+//!   threadspace-m0c c04-verdict <prod|dev> <retained view-recovery run dir>
 //!   threadspace-m0c g09-companion <prod|dev> [crashes]
 //!   threadspace-m0c g10-live <prod|dev> [rounds]
 //!   threadspace-m0c g11-restarts <prod|dev> [cycles]
@@ -78,6 +79,7 @@ fn main() -> ExitCode {
             bridge_gates::stream(&ctx, number(&args, 2, 10_000), number(&args, 3, 60_000))
         }
         "view-recovery" => bridge_gates::recovery(&ctx, number(&args, 2, 10)),
+        "c04-verdict" => bridge_gates::c04_verdict(args.get(2).map_or("", String::as_str)),
         "g09-companion" => service_gates::companion_independence(&ctx, number(&args, 2, 3)),
         "g10-live" => service_gates::sqlite_live(&ctx, number(&args, 2, 5)),
         "g11-restarts" => service_gates::restarts(&ctx, number(&args, 2, 10)),

@@ -618,6 +618,25 @@ fn footprint_slope(samples: &[Value]) -> Option<f64> {
     Some(num / den)
 }
 
+/// C-04's retired-native verdict recomputed from a retained run directory:
+/// its recovery cases (`cases.jsonl`, bootstrap excluded) against the
+/// recoveries its summary ran (the three single cases plus the repeats).
+pub fn c04_verdict(dir: &str) -> Result<Value, String> {
+    let dir = std::path::Path::new(dir);
+    let read = |name: &str| std::fs::read_to_string(dir.join(name)).map_err(|e| format!("{name}: {e}"));
+    let summary: Value = serde_json::from_str(&read("summary.json")?).map_err(|e| e.to_string())?;
+    let cases: Vec<Value> = read("cases.jsonl")?
+        .lines()
+        .filter_map(|line| serde_json::from_str(line).ok())
+        .filter(|c: &Value| c["case"] != "bootstrap-with-companion-unavailable")
+        .collect();
+    let repeats = summary["nativeWindowShells"]["recoveries"]
+        .as_u64()
+        .ok_or("summary names no repeated recoveries")?;
+    let verdict = retired_native_released(&cases, 3 + usize::try_from(repeats).map_err(|e| e.to_string())?);
+    Ok(json!({ "run": dir.display().to_string(), "retiredNative": verdict }))
+}
+
 /// C-04's native oracle over a run's `recoveries` recovery cases (the
 /// bootstrap case excluded). Each case names the office incarnation its
 /// recovery retired (`OFFICE_VIEW_RECOVERED`), all distinct. The desktop's
