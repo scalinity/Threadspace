@@ -28,7 +28,7 @@ use threadspace_journal::{
 };
 use uuid::Uuid;
 
-use threadspace_contracts::canonical::capture::{CaptureRefusal, RecordReceipt};
+use threadspace_contracts::canonical::capture::{CaptureRefusal, RecordReceipt, RecordStatus};
 use threadspace_contracts::canonical::envelope::ObservationEnvelope;
 use threadspace_contracts::canonical::fact::Delivery;
 use threadspace_journal::EnvelopeAdmission;
@@ -143,10 +143,11 @@ pub enum WriterCommand {
         reply: SyncSender<Result<Vec<RecordReceipt>, CaptureRefusal>>,
     },
     /// Records a capture coverage loss: spool saturation markers and
-    /// expired spool records (SPEC §8.4).
+    /// expired spool records (SPEC §8.4). Answers whether it was journaled.
     RecordCaptureLoss {
         dropped: Vec<String>,
         expired: usize,
+        reply: SyncSender<bool>,
     },
     /// A sleep/wake transition (SPEC §19.5), journaled as a lifecycle fact.
     RecordLifecycle {
@@ -400,6 +401,35 @@ impl Writer {
 
     /// Sends a hydrated view the oldest pending intents it has not had, at
     /// most `DELIVERY_WINDOW` unconsumed at a time.
+    /// One capture transaction; receipts exist only after its commit.
+    fn admit_captured(
+        &mut self,
+        admissions: &[EnvelopeAdmission<'_>],
+        delivery: Delivery,
+    ) -> Result<Vec<RecordReceipt>, JournalError> {
+        let outcome = self.journal.admit_batch(admissions, delivery, log::now_ms())?;
+        if let Some(change) = &outcome.change {
+            self.broadcast(change);
+        }
+        if !outcome.notifications.is_empty() {
+            // Delivery of canonical attention intents belongs to the
+            // notification product (M5); the intents are durable.
+            log::info(
+                "OUTBOX_INTENTS_RECORDED",
+                json!({ "count": outcome.notifications.len() }),
+            );
+        }
+        Ok(outcome
+            .records
+            .into_iter()
+            .map(|record| RecordReceipt {
+                observation_id: record.observation_id,
+                status: record.status,
+                reason: record.reason,
+            })
+            .collect())
+    }
+
     fn push_intents(&mut self, subscription_id: &str) {
         let Some(view) = self.views.get_mut(subscription_id) else {
             return;
@@ -988,47 +1018,62 @@ impl Writer {
                         normalized: adapters::normalize(envelope),
                     })
                     .collect();
-                match self.journal.admit_batch(&admissions, delivery, log::now_ms()) {
-                    Ok(outcome) => {
-                        if let Some(change) = &outcome.change {
-                            self.broadcast(change);
+                let answer = match self.admit_captured(&admissions, delivery) {
+                    Ok(receipts) => Ok(receipts),
+                    // A record the store refuses must not hold back the others:
+                    // each is admitted alone, and a refused one is answered
+                    // NotAccepted (the spool drainer quarantines it, SPEC §8.4).
+                    Err(error) if error.is_refusal() => {
+                        log::error(
+                            "CAPTURE_ADMISSION_REFUSED",
+                            json!({ "error": error.to_string(), "records": admissions.len() }),
+                        );
+                        let mut receipts = Vec::new();
+                        let mut busy = false;
+                        for admission in &admissions {
+                            match self.admit_captured(std::slice::from_ref(admission), delivery) {
+                                Ok(mut one) => receipts.append(&mut one),
+                                Err(error) if error.is_refusal() => receipts.push(RecordReceipt {
+                                    observation_id: admission.envelope.observation_id.clone(),
+                                    status: RecordStatus::NotAccepted,
+                                    reason: Some("ADMISSION_REFUSED".to_owned()),
+                                }),
+                                Err(_) => {
+                                    busy = true;
+                                    break;
+                                }
+                            }
                         }
-                        if !outcome.notifications.is_empty() {
-                            // Delivery of canonical attention intents belongs to
-                            // the notification product (M5); the intents are durable.
-                            log::info(
-                                "OUTBOX_INTENTS_RECORDED",
-                                json!({ "count": outcome.notifications.len() }),
-                            );
+                        if busy {
+                            Err(CaptureRefusal::Busy)
+                        } else {
+                            Ok(receipts)
                         }
-                        let receipts = outcome
-                            .records
-                            .into_iter()
-                            .map(|record| RecordReceipt {
-                                observation_id: record.observation_id,
-                                status: record.status,
-                                reason: record.reason,
-                            })
-                            .collect();
-                        let _ = reply.send(Ok(receipts));
                     }
                     Err(error) => {
                         log::error("CAPTURE_ADMISSION_FAILED", json!({ "error": error.to_string() }));
-                        let _ = reply.send(Err(CaptureRefusal::Busy));
+                        Err(CaptureRefusal::Busy)
                     }
-                }
+                };
+                let _ = reply.send(answer);
             }
-            WriterCommand::RecordCaptureLoss { dropped, expired } => {
-                if !RUNTIME.writes_open() {
-                    return;
-                }
-                match self.journal.record_capture_loss(&dropped, expired, log::now_ms()) {
-                    Ok(change) => self.broadcast(&change),
-                    Err(error) => log::warn(
-                        "CAPTURE_LOSS_UNRECORDED",
-                        json!({ "error": error.to_string() }),
-                    ),
-                }
+            WriterCommand::RecordCaptureLoss {
+                dropped,
+                expired,
+                reply,
+            } => {
+                let recorded = RUNTIME.writes_open()
+                    && match self.journal.record_capture_loss(&dropped, expired, log::now_ms()) {
+                        Ok(change) => {
+                            self.broadcast(&change);
+                            true
+                        }
+                        Err(error) => {
+                            log::warn("CAPTURE_LOSS_UNRECORDED", json!({ "error": error.to_string() }));
+                            false
+                        }
+                    };
+                let _ = reply.send(recorded);
             }
             WriterCommand::RecordLifecycle {
                 native_event,

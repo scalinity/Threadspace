@@ -40,11 +40,28 @@ pub fn spawn(store_dir: PathBuf, writer: SyncSender<WriterCommand>) -> std::io::
 pub fn drain(spool: &Spool, writer: &SyncSender<WriterCommand>) -> usize {
     let _ = spool.sweep_pending(Duration::from_secs(3600));
     let expired = spool
-        .expire(Duration::from_millis(SPOOL_MAX_AGE_MS.unsigned_abs()))
-        .unwrap_or(0);
-    let dropped = spool.take_dropped().unwrap_or_default();
-    if expired > 0 || !dropped.is_empty() {
-        let _ = writer.try_send(WriterCommand::RecordCaptureLoss { dropped, expired });
+        .expired(Duration::from_millis(SPOOL_MAX_AGE_MS.unsigned_abs()))
+        .unwrap_or_default();
+    let dropped = spool.dropped().unwrap_or_default();
+    if !expired.is_empty() || !dropped.is_empty() {
+        // The loss is journaled before its evidence leaves the spool; until
+        // then nothing drains, so an expired record is never delivered.
+        let (reply_tx, reply_rx) = sync_channel(1);
+        let recorded = writer
+            .send(WriterCommand::RecordCaptureLoss {
+                dropped: dropped.clone(),
+                expired: expired.len(),
+                reply: reply_tx,
+            })
+            .is_ok()
+            && reply_rx.recv_timeout(COMMIT_WAIT).unwrap_or(false);
+        if !recorded {
+            return 0;
+        }
+        spool.clear_dropped(&dropped);
+        for record in &expired {
+            let _ = spool.quarantine(record, "expired");
+        }
     }
     let Ok(ready) = spool.ready(PER_PASS) else { return 0 };
     let mut committed = 0;

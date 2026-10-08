@@ -222,7 +222,9 @@ fn main() {
                 .and_then(|r| serde_json::to_vec(&r).ok())
                 .filter(|text| text.len() <= RECEIPT_MAX_BYTES)
             {
-                let _ = std::io::stdout().lock().write_all(&text);
+                // Flushed here: the exit below discards buffered output.
+                let mut stdout = std::io::stdout().lock();
+                let _ = stdout.write_all(&text).and_then(|()| stdout.flush());
             }
         }
         _ => {

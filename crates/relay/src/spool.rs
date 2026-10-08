@@ -130,7 +130,13 @@ fn valid_uuid(text: &str) -> bool {
         && text
             .bytes()
             .enumerate()
-            .all(|(i, b)| if matches!(i, 8 | 13 | 18 | 23) { b == b'-' } else { b.is_ascii_hexdigit() })
+            .all(|(i, b)| {
+                if matches!(i, 8 | 13 | 18 | 23) {
+                    b == b'-'
+                } else {
+                    b.is_ascii_digit() || matches!(b, b'a'..=b'f')
+                }
+            })
 }
 
 /// `<uuid>.<bytes>.json` → (uuid, bytes).
@@ -300,43 +306,48 @@ impl Spool {
         Ok(target)
     }
 
-    /// Takes the saturation markers (one per dropped record).
-    pub fn take_dropped(&self) -> io::Result<Vec<String>> {
-        let dir = self.dir("dropped");
-        let mut taken = Vec::new();
-        let entries = match fs::read_dir(&dir) {
+    /// The saturation markers (one per dropped record), left in place until
+    /// the loss they stand for is recorded ([`Spool::clear_dropped`]).
+    pub fn dropped(&self) -> io::Result<Vec<String>> {
+        let mut names = Vec::new();
+        let entries = match fs::read_dir(self.dir("dropped")) {
             Ok(entries) => entries,
-            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(taken),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(names),
             Err(error) => return Err(error),
         };
         for entry in entries {
-            let entry = entry?;
-            if let Some(name) = entry.file_name().to_str() {
-                taken.push(name.to_owned());
+            if let Some(name) = entry?.file_name().to_str() {
+                names.push(name.to_owned());
             }
-            let _ = fs::remove_file(entry.path());
         }
-        taken.sort();
-        Ok(taken)
+        names.sort();
+        Ok(names)
     }
 
-    /// Ready records older than `max_age` are moved to `quarantine/expired`
-    /// (a recorded coverage loss, never a delivery).
-    pub fn expire(&self, max_age: Duration) -> io::Result<usize> {
-        let now = SystemTime::now();
-        let mut expired = 0;
-        for record in self.ready(usize::MAX)? {
-            let old = fs::metadata(&record.path)
-                .and_then(|m| m.modified())
-                .ok()
-                .and_then(|modified| now.duration_since(modified).ok())
-                .is_some_and(|age| age > max_age);
-            if old {
-                self.quarantine(&record, "expired")?;
-                expired += 1;
-            }
+    /// Removes markers whose loss has been recorded.
+    pub fn clear_dropped(&self, names: &[String]) {
+        let dir = self.dir("dropped");
+        for name in names {
+            let _ = fs::remove_file(dir.join(name));
         }
-        Ok(expired)
+    }
+
+    /// Ready records older than `max_age`. Once their loss is recorded they
+    /// go to `quarantine/expired` ([`Spool::quarantine`]); they are never
+    /// delivered.
+    pub fn expired(&self, max_age: Duration) -> io::Result<Vec<ReadyRecord>> {
+        let now = SystemTime::now();
+        Ok(self
+            .ready(usize::MAX)?
+            .into_iter()
+            .filter(|record| {
+                fs::metadata(&record.path)
+                    .and_then(|m| m.modified())
+                    .ok()
+                    .and_then(|modified| now.duration_since(modified).ok())
+                    .is_some_and(|age| age > max_age)
+            })
+            .collect())
     }
 
     /// Removes temporary files a killed writer abandoned.
@@ -435,8 +446,20 @@ mod tests {
         spool.publish(&envelope(9, "Stop")).expect("essential up to the bound");
         assert!(matches!(spool.publish(&envelope(10, "Stop")), Err(SpoolError::Saturated)));
         assert_eq!(spool.stats().ready_records, 10, "never above the bound");
-        let dropped = spool.take_dropped().expect("markers");
+        let dropped = spool.dropped().expect("markers");
         assert_eq!(dropped.len(), 2, "{dropped:?}");
+        spool.clear_dropped(&dropped);
+        assert_eq!(spool.stats().dropped_markers, 0);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn only_the_canonical_lowercase_uuid_is_spooled() {
+        let dir = temp();
+        let spool = Spool::at(&dir);
+        let mut record = envelope(1, "Stop");
+        record.observation_id = record.observation_id.to_ascii_uppercase().replace("0000-4000", "ABCD-4000");
+        assert!(matches!(spool.publish(&record), Err(SpoolError::InvalidId)), "receipts name the lowercase form");
         let _ = fs::remove_dir_all(dir);
     }
 
