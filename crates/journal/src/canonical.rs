@@ -14,6 +14,7 @@
 //! in-memory engine is rebuilt from the store, so memory never holds state
 //! the journal does not.
 
+use rusqlite::types::Value as Sql;
 use rusqlite::{OptionalExtension, Transaction, TransactionBehavior, params};
 use serde_json::Value;
 use threadspace_contracts::canonical::capture::RecordStatus;
@@ -24,7 +25,7 @@ use threadspace_contracts::canonical::envelope::{
 use threadspace_contracts::canonical::fact::{
     Delivery, JournalEntry, NativeFactDraft, ResolvedFact,
 };
-use threadspace_contracts::canonical::records::{CanonicalState, OutboxRecord, OutboxState};
+use threadspace_contracts::canonical::records::{CanonicalState, OutboxRecord, OutboxState, WaitOwnerDecision};
 use threadspace_contracts::cursor::{format_cursor, parse_cursor};
 use threadspace_contracts::projection::AttentionCategory;
 use threadspace_contracts::ui::{CommandReceipt, ReceiptStatus};
@@ -517,6 +518,17 @@ fn upgrade_json(version: u32, state: &mut Value) {
     }
 }
 
+/// A wait owner decision an earlier reducer recorded after its checkpoint,
+/// recovered by this reducer, read as that reducer recorded it, which is
+/// how `upgrade_json` reads the decisions in its checkpoint: reducer 1 kept
+/// only whether a decision covered positives without a causal point, read
+/// as 1.
+fn read_as_recorded(version: u32, decision: &mut WaitOwnerDecision) {
+    if version < 2 {
+        decision.unordered = decision.unordered.min(1);
+    }
+}
+
 pub(crate) fn load_index(conn: &rusqlite::Connection) -> Result<IdentityIndex, JournalError> {
     let mut index = IdentityIndex::default();
     let mut statement = conn.prepare("SELECT native_key, canonical_id FROM identity_assignments")?;
@@ -531,20 +543,96 @@ pub(crate) fn load_index(conn: &rusqlite::Connection) -> Result<IdentityIndex, J
 /// A checkpoint from an earlier reducer is then re-derived under this one;
 /// `true` says so, and opening the store persists the result
 /// (`persist_upgrade`).
+///
+/// The entries after an earlier reducer's checkpoint were admitted by that
+/// reducer, which committed their notification work with them. They are
+/// replayed only to recover the state (`Engine::recover`), the owner
+/// decisions they record are read as that reducer recorded them
+/// (`read_as_recorded`), the result is rebased onto what it committed
+/// (`keep_committed`), and only then is the state re-derived. So where the
+/// checkpoint sits changes nothing: a committed intent keeps its state, and
+/// eligibility first found by this reducer is held, whether it appears
+/// during the replay or the re-derivation.
 pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Result<(Engine, u64, bool), JournalError> {
     let (state, version) = latest_checkpoint(conn)?.unwrap_or_else(|| (Engine::empty().state, REDUCER_VERSION));
     let mut engine = Engine::new(state);
     let after = engine.state.through_cursor;
     let entries = entries_after(conn, after, endpoint_id)?;
     let replayed = entries.len() as u64;
-    for entry in &entries {
-        engine.apply(entry);
-    }
     let upgraded = version < REDUCER_VERSION;
     if upgraded {
+        let decisions = |state: &CanonicalState| -> std::collections::BTreeSet<String> {
+            state.waits.values().flat_map(|w| &w.owner_decisions).map(|d| d.command_id.clone()).collect()
+        };
+        let checkpointed = decisions(&engine.state);
+        for entry in &entries {
+            engine.recover(entry);
+        }
+        let mut state = engine.state;
+        let recovered = state.waits.values_mut().flat_map(|w| w.owner_decisions.iter_mut());
+        for decision in recovered.filter(|d| !checkpointed.contains(&d.command_id)) {
+            read_as_recorded(version, decision);
+        }
+        keep_committed(conn, &mut state)?;
+        engine = Engine::new(state);
         engine.upgrade(endpoint_id);
+    } else {
+        for entry in &entries {
+            engine.apply(entry);
+        }
     }
     Ok((engine, replayed, upgraded))
+}
+
+/// Rebases a recovered state onto what the earlier reducer committed
+/// through the journal's last entry (the materialized rows), so the
+/// re-derivation starts where it would from a checkpoint taken there:
+///
+/// - an intent with a row takes the record the row holds: its state,
+///   detail, times and revision. One without a row was first derived by
+///   this reducer; it is dropped, and the re-derivation creates it as the
+///   upgrade's own;
+/// - an attention item keeps its committed revision unless its row now
+///   differs, which makes it a change of the upgrade, at its cursor.
+fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Result<(), JournalError> {
+    let invalid = |table: &str, key: &str| JournalError::Invalid {
+        detail: format!("committed {table} row {key}"),
+    };
+    let integer = |row: &materialize::Named, column: &str| match row.get(column) {
+        Some(Sql::Integer(value)) => Some(*value),
+        _ => None,
+    };
+    let cursor = state.through_cursor;
+    let attention = materialize::committed_rows(conn, "attention_items")?;
+    for item in state.attention.values_mut() {
+        let committed = attention.get(&item.id);
+        item.revision = match committed {
+            Some(row) => integer(row, "revision").ok_or_else(|| invalid("attention", &item.id))?,
+            None => cursor,
+        };
+        if committed != Some(&materialize::attention_row(item).named()) {
+            item.revision = cursor;
+        }
+    }
+    let outbox = materialize::committed_rows(conn, "notification_outbox")?;
+    state.outbox.retain(|request_id, _| outbox.contains_key(request_id));
+    for record in state.outbox.values_mut() {
+        let row = &outbox[&record.request_id];
+        let fail = || invalid("outbox", &record.request_id);
+        record.state = match row.get("state") {
+            Some(Sql::Text(name)) => serde_json::from_value(Value::String(name.clone())).map_err(|_| fail())?,
+            _ => return Err(fail()),
+        };
+        record.detail = match row.get("outcome_detail") {
+            Some(Sql::Text(detail)) => Some(detail.clone()),
+            Some(Sql::Null) => None,
+            _ => return Err(fail()),
+        };
+        record.created_at_ms = integer(row, "created_at_ms").ok_or_else(fail)?;
+        record.updated_at_ms = integer(row, "updated_at_ms").ok_or_else(fail)?;
+        record.revision = integer(row, "revision").ok_or_else(fail)?;
+    }
+    Ok(())
 }
 
 /// Persists a state upgraded from an earlier reducer's checkpoint: every

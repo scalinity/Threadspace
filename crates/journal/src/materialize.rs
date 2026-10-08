@@ -165,6 +165,33 @@ pub(crate) struct Row {
     pub values: Vec<Sql>,
 }
 
+/// A row as column name to value.
+pub(crate) type Named = std::collections::BTreeMap<&'static str, Sql>;
+
+impl Row {
+    pub(crate) fn named(&self) -> Named {
+        table(self.table).columns.iter().copied().zip(self.values.iter().cloned()).collect()
+    }
+}
+
+/// Every committed row of a table, by its first key column.
+pub(crate) fn committed_rows(conn: &Connection, name: &str) -> Result<std::collections::BTreeMap<String, Named>, JournalError> {
+    let spec = table(name);
+    let mut statement = conn.prepare(&format!("SELECT {} FROM {}", spec.columns.join(", "), spec.name))?;
+    let mut rows = statement.query([])?;
+    let mut out = std::collections::BTreeMap::new();
+    while let Some(row) = rows.next()? {
+        let mut values = Named::new();
+        for (index, column) in spec.columns.iter().enumerate() {
+            values.insert(*column, row.get::<_, Sql>(index)?);
+        }
+        if let Some(Sql::Text(key)) = values.get(spec.key[0]) {
+            out.insert(key.clone(), values);
+        }
+    }
+    Ok(out)
+}
+
 fn text(value: impl Into<String>) -> Sql {
     Sql::Text(value.into())
 }

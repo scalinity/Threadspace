@@ -273,4 +273,20 @@ impl Engine {
     pub fn apply(&mut self, entry: &JournalEntry) -> ReduceOutput {
         crate::reduce::apply(self, entry)
     }
+
+    /// Reduces an entry an earlier reducer admitted, replayed only to bring
+    /// that reducer's checkpoint to the journal's end before an upgrade.
+    /// Its live effects were committed when it was admitted, so a live
+    /// entry is reduced as catch-up: eligibility it yields is held, never
+    /// fresh live work. The entry itself is unchanged.
+    pub fn recover(&mut self, entry: &JournalEntry) -> ReduceOutput {
+        if entry.delivery != Delivery::Live {
+            return self.apply(entry);
+        }
+        let entry = JournalEntry {
+            delivery: Delivery::Catchup,
+            ..entry.clone()
+        };
+        crate::reduce::apply(self, &entry)
+    }
 }
