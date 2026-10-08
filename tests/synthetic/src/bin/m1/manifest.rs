@@ -156,6 +156,7 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "In a simultaneous burst of 16 capture processes about 1% were refused as spoolbusy (debug build, loaded machine): a recorded loss, not a stall.",
             "A store left with a hot rollback journal is rolled back by SQLite when opened, even if it is then refused as too new; the rollback restores its last committed bytes.",
             "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
+            "On the remediated build G08's selection-readback-race routes were refused (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) in both runs, where the first candidate's run focused all five: 0 wrong targets, focus path unchanged, cause not established.",
         ],
     });
     area.json("manifest.json", &manifest)?;
