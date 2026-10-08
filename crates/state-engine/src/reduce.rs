@@ -77,9 +77,11 @@ pub(crate) fn apply(engine: &mut Engine, entry: &JournalEntry) -> ReduceOutput {
     tx.finish()
 }
 
-/// Re-derives every record from its evidence at `cursor` (a migrated
-/// baseline): no facts, no outbox intents (bootstrap delivery).
-pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> ReduceOutput {
+/// Re-derives every record from its evidence at `cursor`, with no facts: a
+/// migrated baseline (bootstrap delivery, so no outbox intents) or a
+/// checkpoint from an earlier reducer (catch-up delivery, so an item that
+/// is eligible again re-arms its suppressed intent as HELD).
+pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, delivery: Delivery) -> ReduceOutput {
     let entry = JournalEntry {
         cursor,
         endpoint_id: endpoint_id.to_owned(),
@@ -89,7 +91,7 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> R
         source_sequence: None,
         sequence_meaning: None,
         captured_wall_ms: 0,
-        delivery: Delivery::Bootstrap,
+        delivery,
         facts: Vec::new(),
     };
     let mut tx = Tx {
@@ -115,6 +117,9 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str) -> R
     }
     for id in ids(tx.state.turns.keys().collect()) {
         tx.touch_turn(&id);
+    }
+    for id in ids(tx.state.waits.keys().collect()) {
+        tx.touch_wait(&id);
     }
     for id in ids(tx.state.attention.keys().collect()) {
         tx.touch_attention(&id);
@@ -1502,9 +1507,7 @@ impl Tx<'_> {
                 "native wait cleared",
             );
             self.set_native_resolution(&attention_id, ResolutionKind::WaitEnded, false, WAIT_SUPERSEDED);
-            let governing: Vec<&WaitOwnerDecision> =
-                decisions.iter().filter(|d| wait::covers(d, &episode)).collect();
-            self.apply_owner_decisions(&attention_id, &governing);
+            self.apply_owner_decisions(&attention_id, &wait::owner_state(&decisions, &episode));
             derived.push(WaitEpisode {
                 index,
                 episode_id,
@@ -1521,7 +1524,7 @@ impl Tx<'_> {
         for (index, attention_id) in previous {
             if let Some(id) = attention_id.filter(|_| !derived.iter().any(|e| e.index == index)) {
                 self.set_native_resolution(&id, ResolutionKind::WaitEnded, true, WAIT_SUPERSEDED);
-                self.apply_owner_decisions(&id, &[]);
+                self.apply_owner_decisions(&id, &wait::OwnerState::default());
             }
         }
         if let Some(scope) = self.state.waits.get_mut(key) {
@@ -1530,32 +1533,28 @@ impl Tx<'_> {
     }
 
     /// A wait item's owner state is derived from the scope's owner decisions
-    /// that govern its episode's evidence (D-0007 §4).
-    fn apply_owner_decisions(&mut self, id: &str, decisions: &[&WaitOwnerDecision]) {
+    /// that apply to its episode's evidence (D-0007 §4).
+    fn apply_owner_decisions(&mut self, id: &str, owner: &wait::OwnerState<'_>) {
         self.touch_attention(id);
         let Some(item) = self.state.attention.get_mut(id) else { return };
         item.acknowledgements.clear();
         item.acknowledged_at_ms = None;
         item.resolutions.retain(|cause| cause.kind != ResolutionKind::Owner);
         item.snoozed_until_ms = None;
-        for decision in decisions {
-            match &decision.action {
-                OwnerAction::Acknowledge => {
-                    item.acknowledgements.insert(decision.command_id.clone());
-                    item.acknowledged_at_ms =
-                        Some(item.acknowledged_at_ms.map_or(decision.at_ms, |at| at.min(decision.at_ms)));
-                }
-                OwnerAction::Resolve { reason } => {
-                    item.resolutions.insert(ResolutionCause {
-                        kind: ResolutionKind::Owner,
-                        detail: reason.clone(),
-                    });
-                }
-                OwnerAction::Snooze { until_ms } => {
-                    item.snoozed_until_ms = Some(item.snoozed_until_ms.map_or(*until_ms, |u| u.max(*until_ms)));
-                }
+        if let Some(acknowledge) = &owner.acknowledge {
+            item.acknowledgements
+                .extend(acknowledge.decisions.iter().map(|d| d.command_id.clone()));
+            item.acknowledged_at_ms = Some(acknowledge.at_ms);
+        }
+        for decision in owner.resolve.iter().flat_map(|resolve| &resolve.decisions) {
+            if let OwnerAction::Resolve { reason } = &decision.action {
+                item.resolutions.insert(ResolutionCause {
+                    kind: ResolutionKind::Owner,
+                    detail: reason.clone(),
+                });
             }
         }
+        item.snoozed_until_ms = owner.snooze.as_ref().and_then(|snooze| snooze.until_ms);
     }
 
     /// Keeps an owner command on a wait item with the evidence of the episode

@@ -4,12 +4,15 @@ import type { OwnerAction } from "./OwnerAction";
 
 /**
  * An owner command on a wait item, kept with the evidence it was made on:
- * the positive witnesses of the episode the owner acted on. A late clear
- * that repartitions the episodes moves the decision with that evidence,
- * never onto a positive it did not cover (D-0007 §4).
+ * the positive witnesses of the episode the owner acted on. It applies to
+ * that evidence only: a repartition moves it with its witnesses, and an
+ * episode also holding active evidence it did not cover stays actionable
+ * (D-0007 §4).
  */
 export type WaitOwnerDecision = { commandId: string, action: OwnerAction, atMs: number, positives: Array<CausalPoint>, 
 /**
- * The episode also held positives without a causal point.
+ * How many positives without a causal point the episode held. They have
+ * no identity, and their count only grows, so this covers the first
+ * `unordered` of them.
  */
-unordered: boolean, };
+unordered: number, };

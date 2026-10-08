@@ -7,7 +7,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use threadspace_contracts::canonical::fact::JournalEntry;
+use threadspace_contracts::canonical::fact::{Delivery, JournalEntry};
 use threadspace_contracts::canonical::records::{
     ActivityRecord, ActorRecord, AttentionRecord, CanonicalState, ExactRequestRecord,
     ExecutionRecord, HumanFrontier, InputRecord, NamespaceRecord, OutboxRecord, ProcessRecord,
@@ -256,7 +256,17 @@ impl Engine {
     /// Re-derives every record from its stored evidence (a migrated
     /// baseline). Deterministic and side-effect free.
     pub fn rederive(&mut self, cursor: i64, endpoint_id: &str) -> ReduceOutput {
-        crate::reduce::rederive(self, cursor, endpoint_id)
+        crate::reduce::rederive(self, cursor, endpoint_id, Delivery::Bootstrap)
+    }
+
+    /// Brings a state checkpointed by an earlier reducer to this one: every
+    /// record re-derived under the current rules at its last cursor.
+    /// Deterministic and side-effect free.
+    pub fn upgrade(&mut self, endpoint_id: &str) -> ReduceOutput {
+        let cursor = self.state.through_cursor;
+        let output = crate::reduce::rederive(self, cursor, endpoint_id, Delivery::Catchup);
+        self.state.reducer_version = REDUCER_VERSION;
+        output
     }
 
     /// Reduces one admitted entry. Deterministic and side-effect free.

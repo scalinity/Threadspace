@@ -1872,7 +1872,7 @@
       "type": "object"
     },
     "WaitOwnerDecision": {
-      "description": "An owner command on a wait item, kept with the evidence it was made on:\nthe positive witnesses of the episode the owner acted on. A late clear\nthat repartitions the episodes moves the decision with that evidence,\nnever onto a positive it did not cover (D-0007 §4).",
+      "description": "An owner command on a wait item, kept with the evidence it was made on:\nthe positive witnesses of the episode the owner acted on. It applies to\nthat evidence only: a repartition moves it with its witnesses, and an\nepisode also holding active evidence it did not cover stays actionable\n(D-0007 §4).",
       "properties": {
         "action": {
           "$ref": "#/$defs/OwnerAction"
@@ -1892,8 +1892,10 @@
           "uniqueItems": true
         },
         "unordered": {
-          "description": "The episode also held positives without a causal point.",
-          "type": "boolean"
+          "description": "How many positives without a causal point the episode held. They have\nno identity, and their count only grows, so this covers the first\n`unordered` of them.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
         }
       },
       "required": [

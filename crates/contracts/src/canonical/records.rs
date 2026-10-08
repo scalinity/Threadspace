@@ -305,9 +305,10 @@ pub struct WaitEpisode {
 }
 
 /// An owner command on a wait item, kept with the evidence it was made on:
-/// the positive witnesses of the episode the owner acted on. A late clear
-/// that repartitions the episodes moves the decision with that evidence,
-/// never onto a positive it did not cover (D-0007 §4).
+/// the positive witnesses of the episode the owner acted on. It applies to
+/// that evidence only: a repartition moves it with its witnesses, and an
+/// episode also holding active evidence it did not cover stays actionable
+/// (D-0007 §4).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
@@ -316,8 +317,10 @@ pub struct WaitOwnerDecision {
     pub action: OwnerAction,
     pub at_ms: i64,
     pub positives: BTreeSet<CausalPoint>,
-    /// The episode also held positives without a causal point.
-    pub unordered: bool,
+    /// How many positives without a causal point the episode held. They have
+    /// no identity, and their count only grows, so this covers the first
+    /// `unordered` of them.
+    pub unordered: u32,
 }
 
 /// An aggregate native wait scope (SPEC §7.1): namespace/Session, known

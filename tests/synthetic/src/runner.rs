@@ -123,6 +123,14 @@ fn wait_kind(category: WaitCategory) -> &'static str {
     }
 }
 
+fn action_name(action: &OwnerAction) -> &'static str {
+    match action {
+        OwnerAction::Acknowledge => "Acknowledge",
+        OwnerAction::Resolve { .. } => "Resolve",
+        OwnerAction::Snooze { .. } => "Snooze",
+    }
+}
+
 /// In-memory admission: dedup by observation UUID, pure normalization,
 /// identity resolution with a seeded allocator, pure reduction.
 pub struct PureRunner {
@@ -337,30 +345,45 @@ impl Monitor {
                 self.ended_executions.insert(execution.id.clone());
             }
         }
-        // A wait item's owner state follows the evidence its decisions were
-        // made on (D-0007 §4): a decision is never dropped, and every episode
-        // now holding that evidence shows it.
+        // A wait item's owner state follows the evidence its decisions
+        // covered (D-0007 §4), restated here without the reducer's helper: an
+        // item holding active evidence shows an action exactly when that
+        // action's decisions together cover every active witness (evidence
+        // the owner never handled keeps it actionable); an item whose
+        // evidence all ended keeps every decision made on it. A decision is
+        // never dropped.
         for scope in state.waits.values() {
-            let episodes = wait::partition(scope);
             for decision in &scope.owner_decisions {
                 self.wait_decisions.insert((scope.key.clone(), decision.command_id.clone()));
-                for (index, _) in episodes.iter().filter(|(_, e)| wait::covers(decision, e)) {
-                    let item = scope
-                        .episodes
-                        .iter()
-                        .find(|e| e.index == *index)
-                        .and_then(|e| e.attention_id.as_ref())
-                        .and_then(|id| state.attention.get(id));
-                    let shown = item.is_some_and(|item| match &decision.action {
-                        OwnerAction::Acknowledge => item.acknowledgements.contains(&decision.command_id),
-                        OwnerAction::Resolve { .. } => {
-                            item.resolutions.iter().any(|c| c.kind == ResolutionKind::Owner)
-                        }
-                        OwnerAction::Snooze { until_ms } => item.snoozed_until_ms >= Some(*until_ms),
-                    });
-                    if !shown {
-                        self.violations
-                            .push(format!("owner decision {} not shown on its evidence", decision.command_id));
+            }
+            for (index, episode) in wait::partition(scope) {
+                let item = scope
+                    .episodes
+                    .iter()
+                    .find(|e| e.index == index)
+                    .and_then(|e| e.attention_id.as_ref())
+                    .and_then(|id| state.attention.get(id));
+                let Some(item) = item else { continue };
+                let shown = [
+                    item.acknowledged(),
+                    item.resolutions.iter().any(|c| c.kind == ResolutionKind::Owner),
+                    item.snoozed_until_ms.is_some(),
+                ];
+                for (name, shown) in ["Acknowledge", "Resolve", "Snooze"].into_iter().zip(shown) {
+                    let decisions: Vec<_> =
+                        scope.owner_decisions.iter().filter(|d| action_name(&d.action) == name).collect();
+                    let active = !episode.active.is_empty() || episode.unordered > 0;
+                    let covered = if active {
+                        episode.active.iter().all(|p| decisions.iter().any(|d| d.positives.contains(p)))
+                            && (episode.unordered == 0 || decisions.iter().any(|d| d.unordered >= episode.unordered))
+                    } else {
+                        decisions.iter().any(|d| !d.positives.is_disjoint(&episode.positives))
+                    };
+                    if covered != shown {
+                        self.violations.push(format!(
+                            "wait episode {index} of {}: {name} shown={shown}, covered={covered}",
+                            scope.key
+                        ));
                     }
                 }
             }
