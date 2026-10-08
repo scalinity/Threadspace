@@ -272,6 +272,7 @@ pub fn recover<R: Runtime>(
             if let Some(window) = app.get_webview_window(OFFICE_LABEL) {
                 #[cfg(feature = "qualification")]
                 shells::track(&window, incarnation);
+                // D-0008 containment for tao 0.37.0 only: see the function.
                 release_window_on_close(&window);
                 let _ = window.destroy();
             }
@@ -325,18 +326,29 @@ pub fn recover<R: Runtime>(
         });
 }
 
+// ======================================================================
+// D-0008 / C-04 CONTAINMENT: VERSION-SCOPED TO tao 0.37.0. NOT WINDOW
+// LIFETIME ARCHITECTURE.
+//
+// tao 0.37.0's `create_window` keeps the +1 NSWindow that
+// `alloc`/`initWithContentRect:` returns and retains it again for its own
+// handle, so one reference has no owner and a closed office window is never
+// deallocated: every recovery left its window-server window behind as an
+// off-screen shell. Setting `releasedWhenClosed` on the retiring office
+// window, and on no other window, has AppKit's own close consume that
+// ownerless reference.
+//
+// An upstream tao ownership fix makes this a DOUBLE RELEASE (a crash). On
+// any Tauri, tao or Wry update, remove this call first and requalify the
+// view-recovery shell gate without it on the new dependency; restore it only
+// if that gate shows the leak again, under a new decision.
+// `tests::window_dependencies_are_the_ones_d0008_qualified` fails the build
+// when any of them moves.
+// ======================================================================
+
 /// Has AppKit release the retiring office window once, when it closes
-/// (C-04). tao 0.37.0's `create_window` keeps the +1 window that
-/// `alloc`/`initWithContentRect:` returns and retains it again for its own
-/// handle, so one reference has no owner and a closed office window was never
-/// deallocated: every recovery left its window-server window behind as an
-/// off-screen shell. `releasedWhenClosed` is AppKit's documented ownership of
-/// a window that frees itself on close; here it takes that ownerless
-/// reference. It is correct only while tao over-retains, so
-/// `tests::tao_is_the_version_whose_window_retain_is_balanced` fails on any
-/// other tao and the view-recovery shell gate must be rerun before it moves.
-/// The pointer is borrowed for one main-thread call; this code never retains
-/// or releases it.
+/// (D-0008). The pointer is borrowed for one main-thread call; this code
+/// never retains or releases it.
 fn release_window_on_close<R: Runtime>(window: &tauri::WebviewWindow<R>) {
     let (done, wait) = std::sync::mpsc::channel();
     let sent = window.with_webview(move |platform| {
@@ -530,23 +542,36 @@ fn keep_web_focus<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
 #[cfg(test)]
 mod tests {
     /// `release_window_on_close` balances a reference tao 0.37.0 never
-    /// releases. A tao that does release it would turn AppKit's release
-    /// into a double release, so the pin moves only with a rerun of the
-    /// view-recovery shell gate (C-04).
+    /// releases (D-0008). A Tauri, tao or Wry other than the qualified set
+    /// fails here: remove the workaround and requalify the view-recovery
+    /// shell gate without it before changing this list.
     #[test]
-    fn tao_is_the_version_whose_window_retain_is_balanced() {
+    fn window_dependencies_are_the_ones_d0008_qualified() {
         let lock =
             std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../Cargo.lock"))
                 .unwrap_or_default();
-        let tao: Vec<&str> = lock
-            .split("[[package]]")
-            .filter(|package| package.contains("\nname = \"tao\"\n"))
-            .filter_map(|package| {
-                package
-                    .lines()
-                    .find_map(|line| line.strip_prefix("version = "))
-            })
-            .collect();
-        assert_eq!(tao, ["\"0.37.0\""]);
+        let versions = |name: &str| -> Vec<String> {
+            lock.split("[[package]]")
+                .filter(|package| package.contains(&format!("\nname = \"{name}\"\n")))
+                .filter_map(|package| {
+                    package
+                        .lines()
+                        .find_map(|line| line.strip_prefix("version = "))
+                        .map(|v| v.trim_matches('"').to_owned())
+                })
+                .collect()
+        };
+        for (name, qualified) in [
+            ("tao", "0.37.0"),
+            ("wry", "0.57.0"),
+            ("tauri", "3.0.0-alpha.4"),
+            ("tauri-runtime-wry", "3.0.0-alpha.4"),
+        ] {
+            assert_eq!(
+                versions(name),
+                [qualified],
+                "{name} moved: remove the D-0008 workaround and requalify C-04 without it first"
+            );
+        }
     }
 }

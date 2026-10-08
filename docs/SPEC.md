@@ -1601,7 +1601,7 @@ SQLite 3.53.4 includes the documented WAL-reset corruption fix. Pin the actual l
 
 Commit `Cargo.lock`, `package-lock.json`, `rust-toolchain.toml` and `docs/compatibility/platform-lock.json`. The platform lock records exact Node/npm, React/TypeScript/Vite, Rust SQLite binding, Xcode/SDK, macOS build, provider versions, bundle IDs, native dictionary hashes, source SHAs and renderer proof. Resolve unlisted application libraries once at M0 and record exact versions; do not write “latest” in the reproducible build recipe.
 
-Use exact direct prerelease pins; validate the transitive family from `cargo metadata`/`cargo tree` and the npm lock. CI uses lock-preserving installation, no floating `@next`, no global CLI substitution, no branch-based dependency and no automatic prerelease drift. A later deliberate dependency-update task repeats the affected M0/native regression suite before replacing the accepted lock.
+Use exact direct prerelease pins; validate the transitive family from `cargo metadata`/`cargo tree` and the npm lock. CI uses lock-preserving installation, no floating `@next`, no global CLI substitution, no branch-based dependency and no automatic prerelease drift. A later deliberate dependency-update task repeats the affected M0/native regression suite before replacing the accepted lock; one that moves Tauri, tao or Wry first removes the D-0008 window-release containment and runs the view-recovery gate without it.
 
 ### 18.2 Tauri 3 application structure and native boundary
 
@@ -1631,7 +1631,7 @@ The default runtime type is `DynRuntime`; `Wry` is the runtime attributes select
 
 Keep all Tauri-specific code in `apps/desktop/src-tauri` and one audited macOS window adapter. The native core, provider adapters, persistence and surface discovery crates do not depend on Tauri. Managed Tauri `State` holds a bridge client, subscription registry, native UI intent queue and window settings—not a second authoritative state engine.
 
-Current Wry-specific operations use the corresponding extension traits; runtime mismatch is a typed error. Main-thread dispatch uses the current `Manager` APIs. Never block the UI thread waiting for work scheduled to that same thread. Borrowed macOS webview pointers remain confined to the adapter and are not treated as owned Objective-C objects. [Tauri 3 changes][T3]
+Current Wry-specific operations use the corresponding extension traits; runtime mismatch is a typed error. Main-thread dispatch uses the current `Manager` APIs. Never block the UI thread waiting for work scheduled to that same thread. Borrowed macOS webview pointers remain confined to the adapter and are not treated as owned Objective-C objects. One narrow exception, scoped to tao `0.37.0` and lapsing with that pin: recovery sets `releasedWhenClosed` on the retiring office window to release the reference tao 0.37.0 leaves unowned ([D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md)). [Tauri 3 changes][T3]
 
 Remove old `macos-private-api` / `app.macOSPrivateApi` settings, removed runtime aliases and old `tauri` runtime feature assumptions. Do not import CEF helpers or Chromium entitlements into the selected Wry build. Tauri 2 examples are comparison material only.
 
