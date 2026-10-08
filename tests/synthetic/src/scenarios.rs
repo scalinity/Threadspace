@@ -495,6 +495,240 @@ pub fn wait_generations() -> Scenario {
     })
 }
 
+/// The decisions a wait scope keeps, as (command, sequences of the
+/// positives it covered).
+fn decisions(state: &CanonicalState, session: &str) -> Vec<(String, Vec<String>)> {
+    let v = View::new(state);
+    let Some(session) = v.session(session) else { return Vec::new() };
+    let mut out: Vec<(String, Vec<String>)> = state
+        .waits
+        .values()
+        .filter(|w| w.session_id == session.id)
+        .flat_map(|w| &w.owner_decisions)
+        .map(|d| (d.command_id.clone(), d.positives.iter().filter_map(|p| p.sequence.clone()).collect()))
+        .collect();
+    out.sort();
+    out
+}
+
+fn other_epoch_wait(b: &mut Builder, s: &NativeSessionRef, turn: &str, sequence: u64, signal: &str) -> usize {
+    b.obs(Some(s), "wait").turn(turn).source(DEFAULT_SOURCE, "mod-epoch-2").sequence(sequence)
+        .payload(json!({ "category": "INPUT", "signal": signal })).push()
+}
+
+fn wait_target(s: &NativeSessionRef, turn: Option<&str>, witness: u64) -> Target {
+    Target::Wait { session: s.clone(), turn: turn.map(str::to_owned), category: "INPUT".into(), witness }
+}
+
+/// P2 (epoch A), the owner resolves it, C3 (A) clears it, then Q1 (epoch B,
+/// captured after the decision) lands in the same episode, incomparable with
+/// C3. The resolution covered P alone: Q, which the owner never handled,
+/// keeps the item open and notifiable.
+pub fn wait_owner_partial_coverage() -> Scenario {
+    let mut b = Builder::new("wait-owner-partial-coverage", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-partial");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(1).push();
+    let p2 = input_wait(&mut b, &s, Some("t1"), 2, "POSITIVE");
+    let resolve = b.owner("cmd-resolve-p", wait_target(&s, Some("t1"), 2), OwnerAction::Resolve { reason: "handled P".into() }, &[p2]);
+    let c3 = input_wait(&mut b, &s, Some("t1"), 3, "CLEARED");
+    let q1 = other_epoch_wait(&mut b, &s, "t1", 1, "POSITIVE");
+    b.before(resolve, c3);
+    b.before(resolve, q1);
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-partial") == vec![("cmd-resolve-p".into(), vec!["2".into()])], "the resolution covers P2 alone");
+        let items = v.wait_items("sess-partial");
+        ensure!(items.len() == 1 && !items[0].resolved(), "P and Q share one item, open for Q");
+        ensure!(wait_eligibility_matches(state, &v, "sess-partial")? == 1, "Q's wait is notifiable");
+        ensure!(turn_state(&v, "sess-partial", "t1")? == TurnState::Waiting, "WAITING on Q");
+        Ok(())
+    })
+}
+
+/// P10 (A), the owner resolves it, C5 (A, earlier) moves it to episode 1,
+/// Q2 (B) lands in episode 0, then D1 (B, before Q2) arrives late and merges
+/// Q2 into P10's episode. P10's resolution stays with P10: the merged item
+/// is open for Q2, and no second decision appears.
+pub fn wait_owner_merge_keeps_coverage() -> Scenario {
+    let mut b = Builder::new("wait-owner-merge-keeps-coverage", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-merge");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p10 = input_wait(&mut b, &s, Some("t1"), 10, "POSITIVE");
+    let resolve = b.owner("cmd-resolve-p10", wait_target(&s, Some("t1"), 10), OwnerAction::Resolve { reason: "handled P10".into() }, &[p10]);
+    input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    let q2 = other_epoch_wait(&mut b, &s, "t1", 2, "POSITIVE");
+    other_epoch_wait(&mut b, &s, "t1", 1, "CLEARED");
+    b.before(resolve, q2);
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-merge") == vec![("cmd-resolve-p10".into(), vec!["10".into()])], "one decision, covering P10 alone");
+        ensure!(state.commands.len() == 1, "no owner command manufactured");
+        let open: Vec<_> = v.wait_items("sess-merge").into_iter().filter(|i| !i.resolved()).collect();
+        ensure!(open.len() == 1, "the merged item is open for Q2");
+        ensure!(wait_eligibility_matches(state, &v, "sess-merge")? == 1, "and notifiable");
+        Ok(())
+    })
+}
+
+/// P2 and Q10 (one epoch, both captured before the owner acts), the owner
+/// resolving episode 0 when only `seen` had arrived, the other, then C5.
+/// Steps: 0 session, 1 t1, 2 the seen positive, 3 owner Resolve, 4 the
+/// other positive, 5 C5. A history where the owner saw P2 and one where it
+/// saw Q10 differ: semantic equality must tell them apart.
+fn wait_owner_coverage(name: &str, seen: u64) -> Builder {
+    let mut b = Builder::new(name, "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-coverage");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(1).push();
+    let shown = input_wait(&mut b, &s, Some("t1"), seen, "POSITIVE");
+    let resolve = b.owner("cmd-resolve-episode", wait_target(&s, Some("t1"), seen), OwnerAction::Resolve { reason: "handled".into() }, &[shown]);
+    let later = input_wait(&mut b, &s, Some("t1"), if seen == 2 { 10 } else { 2 }, "POSITIVE");
+    b.before(resolve, later);
+    let c5 = input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    b.before(resolve, c5);
+    b
+}
+
+/// The owner saw P2: after C5 clears it, Q10 (episode 1) is open.
+pub fn wait_owner_covered_p() -> Scenario {
+    wait_owner_coverage("wait-owner-covered-p", 2).build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-coverage") == vec![("cmd-resolve-episode".into(), vec!["2".into()])], "covers P2");
+        ensure!(wait_eligibility_matches(state, &v, "sess-coverage")? == 1, "Q10 is open");
+        Ok(())
+    })
+}
+
+/// The owner saw Q10: after C5, Q10 (episode 1) stays resolved.
+pub fn wait_owner_covered_q() -> Scenario {
+    wait_owner_coverage("wait-owner-covered-q", 10).build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-coverage") == vec![("cmd-resolve-episode".into(), vec!["10".into()])], "covers Q10");
+        ensure!(wait_eligibility_matches(state, &v, "sess-coverage")? == 0, "nothing open");
+        Ok(())
+    })
+}
+
+/// P2 and Q10 both arrive before the owner resolves: whatever their order,
+/// the decision covers both, and after C5 nothing is open.
+pub fn wait_owner_covers_both() -> Scenario {
+    let mut b = Builder::new("wait-owner-covers-both", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-coverage");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(1).push();
+    let p2 = input_wait(&mut b, &s, Some("t1"), 2, "POSITIVE");
+    let q10 = input_wait(&mut b, &s, Some("t1"), 10, "POSITIVE");
+    let resolve = b.owner("cmd-resolve-episode", wait_target(&s, Some("t1"), 2), OwnerAction::Resolve { reason: "handled".into() }, &[p2, q10]);
+    let c5 = input_wait(&mut b, &s, Some("t1"), 5, "CLEARED");
+    b.before(resolve, c5);
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-coverage") == vec![("cmd-resolve-episode".into(), vec!["10".into(), "2".into()])], "covers P2 and Q10");
+        ensure!(wait_eligibility_matches(state, &v, "sess-coverage")? == 0, "nothing open");
+        Ok(())
+    })
+}
+
+/// t1's wait resolved by the owner, t2's wait untouched, and a turnless
+/// inventory wait acknowledged: each decision stays on its own scope.
+pub fn wait_owner_scopes() -> Scenario {
+    let mut b = Builder::new("wait-owner-scopes", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-owner-scopes");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p3 = input_wait(&mut b, &s, Some("t1"), 3, "POSITIVE");
+    b.owner("cmd-resolve-t1", wait_target(&s, Some("t1"), 3), OwnerAction::Resolve { reason: "handled t1".into() }, &[p3]);
+    b.obs(Some(&s), "turn.start").turn("t2").sequence(6).push();
+    input_wait(&mut b, &s, Some("t2"), 7, "POSITIVE");
+    let p8 = input_wait(&mut b, &s, None, 8, "POSITIVE");
+    b.owner("cmd-ack-session", wait_target(&s, None, 8), OwnerAction::Acknowledge, &[p8]);
+    b.build(|state| {
+        let v = View::new(state);
+        let t1 = v.turn("sess-owner-scopes", None, "t1").ok_or("t1")?.id.clone();
+        let t2 = v.turn("sess-owner-scopes", None, "t2").ok_or("t2")?.id.clone();
+        for scope in state.waits.values() {
+            let commands: Vec<&str> = scope.owner_decisions.iter().map(|d| d.command_id.as_str()).collect();
+            let expected: &[&str] = match scope.turn_id.as_deref() {
+                Some(t) if t == t1 => &["cmd-resolve-t1"],
+                Some(t) if t == t2 => &[],
+                Some(_) => return Err("a wait on an unknown turn".into()),
+                None => &["cmd-ack-session"],
+            };
+            ensure!(commands == expected, "decisions {commands:?} on the wait of turn {:?}", scope.turn_id);
+        }
+        for item in v.wait_items("sess-owner-scopes") {
+            let owner = resolved_by(item, ResolutionKind::Owner);
+            match item.turn_id.as_deref() {
+                Some(t) if t == t1 => ensure!(owner && !item.acknowledged(), "t1 resolved by the owner"),
+                Some(t) if t == t2 => ensure!(!owner && !item.acknowledged(), "t2 untouched"),
+                _ => ensure!(!owner && item.acknowledged(), "the session wait acknowledged only"),
+            }
+        }
+        ensure!(wait_eligibility_matches(state, &v, "sess-owner-scopes")? == 1, "t2's wait alone is notifiable");
+        Ok(())
+    })
+}
+
+/// Witness A's shape for Acknowledge (t1) and Snooze (t2): each covered P
+/// alone, so the incomparable Q that joins its episode keeps the item
+/// unacknowledged and unsnoozed.
+pub fn wait_owner_partial_actions() -> Scenario {
+    let mut b = Builder::new("wait-owner-partial-actions", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-partial-actions");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    for (turn, p, c, q, action) in [
+        ("t1", 2, 3, 1, OwnerAction::Acknowledge),
+        ("t2", 12, 13, 11, OwnerAction::Snooze { until_ms: 4_102_444_800_000 }),
+    ] {
+        b.obs(Some(&s), "turn.start").turn(turn).sequence(1).push();
+        let positive = input_wait(&mut b, &s, Some(turn), p, "POSITIVE");
+        let owner = b.owner(&format!("cmd-{turn}"), wait_target(&s, Some(turn), p), action, &[positive]);
+        let clear = input_wait(&mut b, &s, Some(turn), c, "CLEARED");
+        let other = other_epoch_wait(&mut b, &s, turn, q, "POSITIVE");
+        b.before(owner, clear);
+        b.before(owner, other);
+    }
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(
+            decisions(state, "sess-partial-actions") == vec![("cmd-t1".into(), vec!["2".into()]), ("cmd-t2".into(), vec!["12".into()])],
+            "each decision covers its P alone"
+        );
+        for item in v.wait_items("sess-partial-actions") {
+            ensure!(!item.acknowledged() && item.snoozed_until_ms.is_none() && !item.resolved(), "Q keeps each item open");
+        }
+        ensure!(wait_eligibility_matches(state, &v, "sess-partial-actions")? == 2, "both notifiable");
+        Ok(())
+    })
+}
+
+/// P3 and U1 (a wait positive without a causal point) arrive before the
+/// owner resolves; then U2, another such positive. Positives without a
+/// causal point have no identity, so the decision records that it covered
+/// one of them: U2, which the owner never saw, keeps the item open.
+pub fn wait_owner_unordered_coverage() -> Scenario {
+    let mut b = Builder::new("wait-owner-unordered-coverage", "wait-events");
+    let s = session(CLAUDE_LIKE, "sess-unordered-wait");
+    b.obs(Some(&s), "session.start").sequence(1).push();
+    b.obs(Some(&s), "turn.start").turn("t1").sequence(2).push();
+    let p3 = input_wait(&mut b, &s, Some("t1"), 3, "POSITIVE");
+    let unordered = json!({ "category": "INPUT", "signal": "POSITIVE" });
+    let u1 = b.obs(Some(&s), "wait").turn("t1").unordered().payload(unordered.clone()).push();
+    let resolve = b.owner("cmd-resolve-unordered", wait_target(&s, Some("t1"), 3), OwnerAction::Resolve { reason: "handled".into() }, &[p3, u1]);
+    let u2 = b.obs(Some(&s), "wait").turn("t1").unordered().payload(unordered).push();
+    b.before(resolve, u2);
+    b.build(|state| {
+        let v = View::new(state);
+        ensure!(decisions(state, "sess-unordered-wait") == vec![("cmd-resolve-unordered".into(), vec!["3".into()])], "covers P3");
+        let counts: Vec<u32> = state.waits.values().flat_map(|w| &w.owner_decisions).map(|d| d.unordered).collect();
+        ensure!(counts == [1], "and one positive without a causal point, got {counts:?}");
+        ensure!(wait_eligibility_matches(state, &v, "sess-unordered-wait")? == 1, "U2 keeps the item notifiable");
+        Ok(())
+    })
+}
+
 // ------------------------------------------------------------------ follow-up
 
 fn followup(name: &str, profile: &str, owner: bool) -> Builder {
@@ -897,6 +1131,14 @@ pub fn catalog() -> Vec<Scenario> {
         wait_turn_ownership(),
         wait_session_scoped(),
         wait_generations(),
+        wait_owner_partial_coverage(),
+        wait_owner_merge_keeps_coverage(),
+        wait_owner_covered_p(),
+        wait_owner_covered_q(),
+        wait_owner_covers_both(),
+        wait_owner_scopes(),
+        wait_owner_partial_actions(),
+        wait_owner_unordered_coverage(),
         followup_witnessed(),
         followup_claude(),
         owner_commands(),
