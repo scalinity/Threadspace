@@ -97,7 +97,7 @@
       "evidence/M1/g08-terminal/20261008T033839Z-prod"
     ],
     "selectionReadbackRace": {
-      "observation": "On the remediated build the race routes were refused (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window); the first candidate's run focused all five. 0 wrong targets either way; the focus script, surface adapter and osascript worker are unchanged since that run; cause not established.",
+      "observation": "Across the two runs on the remediated build, 9 of the 10 race routes were refused conservatively (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window) and 1 was focused exactly; 0 wrong targets. Ordinary exact Return (baseline-exact) passed in both runs. The runs record each route's focus timing but not when the competing selection happened, so the race setup and its overlap with each route are not fully attested. The first candidate's run focused all five. The cause is not established; M5 owns the investigation.",
       "runs": [
         {
           "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
@@ -116,8 +116,11 @@
           "wrongTargets": 0
         }
       ],
-      "previous": "evidence/M1/g08-terminal/20261008T020830Z-prod: 5 of 5 exact"
-    }
+      "previous": "evidence/M1/g08-terminal/20261008T020830Z-prod: 5 of 5 exact",
+      "refusedTotal": 9,
+      "investigation": "M5"
+    },
+    "fullscreenNote": "The G08 fullscreen-space-then-return case in these runs recorded null enteredFullscreen and exitFullscreen witnesses: it shows exact Return after the step, not a fresh fullscreen-transition qualification. Fullscreen transitions are qualified by the accepted M0C H-10 evidence."
   },
   "pass": true
 }

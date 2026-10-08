@@ -1,0 +1,56 @@
+== wait_owner_coverage: test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+test a_p2_resolve_c3_q1_keeps_the_unhandled_q_actionable ... FAILED
+test b_a_late_d1_merges_q_with_p_without_transferring_p_s_resolution ... FAILED
+test c_decisions_on_different_evidence_are_different_semantic_states ... FAILED
+test d_the_same_coverage_in_another_admissible_order_converges ... FAILED
+test e_a_new_wait_after_a_clear_is_not_resolved_by_the_old_decision ... FAILED
+test f_owner_decisions_stay_on_their_turn_or_session_scope ... ok
+test g_acknowledge_and_snooze_apply_only_to_the_evidence_they_covered ... FAILED
+test the_oracle_compares_covered_witnesses_not_only_episode_ordinals ... FAILED
+== wait_counterexamples: test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test a_waiting_turn_owns_its_wait_whichever_turn_arrives_first ... ok
+test an_owner_resolution_survives_a_late_earlier_clear ... ok
+test p10_c5_q_keeps_both_waits_notifiable_in_either_order ... ok
+test p2_c3_q_keeps_the_uncertain_wait_notifiable_in_either_order ... ok
+test the_semantic_oracle_sees_an_owner_decision_removed_or_changed ... ok
+== reducer_upgrade: test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test a_reducer_1_store_is_upgraded_not_reinterpreted ... FAILED
+== scenarios: test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.19s
+test allocated_ids_differ_but_semantics_do_not ... ok
+test every_scenario_meets_its_expectation_in_reference_order ... FAILED
+test seeded_permutations_converge_semantically ... FAILED
+test semantic_equality_detects_missing_or_different_evidence ... ok
+== sqlite: test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.39s
+test a_command_that_changes_nothing_reports_the_items_unchanged_revision ... ok
+test a_committed_owner_command_retried_after_its_target_advanced_returns_the_original_result ... ok
+test a_live_batch_returns_only_the_intents_still_pending_after_it ... ok
+test an_observation_id_not_in_canonical_form_is_refused ... ok
+test every_scenario_through_sqlite_matches_the_pure_path_and_replays_exactly ... FAILED
+test ingest_cursor_gaps_raise_nothing_and_source_gaps_stay_scoped ... ok
+test preserved_failing_seeds_now_keep_tables_equal_to_state_at_every_step ... ok
+test sensitive_bodies_never_reach_the_store_files ... ok
+test sqlite_permutations_converge_with_the_pure_reference ... FAILED
+test ten_deliveries_of_each_observation_create_no_duplicate_sessions_or_facts ... ok
+== public_read_model: test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+test a_late_tool_callback_does_not_reopen_a_settled_public_turn ... ok
+test public_observation_shows_a_disconnected_observer_link ... ok
+test public_presence_is_the_sessions_not_the_newest_activations ... ok
+test public_wait_attention_follows_the_canonical_owner_turn_and_eligibility ... ok
+test the_patch_that_settles_a_session_carries_its_canonical_turn_state ... ok
+test the_public_turn_state_is_the_causally_latest_settled_turn_in_every_order ... ok
+
+== scenarios: failing expectations and permutation scenarios
+    "wait-owner-partial-coverage: P and Q share one item, open for Q",
+    "wait-owner-partial-coverage: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Resolve shown=true, covered=false",
+    "wait-owner-merge-keeps-coverage: the merged item is open for Q2",
+    "wait-owner-merge-keeps-coverage: invariant: wait episode 1 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Resolve shown=true, covered=false",
+    "wait-owner-covered-p: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Resolve shown=true, covered=false",
+    "wait-owner-covered-q: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Resolve shown=true, covered=false",
+    "wait-owner-partial-actions: Q keeps each item open",
+    "wait-owner-partial-actions: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Acknowledge shown=true, covered=false",
+    "wait-owner-partial-actions: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Acknowledge shown=true, covered=false",
+    "wait-owner-partial-actions: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Acknowledge shown=true, covered=false",
+    "wait-owner-partial-actions: invariant: wait episode 0 of [\"wait\",\"71bb54d8-d101-45b9-834d-0bff90150280\",\"491718de-357e-4da8-8b43-5c8e74616796\",\"\",\"6775dc77-0156-4f61-9afc-d44d14cf8bfe\",\"INPUT\",\"\"]: Acknowledge shown=true, covered=false",
+== scenarios: seeded-permutation failures per scenario (of 20 seeds)
+20 wait-new-after-resolution
+(the test reports the total, "637 failures:", and lists the first 20, so the per-scenario tally above covers those 20 only)

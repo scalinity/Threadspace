@@ -1,0 +1,41 @@
+== future_store with the unfixed preflight: test result: FAILED. 13 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+test a_garbage_shm_beside_a_future_wal_is_refused_without_writing ... ok
+test a_garbage_wal_beside_a_future_store_is_refused_without_writing ... FAILED
+test a_plain_read_only_open_creates_a_shm_beside_a_wal_without_one ... ok
+test a_supported_store_with_rows_only_in_a_wal_without_shm_opens_and_keeps_them ... ok
+test an_inspection_copy_that_cannot_be_made_fails_without_writing ... FAILED
+test an_unreadable_main_file_fails_without_writing ... ok
+test an_unreadable_wal_fails_without_writing ... ok
+test future_schema_behind_a_hot_journal_is_refused_after_only_the_rollback ... ok
+test future_schema_clean_wal_store_is_refused_without_creating_sidecars ... ok
+test future_schema_only_in_a_wal_without_shm_is_seen_and_refused_without_writing ... FAILED
+test future_schema_only_in_the_wal_is_seen_and_refused_without_writing ... ok
+test future_schema_rollback_store_is_refused_without_writing ... ok
+test newer_reducer_checkpoint_only_in_a_wal_without_shm_is_refused_without_writing ... FAILED
+test newer_reducer_checkpoint_only_in_the_wal_is_refused_without_writing ... ok
+test newer_reducer_checkpoint_rollback_store_is_refused_without_writing ... ok
+test preflight_child ... ok
+test supported_stores_still_open_after_the_preflight ... ok
+test the_inspection_copy_is_removed_after_a_refusal ... FAILED
+
+== failure lines
+thread 'an_inspection_copy_that_cannot_be_made_fails_without_writing' (64257216) panicked at crates/journal/tests/future_store.rs:539:5:
+a store the preflight cannot inspect must not open: Err(SchemaTooNew { found: 99 })
+thread 'the_inspection_copy_is_removed_after_a_refusal' (64257229) panicked at crates/journal/tests/future_store.rs:526:5:
+assertion `left == right` failed: the refusal wrote to the store
+  left: Disk { files: {"journal.sqlite3": (282624, "4e06dd1f2dfd9fdaf4d0c6eeae1e5d3016f40b07d388a17f02a51c9b51ec6897"), "journal.sqlite3-shm": (32768, "7762562bc5e35f1684c215add82cb4744e39feccc3b2d12afd18ccd8fc3aed65"), "journal.sqlite3-wal": (4152, "b7064f9752cccae085590dbaab9152d01e800b26bc6134c48b8beed097feaea0")}, header: [83, 81, 76, 105, 116, 101, 32, 102, 111, 114, 109, 97, 116, 32, 51, 0, 
+thread 'a_garbage_wal_beside_a_future_store_is_refused_without_writing' (64257213) panicked at crates/journal/tests/future_store.rs:456:5:
+assertion `left == right` failed: garbage -wal: the open wrote to the store
+  left: Disk { files: {"journal.sqlite3": (282624, "2e58ffd49b67fbb6069adb4e8c32e971cb5396ff1ce139595b05fa91d598ebfc"), "journal.sqlite3-wal": (8192, "3faac63d133ee546e983a131136bc44c9d3c0910d1c6b143d60509ef90a386e7")}, header: [83, 81, 76, 105, 116, 101, 32, 102, 111, 114, 109, 97, 116, 32, 51, 0, 16, 0, 2, 2, 0, 64, 32, 32, 0, 0, 0, 2, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 4
+thread 'newer_reducer_checkpoint_only_in_a_wal_without_shm_is_refused_without_writing' (64257224) panicked at crates/journal/tests/future_store.rs:159:5:
+assertion `left == right` failed: reducer/wal-no-shm: the refusal wrote to the store
+  left: Disk { files: {"journal.sqlite3": (282624, "f802a4469c41b5e065c4edf4043b4dad205556791faf1583454e82736baba4cc"), "journal.sqlite3-wal": (8272, "71ab600509e3d4a8f9f3cb3acac4ef3a6440d8f32063f6c2e1cbf203d8649086")}, header: [83, 81, 76, 105, 116, 101, 32, 102, 111, 114, 109, 97, 116, 32, 51, 0, 16, 0, 2, 2, 0, 64, 32, 32, 0, 0, 0, 2, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 4
+thread 'future_schema_only_in_a_wal_without_shm_is_seen_and_refused_without_writing' (64257221) panicked at crates/journal/tests/future_store.rs:159:5:
+assertion `left == right` failed: schema99/wal-no-shm: the refusal wrote to the store
+  left: Disk { files: {"journal.sqlite3": (282624, "b77a155f6c5d95cd9b5f6d1121f2037964f4ac81c9feed5dd4c4ea44c9461522"), "journal.sqlite3-wal": (4152, "04a72901e3a8fdd77f108c5e5883c7901261983f627ba89ab0f25b4060fae582")}, header: [83, 81, 76, 105, 116, 101, 32, 102, 111, 114, 109, 97, 116, 32, 51, 0, 16, 0, 2, 2, 0, 64, 32, 32, 0, 0, 0, 2, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 4
+
+== old-open negative control output
+garbage -shm before: header[18..20]=0202 journal.sqlite3 282624B 98006c102f51e029, journal.sqlite3-shm 32768B 611253a4531dea3d, journal.sqlite3-wal 4152B 80c1016b2ee01006
+garbage -shm after : header[18..20]=0202 journal.sqlite3 282624B 98006c102f51e029, journal.sqlite3-shm 32768B 611253a4531dea3d, journal.sqlite3-wal 4152B 80c1016b2ee01006
+schema99/wal+sidecars before: header[18..20]=0202 journal.sqlite3 282624B 97fc608f3dfb817f, journal.sqlite3-shm 32768B 4991d4237f066292, journal.sqlite3-wal 4152B 391487ce34e3967b
+schema99/wal+sidecars after : header[18..20]=0202 journal.sqlite3 282624B 97fc608f3dfb817f, journal.sqlite3-shm 32768B 4991d4237f066292, journal.sqlite3-wal 4152B 391487ce34e3967b

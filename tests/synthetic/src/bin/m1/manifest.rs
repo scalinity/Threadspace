@@ -59,6 +59,10 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
         .ok()
         .and_then(|t| serde_json::from_str::<Value>(&t).ok())
         .unwrap_or(Value::Null);
+    let generator_orders = std::fs::read_to_string(root.join("remediation-2/generator-orders.json"))
+        .ok()
+        .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+        .unwrap_or(Value::Null);
     let oracle: Vec<Value> = std::fs::read_to_string(root.join("remediation/c04-oracle/retained-runs.json"))
         .ok()
         .and_then(|t| serde_json::from_str(&t).ok())
@@ -77,7 +81,22 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
         "milestone": "M1",
         "title": "Journal, Contracts and Deterministic Synthetic Harness",
         "verdict": if areas_pass && native["pass"] == true { "M1 REMEDIATION CANDIDATE — pending independent re-review" } else { "M1 NOT READY" },
-        "remediation": { "base": "d93b0fb2f7fafd97a0a7fc9ad5a19267800c51fd", "record": "evidence/M1/remediation/README.md", "d0008Guard": guard, "c04RetiredNative": c04_oracle },
+        "remediation": {
+            "base": "d93b0fb2f7fafd97a0a7fc9ad5a19267800c51fd", "record": "evidence/M1/remediation/README.md", "d0008Guard": guard, "c04RetiredNative": c04_oracle,
+            "second": {
+                "base": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
+                "record": "evidence/M1/remediation-2/README.md",
+                "groups": ["2: wait owner coverage and semantic equality", "5: WAL store without -shm refused without creating a sidecar"],
+                "negativeControls": "evidence/M1/remediation-2/negative-controls/",
+                "previousEvidence": "evidence/M1/history/f7e9a6c/",
+                "generatorOrders": generator_orders,
+                "evidenceSources": {
+                    "regenerated": { "areas": ["contracts", "fixtures", "replay", "permutations", "crash", "migration"], "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a" },
+                    "retained": { "areas": ["capture", "sanitization"], "sourceCommit": "e52c281f8cc1cb998ea64bcdf8010afeae6400e7", "reason": "hook, relay, spool and companion code unchanged since; the journal changes (wait reduction, which no hook event reaches; the preflight branch for a WAL without -shm; the reducer-upgrade load path) are not reached by those workloads" },
+                    "native": { "m0b": "build 5944c81, not reinstalled: a reducer-2 build would upgrade the owner's live store", "c04": "build 73636ec" },
+                },
+            },
+        },
         "branch": output("git", &["rev-parse", "--abbrev-ref", "HEAD"]),
         "baseCommit": "cd9e37645adf7e6b5f74ab7f0baa5197d8e08b54",
         "sourceCommit": output("git", &["rev-parse", "HEAD"]),
@@ -137,7 +156,7 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "npx vitest run",
             "THREADSPACE_CHECK_SCHEMAS=1 cargo test -p threadspace-contracts --test schemas",
             "cargo build --release -p threadspace-synthetic --bin threadspace-m1 -p threadspace-relay --bin threadspace-hook",
-            "target/aarch64-apple-darwin/release/threadspace-m1 fixtures|replay|permutations 10000|crash|migration|contracts",
+            "target/aarch64-apple-darwin/release/threadspace-m1 fixtures|replay|permutations 20000|crash|migration|contracts",
             "target/aarch64-apple-darwin/release/threadspace-m1 capture target/aarch64-apple-darwin/release/threadspace-hook 1000",
             "target/aarch64-apple-darwin/release/threadspace-m1 sanitization target/aarch64-apple-darwin/release/threadspace-hook",
         ],
@@ -154,9 +173,10 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "Three fields stay last-observation until M2 converts them (D-0007 §10): execution attach mode/presence, the human follow-up frontier and the observer link state; no M1 producer emits conflicting observations of them.",
             "Near the spool's record bound one publication's listing and size pass take hundreds of milliseconds, so a capture can reach the 250 ms watchdog and be lost without a marker; mod-batch publishes its records in sequence and a large batch can do the same (the observer mod, M2, sizes its batches).",
             "In a simultaneous burst of 16 capture processes about 1% were refused as spoolbusy (debug build, loaded machine): a recorded loss, not a stall.",
-            "A store left with a hot rollback journal is rolled back by SQLite when opened, even if it is then refused as too new; the rollback restores its last committed bytes.",
+            "A store left with a hot rollback journal is opened writable by the preflight, so SQLite rolls it back even if it is then refused as too new; the rollback restores its last committed bytes. This is an accepted exception, not a necessity: refusing such a store from a private copy would also be possible.",
             "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
-            "On the remediated build G08's selection-readback-race routes were refused (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) in both runs, where the first candidate's run focused all five: 0 wrong targets, focus path unchanged, cause not established.",
+            "On build 5944c81, 9 of G08's 10 selection-readback-race routes over two runs were refused conservatively (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) and 1 was focused exactly: 0 wrong targets, and ordinary exact Return passed. The race setup and its overlap with each route are not fully attested; the cause is not established; M5 owns the investigation.",
+            "G08's fullscreen-space-then-return case recorded null fullscreen entry and exit witnesses on build 5944c81: it is not a fresh fullscreen-transition qualification; the accepted M0C H-10 evidence stays authoritative.",
         ],
     });
     area.json("manifest.json", &manifest)?;

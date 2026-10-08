@@ -1,0 +1,23 @@
+diff --git a/crates/state-engine/src/wait.rs b/crates/state-engine/src/wait.rs
+index d264266..356429c 100644
+--- a/crates/state-engine/src/wait.rs
++++ b/crates/state-engine/src/wait.rs
+@@ -122,6 +122,18 @@ fn until(decision: &WaitOwnerDecision) -> Option<i64> {
+ /// decision covering an active witness applies. Once no evidence is active,
+ /// every decision made on the episode's evidence is kept on it as history.
+ fn applied<'a>(episode: &Episode, decisions: &[&'a WaitOwnerDecision]) -> Option<Applied<'a>> {
++    // Negative control: reducer 1's rule, a decision governs every episode
++    // whose positives it intersects.
++    if true {
++        let governing: Vec<&WaitOwnerDecision> = decisions
++            .iter()
++            .copied()
++            .filter(|d| !d.positives.is_disjoint(&episode.positives) || (d.unordered > 0 && episode.unordered > 0))
++            .collect();
++        let at_ms = governing.iter().map(|d| d.at_ms).min()?;
++        let until_ms = governing.iter().filter_map(|d| until(d)).max();
++        return Some(Applied { decisions: governing, at_ms, until_ms });
++    }
+     if !episode.is_active() {
+         let history: Vec<&WaitOwnerDecision> = decisions
+             .iter()

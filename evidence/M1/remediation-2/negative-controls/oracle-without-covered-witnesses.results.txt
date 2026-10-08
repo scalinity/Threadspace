@@ -1,0 +1,31 @@
+== wait_owner_coverage: test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+test a_p2_resolve_c3_q1_keeps_the_unhandled_q_actionable ... ok
+test b_a_late_d1_merges_q_with_p_without_transferring_p_s_resolution ... ok
+test c_decisions_on_different_evidence_are_different_semantic_states ... FAILED
+test d_the_same_coverage_in_another_admissible_order_converges ... ok
+test e_a_new_wait_after_a_clear_is_not_resolved_by_the_old_decision ... ok
+test f_owner_decisions_stay_on_their_turn_or_session_scope ... ok
+test g_acknowledge_and_snooze_apply_only_to_the_evidence_they_covered ... ok
+test the_oracle_compares_covered_witnesses_not_only_episode_ordinals ... FAILED
+== wait_counterexamples: test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+test a_waiting_turn_owns_its_wait_whichever_turn_arrives_first ... ok
+test an_owner_resolution_survives_a_late_earlier_clear ... ok
+test p10_c5_q_keeps_both_waits_notifiable_in_either_order ... ok
+test p2_c3_q_keeps_the_uncertain_wait_notifiable_in_either_order ... ok
+test the_semantic_oracle_sees_an_owner_decision_removed_or_changed ... ok
+== scenarios: test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.20s
+test allocated_ids_differ_but_semantics_do_not ... ok
+test every_scenario_meets_its_expectation_in_reference_order ... ok
+test seeded_permutations_converge_semantically ... ok
+test semantic_equality_detects_missing_or_different_evidence ... ok
+
+== failure lines
+thread 'c_decisions_on_different_evidence_are_different_semantic_states' (63486063) panicked at tests/synthetic/tests/wait_owner_coverage.rs:195:5:
+assertion `left != right` failed: covered-P and covered-Q decisions differ
+  left: "8c4d84d65391b68cf1b0693fa00ef1904bde16fd2dfd626c45dfd855b1b00117"
+ right: "8c4d84d65391b68cf1b0693fa00ef1904bde16fd2dfd626c45dfd855b1b00117"
+thread 'the_oracle_compares_covered_witnesses_not_only_episode_ordinals' (63486068) panicked at tests/synthetic/tests/wait_owner_coverage.rs:315:5:
+assertion `left != right` failed: the count of covered unordered positives
+  left: "8c4d84d65391b68cf1b0693fa00ef1904bde16fd2dfd626c45dfd855b1b00117"
+ right: "8c4d84d65391b68cf1b0693fa00ef1904bde16fd2dfd626c45dfd855b1b00117"
+

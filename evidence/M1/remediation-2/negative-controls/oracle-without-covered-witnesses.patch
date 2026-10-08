@@ -1,0 +1,13 @@
+diff --git a/crates/state-engine/src/semantic.rs b/crates/state-engine/src/semantic.rs
+index b9b392e..c4f7074 100644
+--- a/crates/state-engine/src/semantic.rs
++++ b/crates/state-engine/src/semantic.rs
+@@ -175,8 +175,6 @@ fn owner_decisions(scope: &WaitScopeRecord) -> Value {
+             json!({
+                 "command": d.command_id,
+                 "action": d.action,
+-                "covers": d.positives,
+-                "coversUnordered": d.unordered,
+                 "governs": owner.iter().filter(|(_, state)| state.applies(d)).map(|(i, _)| *i).collect::<Vec<_>>(),
+             })
+         })
