@@ -14,6 +14,6 @@ export type WaitScopeRecord = { key: string, sessionId: string, actorId: string 
  */
 unorderedPositives: number, unorderedClears: number, episodes: Array<WaitEpisode>, 
 /**
- * Ordered by command ID.
+ * Ordered by command ID. Absent from checkpoints of earlier M1 builds.
  */
 ownerDecisions: Array<WaitOwnerDecision>, createdCursor: number, revision: number, };

@@ -1950,7 +1950,8 @@
           "type": "string"
         },
         "ownerDecisions": {
-          "description": "Ordered by command ID.",
+          "default": [],
+          "description": "Ordered by command ID. Absent from checkpoints of earlier M1 builds.",
           "items": {
             "$ref": "#/$defs/WaitOwnerDecision"
           },
@@ -2005,7 +2006,6 @@
         "unorderedPositives",
         "unorderedClears",
         "episodes",
-        "ownerDecisions",
         "createdCursor",
         "revision"
       ],

@@ -340,7 +340,8 @@ pub struct WaitScopeRecord {
     pub unordered_positives: u32,
     pub unordered_clears: u32,
     pub episodes: Vec<WaitEpisode>,
-    /// Ordered by command ID.
+    /// Ordered by command ID. Absent from checkpoints of earlier M1 builds.
+    #[serde(default)]
     pub owner_decisions: Vec<WaitOwnerDecision>,
     pub created_cursor: i64,
     pub revision: i64,
