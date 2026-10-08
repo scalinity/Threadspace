@@ -1,0 +1,3622 @@
+{
+  "acknowledgedLost": 0,
+  "area": "crash",
+  "duplicateFacts": 0,
+  "durability": "SQLite WAL with synchronous=FULL on the local APFS volume; the worker is killed with SIGKILL (an ordinary process crash). Power-loss durability is not claimed.",
+  "injections": 100,
+  "matrix": [
+    {
+      "acknowledgedBeforeCrash": 0,
+      "acknowledgedLost": 0,
+      "atAdmission": 1,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 0,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 36,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 1,
+      "acknowledgedLost": 0,
+      "atAdmission": 2,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 1,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 35,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 2,
+      "acknowledgedLost": 0,
+      "atAdmission": 3,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 2,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 34,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 3,
+      "acknowledgedLost": 0,
+      "atAdmission": 4,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 3,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 33,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 4,
+      "acknowledgedLost": 0,
+      "atAdmission": 5,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 4,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 32,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 5,
+      "acknowledgedLost": 0,
+      "atAdmission": 6,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 5,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 31,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 6,
+      "acknowledgedLost": 0,
+      "atAdmission": 7,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 6,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 30,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 7,
+      "acknowledgedLost": 0,
+      "atAdmission": 8,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 7,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 29,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 8,
+      "acknowledgedLost": 0,
+      "atAdmission": 9,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 8,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 28,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 9,
+      "acknowledgedLost": 0,
+      "atAdmission": 10,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 9,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 27,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 10,
+      "acknowledgedLost": 0,
+      "atAdmission": 11,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 10,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 26,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 11,
+      "acknowledgedLost": 0,
+      "atAdmission": 12,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 11,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 25,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 12,
+      "acknowledgedLost": 0,
+      "atAdmission": 13,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 12,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 24,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 13,
+      "acknowledgedLost": 0,
+      "atAdmission": 14,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 13,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 23,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 14,
+      "acknowledgedLost": 0,
+      "atAdmission": 15,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 14,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 22,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 15,
+      "acknowledgedLost": 0,
+      "atAdmission": 16,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 15,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 21,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 16,
+      "acknowledgedLost": 0,
+      "atAdmission": 17,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 16,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 20,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 17,
+      "acknowledgedLost": 0,
+      "atAdmission": 18,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 17,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 19,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 18,
+      "acknowledgedLost": 0,
+      "atAdmission": 19,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 18,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 18,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 19,
+      "acknowledgedLost": 0,
+      "atAdmission": 20,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "before-transaction",
+      "retry": {
+        "alreadyCommitted": 19,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 17,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 0,
+      "acknowledgedLost": 0,
+      "atAdmission": 1,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 0,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 36,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 1,
+      "acknowledgedLost": 0,
+      "atAdmission": 2,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 1,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 35,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 2,
+      "acknowledgedLost": 0,
+      "atAdmission": 3,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 2,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 34,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 3,
+      "acknowledgedLost": 0,
+      "atAdmission": 4,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 3,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 33,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 4,
+      "acknowledgedLost": 0,
+      "atAdmission": 5,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 4,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 32,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 5,
+      "acknowledgedLost": 0,
+      "atAdmission": 6,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 5,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 31,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 6,
+      "acknowledgedLost": 0,
+      "atAdmission": 7,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 6,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 30,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 7,
+      "acknowledgedLost": 0,
+      "atAdmission": 8,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 7,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 29,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 8,
+      "acknowledgedLost": 0,
+      "atAdmission": 9,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 8,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 28,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 9,
+      "acknowledgedLost": 0,
+      "atAdmission": 10,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 9,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 27,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 10,
+      "acknowledgedLost": 0,
+      "atAdmission": 11,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 10,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 26,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 11,
+      "acknowledgedLost": 0,
+      "atAdmission": 12,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 11,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 25,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 12,
+      "acknowledgedLost": 0,
+      "atAdmission": 13,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 12,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 24,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 13,
+      "acknowledgedLost": 0,
+      "atAdmission": 14,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 13,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 23,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 14,
+      "acknowledgedLost": 0,
+      "atAdmission": 15,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 14,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 22,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 15,
+      "acknowledgedLost": 0,
+      "atAdmission": 16,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 15,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 21,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 16,
+      "acknowledgedLost": 0,
+      "atAdmission": 17,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 16,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 20,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 17,
+      "acknowledgedLost": 0,
+      "atAdmission": 18,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 17,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 19,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 18,
+      "acknowledgedLost": 0,
+      "atAdmission": 19,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 18,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 18,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 19,
+      "acknowledgedLost": 0,
+      "atAdmission": 20,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "in-transaction",
+      "retry": {
+        "alreadyCommitted": 19,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 17,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 0,
+      "acknowledgedLost": 0,
+      "atAdmission": 1,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 0,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 36,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 1,
+      "acknowledgedLost": 0,
+      "atAdmission": 2,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 1,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 35,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 2,
+      "acknowledgedLost": 0,
+      "atAdmission": 3,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 2,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 34,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 3,
+      "acknowledgedLost": 0,
+      "atAdmission": 4,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 3,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 33,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 4,
+      "acknowledgedLost": 0,
+      "atAdmission": 5,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 4,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 32,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 5,
+      "acknowledgedLost": 0,
+      "atAdmission": 6,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 5,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 31,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 6,
+      "acknowledgedLost": 0,
+      "atAdmission": 7,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 6,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 30,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 7,
+      "acknowledgedLost": 0,
+      "atAdmission": 8,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 7,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 29,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 8,
+      "acknowledgedLost": 0,
+      "atAdmission": 9,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 8,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 28,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 9,
+      "acknowledgedLost": 0,
+      "atAdmission": 10,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 9,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 27,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 10,
+      "acknowledgedLost": 0,
+      "atAdmission": 11,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 10,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 26,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 11,
+      "acknowledgedLost": 0,
+      "atAdmission": 12,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 11,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 25,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 12,
+      "acknowledgedLost": 0,
+      "atAdmission": 13,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 12,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 24,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 13,
+      "acknowledgedLost": 0,
+      "atAdmission": 14,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 13,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 23,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 14,
+      "acknowledgedLost": 0,
+      "atAdmission": 15,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 14,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 22,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 15,
+      "acknowledgedLost": 0,
+      "atAdmission": 16,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 15,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 21,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 16,
+      "acknowledgedLost": 0,
+      "atAdmission": 17,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 16,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 20,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 17,
+      "acknowledgedLost": 0,
+      "atAdmission": 18,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 17,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 19,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 18,
+      "acknowledgedLost": 0,
+      "atAdmission": 19,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 18,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 18,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 19,
+      "acknowledgedLost": 0,
+      "atAdmission": 20,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-facts",
+      "retry": {
+        "alreadyCommitted": 19,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 17,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 0,
+      "acknowledgedLost": 0,
+      "atAdmission": 1,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 0,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 36,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 1,
+      "acknowledgedLost": 0,
+      "atAdmission": 2,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 1,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 35,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 2,
+      "acknowledgedLost": 0,
+      "atAdmission": 3,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 2,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 34,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 3,
+      "acknowledgedLost": 0,
+      "atAdmission": 4,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 3,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 33,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 4,
+      "acknowledgedLost": 0,
+      "atAdmission": 5,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 4,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 32,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 5,
+      "acknowledgedLost": 0,
+      "atAdmission": 6,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 5,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 31,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 6,
+      "acknowledgedLost": 0,
+      "atAdmission": 7,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 6,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 30,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 7,
+      "acknowledgedLost": 0,
+      "atAdmission": 8,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 7,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 29,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 8,
+      "acknowledgedLost": 0,
+      "atAdmission": 9,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 8,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 28,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 9,
+      "acknowledgedLost": 0,
+      "atAdmission": 10,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 9,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 27,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 10,
+      "acknowledgedLost": 0,
+      "atAdmission": 11,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 10,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 26,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 11,
+      "acknowledgedLost": 0,
+      "atAdmission": 12,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 11,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 25,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 12,
+      "acknowledgedLost": 0,
+      "atAdmission": 13,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 12,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 24,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 13,
+      "acknowledgedLost": 0,
+      "atAdmission": 14,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 13,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 23,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 14,
+      "acknowledgedLost": 0,
+      "atAdmission": 15,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 14,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 22,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 15,
+      "acknowledgedLost": 0,
+      "atAdmission": 16,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 15,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 21,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 16,
+      "acknowledgedLost": 0,
+      "atAdmission": 17,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 16,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 20,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 17,
+      "acknowledgedLost": 0,
+      "atAdmission": 18,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 17,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 19,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 18,
+      "acknowledgedLost": 0,
+      "atAdmission": 19,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 18,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 18,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 19,
+      "acknowledgedLost": 0,
+      "atAdmission": 20,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-reduce",
+      "retry": {
+        "alreadyCommitted": 19,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 17,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 0,
+      "acknowledgedLost": 0,
+      "atAdmission": 1,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 1,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 35,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 1,
+      "acknowledgedLost": 0,
+      "atAdmission": 2,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 2,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 34,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 2,
+      "acknowledgedLost": 0,
+      "atAdmission": 3,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 3,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 33,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 3,
+      "acknowledgedLost": 0,
+      "atAdmission": 4,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 4,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 32,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 4,
+      "acknowledgedLost": 0,
+      "atAdmission": 5,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 5,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 31,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 5,
+      "acknowledgedLost": 0,
+      "atAdmission": 6,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 6,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 30,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 6,
+      "acknowledgedLost": 0,
+      "atAdmission": 7,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 7,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 29,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 7,
+      "acknowledgedLost": 0,
+      "atAdmission": 8,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 8,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 28,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 8,
+      "acknowledgedLost": 0,
+      "atAdmission": 9,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 9,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 27,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 9,
+      "acknowledgedLost": 0,
+      "atAdmission": 10,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 10,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 26,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 10,
+      "acknowledgedLost": 0,
+      "atAdmission": 11,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 11,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 25,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 11,
+      "acknowledgedLost": 0,
+      "atAdmission": 12,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 12,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 24,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 12,
+      "acknowledgedLost": 0,
+      "atAdmission": 13,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 13,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 23,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 13,
+      "acknowledgedLost": 0,
+      "atAdmission": 14,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 14,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 22,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 14,
+      "acknowledgedLost": 0,
+      "atAdmission": 15,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 15,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 21,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 15,
+      "acknowledgedLost": 0,
+      "atAdmission": 16,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 16,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 20,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 16,
+      "acknowledgedLost": 0,
+      "atAdmission": 17,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 17,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 19,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 17,
+      "acknowledgedLost": 0,
+      "atAdmission": 18,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 18,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 18,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 18,
+      "acknowledgedLost": 0,
+      "atAdmission": 19,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 19,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 17,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    },
+    {
+      "acknowledgedBeforeCrash": 19,
+      "acknowledgedLost": 0,
+      "atAdmission": 20,
+      "convergedToReference": true,
+      "duplicateFacts": 0,
+      "entriesAfterRetry": 40,
+      "killedBySigkill": true,
+      "pass": true,
+      "point": "after-commit-before-receipt",
+      "retry": {
+        "alreadyCommitted": 20,
+        "commands": [
+          [
+            "cmd-mark-handled-t1",
+            "37"
+          ],
+          [
+            "cmd-ack-1",
+            "38"
+          ],
+          [
+            "cmd-snooze-2",
+            "39"
+          ],
+          [
+            "cmd-resolve-2",
+            "40"
+          ]
+        ],
+        "committed": 16,
+        "notAccepted": 0
+      },
+      "secondRetryStable": true,
+      "storeConsistentAfterRestart": true
+    }
+  ],
+  "pass": true,
+  "perPoint": 20,
+  "points": [
+    "before-transaction",
+    "in-transaction",
+    "after-facts",
+    "after-reduce",
+    "after-commit-before-receipt"
+  ],
+  "reference": {
+    "entries": 40,
+    "facts": 43
+  }
+}

@@ -1131,14 +1131,6 @@ pub fn catalog() -> Vec<Scenario> {
         wait_turn_ownership(),
         wait_session_scoped(),
         wait_generations(),
-        wait_owner_partial_coverage(),
-        wait_owner_merge_keeps_coverage(),
-        wait_owner_covered_p(),
-        wait_owner_covered_q(),
-        wait_owner_covers_both(),
-        wait_owner_scopes(),
-        wait_owner_partial_actions(),
-        wait_owner_unordered_coverage(),
         followup_witnessed(),
         followup_claude(),
         owner_commands(),
@@ -1154,5 +1146,15 @@ pub fn catalog() -> Vec<Scenario> {
         dropped_observation(),
         unknown_and_malformed(),
         sensitive_payload(),
+        // Appended, so earlier scenarios keep their catalog index and so
+        // their permutation seeds.
+        wait_owner_partial_coverage(),
+        wait_owner_merge_keeps_coverage(),
+        wait_owner_covered_p(),
+        wait_owner_covered_q(),
+        wait_owner_covers_both(),
+        wait_owner_scopes(),
+        wait_owner_partial_actions(),
+        wait_owner_unordered_coverage(),
     ]
 }
