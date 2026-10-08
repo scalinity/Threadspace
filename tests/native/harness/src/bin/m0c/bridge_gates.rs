@@ -22,9 +22,10 @@ const SHELLS_STABLE: Duration = Duration::from_secs(5);
 const SHELLS_SETTLE_CAP: Duration = Duration::from_secs(60);
 /// The office window's title (`window::create_office`).
 const OFFICE_TITLE: &str = "Threadspace";
-/// The most the UI's footprint may grow across the repeated recoveries
-/// (C-04). Before the D-0008 repair it grew about 0.57 MB per recovery.
-const FOOTPRINT_GROWTH_MAX: i64 = 4 * 1024 * 1024;
+/// The most the UI's footprint may trend upward per recovery: the
+/// least-squares slope across the per-recovery samples (C-04). Before the
+/// D-0008 repair it measured 0.45 MiB per recovery.
+const FOOTPRINT_SLOPE_MAX: f64 = 0.1 * 1024.0 * 1024.0;
 
 /// Makes sure exactly one hydrated UI is running; returns its incarnation.
 pub fn ensure_ui(ctx: &Ctx) -> Result<procs::Incarnation, String> {
@@ -586,6 +587,33 @@ fn same_frame(a: &Value, b: &Value) -> bool {
     })
 }
 
+/// A resource sample with the office window in front for a second, so every
+/// sample sees the same window state (a covered window's backing store can be
+/// purged).
+fn sample_resources(ctx: &Ctx, pid: u32) -> Value {
+    ctx.native.ax_action(pid, "raise", Some(OFFICE_TITLE));
+    threadspace_harness::pause_ms(1000);
+    ui_resources(ctx, pid)
+}
+
+/// Least-squares slope of the UI footprint across samples, in bytes per
+/// sample; `None` with fewer than two.
+#[allow(clippy::cast_precision_loss)]
+fn footprint_slope(samples: &[Value]) -> Option<f64> {
+    let ys: Vec<f64> = samples.iter().filter_map(|s| s["footprintBytes"].as_u64()).map(|b| b as f64).collect();
+    if ys.len() < 2 || ys.len() != samples.len() {
+        return None;
+    }
+    let n = ys.len() as f64;
+    let mean_x = (n - 1.0) / 2.0;
+    let mean_y = ys.iter().sum::<f64>() / n;
+    let (num, den) = ys.iter().enumerate().fold((0.0, 0.0), |(num, den), (i, y)| {
+        let dx = i as f64 - mean_x;
+        (num + dx * (y - mean_y), den + dx * dx)
+    });
+    Some(num / den)
+}
+
 /// One sample of the UI's native resources: office windows (shells and the
 /// live view), every layer-0 window, the WebContent processes serving it and
 /// its physical footprint.
@@ -723,7 +751,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     let ui = app.processes().into_iter().next();
     let ui_pid = ui.as_ref().map(|ui| ui.pid as u32);
     let before = ui_pid.map(|pid| settle_shells(ctx, pid));
-    let resources_before = ui_pid.map(|pid| ui_resources(ctx, pid));
+    let resources_before = ui_pid.map(|pid| sample_resources(ctx, pid));
     // Preserved across the recoveries (D-0006): the office window's bounds
     // and visibility, and the durable intent backlog.
     let office_before = ui_pid.map(|pid| office_window(ctx, pid));
@@ -737,7 +765,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
             "MAIN_DOCUMENT_REPLACED",
         )?;
         if let Some(pid) = ui_pid {
-            let sample = ui_resources(ctx, pid);
+            let sample = sample_resources(ctx, pid);
             run.append("resources.jsonl", &json!({ "case": name, "sample": sample }))
                 .map_err(|e| e.to_string())?;
             growth.push(sample);
@@ -745,7 +773,7 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     }
     let immediate = ui_pid.map(|pid| shell_counts(&layer0_windows(ctx, pid)));
     let after = ui_pid.map(|pid| settle_shells(ctx, pid));
-    let resources_after = ui_pid.map(|pid| ui_resources(ctx, pid));
+    let resources_after = ui_pid.map(|pid| sample_resources(ctx, pid));
     let office_after = ui_pid.map(|pid| office_window(ctx, pid));
     let intents_after = crate::handoff::durable(ctx);
     // Incarnation rejection in the recreated view: the IPC suite's stale
@@ -799,14 +827,16 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
         "afterSettle": after,
         "pass": shells_pass,
     });
-    let resources_pass = matches!((&resources_before, &resources_after), (Some(b), Some(a))
-        if a["webContentProcesses"].as_u64().zip(b["webContentProcesses"].as_u64()).is_some_and(|(a, b)| a <= b)
-            && a["footprintBytes"].as_i64().zip(b["footprintBytes"].as_i64()).is_some_and(|(a, b)| a - b <= FOOTPRINT_GROWTH_MAX));
+    let slope = footprint_slope(&growth);
+    let resources_pass = slope.is_some_and(|slope| slope <= FOOTPRINT_SLOPE_MAX)
+        && matches!((&resources_before, &resources_after), (Some(b), Some(a))
+            if a["webContentProcesses"].as_u64().zip(b["webContentProcesses"].as_u64()).is_some_and(|(a, b)| a <= b));
     let resources = json!({
         "before": resources_before,
         "after": resources_after,
         "perRecovery": growth,
-        "footprintGrowthMaxBytes": FOOTPRINT_GROWTH_MAX,
+        "footprintSlopeBytesPerRecovery": slope,
+        "footprintSlopeMaxBytes": FOOTPRINT_SLOPE_MAX,
         "pass": resources_pass,
     });
     let office_pass = matches!((&office_before, &office_after), (Some(b), Some(a))
@@ -898,4 +928,19 @@ pub fn recovery(ctx: &Ctx, repeats: u32) -> Result<Value, String> {
     run.write_json("summary.json", &summary)
         .map_err(|e| e.to_string())?;
     Ok(json!({ "summary": summary, "dir": run.dir }))
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    #[test]
+    fn footprint_slope_is_the_least_squares_trend_per_sample() {
+        let leak: Vec<_> = (0..5).map(|i| json!({ "footprintBytes": 1000 + 300 * i })).collect();
+        assert_eq!(super::footprint_slope(&leak), Some(300.0));
+        let flat = [json!({ "footprintBytes": 10 }), json!({ "footprintBytes": 30 }), json!({ "footprintBytes": 10 }), json!({ "footprintBytes": 30 })];
+        assert!(super::footprint_slope(&flat).is_some_and(|s| s.abs() < 5.0));
+        assert_eq!(super::footprint_slope(&[json!({ "footprintBytes": 1 })]), None);
+        assert_eq!(super::footprint_slope(&[json!({}), json!({ "footprintBytes": 1 })]), None, "a missing sample is no measurement");
+    }
 }
