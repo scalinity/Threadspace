@@ -8,21 +8,21 @@
         "allocator": "random",
         "projectionMatchesTables": true,
         "sessionIdsPreserved": true,
-        "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
         "upgrade": "a"
       },
       {
         "allocator": "random",
         "projectionMatchesTables": true,
         "sessionIdsPreserved": true,
-        "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
         "upgrade": "b"
       },
       {
         "allocator": "seeded",
         "projectionMatchesTables": true,
         "sessionIdsPreserved": true,
-        "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+        "stateSha256": "179791286654c015c25cff8ca3a967ea137c0232c6e43dc5cf0e6da5aea8cf7a",
         "upgrade": "c"
       }
     ]
@@ -35,38 +35,7 @@
   },
   "futureSchemaRefused": {
     "pass": true,
-    "storeUnchanged": true,
-    "stores": [
-      {
-        "fileFormatBytes18To19": "0101",
-        "files": [
-          "journal.sqlite3"
-        ],
-        "refused": true,
-        "shape": "rollback",
-        "unchanged": true
-      },
-      {
-        "fileFormatBytes18To19": "0202",
-        "files": [
-          "journal.sqlite3"
-        ],
-        "refused": true,
-        "shape": "wal",
-        "unchanged": true
-      },
-      {
-        "fileFormatBytes18To19": "0202",
-        "files": [
-          "journal.sqlite3",
-          "journal.sqlite3-shm",
-          "journal.sqlite3-wal"
-        ],
-        "refused": true,
-        "shape": "walSidecars",
-        "unchanged": true
-      }
-    ]
+    "storeUnchanged": true
   },
   "migrations": [
     {
@@ -85,41 +54,7 @@
       "sha256": "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e"
     }
   ],
-  "newerReducerCheckpointRefused": {
-    "pass": true,
-    "storeUnchanged": true,
-    "stores": [
-      {
-        "fileFormatBytes18To19": "0101",
-        "files": [
-          "journal.sqlite3"
-        ],
-        "refused": true,
-        "shape": "rollback",
-        "unchanged": true
-      },
-      {
-        "fileFormatBytes18To19": "0202",
-        "files": [
-          "journal.sqlite3"
-        ],
-        "refused": true,
-        "shape": "wal",
-        "unchanged": true
-      },
-      {
-        "fileFormatBytes18To19": "0202",
-        "files": [
-          "journal.sqlite3",
-          "journal.sqlite3-shm",
-          "journal.sqlite3-wal"
-        ],
-        "refused": true,
-        "shape": "walSidecars",
-        "unchanged": true
-      }
-    ]
-  },
+  "newerReducerCheckpointRefused": true,
   "operatesAfterUpgrade": {
     "ownerCommandThenRestartSameState": true
   },

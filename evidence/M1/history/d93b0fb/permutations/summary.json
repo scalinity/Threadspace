@@ -1,10 +1,10 @@
 {
   "area": "permutations",
-  "durationMs": 13264,
+  "durationMs": 13271,
   "failures": 0,
   "families": {
     "activation-changes": {
-      "duplicateDeliveriesInjected": 1203,
+      "duplicateDeliveriesInjected": 1272,
       "failures": 0,
       "permutations": 1250,
       "scenarios": [
@@ -18,39 +18,39 @@
       ],
       "seedRanges": [
         {
-          "from": 9000000,
+          "from": 8400000,
           "scenario": "resume",
-          "to": 9000178
+          "to": 8400178
         },
         {
-          "from": 9100000,
+          "from": 8500000,
           "scenario": "pid-tty-reuse",
-          "to": 9100178
+          "to": 8500178
         },
         {
-          "from": 9200000,
+          "from": 8600000,
           "scenario": "executable-replaced",
-          "to": 9200178
+          "to": 8600178
         },
         {
-          "from": 9300000,
+          "from": 8700000,
           "scenario": "replaced-then-unordered-image",
-          "to": 9300178
+          "to": 8700178
         },
         {
-          "from": 9400000,
+          "from": 8800000,
           "scenario": "executable-requalified",
-          "to": 9400177
+          "to": 8800177
         },
         {
-          "from": 9500000,
+          "from": 8900000,
           "scenario": "routing-ambiguity",
-          "to": 9500177
+          "to": 8900177
         },
         {
-          "from": 9600000,
+          "from": 9000000,
           "scenario": "execution-end-retained",
-          "to": 9600177
+          "to": 9000177
         }
       ]
     },
@@ -109,7 +109,7 @@
       ]
     },
     "delayed-callbacks": {
-      "duplicateDeliveriesInjected": 1292,
+      "duplicateDeliveriesInjected": 1256,
       "failures": 0,
       "permutations": 1250,
       "scenarios": [
@@ -117,9 +117,9 @@
       ],
       "seedRanges": [
         {
-          "from": 6700000,
+          "from": 6100000,
           "scenario": "a-b-a-delayed",
-          "to": 6701249
+          "to": 6101249
         }
       ]
     },
@@ -139,7 +139,7 @@
       ]
     },
     "output-input": {
-      "duplicateDeliveriesInjected": 1197,
+      "duplicateDeliveriesInjected": 1246,
       "failures": 0,
       "permutations": 1250,
       "scenarios": [
@@ -148,19 +148,19 @@
       ],
       "seedRanges": [
         {
-          "from": 1700000,
+          "from": 1100000,
           "scenario": "followup-witnessed",
-          "to": 1700624
+          "to": 1100624
         },
         {
-          "from": 1800000,
+          "from": 1200000,
           "scenario": "followup-claude",
-          "to": 1800624
+          "to": 1200624
         }
       ]
     },
     "owner-commands": {
-      "duplicateDeliveriesInjected": 1247,
+      "duplicateDeliveriesInjected": 1252,
       "failures": 0,
       "permutations": 1250,
       "scenarios": [
@@ -168,9 +168,9 @@
       ],
       "seedRanges": [
         {
-          "from": 6900000,
+          "from": 6300000,
           "scenario": "owner-commands",
-          "to": 6901249
+          "to": 6301249
         }
       ]
     },
@@ -184,14 +184,14 @@
       ],
       "seedRanges": [
         {
-          "from": 12000000,
+          "from": 11400000,
           "scenario": "unknown-and-malformed",
-          "to": 12000099
+          "to": 11400099
         },
         {
-          "from": 12100000,
+          "from": 11500000,
           "scenario": "sensitive-payload",
-          "to": 12100099
+          "to": 11500099
         }
       ]
     },
@@ -205,83 +205,47 @@
       ],
       "seedRanges": [
         {
-          "from": 8800000,
+          "from": 8200000,
           "scenario": "stale-snapshot",
-          "to": 8800624
+          "to": 8200624
         },
         {
-          "from": 8900000,
+          "from": 8300000,
           "scenario": "dropped-observation",
-          "to": 8900624
+          "to": 8300624
         }
       ]
     },
     "wait-events": {
-      "duplicateDeliveriesInjected": 1199,
+      "duplicateDeliveriesInjected": 1243,
       "failures": 0,
       "permutations": 1250,
       "scenarios": [
         "waiting",
         "delayed-positive-wait",
         "delayed-clear-wait",
-        "wait-reappears",
-        "wait-uncertain-reopens",
-        "wait-owner-resolution-kept",
-        "wait-new-after-resolution",
-        "wait-turn-ownership",
-        "wait-session-scoped",
         "wait-generations"
       ],
       "seedRanges": [
         {
           "from": 2700000,
           "scenario": "waiting",
-          "to": 2700124
+          "to": 2700312
         },
         {
           "from": 2800000,
           "scenario": "delayed-positive-wait",
-          "to": 2800124
+          "to": 2800312
         },
         {
           "from": 2900000,
           "scenario": "delayed-clear-wait",
-          "to": 2900124
+          "to": 2900311
         },
         {
           "from": 3000000,
-          "scenario": "wait-reappears",
-          "to": 3000124
-        },
-        {
-          "from": 3100000,
-          "scenario": "wait-uncertain-reopens",
-          "to": 3100124
-        },
-        {
-          "from": 3200000,
-          "scenario": "wait-owner-resolution-kept",
-          "to": 3200124
-        },
-        {
-          "from": 3300000,
-          "scenario": "wait-new-after-resolution",
-          "to": 3300124
-        },
-        {
-          "from": 3400000,
-          "scenario": "wait-turn-ownership",
-          "to": 3400124
-        },
-        {
-          "from": 3500000,
-          "scenario": "wait-session-scoped",
-          "to": 3500124
-        },
-        {
-          "from": 3600000,
           "scenario": "wait-generations",
-          "to": 3600124
+          "to": 3000311
         }
       ]
     }

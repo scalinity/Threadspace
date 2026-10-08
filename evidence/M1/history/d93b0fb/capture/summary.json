@@ -10,11 +10,11 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 12914,
-          "minUs": 8898,
-          "p50Us": 10846,
-          "p95Us": 12583,
-          "p99Us": 12914
+          "maxUs": 17065,
+          "minUs": 9958,
+          "p50Us": 11948,
+          "p95Us": 14825,
+          "p99Us": 17065
         },
         "withinWallBudget": true
       },
@@ -28,11 +28,11 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 13012,
-          "minUs": 8982,
-          "p50Us": 10959,
-          "p95Us": 12162,
-          "p99Us": 13012
+          "maxUs": 12977,
+          "minUs": 9108,
+          "p50Us": 11208,
+          "p95Us": 12512,
+          "p99Us": 12977
         },
         "withinWallBudget": true
       },
@@ -45,11 +45,11 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 5772,
-          "minUs": 2469,
-          "p50Us": 2901,
-          "p95Us": 5126,
-          "p99Us": 5772
+          "maxUs": 3316,
+          "minUs": 2088,
+          "p50Us": 2367,
+          "p95Us": 3306,
+          "p99Us": 3316
         },
         "withinWallBudget": true
       }
@@ -66,11 +66,11 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 4228,
-          "minUs": 2411,
-          "p50Us": 2763,
-          "p95Us": 4223,
-          "p99Us": 4228
+          "maxUs": 3904,
+          "minUs": 2205,
+          "p50Us": 3206,
+          "p95Us": 3727,
+          "p99Us": 3904
         },
         "withinWallBudget": true
       }
@@ -82,11 +82,11 @@
         "runs": 5,
         "wall": {
           "count": 5,
-          "maxUs": 7264,
-          "minUs": 5405,
-          "p50Us": 5929,
-          "p95Us": 7264,
-          "p99Us": 7264
+          "maxUs": 8291,
+          "minUs": 7697,
+          "p50Us": 8221,
+          "p95Us": 8291,
+          "p99Us": 8291
         },
         "withinWallBudget": true
       }
@@ -98,11 +98,11 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 5276,
-          "minUs": 2724,
-          "p50Us": 4056,
-          "p95Us": 4753,
-          "p99Us": 5276
+          "maxUs": 4805,
+          "minUs": 2629,
+          "p50Us": 3168,
+          "p95Us": 4402,
+          "p99Us": 4805
         },
         "withinWallBudget": true
       }
@@ -114,18 +114,18 @@
         "runs": 25,
         "wall": {
           "count": 25,
-          "maxUs": 4712,
-          "minUs": 2714,
-          "p50Us": 3953,
-          "p95Us": 4616,
-          "p99Us": 4712
+          "maxUs": 4254,
+          "minUs": 2320,
+          "p50Us": 2624,
+          "p95Us": 3306,
+          "p99Us": 4254
         },
         "withinWallBudget": true
       }
     }
   },
   "hookExecutable": "threadspace-hook",
-  "hookSha256": "831525737e59a11bf360117aadf6ede150c052f3eb325e7bacb2be5fad847b98",
+  "hookSha256": "415ca5a088e03357a4ab1f2fc30fd8dafccf8edbd7037bf87e6e55b141054f97",
   "method": "Each capture spawns the release threadspace-hook binary with Claude-shaped stdin and waits for exit; wall time is spawn-to-exit on the monotonic clock. The companion is the real writer and event socket on a disposable store (fixture), SQLite WAL with synchronous=FULL.",
   "normal": {
     "committedInJournal": 1020,
@@ -145,17 +145,17 @@
       "readyRecords": 0
     },
     "storedEnvelopeBytes": {
-      "max": 2597,
-      "median": 2587,
-      "min": 2574
+      "max": 2593,
+      "median": 2583,
+      "min": 2568
     },
     "wall": {
       "count": 1000,
-      "maxUs": 9260,
-      "minUs": 2590,
-      "p50Us": 4444,
-      "p95Us": 6310,
-      "p99Us": 6951
+      "maxUs": 8571,
+      "minUs": 2474,
+      "p50Us": 4013,
+      "p95Us": 6183,
+      "p99Us": 7176
     },
     "warmup": 20
   },

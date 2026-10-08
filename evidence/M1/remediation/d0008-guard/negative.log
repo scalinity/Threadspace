@@ -1,0 +1,3 @@
+error: failed to run custom build command for `threadspace-desktop v0.1.0 (<disposable>/src/apps/desktop/src-tauri)`
+  thread 'main' (60877343) panicked at apps/desktop/src-tauri/build.rs:9:9:
+  D-0008 / C-04 containment guard: tao resolves to ["0.37.1 from registry+https://github.com/rust-lang/crates.io-index"], qualified 0.37.0. `release_window_on_close` (src/window.rs) balances an NSWindow reference that only tao 0.37.0 leaves unowned; on any other Tauri, tao or Wry it can become a double release (a crash). Remove the D-0008 containment first, then requalify the view-recovery gate (C-04) on the updated dependency without it; only then change D0008_QUALIFIED (d0008_guard.rs).
