@@ -25,7 +25,9 @@ use threadspace_contracts::projection::{
     AttentionCategory, ExecutionPresence, NotificationState, ObservationState, TurnState,
 };
 use threadspace_contracts::route::ProcessKey;
+use threadspace_contracts::canonical::command::{OwnerAction, OwnerCommand};
 use threadspace_state_engine::REDUCER_VERSION;
+use threadspace_state_engine::hash::sha256_hex;
 use threadspace_state_engine::engine::Engine;
 use threadspace_state_engine::ids::derived_id;
 use threadspace_state_engine::keys;
@@ -463,4 +465,25 @@ pub(crate) fn from_m0(conn: &Connection) -> Result<(CanonicalState, Vec<Assignme
     let mut engine = Engine::new(state);
     engine.rederive(through, &endpoint);
     Ok((engine.state, assignments))
+}
+
+/// The fingerprint the M0 journal gave an owner request: SHA-256 of its own
+/// payload JSON, which a migrated command row keeps. Rendering a retried
+/// request as M0 did recognises the original request; M0 had no snooze.
+pub(crate) fn m0_fingerprint(command: &OwnerCommand) -> Option<String> {
+    let payload = match &command.action {
+        OwnerAction::Acknowledge => serde_json::json!({
+            "action": "AcknowledgeAttention",
+            "attentionId": command.attention_id,
+            "expectedRevision": command.expected_revision,
+        }),
+        OwnerAction::Resolve { reason } => serde_json::json!({
+            "action": "ResolveAttention",
+            "attentionId": command.attention_id,
+            "expectedRevision": command.expected_revision,
+            "reason": reason,
+        }),
+        OwnerAction::Snooze { .. } => return None,
+    };
+    Some(sha256_hex(payload.to_string().as_bytes()))
 }

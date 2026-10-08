@@ -825,7 +825,8 @@ impl Journal {
             )
             .optional()?;
         if let Some((recorded, result_json)) = existing {
-            if recorded != print {
+            // A command the M0 store committed keeps M0's fingerprint.
+            if recorded != print && crate::baseline::m0_fingerprint(command_in).as_ref() != Some(&recorded) {
                 return Err(JournalError::Conflict {
                     detail: format!(
                         "command {} was already used for a different payload",

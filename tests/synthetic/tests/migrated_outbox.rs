@@ -17,9 +17,11 @@ fn migrated_store_with_a_pending_intent() -> PathBuf {
     let dir = std::env::temp_dir().join(format!("ts-m0-outbox-{}", uuid::Uuid::new_v4()));
     std::fs::create_dir_all(&dir).expect("dir");
     let path = dir.join("journal.sqlite3");
+    // `immutable=1`: reading the committed fixture must not touch its files.
+    let fixture = repo.join("fixtures/m1/m0-store-v2/journal.sqlite3");
     rusqlite::Connection::open_with_flags(
-        repo.join("fixtures/m1/m0-store-v2/journal.sqlite3"),
-        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+        format!("file:{}?immutable=1", fixture.display()),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_URI,
     )
     .and_then(|source| source.execute("VACUUM INTO ?1", [path.to_str().expect("utf-8")]))
     .expect("copy");
