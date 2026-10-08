@@ -249,9 +249,9 @@
   "deterministicSeeds": {
     "families": {
       "activation-changes": {
-        "duplicateDeliveriesInjected": 1203,
+        "duplicateDeliveriesInjected": 2498,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "resume",
           "pid-tty-reuse",
@@ -265,44 +265,44 @@
           {
             "from": 9000000,
             "scenario": "resume",
-            "to": 9000178
+            "to": 9000357
           },
           {
             "from": 9100000,
             "scenario": "pid-tty-reuse",
-            "to": 9100178
+            "to": 9100356
           },
           {
             "from": 9200000,
             "scenario": "executable-replaced",
-            "to": 9200178
+            "to": 9200356
           },
           {
             "from": 9300000,
             "scenario": "replaced-then-unordered-image",
-            "to": 9300178
+            "to": 9300356
           },
           {
             "from": 9400000,
             "scenario": "executable-requalified",
-            "to": 9400177
+            "to": 9400356
           },
           {
             "from": 9500000,
             "scenario": "routing-ambiguity",
-            "to": 9500177
+            "to": 9500356
           },
           {
             "from": 9600000,
             "scenario": "execution-end-retained",
-            "to": 9600177
+            "to": 9600356
           }
         ]
       },
       "actor-events": {
-        "duplicateDeliveriesInjected": 1232,
+        "duplicateDeliveriesInjected": 2541,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "child-actors",
           "shared-native-turn-id"
@@ -311,19 +311,19 @@
           {
             "from": 1500000,
             "scenario": "child-actors",
-            "to": 1500624
+            "to": 1501249
           },
           {
             "from": 1600000,
             "scenario": "shared-native-turn-id",
-            "to": 1600624
+            "to": 1601249
           }
         ]
       },
       "completion": {
-        "duplicateDeliveriesInjected": 1264,
+        "duplicateDeliveriesInjected": 2532,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "normal-session",
           "parallel-tools",
@@ -334,29 +334,29 @@
           {
             "from": 3000000,
             "scenario": "normal-session",
-            "to": 3000312
+            "to": 3000624
           },
           {
             "from": 3100000,
             "scenario": "parallel-tools",
-            "to": 3100312
+            "to": 3100624
           },
           {
             "from": 3200000,
             "scenario": "outcomes",
-            "to": 3200311
+            "to": 3200624
           },
           {
             "from": 3300000,
             "scenario": "latest-turn-outcome",
-            "to": 3300311
+            "to": 3300624
           }
         ]
       },
       "delayed-callbacks": {
-        "duplicateDeliveriesInjected": 1292,
+        "duplicateDeliveriesInjected": 2560,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "a-b-a-delayed"
         ],
@@ -364,7 +364,7 @@
           {
             "from": 6700000,
             "scenario": "a-b-a-delayed",
-            "to": 6701249
+            "to": 6702499
           }
         ]
       },
@@ -384,9 +384,9 @@
         ]
       },
       "output-input": {
-        "duplicateDeliveriesInjected": 1197,
+        "duplicateDeliveriesInjected": 2430,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "followup-witnessed",
           "followup-claude"
@@ -395,19 +395,19 @@
           {
             "from": 1700000,
             "scenario": "followup-witnessed",
-            "to": 1700624
+            "to": 1701249
           },
           {
             "from": 1800000,
             "scenario": "followup-claude",
-            "to": 1800624
+            "to": 1801249
           }
         ]
       },
       "owner-commands": {
-        "duplicateDeliveriesInjected": 1247,
+        "duplicateDeliveriesInjected": 2457,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "owner-commands"
         ],
@@ -415,7 +415,7 @@
           {
             "from": 6900000,
             "scenario": "owner-commands",
-            "to": 6901249
+            "to": 6902499
           }
         ]
       },
@@ -441,9 +441,9 @@
         ]
       },
       "snapshot-live": {
-        "duplicateDeliveriesInjected": 1259,
+        "duplicateDeliveriesInjected": 2479,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "stale-snapshot",
           "dropped-observation"
@@ -452,19 +452,19 @@
           {
             "from": 8800000,
             "scenario": "stale-snapshot",
-            "to": 8800624
+            "to": 8801249
           },
           {
             "from": 8900000,
             "scenario": "dropped-observation",
-            "to": 8900624
+            "to": 8901249
           }
         ]
       },
       "wait-events": {
-        "duplicateDeliveriesInjected": 1199,
+        "duplicateDeliveriesInjected": 2459,
         "failures": 0,
-        "permutations": 1250,
+        "permutations": 2500,
         "scenarios": [
           "waiting",
           "delayed-positive-wait",
@@ -475,58 +475,106 @@
           "wait-new-after-resolution",
           "wait-turn-ownership",
           "wait-session-scoped",
-          "wait-generations"
+          "wait-generations",
+          "wait-owner-partial-coverage",
+          "wait-owner-merge-keeps-coverage",
+          "wait-owner-covered-p",
+          "wait-owner-covered-q",
+          "wait-owner-covers-both",
+          "wait-owner-scopes",
+          "wait-owner-partial-actions",
+          "wait-owner-unordered-coverage"
         ],
         "seedRanges": [
           {
             "from": 2700000,
             "scenario": "waiting",
-            "to": 2700124
+            "to": 2700138
           },
           {
             "from": 2800000,
             "scenario": "delayed-positive-wait",
-            "to": 2800124
+            "to": 2800138
           },
           {
             "from": 2900000,
             "scenario": "delayed-clear-wait",
-            "to": 2900124
+            "to": 2900138
           },
           {
             "from": 3000000,
             "scenario": "wait-reappears",
-            "to": 3000124
+            "to": 3000138
           },
           {
             "from": 3100000,
             "scenario": "wait-uncertain-reopens",
-            "to": 3100124
+            "to": 3100138
           },
           {
             "from": 3200000,
             "scenario": "wait-owner-resolution-kept",
-            "to": 3200124
+            "to": 3200138
           },
           {
             "from": 3300000,
             "scenario": "wait-new-after-resolution",
-            "to": 3300124
+            "to": 3300138
           },
           {
             "from": 3400000,
             "scenario": "wait-turn-ownership",
-            "to": 3400124
+            "to": 3400138
           },
           {
             "from": 3500000,
             "scenario": "wait-session-scoped",
-            "to": 3500124
+            "to": 3500138
           },
           {
             "from": 3600000,
             "scenario": "wait-generations",
-            "to": 3600124
+            "to": 3600138
+          },
+          {
+            "from": 5200000,
+            "scenario": "wait-owner-partial-coverage",
+            "to": 5200138
+          },
+          {
+            "from": 5300000,
+            "scenario": "wait-owner-merge-keeps-coverage",
+            "to": 5300138
+          },
+          {
+            "from": 5400000,
+            "scenario": "wait-owner-covered-p",
+            "to": 5400138
+          },
+          {
+            "from": 5500000,
+            "scenario": "wait-owner-covered-q",
+            "to": 5500138
+          },
+          {
+            "from": 5600000,
+            "scenario": "wait-owner-covers-both",
+            "to": 5600138
+          },
+          {
+            "from": 5700000,
+            "scenario": "wait-owner-scopes",
+            "to": 5700138
+          },
+          {
+            "from": 5800000,
+            "scenario": "wait-owner-partial-actions",
+            "to": 5800137
+          },
+          {
+            "from": 5900000,
+            "scenario": "wait-owner-unordered-coverage",
+            "to": 5900137
           }
         ]
       }
@@ -538,29 +586,29 @@
     "catalog": "evidence/M1/fixtures/catalog.json",
     "m0StoreV2Sha256": "0db6a0509e0190350388ba59706592ce134b4c276d25c9a4dc714ecf787b278d",
     "regressionSeedsSha256": "363cfebd793cabac32f4c304452ac81db0b283ca537fb43e437f3bf0d39deb89",
-    "scenarios": 32
+    "scenarios": 40
   },
   "generatedArtifacts": {
     "instanceValidation": {
       "CanonicalState.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 32
+        "instances": 40
       },
       "JournalEntry.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 234
+        "instances": 290
       },
       "NativeFactDraft.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 270
+        "instances": 316
       },
       "ObservationEnvelope.schema.json": {
         "errors": 0,
         "firstErrors": [],
-        "instances": 255
+        "instances": 301
       },
       "OwnerCommand.schema.json": {
         "errors": 0,
@@ -569,7 +617,7 @@
       }
     },
     "jsonSchema": {
-      "aggregateSha256": "654849373d1b2cdb6845fdba1a726804b4e877eef07a1b63f9b69094afc869dc",
+      "aggregateSha256": "aaccded5c9a0ff7c23e2c0472c0b2363091d45597022c34f6db49cbcfb978746",
       "files": 8,
       "freshAgainstRust": {
         "CanonicalState.schema.json": true,
@@ -583,7 +631,7 @@
       }
     },
     "typescript": {
-      "aggregateSha256": "ae218738f4ed8d479f8ee071be65c656a1cc5cba88a4da773273d14548680c2c",
+      "aggregateSha256": "de9ecc86bd2d86e3694f781c82bdf17c22a3dc0cb0360549e7c4444a221624eb",
       "files": 157
     }
   },
@@ -599,9 +647,10 @@
     "Three fields stay last-observation until M2 converts them (D-0007 §10): execution attach mode/presence, the human follow-up frontier and the observer link state; no M1 producer emits conflicting observations of them.",
     "Near the spool's record bound one publication's listing and size pass take hundreds of milliseconds, so a capture can reach the 250 ms watchdog and be lost without a marker; mod-batch publishes its records in sequence and a large batch can do the same (the observer mod, M2, sizes its batches).",
     "In a simultaneous burst of 16 capture processes about 1% were refused as spoolbusy (debug build, loaded machine): a recorded loss, not a stall.",
-    "A store left with a hot rollback journal is rolled back by SQLite when opened, even if it is then refused as too new; the rollback restores its last committed bytes.",
+    "A store left with a hot rollback journal is opened writable by the preflight, so SQLite rolls it back even if it is then refused as too new; the rollback restores its last committed bytes. This is an accepted exception, not a necessity: refusing such a store from a private copy would also be possible.",
     "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
-    "On the remediated build G08's selection-readback-race routes were refused (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) in both runs, where the first candidate's run focused all five: 0 wrong targets, focus path unchanged, cause not established."
+    "On build 5944c81, 9 of G08's 10 selection-readback-race routes over two runs were refused conservatively (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) and 1 was focused exactly: 0 wrong targets, and ordinary exact Return passed. The race setup and its overlap with each route are not fully attested; the cause is not established; M5 owns the investigation.",
+    "G08's fullscreen-space-then-return case recorded null fullscreen entry and exit witnesses on build 5944c81: it is not a fresh fullscreen-transition qualification; the accepted M0C H-10 evidence stays authoritative."
   ],
   "m0bCompatibility": {
     "build": {
@@ -624,6 +673,7 @@
       "target-closed-during-route": true,
       "terminal-restart": false
     },
+    "fullscreenNote": "The G08 fullscreen-space-then-return case in these runs recorded null enteredFullscreen and exitFullscreen witnesses: it shows exact Return after the step, not a fresh fullscreen-transition qualification. Fullscreen transitions are qualified by the accepted M0C H-10 evidence.",
     "pass": true,
     "previousRun": "evidence/M1/g08-terminal/20261008T020830Z-prod (build 73636ec)",
     "run": "evidence/M1/g08-terminal/20261008T032951Z-prod",
@@ -633,8 +683,10 @@
       "evidence/M1/g08-terminal/20261008T033839Z-prod"
     ],
     "selectionReadbackRace": {
-      "observation": "On the remediated build the race routes were refused (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window); the first candidate's run focused all five. 0 wrong targets either way; the focus script, surface adapter and osascript worker are unchanged since that run; cause not established.",
+      "investigation": "M5",
+      "observation": "Across the two runs on the remediated build, 9 of the 10 race routes were refused conservatively (READBACK_FAILED: the focus script's first AppleEvent to Terminal failed with -600 while the harness activated Terminal to raise another window) and 1 was focused exactly; 0 wrong targets. Ordinary exact Return (baseline-exact) passed in both runs. The runs record each route's focus timing but not when the competing selection happened, so the race setup and its overlap with each route are not fully attested. The first candidate's run focused all five. The cause is not established; M5 owns the investigation.",
       "previous": "evidence/M1/g08-terminal/20261008T020830Z-prod: 5 of 5 exact",
+      "refusedTotal": 9,
       "runs": [
         {
           "casePass": true,
@@ -668,21 +720,21 @@
           "allocator": "random",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+          "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
           "upgrade": "a"
         },
         {
           "allocator": "random",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+          "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
           "upgrade": "b"
         },
         {
           "allocator": "seeded",
           "projectionMatchesTables": true,
           "sessionIdsPreserved": true,
-          "stateSha256": "358064c2933a4324fa604a5c92d177f591ccd3bdfb9e792f0782d42792d5cc7a",
+          "stateSha256": "9af1ab3881d690ad94cc3f6886dc705cf529dc023ba6e4025279439d79b2f43a",
           "upgrade": "c"
         }
       ]
@@ -698,32 +750,314 @@
       "storeUnchanged": true,
       "stores": [
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "e3b4ddf33ca8367a93c386424fb7ebaab216e2f3eabb29aa2033ef6ba58a209d"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "e3b4ddf33ca8367a93c386424fb7ebaab216e2f3eabb29aa2033ef6ba58a209d"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "error": "store schema 99 is newer than supported 3",
           "fileFormatBytes18To19": "0101",
           "files": [
             "journal.sqlite3"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 5,
+              "fileFormatReadVersion": 1,
+              "fileFormatWriteVersion": 1,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 5
+            },
+            "before": {
+              "fileChangeCounter": 5,
+              "fileFormatReadVersion": 1,
+              "fileFormatWriteVersion": 1,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 5
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?immutable=1"
+          },
           "refused": true,
           "shape": "rollback",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         },
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "45d66ce9d71854c324e5cf2f643d0137fc342d2d6ec3cc79efaf299d178b5841"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "45d66ce9d71854c324e5cf2f643d0137fc342d2d6ec3cc79efaf299d178b5841"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "error": "store schema 99 is newer than supported 3",
           "fileFormatBytes18To19": "0202",
           "files": [
             "journal.sqlite3"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?immutable=1"
+          },
           "refused": true,
           "shape": "wal",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         },
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-shm": {
+                "bytes": 32768,
+                "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 4152,
+                "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": true,
+              "wal": true
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-shm": {
+                "bytes": 32768,
+                "sha256": "dfe8614b0e9dbf2049461e2f4e2033e2a659e8c6c2934ef4b3d69150b6e9ff6c"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 4152,
+                "sha256": "0b230398fb53d0d2f1eadf1deb8078b8844d1a425b74dc1b56317b1fafa65205"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": true,
+              "wal": true
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "error": "store schema 99 is newer than supported 3",
           "fileFormatBytes18To19": "0202",
           "files": [
             "journal.sqlite3",
             "journal.sqlite3-shm",
             "journal.sqlite3-wal"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?readonly_shm=1"
+          },
           "refused": true,
           "shape": "walSidecars",
+          "sqliteVersion": "3.53.4",
+          "unchanged": true
+        },
+        {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 4152,
+                "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": true
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 4152,
+                "sha256": "46aa8140bb5dd7190b6dfa88be91980aa0b72968093df8cbc84c0efc63fb7561"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": true
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 99
+          },
+          "error": "store schema 99 is newer than supported 3",
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3",
+            "journal.sqlite3-wal"
+          ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "a copy of the main file and -wal in a private 0700 temporary directory",
+            "uriQuery": ""
+          },
+          "refused": true,
+          "shape": "walNoShm",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         }
       ]
@@ -750,32 +1084,314 @@
       "storeUnchanged": true,
       "stores": [
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "bffc8334f0ec8a685b71c22d7b1c856a7bf4d8e8f10376fbb812a9de220bfee9"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "bffc8334f0ec8a685b71c22d7b1c856a7bf4d8e8f10376fbb812a9de220bfee9"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "error": "store schema 3 is newer than supported 3",
           "fileFormatBytes18To19": "0101",
           "files": [
             "journal.sqlite3"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 5,
+              "fileFormatReadVersion": 1,
+              "fileFormatWriteVersion": 1,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 5
+            },
+            "before": {
+              "fileChangeCounter": 5,
+              "fileFormatReadVersion": 1,
+              "fileFormatWriteVersion": 1,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 5
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?immutable=1"
+          },
           "refused": true,
           "shape": "rollback",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         },
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "f05428ce65fd7012d11df0dc1adce2e8c1b0fbccf5b83d82f6c802d621c612c8"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "f05428ce65fd7012d11df0dc1adce2e8c1b0fbccf5b83d82f6c802d621c612c8"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": false
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "error": "store schema 3 is newer than supported 3",
           "fileFormatBytes18To19": "0202",
           "files": [
             "journal.sqlite3"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?immutable=1"
+          },
           "refused": true,
           "shape": "wal",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         },
         {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-shm": {
+                "bytes": 32768,
+                "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 8272,
+                "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": true,
+              "wal": true
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-shm": {
+                "bytes": 32768,
+                "sha256": "c66c1ffd97497a14a57423eb81f9a84f0805bb4528efaf5bc33e4d67519e4498"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 8272,
+                "sha256": "508d7b2f577576228bd8b511c05ae839e6dd21adb304eab6baea2a1742f12f9d"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": true,
+              "wal": true
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "error": "store schema 3 is newer than supported 3",
           "fileFormatBytes18To19": "0202",
           "files": [
             "journal.sqlite3",
             "journal.sqlite3-shm",
             "journal.sqlite3-wal"
           ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "the store's main file",
+            "uriQuery": "?readonly_shm=1"
+          },
           "refused": true,
           "shape": "walSidecars",
+          "sqliteVersion": "3.53.4",
+          "unchanged": true
+        },
+        {
+          "after": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 8272,
+                "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": true
+            }
+          },
+          "before": {
+            "files": {
+              "journal.sqlite3": {
+                "bytes": 286720,
+                "sha256": "ae803b403ad00d40083995dfe83c1f617fc5ce9e667b454dd31391a0183369aa"
+              },
+              "journal.sqlite3-wal": {
+                "bytes": 8272,
+                "sha256": "34f1cae21f8d850c7953a26df2186d56452045e629a76109cecec89fda3e56a2"
+              }
+            },
+            "present": {
+              "journal": false,
+              "main": true,
+              "shm": false,
+              "wal": true
+            }
+          },
+          "committedVersions": {
+            "reducerVersion": 3,
+            "schemaVersion": 3
+          },
+          "error": "store schema 3 is newer than supported 3",
+          "fileFormatBytes18To19": "0202",
+          "files": [
+            "journal.sqlite3",
+            "journal.sqlite3-wal"
+          ],
+          "header": {
+            "after": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            },
+            "before": {
+              "fileChangeCounter": 3,
+              "fileFormatReadVersion": 2,
+              "fileFormatWriteVersion": 2,
+              "magic": "SQLite format 3",
+              "sqliteVersionNumber": 3053004,
+              "versionValidFor": 3
+            }
+          },
+          "mainFileOnlyVersions": {
+            "reducerVersion": 2,
+            "schemaVersion": 3
+          },
+          "preflightOpen": {
+            "dbConfig": "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE",
+            "flags": "SQLITE_OPEN_READ_ONLY | SQLITE_OPEN_URI | SQLITE_OPEN_NO_MUTEX",
+            "opens": "a copy of the main file and -wal in a private 0700 temporary directory",
+            "uriQuery": ""
+          },
+          "refused": true,
+          "shape": "walNoShm",
+          "sqliteVersion": "3.53.4",
           "unchanged": true
         }
       ]
@@ -791,7 +1407,7 @@
       "m0bUnprovenSurfaceKept": true,
       "ownerResolvedItems": 1
     },
-    "reducerVersion": 1,
+    "reducerVersion": 2,
     "targetSchemaVersion": 3
   },
   "migrations": [
@@ -830,9 +1446,9 @@
     "failures": 0,
     "pass": true,
     "preservedFailingSeeds": "fixtures/m1/regression-seeds.json",
-    "requiredFamilyPermutations": 10000,
-    "sqliteStepwiseCrossChecks": 1040,
-    "totalPermutations": 10400
+    "requiredFamilyPermutations": 20000,
+    "sqliteStepwiseCrossChecks": 2040,
+    "totalPermutations": 20400
   },
   "reducerInvariantCatalog": "evidence/M1/reducer-invariants.md",
   "remediation": {
@@ -856,7 +1472,63 @@
       "positiveBuildExit": 0,
       "sourceCommit": "5483afd9860e047c9308e5821c269e1b7349e023"
     },
-    "record": "evidence/M1/remediation/README.md"
+    "record": "evidence/M1/remediation/README.md",
+    "second": {
+      "base": "f7e9a6ce2ce034e04abff03bf8a358dc98a98e01",
+      "evidenceSources": {
+        "native": {
+          "c04": "build 73636ec",
+          "m0b": "build 5944c81, not reinstalled: a reducer-2 build would upgrade the owner's live store"
+        },
+        "regenerated": {
+          "areas": [
+            "contracts",
+            "fixtures",
+            "replay",
+            "permutations",
+            "crash",
+            "migration"
+          ],
+          "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a"
+        },
+        "retained": {
+          "areas": [
+            "capture",
+            "sanitization"
+          ],
+          "reason": "hook, relay, spool and companion code unchanged since; the journal changes (wait reduction, which no hook event reaches; the preflight branch for a WAL without -shm; the reducer-upgrade load path) are not reached by those workloads",
+          "sourceCommit": "e52c281f8cc1cb998ea64bcdf8010afeae6400e7"
+        }
+      },
+      "generatorOrders": {
+        "byScenario": [
+          {
+            "changed": 37,
+            "invalidBeforeFix": 28,
+            "scenario": "wait-new-after-resolution",
+            "validButChanged": 9
+          }
+        ],
+        "campaign": "evidence/M1/history/f7e9a6c/permutations/summary.json",
+        "changedOrders": 37,
+        "invalidAfterFix": 0,
+        "invalidBeforeFix": 28,
+        "invalidBeforeFixByViolatedStep": {
+          "wait#4": 15,
+          "wait#4 + wait#5": 3,
+          "wait#5": 10
+        },
+        "seeds": 10400,
+        "validButChanged": 9
+      },
+      "groups": [
+        "2: wait owner coverage and semantic equality",
+        "5: WAL store without -shm refused without creating a sidecar"
+      ],
+      "negativeControls": "evidence/M1/remediation-2/negative-controls/",
+      "previousEvidence": "evidence/M1/history/f7e9a6c/",
+      "record": "evidence/M1/remediation-2/README.md"
+    }
   },
   "replay": {
     "contract": "Exact: the same admitted journal (or checkpoint plus later entries) replays to identical state, projection and table digests, repeatedly, across restart and from genesis. Semantic: the SQLite path's native-key projection equals the pure path's.",
@@ -864,7 +1536,7 @@
     "repeats": 3,
     "scenarios": [
       {
-        "checkpointSha256": "b025c437698c148e76f27cd79403aa4ee1ba95eef5855bdc3a8651c92a4164fe",
+        "checkpointSha256": "e1170d9abe2060429e46c076a82e6015f37634c78b1600c162d30d985bc3856d",
         "entries": 14,
         "facts": 15,
         "journalRange": [
@@ -875,10 +1547,10 @@
         "projectionSha256": "221fa7139a5cb200e564b87cb0a385987493321db1176d477e18855056d1f4e2",
         "scenario": "normal-session",
         "semanticSha256": "ce6da2a8c21c7e0ad83b3d41c389bba1c14bf99fac767a912728b3bfa212e406",
-        "stateSha256": "b025c437698c148e76f27cd79403aa4ee1ba95eef5855bdc3a8651c92a4164fe"
+        "stateSha256": "e1170d9abe2060429e46c076a82e6015f37634c78b1600c162d30d985bc3856d"
       },
       {
-        "checkpointSha256": "7e5957250b21a61575ce190aa7f8ac1804bed281f29ce8e6ae0cfd6868de2011",
+        "checkpointSha256": "c20c35facb0a9cc59491b8cc77af40b36299cd87ecc19e3d12a62f2a65ea8904",
         "entries": 13,
         "facts": 13,
         "journalRange": [
@@ -889,10 +1561,10 @@
         "projectionSha256": "b061765ee7582e5aa38682acc2b18c135687d0c5d4eec0256386216458d23577",
         "scenario": "parallel-tools",
         "semanticSha256": "b8b5b93c7810702f1e9c4f12fc66321c3d0b7392e8a9c15ad4c738c3155bb174",
-        "stateSha256": "7e5957250b21a61575ce190aa7f8ac1804bed281f29ce8e6ae0cfd6868de2011"
+        "stateSha256": "c20c35facb0a9cc59491b8cc77af40b36299cd87ecc19e3d12a62f2a65ea8904"
       },
       {
-        "checkpointSha256": "e0ec310465073684fa4546bd9b97be82e839db30de3d11f4c1d69a25e10b9b36",
+        "checkpointSha256": "7c01f9bbd7f84539f5211428697f052f5c0c5997e207344db89f3d1e3daac435",
         "entries": 10,
         "facts": 10,
         "journalRange": [
@@ -903,10 +1575,10 @@
         "projectionSha256": "0b0b06246a509eebf0ddff879715fa87ae4a3f0772d085eb057bc971bfd8d52e",
         "scenario": "outcomes",
         "semanticSha256": "5538bea6cccd6506f6ef876545a61e705cfe19f36b5a7c74062330947c75ac1f",
-        "stateSha256": "e0ec310465073684fa4546bd9b97be82e839db30de3d11f4c1d69a25e10b9b36"
+        "stateSha256": "7c01f9bbd7f84539f5211428697f052f5c0c5997e207344db89f3d1e3daac435"
       },
       {
-        "checkpointSha256": "c55e7a20eebab01f7f85d11b877127b6963ac4b5c92bbcbd8362760b894ca3ab",
+        "checkpointSha256": "d104030efb66e95732bd12ed8d3683006578add5393394a4f7e44baa4bb34c70",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -917,10 +1589,10 @@
         "projectionSha256": "01760f997709d5f59d9488ccb1fb0cc05a981108f83f70082f655f85b30bfaea",
         "scenario": "latest-turn-outcome",
         "semanticSha256": "e0ead851f6aeb01701590984ea08964fba91c0b7c46fa1e7b996f7b8ce6938c3",
-        "stateSha256": "c55e7a20eebab01f7f85d11b877127b6963ac4b5c92bbcbd8362760b894ca3ab"
+        "stateSha256": "d104030efb66e95732bd12ed8d3683006578add5393394a4f7e44baa4bb34c70"
       },
       {
-        "checkpointSha256": "1c14ea5bbc643088190408064eea05408557e39f2f3eb263c888025871e3f3f0",
+        "checkpointSha256": "b4216710cbebaa33cc980b090c478bd5bba8cea7851da3b89d07f3441c362f84",
         "entries": 3,
         "facts": 3,
         "journalRange": [
@@ -931,10 +1603,10 @@
         "projectionSha256": "d96bbccaff7fbc548ec29cbfcb0f5cbb45acb531d4c30d7803a21461714e2d12",
         "scenario": "duplicate-deliveries",
         "semanticSha256": "7ae64a374240390f6e1ca9f9a6c2126bd80fbce9511304dbfba3214816e939fb",
-        "stateSha256": "1c14ea5bbc643088190408064eea05408557e39f2f3eb263c888025871e3f3f0"
+        "stateSha256": "b4216710cbebaa33cc980b090c478bd5bba8cea7851da3b89d07f3441c362f84"
       },
       {
-        "checkpointSha256": "b90cf7ba6b23c15f020eeb121226f30d74899c6f51d3a36d46a9520f2a4228e4",
+        "checkpointSha256": "34c83819dcfa8b0ee81c8c9f38edf736e5bdaf650352ab6fd2e0bbc47fbfdece",
         "entries": 11,
         "facts": 13,
         "journalRange": [
@@ -945,10 +1617,10 @@
         "projectionSha256": "3a711962122bee919696b9c060ccba96d9134d761e93f6b3d4f9b687236f4278",
         "scenario": "child-actors",
         "semanticSha256": "f2bc504496f5da0580df550c2e0b8427944e535c44b628a7756584d8f50eaa97",
-        "stateSha256": "b90cf7ba6b23c15f020eeb121226f30d74899c6f51d3a36d46a9520f2a4228e4"
+        "stateSha256": "34c83819dcfa8b0ee81c8c9f38edf736e5bdaf650352ab6fd2e0bbc47fbfdece"
       },
       {
-        "checkpointSha256": "8aca141a29f313c3130bb4ec3196da9f169e22d34a71bff4963af29c24a6fb1b",
+        "checkpointSha256": "49ed00d238c5ce4c63b46b8ac663ab4321a274973fe6660284ac78dc2fb421d5",
         "entries": 6,
         "facts": 7,
         "journalRange": [
@@ -959,10 +1631,10 @@
         "projectionSha256": "771816fe171d12979323b3d3c22f9fabff5de58b6cfc2b77eecb5cebe8ec5e8e",
         "scenario": "shared-native-turn-id",
         "semanticSha256": "4a05dee4465661d59ac326bcbd200267e0ebfa88c1f45b1db29e917fb29210ce",
-        "stateSha256": "8aca141a29f313c3130bb4ec3196da9f169e22d34a71bff4963af29c24a6fb1b"
+        "stateSha256": "49ed00d238c5ce4c63b46b8ac663ab4321a274973fe6660284ac78dc2fb421d5"
       },
       {
-        "checkpointSha256": "c06f893924443bb6e2cb4948c42bc9ec86d780ab2a8c49a672fd421cb8942d4d",
+        "checkpointSha256": "3c85d9cd7c7a414ef741ca3ffb10ee0fa7362d4a4e0c483331db5fa64785b71a",
         "entries": 7,
         "facts": 7,
         "journalRange": [
@@ -973,10 +1645,10 @@
         "projectionSha256": "96309430a7bd18c495ee3df8734c5575b41ca802b0fd2d8a33d8a79e8ff45091",
         "scenario": "waiting",
         "semanticSha256": "a6402f57f5a475c6979ca0f1fe91ce9ecf60b88b0ea48979b8f15d6c2d6d5508",
-        "stateSha256": "c06f893924443bb6e2cb4948c42bc9ec86d780ab2a8c49a672fd421cb8942d4d"
+        "stateSha256": "3c85d9cd7c7a414ef741ca3ffb10ee0fa7362d4a4e0c483331db5fa64785b71a"
       },
       {
-        "checkpointSha256": "04078ceb8932f31e4619065dd8723b3744ce9797c67eecbbaa1a0632ec08b601",
+        "checkpointSha256": "5e64f99986f87f5c0cee97e94a8e8132185d4144e8b418ca02924353a8c278d7",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -987,10 +1659,10 @@
         "projectionSha256": "612d1ed8165041c245858effff796b52eee660fa4f8cbb9ed4bed36093ff6724",
         "scenario": "delayed-positive-wait",
         "semanticSha256": "5f4c32d51db765df893e6f73bee4a49902e48dd90787d61321495d28ab582776",
-        "stateSha256": "04078ceb8932f31e4619065dd8723b3744ce9797c67eecbbaa1a0632ec08b601"
+        "stateSha256": "5e64f99986f87f5c0cee97e94a8e8132185d4144e8b418ca02924353a8c278d7"
       },
       {
-        "checkpointSha256": "56e237d86434f0de9ac86b38395f8ed0f32298fc91a232093bed93d9315da174",
+        "checkpointSha256": "dabada0c6c848ddd8d1c9d5a93ca47b67a0793e6924ec2daa5ec79a84185c42d",
         "entries": 6,
         "facts": 6,
         "journalRange": [
@@ -1001,10 +1673,10 @@
         "projectionSha256": "a4e7f01af9b6dd9ff062ae8ce53336643db30edaa2c2c87752a41130a3e3e4fe",
         "scenario": "delayed-clear-wait",
         "semanticSha256": "9f4c1f8cec8d3a383bfb222546291bf50e42617537b1ea8c4315ac41d4b3b303",
-        "stateSha256": "56e237d86434f0de9ac86b38395f8ed0f32298fc91a232093bed93d9315da174"
+        "stateSha256": "dabada0c6c848ddd8d1c9d5a93ca47b67a0793e6924ec2daa5ec79a84185c42d"
       },
       {
-        "checkpointSha256": "b3f8f219a1fda6c5ee16b99e58b1f9d8b5945ed69741fbe0ec998c4669ae0b20",
+        "checkpointSha256": "11ddfbff6d72241118a65ee2a66c21f15a6a6f279fb326793437390ea14ede53",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -1015,10 +1687,10 @@
         "projectionSha256": "8849408464ffa3923f10476eef02e8fae16f60922031b679d0ce4b16eb466e6e",
         "scenario": "wait-reappears",
         "semanticSha256": "4e2c1c0cd677dce32f574e1502eafea6f238eeaeebc3ef4abd5ca8be42f849eb",
-        "stateSha256": "b3f8f219a1fda6c5ee16b99e58b1f9d8b5945ed69741fbe0ec998c4669ae0b20"
+        "stateSha256": "11ddfbff6d72241118a65ee2a66c21f15a6a6f279fb326793437390ea14ede53"
       },
       {
-        "checkpointSha256": "2e77d65c483559412b6088ddcc13cc112c8969b0591a055427337cfc755b6b44",
+        "checkpointSha256": "d6716ad8c1aa1b9542559760065dd029cd528c546db84ed3b7d46b998519c876",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -1029,10 +1701,10 @@
         "projectionSha256": "00007508b90c15cf615ad754257fbde232e85f25f0382946b78f49026ade91ff",
         "scenario": "wait-uncertain-reopens",
         "semanticSha256": "047c62bae6ec5f10495e81e5e8333f51f130231d8ba9435fb878680e18ad5e15",
-        "stateSha256": "2e77d65c483559412b6088ddcc13cc112c8969b0591a055427337cfc755b6b44"
+        "stateSha256": "d6716ad8c1aa1b9542559760065dd029cd528c546db84ed3b7d46b998519c876"
       },
       {
-        "checkpointSha256": "0d4764d4a9c5f44ec9da391c08fa7df98e5fc46097b873b13b96538835e210e7",
+        "checkpointSha256": "80c2e7ec3fa7b29bd593ab8d13fb321ea722da1e2a47350a085ed10101ed9ddd",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -1042,11 +1714,11 @@
         "journalSha256": "756a79be59b006d7c67f13421f0ddca4cc700bae1ab5878010603c1f5af5f3d5",
         "projectionSha256": "53a08d245d806cd8976c98f5f3e59ba26a05aa11b96653ff390ee16ab54a3588",
         "scenario": "wait-owner-resolution-kept",
-        "semanticSha256": "fbfa43192607d0bd4ccf864a0034552b2296babd279896b02a60341fb16934c7",
-        "stateSha256": "0d4764d4a9c5f44ec9da391c08fa7df98e5fc46097b873b13b96538835e210e7"
+        "semanticSha256": "069830c6e72efcb141f7dff43a7e472edf5a5f3c18df600d4f157f69692a1042",
+        "stateSha256": "80c2e7ec3fa7b29bd593ab8d13fb321ea722da1e2a47350a085ed10101ed9ddd"
       },
       {
-        "checkpointSha256": "5c60064b78a5eb0d9858c63f61eb4264159dc065ead652ebf2e531df02d49052",
+        "checkpointSha256": "fac135adf3c4452881c009d396a98f1c9174d785e30a64db489c95769cf0394b",
         "entries": 6,
         "facts": 6,
         "journalRange": [
@@ -1056,11 +1728,11 @@
         "journalSha256": "d1a15561ff4770d44b70cb045f92aef905b8671b3b989172a061bad877bfcca3",
         "projectionSha256": "7d673c923b56b5a2c43309d3dd716a5a89c9f65323ce0d58c3575805c2411cf7",
         "scenario": "wait-new-after-resolution",
-        "semanticSha256": "a1026ba4704a6c9c38172691d6fb139c659cd197cb46419f4a800e10860de23b",
-        "stateSha256": "5c60064b78a5eb0d9858c63f61eb4264159dc065ead652ebf2e531df02d49052"
+        "semanticSha256": "d549bda5b71f2780db022baa965185b0fa43fab99cb55917a1f348cd5b773e78",
+        "stateSha256": "fac135adf3c4452881c009d396a98f1c9174d785e30a64db489c95769cf0394b"
       },
       {
-        "checkpointSha256": "3c7337ad1d614a1aee47991be711b788857583d45e62f8f9ec2de8fa0a98befd",
+        "checkpointSha256": "d52b9f5cd3b4092eda68675ef3bec7cbfc989da71e00feca4188421330fce014",
         "entries": 7,
         "facts": 7,
         "journalRange": [
@@ -1071,10 +1743,10 @@
         "projectionSha256": "9c80743152ee1cf46a68ed4281b1e601f0a45de854995d3273a000013a5ef6e3",
         "scenario": "wait-turn-ownership",
         "semanticSha256": "6d8133da4d6d0e8fc9d47759fb2253965e00eedcc90ce9ac86d5fab4cb3e3282",
-        "stateSha256": "3c7337ad1d614a1aee47991be711b788857583d45e62f8f9ec2de8fa0a98befd"
+        "stateSha256": "d52b9f5cd3b4092eda68675ef3bec7cbfc989da71e00feca4188421330fce014"
       },
       {
-        "checkpointSha256": "e46ba8eb5a637c6889d9080ff8e3056b5de3a46438479a9f1dceb08a666002e0",
+        "checkpointSha256": "3d66a1ad824f3fedf880f875027ee161828f01070fcdc0efed336104c15b723a",
         "entries": 3,
         "facts": 3,
         "journalRange": [
@@ -1085,10 +1757,10 @@
         "projectionSha256": "2fdb6ec8b29fe6318b1d8472425d7e19f53ceafa8b1da135becc80d628bb7b0a",
         "scenario": "wait-session-scoped",
         "semanticSha256": "2d7a6d9236856422d96e339da1fc254d60342b352875e1bf0e409955868239c3",
-        "stateSha256": "e46ba8eb5a637c6889d9080ff8e3056b5de3a46438479a9f1dceb08a666002e0"
+        "stateSha256": "3d66a1ad824f3fedf880f875027ee161828f01070fcdc0efed336104c15b723a"
       },
       {
-        "checkpointSha256": "e8ae5e14f789eea95a227ec752aeb398f7b19ee73f7ffdd438b71216b6fcd2f7",
+        "checkpointSha256": "02060451b7d8662f5b262f8b6bd8acb04d12a72b70f0c264afbcc5e1e4ca1ade",
         "entries": 6,
         "facts": 6,
         "journalRange": [
@@ -1099,10 +1771,10 @@
         "projectionSha256": "e9f8ffd979ba31513be52653542872087c400c4f9cc2533c116429248d0d4069",
         "scenario": "wait-generations",
         "semanticSha256": "e46c9890dc762782a24c8b4b2f22773474eca96762a64c198297787c310b53b5",
-        "stateSha256": "e8ae5e14f789eea95a227ec752aeb398f7b19ee73f7ffdd438b71216b6fcd2f7"
+        "stateSha256": "02060451b7d8662f5b262f8b6bd8acb04d12a72b70f0c264afbcc5e1e4ca1ade"
       },
       {
-        "checkpointSha256": "e1ab8cdb4d982cc3837fbc3195c12367394f9568afb7e86e11537214ad459f64",
+        "checkpointSha256": "0a310b04603e9f4654e46864e4481a451b2544c06865859eff81e001e601e8fe",
         "entries": 15,
         "facts": 15,
         "journalRange": [
@@ -1113,10 +1785,10 @@
         "projectionSha256": "ec6af64d49bbcd6b149e1508fe53d5c254a296167fe59b8c742f831cb5f7cd81",
         "scenario": "followup-witnessed",
         "semanticSha256": "2c404878172e8d8ed90c69822d89ecf7ea94e13e87b9ddc18904274802910dfe",
-        "stateSha256": "e1ab8cdb4d982cc3837fbc3195c12367394f9568afb7e86e11537214ad459f64"
+        "stateSha256": "0a310b04603e9f4654e46864e4481a451b2544c06865859eff81e001e601e8fe"
       },
       {
-        "checkpointSha256": "8993bb25936a5ef6ad363e8d63e3a772505cc0875495531e844e28f78b87acad",
+        "checkpointSha256": "94eb842ca30866b7632db9d5f522cba51c37025e232a6d2067953d53ad1d846a",
         "entries": 16,
         "facts": 16,
         "journalRange": [
@@ -1127,10 +1799,10 @@
         "projectionSha256": "d199503dd411726557bbdf15ae86f346199d46f12721975e9300320e1bd6c21a",
         "scenario": "followup-claude",
         "semanticSha256": "4dbd63ffb00d59c8ba4db4b37b96840269f25afb2a38ad6494d350d7e641bf18",
-        "stateSha256": "8993bb25936a5ef6ad363e8d63e3a772505cc0875495531e844e28f78b87acad"
+        "stateSha256": "94eb842ca30866b7632db9d5f522cba51c37025e232a6d2067953d53ad1d846a"
       },
       {
-        "checkpointSha256": "66da5984885fc4c86b961b8f7739dd9fd93b3327d541bf61ca43a137f08ab4b2",
+        "checkpointSha256": "71b83922c14a3047b8cad8182dc60124640bbcf862229c51d2a1d745b73e6535",
         "entries": 8,
         "facts": 8,
         "journalRange": [
@@ -1141,10 +1813,10 @@
         "projectionSha256": "f2ba4ca12ff97f6f392bbe8bcea8bb9bebb88e52455f2fe04876c842b5a7a2ee",
         "scenario": "owner-commands",
         "semanticSha256": "9827101e3fada6bae69e79340383c11934163af3b5b8090f60c874c6ec0477c4",
-        "stateSha256": "66da5984885fc4c86b961b8f7739dd9fd93b3327d541bf61ca43a137f08ab4b2"
+        "stateSha256": "71b83922c14a3047b8cad8182dc60124640bbcf862229c51d2a1d745b73e6535"
       },
       {
-        "checkpointSha256": "da60cf20efb7802a75d5a95874da7f625b9d9b45d19b7aac22969e929af4c3e3",
+        "checkpointSha256": "fe92ca727b0f8326187f2d5e302ae03c5b53ae5a0ab89c78576df6a04ddc1d9a",
         "entries": 11,
         "facts": 13,
         "journalRange": [
@@ -1155,10 +1827,10 @@
         "projectionSha256": "6119e76bfb0acee835688329d50a73cd599e256a2cbedc4c0d2a8abe2f335a15",
         "scenario": "resume",
         "semanticSha256": "368b9916ae5dbb1f4c565767f9d5739b8ce7d47768cdd83fefcd052fbb82f6ed",
-        "stateSha256": "da60cf20efb7802a75d5a95874da7f625b9d9b45d19b7aac22969e929af4c3e3"
+        "stateSha256": "fe92ca727b0f8326187f2d5e302ae03c5b53ae5a0ab89c78576df6a04ddc1d9a"
       },
       {
-        "checkpointSha256": "a07f64c34b9d418b5457df65d6e3fe5317918df9188a9b522b1184bc8a8dc7dd",
+        "checkpointSha256": "606bc0409a4614ee96501f8ddc0e651693c111b4916d4a275a1098e55d444c45",
         "entries": 9,
         "facts": 12,
         "journalRange": [
@@ -1169,10 +1841,10 @@
         "projectionSha256": "3b5c4853861b8a1e6987af46b3304de17821e4c30d1896c4b3b0c91f55e73e73",
         "scenario": "pid-tty-reuse",
         "semanticSha256": "2ab136750d157e5bdf52577ab5208196ba3f993c485b03a5bb37a5051e6783d6",
-        "stateSha256": "a07f64c34b9d418b5457df65d6e3fe5317918df9188a9b522b1184bc8a8dc7dd"
+        "stateSha256": "606bc0409a4614ee96501f8ddc0e651693c111b4916d4a275a1098e55d444c45"
       },
       {
-        "checkpointSha256": "1d80103c94458c4eb9092d84baed46453ab94cda1ea0b4ac6c03ddbc08ca424a",
+        "checkpointSha256": "4e9f82931b1443dfe958cde923f246426cb2ebefc2809b64b54629dd1f2ef2c2",
         "entries": 4,
         "facts": 5,
         "journalRange": [
@@ -1183,10 +1855,10 @@
         "projectionSha256": "8f5fc3e9f12e9c052f334472c6c49e22279c3b1e3080a0a78a1f32b8d0f15e71",
         "scenario": "executable-replaced",
         "semanticSha256": "560e9557cf8b61106bc46830f62e03cb66eb345cde407eb104e7326ffea2b95d",
-        "stateSha256": "1d80103c94458c4eb9092d84baed46453ab94cda1ea0b4ac6c03ddbc08ca424a"
+        "stateSha256": "4e9f82931b1443dfe958cde923f246426cb2ebefc2809b64b54629dd1f2ef2c2"
       },
       {
-        "checkpointSha256": "8b72cd995328d5db7b22a5df1bfaca565dd7eb4ec30a160256f389f619c06d6a",
+        "checkpointSha256": "672cd99a7c428050c1a1989d51d48bd8f80b0025c14da65605f512a2644a3b39",
         "entries": 5,
         "facts": 6,
         "journalRange": [
@@ -1197,10 +1869,10 @@
         "projectionSha256": "6d6ac8fa3b445bacc545e52e526655384507a47b183505d77f2e7841bd136c23",
         "scenario": "replaced-then-unordered-image",
         "semanticSha256": "473330dc1232cc35ad766d006fa298c70f5f31f13ae055fc7250add59f7d5f8b",
-        "stateSha256": "8b72cd995328d5db7b22a5df1bfaca565dd7eb4ec30a160256f389f619c06d6a"
+        "stateSha256": "672cd99a7c428050c1a1989d51d48bd8f80b0025c14da65605f512a2644a3b39"
       },
       {
-        "checkpointSha256": "d2cd1809b1312cd2e9f6e3ff9b8fb0a0fa21bc093a48e3239977570239501ac2",
+        "checkpointSha256": "d960cb8f9754252fedf6700ee145984ff7c0f3fc503acddeb562341debc077f7",
         "entries": 9,
         "facts": 11,
         "journalRange": [
@@ -1211,10 +1883,10 @@
         "projectionSha256": "1670d6e673aea33f1962fda26e66329602eca0b62be564cdcfdcfc8848fc24ae",
         "scenario": "executable-requalified",
         "semanticSha256": "8224e3e9d7425c5e39a54bba3e33affdfe998717a1dc8eac0649db06be134b6d",
-        "stateSha256": "d2cd1809b1312cd2e9f6e3ff9b8fb0a0fa21bc093a48e3239977570239501ac2"
+        "stateSha256": "d960cb8f9754252fedf6700ee145984ff7c0f3fc503acddeb562341debc077f7"
       },
       {
-        "checkpointSha256": "2b897a11de582ee62dba997a7829cc3e3d13dbe04d47973750d4706612721e6f",
+        "checkpointSha256": "0a2d166189564d208e72710c8ac2e1279c4564037c539c434bed0d851d67f6e4",
         "entries": 5,
         "facts": 7,
         "journalRange": [
@@ -1225,10 +1897,10 @@
         "projectionSha256": "8ecf5cb9dd07fa284e05da9ec07f6eb3ec0d42b3bde97a834aa785b54618a13f",
         "scenario": "routing-ambiguity",
         "semanticSha256": "1ff85a7b81fc5926ed0ab07561fc3efbd664a7c63dafc18db4a3ba7c2935094b",
-        "stateSha256": "2b897a11de582ee62dba997a7829cc3e3d13dbe04d47973750d4706612721e6f"
+        "stateSha256": "0a2d166189564d208e72710c8ac2e1279c4564037c539c434bed0d851d67f6e4"
       },
       {
-        "checkpointSha256": "a9fc43648aa0808e5da39d24d58f7a27eac8c7c2fc80d65692847d7d7c0f7300",
+        "checkpointSha256": "2764bbb17e19a2b3ae0a599348f695183ec4fe7101cd75b40ebb254981511638",
         "entries": 5,
         "facts": 6,
         "journalRange": [
@@ -1239,10 +1911,10 @@
         "projectionSha256": "f07e65312c237dfbf047d19ada5a4845ea5c4e438c6a4e7b0362bacf6533e11b",
         "scenario": "execution-end-retained",
         "semanticSha256": "15715b7d34f1555a3735674a281b28dda40aa02e91ff474e690c7390fd472567",
-        "stateSha256": "a9fc43648aa0808e5da39d24d58f7a27eac8c7c2fc80d65692847d7d7c0f7300"
+        "stateSha256": "2764bbb17e19a2b3ae0a599348f695183ec4fe7101cd75b40ebb254981511638"
       },
       {
-        "checkpointSha256": "abedd1038fac29a04effff8b7f6d632d512f82938c460bc41e3f4ae8c0fd5d35",
+        "checkpointSha256": "62a4179736958c9c65d8ba46bf3e8962d66cc91f7322a11f176dcda02d1ef78d",
         "entries": 12,
         "facts": 15,
         "journalRange": [
@@ -1253,10 +1925,10 @@
         "projectionSha256": "9e6024e3cc87305510bad11c907983257497114ca1d3bed08c2601c2bece6c7b",
         "scenario": "a-b-a-delayed",
         "semanticSha256": "24f70a9ac360379a56b73f39641dce37997217860ec2d084b2005ed4632d04a9",
-        "stateSha256": "abedd1038fac29a04effff8b7f6d632d512f82938c460bc41e3f4ae8c0fd5d35"
+        "stateSha256": "62a4179736958c9c65d8ba46bf3e8962d66cc91f7322a11f176dcda02d1ef78d"
       },
       {
-        "checkpointSha256": "6f1f2c23e63f995b4823b3d96142cc1ddb18d7c6cb7d02868ab7d20b8b5d4f99",
+        "checkpointSha256": "29e74ccfc75634cb87c5beecb2e02b65d047b2ff00990b6f1b7ac3576e19e721",
         "entries": 5,
         "facts": 5,
         "journalRange": [
@@ -1267,10 +1939,10 @@
         "projectionSha256": "aca2aa5572b526574e0fdd6471beb90b035ad81ef21c8955b02cfa99a9fdf1c0",
         "scenario": "stale-snapshot",
         "semanticSha256": "89ac01ec082875311d7d2eefee8fdf4665c9e967afdd9f52b8737748e8ded8e1",
-        "stateSha256": "6f1f2c23e63f995b4823b3d96142cc1ddb18d7c6cb7d02868ab7d20b8b5d4f99"
+        "stateSha256": "29e74ccfc75634cb87c5beecb2e02b65d047b2ff00990b6f1b7ac3576e19e721"
       },
       {
-        "checkpointSha256": "1755b5aee08c6c18b27ab5f4cffe3241865cb5a0639e0d0ece5f78b6f6934d8a",
+        "checkpointSha256": "61bce1d06df42bdfc8090027dad16d793be55ecdc56545a1a650af2c49236b85",
         "entries": 4,
         "facts": 4,
         "journalRange": [
@@ -1281,10 +1953,10 @@
         "projectionSha256": "ec3b9946a2e6198224cd0c3f97afe32829010ddce07892063e4fb4ae3320a8b0",
         "scenario": "dropped-observation",
         "semanticSha256": "6dd0ff6722de3399ef72b5d69a758b8f8d49c2fb75847fde8c15da767ce57cc1",
-        "stateSha256": "1755b5aee08c6c18b27ab5f4cffe3241865cb5a0639e0d0ece5f78b6f6934d8a"
+        "stateSha256": "61bce1d06df42bdfc8090027dad16d793be55ecdc56545a1a650af2c49236b85"
       },
       {
-        "checkpointSha256": "742ee59d372a6926d113c189f8cf72db24bccbfbf95dc7d1bb2dda3c59a4aa1a",
+        "checkpointSha256": "7908fb5dc4b362d3764336489a9bc65fb6844b7789524b68f2a4474b830ce3d4",
         "entries": 6,
         "facts": 1,
         "journalRange": [
@@ -1295,10 +1967,10 @@
         "projectionSha256": "0213fb60c3278ec275d1313bc70c86a969060bcef4d170080584193a360087b2",
         "scenario": "unknown-and-malformed",
         "semanticSha256": "85e75dfbefc53e21dd15da69a633b514a5ce1ca5a4824558e9314de67c143fdc",
-        "stateSha256": "742ee59d372a6926d113c189f8cf72db24bccbfbf95dc7d1bb2dda3c59a4aa1a"
+        "stateSha256": "7908fb5dc4b362d3764336489a9bc65fb6844b7789524b68f2a4474b830ce3d4"
       },
       {
-        "checkpointSha256": "7a9879c5f4c94b4581a7d59bb98f34e3ac619856ab193d26af1416d188ac7437",
+        "checkpointSha256": "281bc0f9f51ef7fa69531b4c45909e6c4855168643f3ec029b88cc435e57870e",
         "entries": 3,
         "facts": 3,
         "journalRange": [
@@ -1309,7 +1981,119 @@
         "projectionSha256": "615da6022a48a4d3f7dd520cbdab2a25c9a254f1726f75f707ba9cb4cd1ad19d",
         "scenario": "sensitive-payload",
         "semanticSha256": "01ef18496e2530e13f3c78f6c835442859bf8f784705f84fd0406355a19ff0b9",
-        "stateSha256": "7a9879c5f4c94b4581a7d59bb98f34e3ac619856ab193d26af1416d188ac7437"
+        "stateSha256": "281bc0f9f51ef7fa69531b4c45909e6c4855168643f3ec029b88cc435e57870e"
+      },
+      {
+        "checkpointSha256": "ac70aaa68cb672a255b3c62914e41599073605cae1c82ce5e35afb3156d742a0",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "01726fb390d079228812b3043ed5a155b57e46f83f90c6b2d67278e64e727b9e",
+        "projectionSha256": "ffc2932ee52b1a88166c5531ac2c922ad9113c2be3072b11fa47fe90f8da336c",
+        "scenario": "wait-owner-partial-coverage",
+        "semanticSha256": "8b51d5b8133f0d4cdd1c27f0fbccd70902e53e790689a0e5483b5715f6598f88",
+        "stateSha256": "ac70aaa68cb672a255b3c62914e41599073605cae1c82ce5e35afb3156d742a0"
+      },
+      {
+        "checkpointSha256": "ed058538060576e24620f5aa643977854a96d9d815b0ec8e0c2a484b43610f13",
+        "entries": 7,
+        "facts": 7,
+        "journalRange": [
+          1,
+          7
+        ],
+        "journalSha256": "6f1305f928df2f1612f96d89c1ad306a08d333312f7ea46da8f22991f7b52915",
+        "projectionSha256": "1db589f33529db7cfd5bc6fb2e735d255a9812462c99f62e2e42478fe6e5bb24",
+        "scenario": "wait-owner-merge-keeps-coverage",
+        "semanticSha256": "18ca5d4130e67bdd823d4f1e0f39dbb7f8252a5b5e13a33df4c4ad95ef2cd9a2",
+        "stateSha256": "ed058538060576e24620f5aa643977854a96d9d815b0ec8e0c2a484b43610f13"
+      },
+      {
+        "checkpointSha256": "a2ca84377dab23de4aff86e47a7d555e008db8726c4086ce0fa5b120c61f6a97",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "7a070147a739d3aaa405f49ba0a3adaf9889262697de6aa1a80d05aa627fb651",
+        "projectionSha256": "35bd25deb2584242ea6e0094f6930bfc0c839df0688fe41338e4e67fa4743220",
+        "scenario": "wait-owner-covered-p",
+        "semanticSha256": "ce28663f044fe1c61d25f7b4abe8d9c9901b12ba44242faf8fa10e7897859418",
+        "stateSha256": "a2ca84377dab23de4aff86e47a7d555e008db8726c4086ce0fa5b120c61f6a97"
+      },
+      {
+        "checkpointSha256": "3e028ffcf3323c162a50c1329cbfdb6b3df38de95112fc00253e3edd56b522f2",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "96ac933f04730de5ea85bca575ac89cdd339ae43b73dc56c43747533eca5ecd5",
+        "projectionSha256": "4be2ab279fb15f8cfec8708b05ef0a4263452c3e69b0a609463440fbb8f7b36c",
+        "scenario": "wait-owner-covered-q",
+        "semanticSha256": "f63496a9fba74c43d42baafaf0246db5821e4d262f5478aee275ae7f6afed6f2",
+        "stateSha256": "3e028ffcf3323c162a50c1329cbfdb6b3df38de95112fc00253e3edd56b522f2"
+      },
+      {
+        "checkpointSha256": "043a0ca2d28c557cf26942da5739248229a5dbbdb13a35cb1f934fc9cfe27d82",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "f3e43c5850bf5562bd864b811c7b1a4391b1757e60dff5473a5f77564950ff7a",
+        "projectionSha256": "dc393dd5f6a88b7ea8f3ac2c24c9b7da4b58103b807713704b6d1972c5467db1",
+        "scenario": "wait-owner-covers-both",
+        "semanticSha256": "ec5f67a211050417f3d4c78d31bf20d7b893a89ca7c123c38f844db3f9a3370e",
+        "stateSha256": "043a0ca2d28c557cf26942da5739248229a5dbbdb13a35cb1f934fc9cfe27d82"
+      },
+      {
+        "checkpointSha256": "65d2243fca8eb7e02607dc92f1e091e56c5a18656aa617a0f0fa828f98204c5a",
+        "entries": 8,
+        "facts": 8,
+        "journalRange": [
+          1,
+          8
+        ],
+        "journalSha256": "3f9c3772623b9dc2ff44c88bfec2cf5620e9c2d835266c2c9ffe9dd6907cdd15",
+        "projectionSha256": "d445b5f0fb69374a18434e99494a98769d336f11df8f1c5fe412852cc9521190",
+        "scenario": "wait-owner-scopes",
+        "semanticSha256": "0d112f4925b2fe53645186c0c2213f7a2cd162abd57fc742cf888f8d76ea8817",
+        "stateSha256": "65d2243fca8eb7e02607dc92f1e091e56c5a18656aa617a0f0fa828f98204c5a"
+      },
+      {
+        "checkpointSha256": "ff9a4edd8498a4565116a49d1b3814f314b3a5dceaa3ce6804f01ad405a53ba8",
+        "entries": 11,
+        "facts": 11,
+        "journalRange": [
+          1,
+          11
+        ],
+        "journalSha256": "c8a66a27f9b41eeccfa307449f8417f02797820be4e4313d73459d3c64807d69",
+        "projectionSha256": "97c0c91e24f12f8619602504bd213a33e41c6d27a89340c32ef330fbc0932a11",
+        "scenario": "wait-owner-partial-actions",
+        "semanticSha256": "a77b147e00408e749db0c57172e423df81f8f195cd0dcffae7149a2d33ef8f41",
+        "stateSha256": "ff9a4edd8498a4565116a49d1b3814f314b3a5dceaa3ce6804f01ad405a53ba8"
+      },
+      {
+        "checkpointSha256": "b5baadc8eb278fa8f98b0282c050891b3e4a5471c56cbf0d0bec471e8fb13e7f",
+        "entries": 6,
+        "facts": 6,
+        "journalRange": [
+          1,
+          6
+        ],
+        "journalSha256": "691b52d2f4950b45c316ef909486a536225a7844265ba85b8db76dfe3b13cbe0",
+        "projectionSha256": "bc6a5dbd6543932adb18c23341bf26ae78965d7c8fbbaad9e0fbba74dbc937aa",
+        "scenario": "wait-owner-unordered-coverage",
+        "semanticSha256": "151a44f5e7c4b8a38d4bbe85c3b66cf62c407431f70085252fcab94d53b482ab",
+        "stateSha256": "b5baadc8eb278fa8f98b0282c050891b3e4a5471c56cbf0d0bec471e8fb13e7f"
       }
     ]
   },
@@ -1328,13 +2112,13 @@
     }
   },
   "schema": 1,
-  "sourceCommit": "cbb8cfab8fea9eb876152d8775b8737804d0f988",
+  "sourceCommit": "32bde63e7c7139472fad887ce1e4096506de0728",
   "testCommands": [
     "cargo test --workspace --features threadspace-journal/qualification,threadspace-agent/qualification",
     "npx vitest run",
     "THREADSPACE_CHECK_SCHEMAS=1 cargo test -p threadspace-contracts --test schemas",
     "cargo build --release -p threadspace-synthetic --bin threadspace-m1 -p threadspace-relay --bin threadspace-hook",
-    "target/aarch64-apple-darwin/release/threadspace-m1 fixtures|replay|permutations 10000|crash|migration|contracts",
+    "target/aarch64-apple-darwin/release/threadspace-m1 fixtures|replay|permutations 20000|crash|migration|contracts",
     "target/aarch64-apple-darwin/release/threadspace-m1 capture target/aarch64-apple-darwin/release/threadspace-hook 1000",
     "target/aarch64-apple-darwin/release/threadspace-m1 sanitization target/aarch64-apple-darwin/release/threadspace-hook"
   ],
@@ -1360,7 +2144,7 @@
       }
     ],
     "journalSchema": 3,
-    "reducer": 1,
+    "reducer": 2,
     "runtimeLocator": 1
   }
 }
