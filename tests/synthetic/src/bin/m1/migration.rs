@@ -1,11 +1,15 @@
 //! Schema migration evidence: the M0-era store written by the accepted M0C
 //! journal (`fixtures/m1/m0-store-v2/`) upgrades deterministically to the
 //! canonical schema, preserves what it held, keeps the M0B route semantics,
-//! and a newer schema or reducer checkpoint is refused without writing.
+//! and a newer schema or reducer checkpoint is refused without writing: in
+//! rollback-journal, clean WAL and WAL-with-sidecars stores, every file's
+//! bytes, the main header and the sidecar set are compared across the
+//! refusal.
 
 use std::path::{Path, PathBuf};
 
-use rusqlite::{Connection, params};
+use rusqlite::Connection;
+use rusqlite::config::DbConfig;
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::records::ResolutionKind;
 use threadspace_journal::{Journal, JournalError, RouteTargetRow, SCHEMA_VERSION, migration_catalog};
@@ -13,7 +17,7 @@ use threadspace_state_engine::hash::state_hash;
 use threadspace_state_engine::ids::{RandomAllocator, SeededAllocator};
 use threadspace_state_engine::REDUCER_VERSION;
 
-use crate::evidence::{Area, sha256_file};
+use crate::evidence::{Area, sha256, sha256_file};
 
 const NOW: i64 = 1_791_100_000_000;
 
@@ -34,6 +38,82 @@ fn old_ids(path: &Path, table: &str) -> Result<Vec<String>, String> {
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| e.to_string())?;
     Ok(ids)
+}
+
+#[derive(Clone, Copy)]
+enum Shape {
+    /// Rollback journal (`journal_mode=DELETE`), no sidecars.
+    Rollback,
+    /// WAL, closed cleanly: no sidecars.
+    Wal,
+    /// WAL left with its `-wal` and `-shm`; the change lives only in the WAL.
+    WalSidecars,
+}
+
+/// Everything on disk beside the store: each file's length and SHA-256, and
+/// the main file's 100-byte header (file-format bytes 18–19 included).
+fn store_disk(path: &Path) -> Result<Value, String> {
+    let dir = path.parent().ok_or("store has no directory")?;
+    let mut files = serde_json::Map::new();
+    for entry in std::fs::read_dir(dir).map_err(|e| e.to_string())? {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let bytes = std::fs::read(entry.path()).map_err(|e| e.to_string())?;
+        files.insert(
+            entry.file_name().to_string_lossy().into_owned(),
+            json!({ "bytes": bytes.len(), "sha256": sha256(&bytes) }),
+        );
+    }
+    let main = std::fs::read(path).map_err(|e| e.to_string())?;
+    let header: String = main.iter().take(100).map(|b| format!("{b:02x}")).collect();
+    Ok(json!({ "files": files, "header": header }))
+}
+
+/// The upgraded fixture with `sql` applied and left in `shape`, then opened:
+/// it must be refused as `found` with every file, header and sidecar as it
+/// was and no file added. Hashes vary per run, so only the verdicts and the
+/// shape are reported.
+fn refusal(repo: &Path, shape: Shape, sql: &str, found: u32) -> Result<Value, String> {
+    let label = match shape {
+        Shape::Rollback => "rollback",
+        Shape::Wal => "wal",
+        Shape::WalSidecars => "walSidecars",
+    };
+    let path = copy_fixture(repo, &format!("refuse-{label}"))?;
+    drop(Journal::open(&path, "migration", NOW).map_err(|e| e.to_string())?);
+    {
+        let conn = Connection::open(&path).map_err(|e| e.to_string())?;
+        match shape {
+            Shape::Rollback => {
+                let mode: String = conn
+                    .query_row("PRAGMA journal_mode=DELETE", [], |r| r.get(0))
+                    .map_err(|e| e.to_string())?;
+                if mode != "delete" {
+                    return Err(format!("store stayed in journal_mode {mode}"));
+                }
+            }
+            Shape::Wal => {}
+            Shape::WalSidecars => {
+                conn.set_db_config(DbConfig::SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE, true)
+                    .map_err(|e| e.to_string())?;
+                conn.pragma_update(None, "wal_autocheckpoint", 0).map_err(|e| e.to_string())?;
+            }
+        }
+        conn.execute_batch(sql).map_err(|e| e.to_string())?;
+    }
+    let before = store_disk(&path)?;
+    let refused = matches!(
+        Journal::open(&path, "migration", NOW),
+        Err(JournalError::SchemaTooNew { found: refused }) if refused == found
+    );
+    let after = store_disk(&path)?;
+    let header = before["header"].as_str().unwrap_or_default();
+    Ok(json!({
+        "shape": label,
+        "files": before["files"].as_object().map(|files| files.keys().cloned().collect::<Vec<_>>()),
+        "fileFormatBytes18To19": header.get(36..40),
+        "refused": refused,
+        "unchanged": before == after,
+    }))
 }
 
 pub fn run(repo: &Path, root: &Path) -> Result<Value, String> {
@@ -102,28 +182,24 @@ pub fn run(repo: &Path, root: &Path) -> Result<Value, String> {
     drop(reopened);
 
     // A store written by a newer schema, or a checkpoint from a newer
-    // reducer, is refused before any write.
-    let future = copy_fixture(repo, "future")?;
-    drop(Journal::open(&future, "migration", NOW).map_err(|e| e.to_string())?);
-    Connection::open(&future)
-        .and_then(|c| c.execute("INSERT INTO schema_migrations (id, name, checksum, applied_at_ms) VALUES (99, 'future', 'x', 0)", []))
-        .map_err(|e| e.to_string())?;
-    let before = sha256_file(&future);
-    let refused_schema = matches!(Journal::open(&future, "migration", NOW), Err(JournalError::SchemaTooNew { found: 99 }));
-    let unchanged = sha256_file(&future) == before;
-
-    let newer = copy_fixture(repo, "reducer")?;
-    drop(Journal::open(&newer, "migration", NOW).map_err(|e| e.to_string())?);
-    Connection::open(&newer)
-        .and_then(|c| {
-            c.execute(
-                "INSERT INTO projection_checkpoints (reducer_version, schema_version, through_cursor, state_json, state_sha256, origin, created_at_ms)
-                 VALUES (?1, ?2, 0, '{}', 'x', 'FUTURE', 0)",
-                params![REDUCER_VERSION + 1, SCHEMA_VERSION],
-            )
-        })
-        .map_err(|e| e.to_string())?;
-    let refused_reducer = matches!(Journal::open(&newer, "migration", NOW), Err(JournalError::SchemaTooNew { .. }));
+    // reducer, is refused before any write, in every shape a store is left.
+    let future_schema = "INSERT INTO schema_migrations (id, name, checksum, applied_at_ms) VALUES (99, 'future', 'x', 0);";
+    let future_reducer = format!(
+        "INSERT INTO projection_checkpoints (reducer_version, schema_version, through_cursor, state_json, state_sha256, origin, created_at_ms)
+         VALUES ({}, {SCHEMA_VERSION}, 0, '{{}}', 'x', 'FUTURE', 0);",
+        REDUCER_VERSION + 1
+    );
+    let mut schema_stores = Vec::new();
+    let mut reducer_stores = Vec::new();
+    for shape in [Shape::Rollback, Shape::Wal, Shape::WalSidecars] {
+        schema_stores.push(refusal(repo, shape, future_schema, 99)?);
+        reducer_stores.push(refusal(repo, shape, &future_reducer, REDUCER_VERSION + 1)?);
+    }
+    let all = |stores: &[Value], key: &str| stores.iter().all(|s| s[key] == true);
+    let refused_schema = all(&schema_stores, "refused");
+    let unchanged = all(&schema_stores, "unchanged");
+    let refused_reducer = all(&reducer_stores, "refused");
+    let reducer_unchanged = all(&reducer_stores, "unchanged");
 
     let pass = deterministic
         && digests.iter().all(|d| d["projectionMatchesTables"] == true && d["sessionIdsPreserved"] == true)
@@ -136,7 +212,8 @@ pub fn run(repo: &Path, root: &Path) -> Result<Value, String> {
         && replay_ok
         && refused_schema
         && unchanged
-        && refused_reducer;
+        && refused_reducer
+        && reducer_unchanged;
     let summary = json!({
         "area": "migration",
         "pass": pass,
@@ -159,8 +236,8 @@ pub fn run(repo: &Path, root: &Path) -> Result<Value, String> {
             "ownerResolvedItems": resolved,
         },
         "operatesAfterUpgrade": { "ownerCommandThenRestartSameState": replay_ok },
-        "futureSchemaRefused": { "pass": refused_schema, "storeUnchanged": unchanged },
-        "newerReducerCheckpointRefused": refused_reducer,
+        "futureSchemaRefused": { "pass": refused_schema, "storeUnchanged": unchanged, "stores": schema_stores },
+        "newerReducerCheckpointRefused": { "pass": refused_reducer, "storeUnchanged": reducer_unchanged, "stores": reducer_stores },
     });
     area.json("summary.json", &summary)?;
     Ok(summary)
