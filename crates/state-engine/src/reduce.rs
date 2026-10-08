@@ -191,15 +191,20 @@ fn is_native_resolution(kind: ResolutionKind) -> bool {
     !matches!(kind, ResolutionKind::Owner)
 }
 
-/// True when an observation of `proven` causally precedes one of another
-/// image. Monotone in the evidence, so a lost proof is never revived.
-fn followed_by_another(images: &BTreeSet<ProcessImage>, proven: &str) -> bool {
-    images.iter().filter(|a| a.executable == proven).any(|a| {
+/// True when an image other than `proven` is observed causally after the
+/// proof. Monotone in the evidence, so a lost proof is never revived. A
+/// proof without a causal point counts any observation of `proven` that
+/// another image follows.
+fn replaced_after(images: &BTreeSet<ProcessImage>, proven: &str, proof: Option<&CausalPoint>) -> bool {
+    let after = |earlier: &CausalPoint| {
         images.iter().any(|b| {
-            b.executable != proven
-                && matches!((&a.point, &b.point), (Some(p), Some(q)) if compare(p, q) == CausalOrder::Before)
+            b.executable != proven && b.point.as_ref().is_some_and(|q| compare(earlier, q) == CausalOrder::Before)
         })
-    })
+    };
+    match proof {
+        Some(proof) => after(proof),
+        None => images.iter().filter(|a| a.executable == proven).filter_map(|a| a.point.as_ref()).any(after),
+    }
 }
 
 /// The image of the one observation every other observation precedes; with
@@ -695,6 +700,7 @@ impl Tx<'_> {
                 tab_hint: None,
                 proof: serde_json::Value::Null,
                 evidence_observation: None,
+                proof_point: None,
                 invalidations: BTreeSet::new(),
                 valid: false,
                 invalidation_reason: None,
@@ -945,6 +951,7 @@ impl Tx<'_> {
                     binding.tab_hint = proof.tab_hint;
                     binding.proof = proof.evidence.clone();
                     binding.evidence_observation = Some(fact.observation_id.clone());
+                    binding.proof_point.clone_from(&fact.causal);
                     binding.recorded_cursor = Some(cursor);
                 }
             }
@@ -1298,15 +1305,16 @@ impl Tx<'_> {
             let execution = self.state.executions.get(&binding.execution_id);
             // In-place exec invalidates a proof when the current image is
             // determinable and is not the one the binding was proven with, or
-            // once the proven image is causally followed by another: later
-            // evidence without a causal point cannot undo that.
+            // once another image is observed causally after the proof: later
+            // evidence without a causal point cannot undo that, and an image
+            // before a fresh proof does not count against it.
             let replaced = execution
                 .and_then(|e| e.process_id.as_ref())
                 .and_then(|p| self.state.processes.get(p))
                 .zip(binding.executable_identity.as_ref())
                 .is_some_and(|(process, proven)| {
                     process.current_executable.as_ref().is_some_and(|current| current != proven)
-                        || followed_by_another(&process.images, proven)
+                        || replaced_after(&process.images, proven, binding.proof_point.as_ref())
                 });
             let ended = execution.is_some_and(|e| e.presence == ExecutionPresence::Ended);
             let reason = if let Some(reason) = binding.invalidations.iter().next() {

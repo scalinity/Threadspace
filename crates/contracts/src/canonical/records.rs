@@ -277,6 +277,9 @@ pub struct SurfaceBindingRecord {
     #[ts(type = "unknown")]
     pub proof: serde_json::Value,
     pub evidence_observation: Option<String>,
+    /// Where the proof was made: a different image observed causally after
+    /// it invalidates the binding; one before it cannot (D-0007 §5).
+    pub proof_point: Option<CausalPoint>,
     pub invalidations: BTreeSet<String>,
     // Derived.
     pub valid: bool,

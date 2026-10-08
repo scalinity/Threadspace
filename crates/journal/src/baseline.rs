@@ -267,6 +267,7 @@ pub(crate) fn from_m0(conn: &Connection) -> Result<(CanonicalState, Vec<Assignme
                 tab_hint: tab,
                 proof: serde_json::from_str(&proof_json).unwrap_or(Value::Null),
                 evidence_observation: evidence,
+                proof_point: None,
                 invalidations: if valid {
                     BTreeSet::new()
                 } else {

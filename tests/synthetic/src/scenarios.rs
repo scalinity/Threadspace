@@ -703,30 +703,23 @@ pub fn executable_requalified() -> Scenario {
     let mut b = Builder::new("executable-requalified", "activation-changes");
     let s = session(CLAUDE_LIKE, "sess-requalify");
     b.obs(Some(&s), "session.start").push();
+    // A1 is proven with executable A; the process then execs B, so A1's
+    // proof is lost for good, even when A is later observed again.
     attach(&mut b, &s, "act-1", 810, 1000, 16_777_251);
     bind(&mut b, &s, "act-1", "/dev/ttys031", 16_777_251, "810:1000");
+    b.obs(Some(&s), "process.exec").provider(process(810, 1000), "/bin/zsh", None).push();
+    b.obs(Some(&s), "process.exec").provider(process(810, 1000), CLAUDE_EXE, None).unordered().push();
     b.obs(Some(&s), "execution.end").activation("act-1").payload(json!({ "reason": "EXECUTABLE_REPLACED" })).push();
-    b.obs(Some(&s), "execution.attach")
-        .activation("act-2")
-        .provider(process(810, 1000), "/opt/synthetic/bin/claude-2", Some(16_777_251))
-        .payload(json!({ "mode": "terminal_embedded", "presence": "LIVE", "device": 16_777_251 }))
-        .push();
-    b.obs(Some(&s), "surface.bind")
-        .activation("act-2")
-        .payload(json!({
-            "surface": tty_surface("/dev/ttys031", 16_777_251, "810:1000"),
-            "method": "NATIVE_INVENTORY",
-            "executable": "/opt/synthetic/bin/claude-2",
-        }))
-        .push();
+    // The same process returns to A and A2 is proven afresh with A.
+    b.obs(Some(&s), "process.exec").provider(process(810, 1000), CLAUDE_EXE, None).push();
+    attach(&mut b, &s, "act-2", 810, 1000, 16_777_251);
+    bind(&mut b, &s, "act-2", "/dev/ttys031", 16_777_251, "810:1000");
     b.build(|state| {
         let v = View::new(state);
         let old = v.execution("sess-requalify", "act-1").ok_or("act-1")?;
         let new = v.execution("sess-requalify", "act-2").ok_or("act-2")?;
         ensure!(v.bindings(old).iter().all(|b| !b.valid), "old image's proof stays invalid");
-        ensure!(v.bindings(new).iter().all(|b| b.valid), "the new image requalifies");
-        let process = state.processes.values().next().ok_or("process")?;
-        ensure!(process.current_executable.as_deref() == Some("/opt/synthetic/bin/claude-2"), "current image");
+        ensure!(!v.bindings(new).is_empty() && v.bindings(new).iter().all(|b| b.valid), "a fresh proof with A requalifies");
         Ok(())
     })
 }

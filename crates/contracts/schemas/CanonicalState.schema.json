@@ -1605,6 +1605,17 @@
           "description": "None until the proof itself is admitted: an invalidation can arrive\nfirst, and the binding is then invalid from birth."
         },
         "proof": true,
+        "proofPoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Where the proof was made: a different image observed causally after\nit invalidates the binding; one before it cannot (D-0007 §5)."
+        },
         "recordedCursor": {
           "format": "int64",
           "type": [
