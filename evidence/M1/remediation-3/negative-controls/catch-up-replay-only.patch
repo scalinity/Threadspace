@@ -1,0 +1,32 @@
+diff --git a/crates/journal/src/canonical.rs b/crates/journal/src/canonical.rs
+index 44b22f7..848d48f 100644
+--- a/crates/journal/src/canonical.rs
++++ b/crates/journal/src/canonical.rs
+@@ -523,6 +523,7 @@ fn upgrade_json(version: u32, state: &mut Value) {
+ /// how `upgrade_json` reads the decisions in its checkpoint: reducer 1 kept
+ /// only whether a decision covered positives without a causal point, read
+ /// as 1.
++#[allow(dead_code)]
+ fn read_as_recorded(version: u32, decision: &mut WaitOwnerDecision) {
+     if version < 2 {
+         decision.unordered = decision.unordered.min(1);
+@@ -569,11 +570,6 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
+             engine.recover(entry);
+         }
+         let mut state = engine.state;
+-        let recovered = state.waits.values_mut().flat_map(|w| w.owner_decisions.iter_mut());
+-        for decision in recovered.filter(|d| !checkpointed.contains(&d.command_id)) {
+-            read_as_recorded(version, decision);
+-        }
+-        keep_committed(conn, &mut state)?;
+         engine = Engine::new(state);
+         engine.upgrade(endpoint_id);
+     } else {
+@@ -594,6 +590,7 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
+ ///   upgrade's own;
+ /// - an attention item keeps its committed revision unless its row now
+ ///   differs, which makes it a change of the upgrade, at its cursor.
++#[allow(dead_code)]
+ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Result<(), JournalError> {
+     let invalid = |table: &str, key: &str| JournalError::Invalid {
+         detail: format!("committed {table} row {key}"),

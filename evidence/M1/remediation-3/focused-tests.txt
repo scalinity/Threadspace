@@ -1,0 +1,9 @@
+# source 2e42561c339ea42955151af4219c295fb5984db3
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-3 cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade --test reducer_upgrade -- --nocapture
+     Running tests/checkpoint_tail_upgrade.rs
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+     Running tests/reducer_upgrade.rs
+test a_reducer_1_store_is_upgraded_not_reinterpreted ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s

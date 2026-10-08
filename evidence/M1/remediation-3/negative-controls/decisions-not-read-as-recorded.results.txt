@@ -1,0 +1,11 @@
+# source 2e42561c339ea42955151af4219c295fb5984db3 with decisions-not-read-as-recorded.patch applied
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-3/negative-controls/decisions-not-read-as-recorded cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade -- --nocapture
+thread 'a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint' (71612164) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:419:5:
+assertion `left == right` failed: the decision reads the same in or after the checkpoint
+  left: [".attention.663fb032-fef5-812b-9104-b15bd1135349.notificationState: \"PENDING\" | \"NOT_REQUESTED\"", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutionReason: null | \"handled all three\"", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutions: [] | [{\"detail\":\"handled all three\",\"kind\":\"OWNER\"}]", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolvedAtMs: nul
+ right: []
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... FAILED
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:

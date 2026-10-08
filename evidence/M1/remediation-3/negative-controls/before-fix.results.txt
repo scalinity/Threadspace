@@ -1,0 +1,15 @@
+# source 2e42561c339ea42955151af4219c295fb5984db3 with before-fix.patch applied
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-3/negative-controls/before-fix cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade -- --nocapture
+thread 'a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint' (71607731) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:419:5:
+assertion `left == right` failed: the decision reads the same in or after the checkpoint
+  left: [".attention.663fb032-fef5-812b-9104-b15bd1135349.notificationState: \"PENDING\" | \"NOT_REQUESTED\"", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutionReason: null | \"handled all three\"", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutions: [] | [{\"detail\":\"handled all three\",\"kind\":\"OWNER\"}]", ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolvedAtMs: nul
+ right: []
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... FAILED
+thread 'checkpoint_placement_does_not_change_the_upgraded_store' (71607732) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:256:9:
+assertion `left == right` failed: variant B: 4d9804b6-303f-81f5-b80d-c997326b6dc8 (sess-partial t1 episode 0)
+  left: "PENDING"
+ right: "HELD"
+test checkpoint_placement_does_not_change_the_upgraded_store ... FAILED
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:

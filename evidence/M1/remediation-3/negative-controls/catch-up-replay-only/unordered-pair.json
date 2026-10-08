@@ -1,0 +1,65 @@
+{
+  "X": {
+    "decisions": [
+      {
+        "commandId": "cmd-resolve-pair",
+        "unordered": 1
+      }
+    ],
+    "digest": {
+      "checkpointCursor": 6,
+      "checkpointSha256": "38dc49dfa7b13bba2021f7d33bcc3879d69aac8f90b73b50d441c75a44ed9b71",
+      "entries": 6,
+      "facts": 6,
+      "firstCursor": 1,
+      "journalSha256": "e75f977afb5ededdd73a3d48fd17dba5ee26ad1498b101b993944f8bc442b8df",
+      "lastCursor": 6,
+      "projectionSha256": "c590ac802e89bbd8dbac8096e62e9605b8f2d4f9a74d85c4ae0fff0bbc031824",
+      "reducerVersion": 2,
+      "schemaVersion": 3,
+      "semanticSha256": "615f27c71e7d44c1a3581cf528c5559f6e481c42d63c659ab70ae3d3a81156f3",
+      "stateSha256": "38dc49dfa7b13bba2021f7d33bcc3879d69aac8f90b73b50d441c75a44ed9b71",
+      "tablesSha256": "c590ac802e89bbd8dbac8096e62e9605b8f2d4f9a74d85c4ae0fff0bbc031824"
+    },
+    "outbox": {
+      "HELD": 1
+    }
+  },
+  "Y": {
+    "decisions": [
+      {
+        "commandId": "cmd-resolve-pair",
+        "unordered": 2
+      }
+    ],
+    "digest": {
+      "checkpointCursor": 6,
+      "checkpointSha256": "aab4880e4858aed70b47337d19ae35b42d8832787bc0e9d55aad5fdafa64519c",
+      "entries": 6,
+      "facts": 6,
+      "firstCursor": 1,
+      "journalSha256": "e75f977afb5ededdd73a3d48fd17dba5ee26ad1498b101b993944f8bc442b8df",
+      "lastCursor": 6,
+      "projectionSha256": "ddb6c692401fe51b6c5351fdc2643c1614004c229e1a59751ef5f04bc6616fe1",
+      "reducerVersion": 2,
+      "schemaVersion": 3,
+      "semanticSha256": "d4f7a574cb0f22eb52462035a9fa97e8e1869455373643ccbf6bb70fa383f380",
+      "stateSha256": "aab4880e4858aed70b47337d19ae35b42d8832787bc0e9d55aad5fdafa64519c",
+      "tablesSha256": "ddb6c692401fe51b6c5351fdc2643c1614004c229e1a59751ef5f04bc6616fe1"
+    },
+    "outbox": {
+      "SUPPRESSED": 1
+    }
+  },
+  "fixture": "fixtures/m1/reducer-1-store/journal-unordered-pair.sqlite3",
+  "stateDifferencesXY": [
+    ".attention.663fb032-fef5-812b-9104-b15bd1135349.notificationState: \"PENDING\" | \"NOT_REQUESTED\"",
+    ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutionReason: null | \"handled all three\"",
+    ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolutions: [] | [{\"detail\":\"handled all three\",\"kind\":\"OWNER\"}]",
+    ".attention.663fb032-fef5-812b-9104-b15bd1135349.resolvedAtMs: null | 1791000000060",
+    ".outbox.4d9804b6-303f-81f5-b80d-c997326b6dc8.detail: null | \"ineligible before submission\"",
+    ".outbox.4d9804b6-303f-81f5-b80d-c997326b6dc8.state: \"HELD\" | \"SUPPRESSED\"",
+    ".outbox.4d9804b6-303f-81f5-b80d-c997326b6dc8.updatedAtMs: 0 | 1791000000060",
+    ".waits.[\"wait\",\"64cc5c57-a451-4d5c-9d3b-18701655846f\",\"cacf53da-5ff0-44c2-8d4e-122375965811\",\"\",\"a714741e-7317-4827-ad40-714bfe6a03e7\",\"INPUT\",\"\"].ownerDecisions[0].unordered: 1 | 2"
+  ]
+}

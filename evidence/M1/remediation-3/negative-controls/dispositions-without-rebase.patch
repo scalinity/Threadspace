@@ -1,0 +1,28 @@
+diff --git a/crates/journal/src/canonical.rs b/crates/journal/src/canonical.rs
+index 44b22f7..5957646 100644
+--- a/crates/journal/src/canonical.rs
++++ b/crates/journal/src/canonical.rs
+@@ -602,22 +602,9 @@ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Re
+         Some(Sql::Integer(value)) => Some(*value),
+         _ => None,
+     };
+-    let cursor = state.through_cursor;
+-    let attention = materialize::committed_rows(conn, "attention_items")?;
+-    for item in state.attention.values_mut() {
+-        let committed = attention.get(&item.id);
+-        item.revision = match committed {
+-            Some(row) => integer(row, "revision").ok_or_else(|| invalid("attention", &item.id))?,
+-            None => cursor,
+-        };
+-        if committed != Some(&materialize::attention_row(item).named()) {
+-            item.revision = cursor;
+-        }
+-    }
+     let outbox = materialize::committed_rows(conn, "notification_outbox")?;
+-    state.outbox.retain(|request_id, _| outbox.contains_key(request_id));
+     for record in state.outbox.values_mut() {
+-        let row = &outbox[&record.request_id];
++        let Some(row) = outbox.get(&record.request_id) else { continue };
+         let fail = || invalid("outbox", &record.request_id);
+         record.state = match row.get("state") {
+             Some(Sql::Text(name)) => serde_json::from_value(Value::String(name.clone())).map_err(|_| fail())?,

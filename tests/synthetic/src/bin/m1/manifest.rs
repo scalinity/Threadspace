@@ -63,6 +63,38 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
         .ok()
         .and_then(|t| serde_json::from_str::<Value>(&t).ok())
         .unwrap_or(Value::Null);
+    let evidence = |path: &str| {
+        std::fs::read_to_string(root.join(path))
+            .ok()
+            .and_then(|t| serde_json::from_str::<Value>(&t).ok())
+            .unwrap_or(Value::Null)
+    };
+    // The reducer-1 upgrade wherever its newest checkpoint sits.
+    let tail = evidence("remediation-3/checkpoint-tail.json");
+    let pair = evidence("remediation-3/unordered-pair.json");
+    let tail_rows: Vec<Value> = tail["variants"]
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .map(|v| {
+                    json!({
+                        "variant": v["variant"], "newestCheckpointBefore": v["checkpointsBefore"].as_array().and_then(|c| c.last()),
+                        "suffixEntriesReplayed": v["suffixEntriesReplayed"], "outbox": v["counts"],
+                        "stateSha256": v["digest"]["stateSha256"], "tablesSha256": v["digest"]["tablesSha256"],
+                        "semanticSha256": v["digest"]["semanticSha256"],
+                        "stateDifferencesFromA": v["stateDifferencesFromA"].as_array().map(Vec::len),
+                    })
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let tail_pass = tail_rows.len() == 3
+        && tail_rows.iter().all(|v| {
+            v["outbox"] == json!({ "PENDING": 1, "HELD": 4, "SUPPRESSED": 1 })
+                && v["stateDifferencesFromA"] == json!(0)
+                && v["stateSha256"] == tail_rows[0]["stateSha256"]
+        })
+        && pair["stateDifferencesXY"] == json!([]);
     let oracle: Vec<Value> = std::fs::read_to_string(root.join("remediation/c04-oracle/retained-runs.json"))
         .ok()
         .and_then(|t| serde_json::from_str(&t).ok())
@@ -75,7 +107,8 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
         .unwrap_or(Value::Null);
     let areas_pass = [&contracts, &replay, &permutations, &crash, &capture, &migration, &sanitization, &guard, &c04_oracle]
         .iter()
-        .all(|summary| summary["pass"] == true);
+        .all(|summary| summary["pass"] == true)
+        && tail_pass;
     let manifest = json!({
         "schema": 1,
         "milestone": "M1",
@@ -94,6 +127,20 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
                     "regenerated": { "areas": ["contracts", "fixtures", "replay", "permutations", "crash", "migration"], "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a" },
                     "retained": { "areas": ["capture", "sanitization"], "sourceCommit": "e52c281f8cc1cb998ea64bcdf8010afeae6400e7", "reason": "hook, relay, spool and companion code unchanged since; the journal changes (wait reduction, which no hook event reaches; the preflight branch for a WAL without -shm; the reducer-upgrade load path) are not reached by those workloads" },
                     "native": { "m0b": "build 5944c81, not reinstalled: a reducer-2 build would upgrade the owner's live store", "c04": "build 73636ec" },
+                },
+            },
+            "third": {
+                "base": "85d188e221c24a4e91a533d0ab743fa0e1184c80",
+                "record": "evidence/M1/remediation-3/README.md",
+                "defect": "a reducer-1 store whose newest checkpoint was followed by journal entries upgraded with fresh PENDING intents for attention reducer 2 first derived while replaying them",
+                "repair": "6ed18f0b11856120c956b42f620001127fa3b66b",
+                "tests": "2e42561c339ea42955151af4219c295fb5984db3",
+                "checkpointTail": { "pass": tail_pass, "variants": tail_rows, "unorderedPair": { "X": pair["X"]["outbox"], "Y": pair["Y"]["outbox"], "stateDifferencesXY": pair["stateDifferencesXY"] } },
+                "negativeControls": "evidence/M1/remediation-3/negative-controls/",
+                "evidenceSources": {
+                    "regenerated": { "areas": ["migration"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "every field reproduced except the per-run file SHA-256 of fresh stores" },
+                    "reproduced": { "areas": ["contracts", "fixtures", "replay", "crash"], "sourceCommit": "2e42561c339ea42955151af4219c295fb5984db3", "note": "files byte-identical to those regenerated at 05a9a2e" },
+                    "retained": { "areas": ["permutations"], "sourceCommit": "05a9a2eaaab72c0ed08ea2ac9e5cfb5f31bd9f9a", "reason": "reducer and admission unchanged; every permutation store is written by reducer 2, so its load takes the unchanged same-reducer branch" },
                 },
             },
         },
@@ -176,6 +223,7 @@ pub fn compose(repo: &Path, root: &Path, native: &Value) -> Result<Value, String
             "A store left with a hot rollback journal is opened writable by the preflight, so SQLite rolls it back even if it is then refused as too new; the rollback restores its last committed bytes. This is an accepted exception, not a necessity: refusing such a store from a private copy would also be possible.",
             "G08's full Terminal.app restart stays BLOCKED on this owner machine (D-0006 C-08, M15).",
             "On build 5944c81, 9 of G08's 10 selection-readback-race routes over two runs were refused conservatively (READBACK_FAILED; Terminal answered the focus script's first AppleEvent with -600 while the harness activated Terminal) and 1 was focused exactly: 0 wrong targets, and ordinary exact Return passed. The race setup and its overlap with each route are not fully attested; the cause is not established; M5 owns the investigation.",
+            "A reducer-1 wait owner decision kept only whether it covered positives without a causal point; the upgrade reads it as covering one, in the checkpoint or replayed after it, so an item whose owner covered two or more such positives in one reducer-1 decision is shown again after the upgrade.",
             "G08's fullscreen-space-then-return case recorded null fullscreen entry and exit witnesses on build 5944c81: it is not a fresh fullscreen-transition qualification; the accepted M0C H-10 evidence stays authoritative.",
         ],
     });

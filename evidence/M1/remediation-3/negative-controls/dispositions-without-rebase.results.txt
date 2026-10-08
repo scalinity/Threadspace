@@ -1,0 +1,11 @@
+# source 2e42561c339ea42955151af4219c295fb5984db3 with dispositions-without-rebase.patch applied
+# THREADSPACE_WRITE_CHECKPOINT_TAIL=<repo>/evidence/M1/remediation-3/negative-controls/dispositions-without-rebase cargo test --no-fail-fast -p threadspace-synthetic --test checkpoint_tail_upgrade -- --nocapture
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+thread 'checkpoint_placement_does_not_change_the_upgraded_store' (71610814) panicked at tests/synthetic/tests/checkpoint_tail_upgrade.rs:372:9:
+assertion `left == right` failed: variant B: state differs from A
+  left: Array [String(".attention.38cc3ee8-5b0f-8db0-b9f9-5009640eba9c.revision: 30 | 19"), String(".attention.3e47b2b0-a74f-827a-97d8-ce9cae31767e.revision: 30 | 13"), String(".attention.663fb032-fef5-812b-9104-b15bd1135349.revision: 30 | 6"), String(".attention.9c14d766-ad73-835e-ae27-ff21b71c0222.revision: 30 | 24"), String(".outbox.e976fef2-0ab9-86de-86e5-5eb61c2cadc1.createdAtMs: 0 | 17910000
+ right: Array []
+test checkpoint_placement_does_not_change_the_upgraded_store ... FAILED
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+error: test failed, to rerun pass `-p threadspace-synthetic --test checkpoint_tail_upgrade`
+error: 1 target failed:
