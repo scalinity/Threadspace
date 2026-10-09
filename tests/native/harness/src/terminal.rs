@@ -244,10 +244,12 @@ impl Tab {
 
     /// Submits `text` to a provider's prompt. `do script` ends what it types
     /// with a line feed, which Claude's prompt editor inserts as a newline
-    /// rather than a submit; the carriage return goes as its own write.
+    /// rather than a submit; the carriage return goes as its own write, after
+    /// the editor's paste window: a long text arriving in one write is a
+    /// paste, and a return within about 3 s of it is dropped.
     pub fn submit_line(&self, text: &str) -> bool {
         let typed = self.type_line(text);
-        crate::pause_ms(400);
+        crate::pause_ms(3500);
         typed && self.type_line("\r")
     }
 

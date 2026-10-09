@@ -268,23 +268,8 @@ pub fn wait_view(ctx: &Ctx, native: &str, timeout: Duration, condition: impl Fn(
 /// Types a prompt and waits for the session's completed-turn count to reach
 /// `expected`; returns the elapsed milliseconds.
 pub fn prompt_and_complete(ctx: &Ctx, observed: &Observed, text: &str, expected: usize) -> Result<u64, String> {
-    let before = submitted_inputs(ctx, &observed.session_id);
-    observed.tab.submit_line(text);
     let started = Instant::now();
-    // A submit the editor did not take is retried once, with the
-    // carriage return alone: the text is already in the prompt.
-    let mut retried = false;
-    while submitted_inputs(ctx, &observed.session_id) <= before {
-        let waited = started.elapsed();
-        if waited > Duration::from_secs(40) {
-            return Err(format!("prompt {expected} was never submitted"));
-        }
-        if waited > Duration::from_secs(20) && !retried {
-            observed.tab.type_line("\r");
-            retried = true;
-        }
-        threadspace_harness::pause_ms(250);
-    }
+    submit(ctx, observed, text)?;
     while started.elapsed() < TURN_TIMEOUT {
         if completed_turns(ctx, &observed.session_id) >= expected {
             return Ok(started.elapsed().as_millis() as u64);
@@ -292,6 +277,37 @@ pub fn prompt_and_complete(ctx: &Ctx, observed: &Observed, text: &str, expected:
         threadspace_harness::pause_ms(250);
     }
     Err(format!("turn {expected} did not complete within {TURN_TIMEOUT:?}"))
+}
+
+/// Submits a prompt to an idle session and confirms it from the companion's
+/// inputs. A return the editor did not take is sent again every 4 s (the
+/// text is already in the prompt; a return on an empty prompt is ignored);
+/// answers how many returns were resent.
+pub fn submit(ctx: &Ctx, observed: &Observed, text: &str) -> Result<u32, String> {
+    let before = submitted_inputs(ctx, &observed.session_id);
+    observed.tab.submit_line(text);
+    let started = Instant::now();
+    let mut resent = 0;
+    while submitted_inputs(ctx, &observed.session_id) <= before {
+        if started.elapsed() > Duration::from_secs(40) {
+            return Err(format!("prompt was never submitted ({resent} returns resent)"));
+        }
+        if started.elapsed() > Duration::from_secs(4 * (u64::from(resent) + 1)) {
+            observed.tab.type_line("\r");
+            resent += 1;
+        }
+        threadspace_harness::pause_ms(250);
+    }
+    Ok(resent)
+}
+
+/// Types a prompt and sends the return again after the paste window, for a
+/// session whose inputs the companion may not record (stopped, blocked or
+/// limited); a return on an empty prompt is ignored.
+pub fn submit_unconfirmed(observed: &Observed, text: &str) {
+    observed.tab.submit_line(text);
+    threadspace_harness::pause_ms(4000);
+    observed.tab.type_line("\r");
 }
 
 /// The UI's own controls, through the qualification command handlers.
@@ -493,6 +509,8 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let scratch = Scratch::new(ctx, "vertical")?;
     let activation = activate(ctx, &scratch.dir)?;
     let ui_state = ensure_ui(ctx)?;
+    let recording = Recording::start()?;
+    let start_cursor = journal_cursor(ctx);
     let dir = disposable("vertical-work")?;
     let command = claude_command(&dir, &activation, &launcher()?, &["--allowedTools", "Bash(echo:*)"], &[]);
     let observed = start_observed(ctx, dir, &command)?;
@@ -542,6 +560,13 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
             }))
             .map_err(|e| e.to_string())?;
     }
+    let latency = latency(ctx, &observed.native_session_id, start_cursor);
+    let handled = mark_handled(ctx, &observed.session_id);
+    let still_one = ui(ctx, "m2-fleet", json!({ "sessionId": observed.session_id }))
+        .ok()
+        .and_then(|f| f["result"]["rows"].as_array().map(Vec::len))
+        == Some(1);
+    pass &= handled["pass"] == json!(true) && still_one;
     observed.tab.submit_line("/exit");
     let exited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
         format!("{:?}", v.execution_presence) == "Ended"
@@ -557,14 +582,19 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let _ = other.close();
     let _ = std::fs::remove_dir_all(&other.dir);
     let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
+    let recording = recording.map(|mut recording| recording.stop());
     let summary = json!({
         "pass": pass,
         "cycles": cycles,
+        "recording": recording,
         "nativeSessionId": observed.native_session_id,
         "sessionId": observed.session_id,
         "ui": ui_state,
         "exit": exited.as_ref().ok().map(|(v, ms)| json!({ "presence": v.execution_presence, "observation": v.observation, "ms": ms })),
         "exitError": exited.as_ref().err(),
+        "latency": latency,
+        "markHandled": handled,
+        "workerAfterMarkHandled": still_one,
         "workerKeptAfterExit": worker_kept,
         "windowClosed": closed,
         "activation": activation.record["detail"]["pluginDir"].as_str().map(redact_home),
@@ -579,6 +609,186 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
 pub fn refusals() -> Value {
     let (count, ms) = terminal::refusals();
     json!({ "count": count, "waitedMs": ms })
+}
+
+/// An uncut recording of the main display for a run, written only to the
+/// private directory `THREADSPACE_M2_RECORDING_DIR` outside the repository
+/// (it shows whatever the display shows); the evidence keeps its digest.
+struct Recording {
+    child: std::process::Child,
+    path: PathBuf,
+    started: Instant,
+    stopped: bool,
+}
+
+impl Recording {
+    fn start() -> Result<Option<Self>, String> {
+        let Some(dir) = std::env::var_os("THREADSPACE_M2_RECORDING_DIR").map(PathBuf::from) else {
+            return Ok(None);
+        };
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let dir = dir.canonicalize().map_err(|e| e.to_string())?;
+        let repo = std::env::current_dir().and_then(|d| d.canonicalize()).map_err(|e| e.to_string())?;
+        if dir.starts_with(&repo) {
+            return Err("THREADSPACE_M2_RECORDING_DIR must be outside the repository".into());
+        }
+        let path = dir.join(format!("m2-vertical-{}.mov", threadspace_harness::now_ms()));
+        let child = std::process::Command::new("/usr/sbin/screencapture")
+            .args(["-x", "-v", "-D1"])
+            .arg(&path)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .map_err(|e| format!("screencapture: {e}"))?;
+        Ok(Some(Self { child, path, started: Instant::now(), stopped: false }))
+    }
+
+    /// Ends the recording (SIGINT finalizes the movie) and describes it.
+    fn stop(&mut self) -> Value {
+        let wall_ms = self.started.elapsed().as_millis() as u64;
+        self.stopped = true;
+        threadspace_harness::procs::signal(self.child.id() as i32, libc::SIGINT);
+        let status = self.child.wait().ok().and_then(|s| s.code());
+        let bytes = std::fs::metadata(&self.path).map(|m| m.len()).ok();
+        let digest = run("/usr/bin/shasum", &["-a", "256", &self.path.display().to_string()], Duration::from_secs(120));
+        json!({
+            "file": self.path.file_name().map(|n| n.to_string_lossy().into_owned()),
+            "privateDirectory": "THREADSPACE_M2_RECORDING_DIR (outside the repository)",
+            "sha256": digest.stdout.split_whitespace().next(),
+            "bytes": bytes,
+            "wallMs": wall_ms,
+            "exit": status,
+        })
+    }
+}
+
+/// A run that ends early still finalizes its recording.
+impl Drop for Recording {
+    fn drop(&mut self) {
+        if !self.stopped {
+            threadspace_harness::procs::signal(self.child.id() as i32, libc::SIGINT);
+            let _ = self.child.wait();
+        }
+    }
+}
+
+/// The journal's last ingest sequence (the projection cursor).
+fn journal_cursor(ctx: &Ctx) -> u64 {
+    journal_query(ctx, "SELECT COALESCE(MAX(ingest_seq), 0) AS n FROM observations")
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+        .and_then(|rows| rows[0]["n"].as_u64())
+        .unwrap_or(0)
+}
+
+fn percentiles(mut values: Vec<i64>) -> Value {
+    values.sort_unstable();
+    let at = |q: usize| values.get((values.len() * q).div_ceil(100).saturating_sub(1)).copied();
+    json!({ "n": values.len(), "p50": at(50), "p95": at(95), "max": values.last() })
+}
+
+/// SPEC §20.2 latency for one session's observations after `after`: local
+/// capture → commit (`received − captured`, per source; the observer's
+/// includes its bounded drain), commit → applied DOM (the view's DOM first
+/// showing that observation's own patch cursor) and native event → DOM.
+fn latency(ctx: &Ctx, native: &str, after: u64) -> Value {
+    let marks = ui(ctx, "m2-latency", json!({ "afterCursor": after.to_string() }))
+        .ok()
+        .and_then(|r| r["result"]["marks"].as_array().cloned())
+        .unwrap_or_default();
+    let dom: std::collections::HashMap<u64, i64> = marks
+        .iter()
+        .filter_map(|m| Some((m["cursor"].as_str()?.parse().ok()?, m["domWallMs"].as_f64()? as i64)))
+        .collect();
+    let rows: Vec<Value> = journal_query(ctx, &format!(
+        "SELECT ingest_seq, source_id, captured_wall_ms, received_wall_ms FROM observations
+          WHERE ingest_seq > {after} AND source_id IN ('claude.hook', 'claude.observer')
+            AND json_extract(payload_json, '$.sessionKey.nativeSessionId') = '{}'",
+        native.replace('\'', "")
+    ))
+    .ok()
+    .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+    .and_then(|v| v.as_array().cloned())
+    .unwrap_or_default();
+    #[derive(Default)]
+    struct Spans {
+        commit: Vec<i64>,
+        view: Vec<i64>,
+        total: Vec<i64>,
+    }
+    let mut by_source: std::collections::BTreeMap<String, Spans> = Default::default();
+    for row in &rows {
+        let (Some(seq), Some(source), Some(captured), Some(received)) =
+            (row["ingest_seq"].as_u64(), row["source_id"].as_str(), row["captured_wall_ms"].as_i64(), row["received_wall_ms"].as_i64())
+        else {
+            continue;
+        };
+        let entry = by_source.entry(source.to_owned()).or_default();
+        entry.commit.push(received - captured);
+        if let Some(&shown) = dom.get(&seq) {
+            entry.view.push(shown - received);
+            entry.total.push(shown - captured);
+        }
+    }
+    let sources: serde_json::Map<String, Value> = by_source
+        .into_iter()
+        .map(|(source, spans)| {
+            (source, json!({ "captureToCommitMs": percentiles(spans.commit), "commitToDomMs": percentiles(spans.view), "eventToDomMs": percentiles(spans.total) }))
+        })
+        .collect();
+    let hook = &sources.get("claude.hook").cloned().unwrap_or(Value::Null);
+    let within = |v: &Value, limit: i64| v["p95"].as_i64().is_some_and(|p| p <= limit);
+    json!({
+        "targets": { "captureToCommitP95Ms": 100, "commitToDomP95Ms": 100, "eventToDomP95Ms": 250 },
+        "viewMarks": marks.len(),
+        "observations": rows.len(),
+        "bySource": sources,
+        "normalPathPass": within(&hook["captureToCommitMs"], 100) && within(&hook["commitToDomMs"], 100) && within(&hook["eventToDomMs"], 250),
+    })
+}
+
+/// Presses the inspector's Mark handled for each open attention item of a
+/// session and reads back, for each, the view's resolution, the journaled
+/// owner command and the item's resolution in canonical state.
+fn mark_handled(ctx: &Ctx, session_id: &str) -> Value {
+    let sid = session_id.replace('\'', "");
+    let open: Vec<Value> = journal_query(ctx, &format!(
+        "SELECT id, category FROM attention_items WHERE session_id = '{sid}' AND resolved_at_ms IS NULL ORDER BY created_at_ms LIMIT 25"
+    ))
+    .ok()
+    .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+    .and_then(|v| v.as_array().cloned())
+    .unwrap_or_default();
+    let mut items = Vec::new();
+    for item in &open {
+        let id = item["id"].as_str().unwrap_or_default().replace('\'', "");
+        let pressed = ui(ctx, "m2-press-mark-handled", json!({ "attentionId": id }));
+        let result = pressed.as_ref().ok().map(|p| p["result"].clone()).unwrap_or(Value::Null);
+        let journal = journal_query(ctx, &format!(
+            "SELECT i.resolved_at_ms IS NOT NULL AS resolved, i.resolution_reason AS reason,
+                    (SELECT COUNT(*) FROM attention_commands c WHERE c.attention_id = i.id AND c.observation_id IS NOT NULL) AS commands
+               FROM attention_items i WHERE i.id = '{id}'"
+        ))
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+        .map(|rows| rows[0].clone())
+        .unwrap_or(Value::Null);
+        let ok = result["resolvedInView"] == json!(true)
+            && result["listedAfter"] == json!(false)
+            && journal["resolved"] == json!(1)
+            && journal["commands"].as_u64().unwrap_or(0) >= 1;
+        items.push(json!({
+            "attentionId": id, "category": item["category"], "ok": ok,
+            "view": { "clicked": result["clicked"], "resolvedInView": result["resolvedInView"], "listedAfter": result["listedAfter"], "receipt": result["receipt"], "error": result["error"] },
+            "uiError": pressed.as_ref().err(), "journal": journal,
+        }));
+    }
+    json!({
+        "pass": !items.is_empty() && items.iter().all(|i| i["ok"] == json!(true)),
+        "openBefore": open.len(),
+        "items": items,
+    })
 }
 
 // ------------------------------------------------------------------ routes
