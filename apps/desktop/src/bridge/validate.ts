@@ -80,6 +80,7 @@ export function compareCursors(left: string, right: string): number {
 const TURN_STATES = ["UNKNOWN", "QUEUED", "WORKING", "WAITING", "COMPLETED", "INTERRUPTED", "FAILED", "REFUSED"] as const;
 const PRESENCE = ["LIVE", "DETACHED", "PARKED", "ENDED", "UNKNOWN"] as const;
 const OBSERVATION = ["CURRENT", "STALE", "DISCONNECTED", "CONFLICT", "UNKNOWN"] as const;
+const OBSERVER_TIERS = ["NATIVE", "RESTORED", "LOWER_TIER"] as const;
 const CATEGORIES = [
   "INPUT_REQUIRED",
   "APPROVAL_REQUIRED",
@@ -130,6 +131,9 @@ function session(value: unknown, path: string): SessionView {
     turnState: oneOf(v.turnState, `${path}.turnState`, TURN_STATES),
     executionPresence: oneOf(v.executionPresence, `${path}.executionPresence`, PRESENCE),
     observation: oneOf(v.observation, `${path}.observation`, OBSERVATION),
+    observerTier: v.observerTier === null ? null : oneOf(v.observerTier, `${path}.observerTier`, OBSERVER_TIERS),
+    observerVersion: optionalString(v.observerVersion, `${path}.observerVersion`),
+    linkConflict: boolean(v.linkConflict, `${path}.linkConflict`),
     process: process && {
       pid: integer(process.pid, `${path}.process.pid`),
       bootId: string(process.bootId, `${path}.process.bootId`),

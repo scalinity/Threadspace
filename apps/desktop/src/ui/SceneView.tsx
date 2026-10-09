@@ -1,34 +1,12 @@
 import { useCallback } from "react";
 
-import {
-  RendererLifecycle,
-  createThreeRendererPlatform,
-  documentVisibilityConfirmation,
-  type SceneModel,
-  type WorkerVisualState,
-} from "@threadspace/scene";
+import { RendererLifecycle, createThreeRendererPlatform, documentVisibilityConfirmation } from "@threadspace/scene";
 
-import type { BridgeClient, ViewState } from "../bridge/client";
+import type { BridgeClient } from "../bridge/client";
 import { ipc } from "../bridge/ipc";
 import { launch } from "../launch";
 import { registerRendererLifecycle } from "../qualification/rendererQualification";
-
-function workerState(state: ViewState, sessionId: string): WorkerVisualState {
-  const open = state.attention.filter((item) => item.sessionId === sessionId && item.resolvedAtMs === null);
-  if (open.some((item) => item.acknowledgedAtMs === null)) return "attention";
-  return open.length > 0 ? "acknowledged" : "idle";
-}
-
-export function sceneModel(state: ViewState): SceneModel {
-  return {
-    workers: state.sessions.map((session) => ({
-      id: session.sessionId,
-      label: session.displayName,
-      state: workerState(state, session.sessionId),
-    })),
-    selectedId: state.inspector?.sessionId ?? null,
-  };
-}
+import { sceneModel } from "./worker";
 
 const lifecycles = new WeakMap<BridgeClient, RendererLifecycle>();
 

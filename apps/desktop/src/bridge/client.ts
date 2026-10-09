@@ -9,6 +9,7 @@ import { Channel } from "@tauri-apps/api/core";
 
 import type { AttentionCounts } from "../contracts/generated/AttentionCounts";
 import type { AttentionView } from "../contracts/generated/AttentionView";
+import type { CommandReceipt } from "../contracts/generated/CommandReceipt";
 import type { DiagnosticsReport } from "../contracts/generated/DiagnosticsReport";
 import type { DiscoverySummary } from "../contracts/generated/DiscoverySummary";
 import type { FrameHeader } from "../contracts/generated/FrameHeader";
@@ -24,6 +25,7 @@ import type { UiQuery } from "../contracts/generated/UiQuery";
 import type { UiQueryResult } from "../contracts/generated/UiQueryResult";
 import type { RendererAttestation } from "@threadspace/scene";
 import { launch } from "../launch";
+import { canAcknowledge, canMarkHandled, selectableItem } from "../ui/attention";
 import { BridgeError, ipc, normalizeFailure } from "./ipc";
 import { UI_PROTOCOL_VERSION, ValidationError, compareCursors, parseFrame, parsePage, parseSnapshot } from "./validate";
 import type { RouteSummary } from "../contracts/generated/RouteSummary";
@@ -52,6 +54,9 @@ export interface Paging {
   staleRepliesIgnored: number;
   invalidations: number;
 }
+
+/** A durable owner command's receipt, or why it was not committed. */
+export type CommandOutcome = { ok: true; receipt: CommandReceipt } | { ok: false; error: string };
 
 export type QualificationHandler = (command: string, args: unknown) => Promise<unknown> | unknown;
 
@@ -91,8 +96,14 @@ export interface ViewState {
   notices: string[];
   /** Latest Return result per session, with its evidence chain. */
   routes: Record<string, RouteResult>;
+  /** Why a session's latest Return request got no route result at all; cleared by the next result. */
+  routeFailures: Record<string, string>;
   /** Session whose Return is in flight. */
   routing: string | null;
+  /** Attention item whose Mark handled command is in flight. */
+  resolving: string | null;
+  /** Latest Mark handled outcome per attention item. */
+  resolutions: Record<string, CommandOutcome>;
   discovery: DiscoverySummary | null;
   paging: Paging;
   /** Times the view revalidated after timers were suspended (sleep, hidden). */
@@ -153,7 +164,10 @@ const initialState: ViewState = {
   rendererError: null,
   notices: [],
   routes: {},
+  routeFailures: {},
   routing: null,
+  resolving: null,
+  resolutions: {},
   discovery: null,
   paging: { complete: true, totalSessions: 0, totalAttention: 0, pagesLoaded: 0, staleRepliesIgnored: 0, invalidations: 0 },
   resumes: 0,
@@ -714,6 +728,10 @@ export class BridgeClient {
 
   async acknowledge(attentionId: string): Promise<void> {
     const item = this.state.attention.find((entry) => entry.attentionId === attentionId);
+    if (item && !canAcknowledge(item)) {
+      this.notice(`Acknowledge skipped: ${attentionId.slice(0, 8)} is ${item.resolvedAtMs !== null ? "already resolved" : "already acknowledged"}`);
+      return;
+    }
     try {
       const result = await this.action({ kind: "AcknowledgeAttention", attentionId }, item?.revision ?? null);
       if (result.kind === "CommandCommitted") {
@@ -724,17 +742,27 @@ export class BridgeClient {
     }
   }
 
-  /** "Mark handled": explicit resolution with a reason (SPEC §7.2). */
+  /**
+   * "Mark handled": the explicit durable resolution, with a reason (SPEC
+   * §7.2). Only an item still open in this view can be marked handled.
+   */
   async resolve(attentionId: string, reason: string): Promise<void> {
     const item = this.state.attention.find((entry) => entry.attentionId === attentionId);
+    if (this.state.resolving !== null) return;
+    if (item && !canMarkHandled(item)) {
+      this.notice(`Mark handled skipped: ${attentionId.slice(0, 8)} is already resolved`);
+      return;
+    }
+    this.set({ resolving: attentionId });
+    let outcome: CommandOutcome;
     try {
       const result = await this.action({ kind: "ResolveAttention", attentionId, reason }, item?.revision ?? null);
-      if (result.kind === "CommandCommitted") {
-        this.notice(`Marked handled ${attentionId.slice(0, 8)} — ${result.receipt.status}`);
-      }
+      outcome = result.kind === "CommandCommitted" ? { ok: true, receipt: result.receipt } : { ok: false, error: `unexpected reply ${result.kind}` };
     } catch (error) {
-      this.notice(`Mark handled failed: ${error instanceof Error ? error.message : String(error)}`);
+      outcome = { ok: false, error: error instanceof Error ? error.message : String(error) };
     }
+    this.notice(outcome.ok ? `Marked handled ${attentionId.slice(0, 8)} — ${outcome.receipt.status}` : `Mark handled failed: ${outcome.error}`);
+    this.set({ resolving: null, resolutions: { ...this.state.resolutions, [attentionId]: outcome } });
   }
 
   /** Enable/Stop Observation run the native bootstrap ordering (SPEC §19.5). */
@@ -767,10 +795,16 @@ export class BridgeClient {
         expectedBindingRevision: null,
       });
       if (result.kind === "Routed") {
-        this.set({ routes: { ...this.state.routes, [sessionId]: result.result } });
+        const routeFailures = { ...this.state.routeFailures };
+        delete routeFailures[sessionId];
+        this.set({ routes: { ...this.state.routes, [sessionId]: result.result }, routeFailures });
+      } else {
+        this.set({ routeFailures: { ...this.state.routeFailures, [sessionId]: `unexpected reply ${result.kind}` } });
       }
     } catch (error) {
-      this.notice(`Return failed: ${error instanceof Error ? error.message : String(error)}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.notice(`Return failed: ${message}`);
+      this.set({ routeFailures: { ...this.state.routeFailures, [sessionId]: message } });
     } finally {
       this.set({ routing: null });
     }
@@ -824,7 +858,7 @@ export class BridgeClient {
       this.set({ inspector: null });
       return;
     }
-    const outstanding = this.state.attention.find((item) => item.sessionId === sessionId && item.acknowledgedAtMs === null);
+    const outstanding = selectableItem(this.state.attention, sessionId);
     this.set({
       inspector: {
         attentionId: outstanding?.attentionId ?? null,

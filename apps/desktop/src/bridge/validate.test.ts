@@ -75,6 +75,9 @@ describe("provider sessions", () => {
     turnState: "UNKNOWN",
     executionPresence: "LIVE",
     observation: "CURRENT",
+    observerTier: "NATIVE",
+    observerVersion: "2.1.295",
+    linkConflict: false,
     process: { pid: 501, bootId: "b", startSeconds: "1000", startMicroseconds: 7, executableIdentity: "/x#1:2" },
     binding: {
       bindingId: "b1",
@@ -118,6 +121,20 @@ describe("provider sessions", () => {
     const parsed = parseSnapshot(snapshot([session]));
     expect(parsed.sessions[0]?.binding?.locator).toBe("/dev/ttys005");
     expect(parsed.sessions[0]?.lastRoute?.sessionVerification).toBe("CURRENT_NATIVE_REVALIDATED");
+  });
+
+  it("accepts the observer tier, version and link conflict, including no observer", () => {
+    const parsed = parseSnapshot(snapshot([session]));
+    expect(parsed.sessions[0]).toMatchObject({ observerTier: "NATIVE", observerVersion: "2.1.295", linkConflict: false });
+    const none = parseSnapshot(snapshot([{ ...session, observerTier: null, observerVersion: null, linkConflict: true }]));
+    expect(none.sessions[0]).toMatchObject({ observerTier: null, observerVersion: null, linkConflict: true });
+  });
+
+  it("rejects an unknown observer tier or a missing coverage field", () => {
+    expect(() => parseSnapshot(snapshot([{ ...session, observerTier: "LIMITED" }]))).toThrow(ValidationError);
+    const withoutConflict: Record<string, unknown> = { ...session };
+    delete withoutConflict.linkConflict;
+    expect(() => parseSnapshot(snapshot([withoutConflict]))).toThrow(ValidationError);
   });
 
   it("rejects an unknown route axis value", () => {

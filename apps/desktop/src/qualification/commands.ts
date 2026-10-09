@@ -6,7 +6,7 @@
 
 import type { BridgeClient } from "../bridge/client";
 import { BridgeError, ipc, normalizeFailure } from "../bridge/ipc";
-import { sceneModel } from "../ui/SceneView";
+import { sceneModel } from "../ui/worker";
 import { runRendererQualificationCommand } from "./rendererQualification";
 
 interface Outcome {
@@ -261,7 +261,7 @@ export function installQualificationCommands(client: BridgeClient, extra: ExtraH
         return { reloading: true };
       case "scene-workers":
         // The office lays workers out in this order, centred on the camera.
-        return { workers: sceneModel(client.getSnapshot()).workers.map(({ id, state }) => ({ id, state })) };
+        return { workers: sceneModel(client.getSnapshot()).workers.map(({ id, state, attention }) => ({ id, state, attention })) };
       case "resource-hold": {
         // G15 overlap witness: arm, release or read the shell's hold on one
         // same-scheme response (the shell answers NOT_IMPLEMENTED in release builds).

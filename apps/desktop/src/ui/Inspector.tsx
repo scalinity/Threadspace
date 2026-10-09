@@ -1,12 +1,18 @@
-import type { BridgeClient, ViewState } from "../bridge/client";
+import type { BridgeClient, CommandOutcome, ViewState } from "../bridge/client";
 import type { RouteResult } from "../contracts/generated/RouteResult";
-import { RouteAxes } from "./RouteAxes";
+import { canAcknowledge, canMarkHandled, categoryText, itemStateText, openCountText, openItemsFor } from "./attention";
+import { LINK_CONFLICT_TEXT, inventoryText, observationText, observerText, presenceText, turnText } from "./coverage";
+import { ReturnResult } from "./ReturnResult";
+import { returnGate } from "./returnControl";
+import { WORKER_STATE_TEXT, workerState } from "./worker";
 
-function Field({ label, value }: { label: string; value: string | null | undefined }) {
+const MARK_HANDLED_REASON = "Marked handled in the inspector";
+
+function Field({ id, label, value, warning }: { id?: string; label: string; value: string | null | undefined; warning?: boolean }) {
   return (
-    <div className="field">
+    <div className="field" data-field={id}>
       <dt>{label}</dt>
-      <dd className="mono">{value ?? "—"}</dd>
+      <dd className={warning ? "mono warning" : "mono"}>{value ?? "—"}</dd>
     </div>
   );
 }
@@ -44,21 +50,29 @@ function RouteProof({ result }: { result: RouteResult }) {
   );
 }
 
+function resolutionText(outcome: CommandOutcome): string {
+  return outcome.ok ? `Marked handled: ${outcome.receipt.status} at cursor ${outcome.receipt.cursor}` : `Mark handled failed: ${outcome.error}`;
+}
+
 export function Inspector({ state, client }: { state: ViewState; client: BridgeClient }) {
   const inspector = state.inspector;
   if (!inspector) {
     return (
-      <section className="panel" aria-labelledby="inspector-heading">
+      <section className="panel" aria-labelledby="inspector-heading" data-testid="inspector">
         <h2 id="inspector-heading" className="panel__title">Inspector</h2>
         <p className="empty">Select a worker or an attention item.</p>
       </section>
     );
   }
+  const live = state.phase === "live";
   const session = state.sessions.find((entry) => entry.sessionId === inspector.sessionId);
   const item = inspector.attentionId ? state.attention.find((entry) => entry.attentionId === inspector.attentionId) : undefined;
-  const route = state.routes[inspector.sessionId];
+  const route = state.routes[inspector.sessionId] ?? null;
+  const failure = state.routeFailures[inspector.sessionId] ?? null;
+  const gate = session ? returnGate(session, live, state.routing) : null;
+  const resolution = item ? state.resolutions[item.attentionId] : undefined;
   return (
-    <section className="panel" aria-labelledby="inspector-heading" data-inspector-source={inspector.source}>
+    <section className="panel" aria-labelledby="inspector-heading" data-inspector-source={inspector.source} data-testid="inspector" data-session-id={inspector.sessionId}>
       <h2 id="inspector-heading" className="panel__title">Inspector</h2>
       {inspector.source === "NOTIFICATION_RESPONSE" ? (
         <p className="callout" role="status">
@@ -68,14 +82,26 @@ export function Inspector({ state, client }: { state: ViewState; client: BridgeC
         </p>
       ) : null}
       <dl className="fields">
-        <Field label="Worker" value={session?.displayName} />
-        <Field label="Session" value={inspector.sessionId} />
-        <Field label="Native session" value={session?.nativeSessionId} />
-        <Field label="Observation" value={session ? `${session.observation.toLowerCase()} · ${session.executionPresence.toLowerCase()}` : null} />
-        <Field label="Activation" value={session?.activation} />
-        <Field label="Process" value={session?.process ? `pid ${session.process.pid} · born ${session.process.startSeconds}.${String(session.process.startMicroseconds).padStart(6, "0")}` : null} />
-        <Field label="Executable" value={session?.process?.executableIdentity} />
+        <Field id="worker" label="Worker" value={session?.displayName} />
+        <Field id="workerState" label="State" value={session ? WORKER_STATE_TEXT[workerState(session, state.attention)] : null} />
+        <Field id="session" label="Session" value={inspector.sessionId} />
+        <Field id="nativeSession" label="Native session" value={session?.nativeSessionId} />
+        <Field id="turn" label="Turn" value={session ? turnText(session.turnState) : null} />
+        <Field id="presence" label="Presence" value={session ? presenceText(session.executionPresence) : null} />
+        <Field id="observer" label="Observer" value={session ? (session.fixture ? "Fixture: not observed" : observerText(session.observerTier, session.observerVersion)) : null} />
+        <Field id="observation" label="Observation" value={session ? observationText(session.observation) : null} />
         <Field
+          id="link"
+          label="Observer link"
+          value={session ? (session.linkConflict ? LINK_CONFLICT_TEXT : "Reports agree") : null}
+          warning={session?.linkConflict === true}
+        />
+        <Field id="inventory" label="Inventory" value={session ? inventoryText(session) : null} />
+        <Field id="activation" label="Activation" value={session?.activation} />
+        <Field id="process" label="Process" value={session?.process ? `pid ${session.process.pid} · born ${session.process.startSeconds}.${String(session.process.startMicroseconds).padStart(6, "0")}` : null} />
+        <Field id="executable" label="Executable" value={session?.process?.executableIdentity} />
+        <Field
+          id="binding"
           label="Binding"
           value={
             session?.binding
@@ -85,47 +111,72 @@ export function Inspector({ state, client }: { state: ViewState; client: BridgeC
                 : null
           }
         />
-        <Field label="Reported" value={session?.providerStatus ? `${session.providerStatus}${session.providerWaitingFor ? ` (${session.providerWaitingFor})` : ""}` : null} />
-        <Field label="Attention" value={inspector.attentionId} />
-        <Field label="Item state" value={item ? (item.resolvedAtMs !== null ? "resolved" : item.acknowledgedAtMs !== null ? "acknowledged" : "needs attention") : inspector.attentionId ? "not in projection" : null} />
+        <Field id="openAttention" label="Open attention" value={openCountText(openItemsFor(state.attention, inspector.sessionId).length)} />
+        <Field id="attention" label="Attention" value={inspector.attentionId} />
+        <Field id="itemCategory" label="Item" value={item ? categoryText(item.category) : null} />
+        <Field id="itemState" label="Item state" value={item ? itemStateText(item) : inspector.attentionId ? "not in projection" : null} />
       </dl>
-      {route ? (
-        <>
-          <h3 className="panel__subtitle">Last return</h3>
-          <RouteAxes surface={route.surfaceResult} verification={route.sessionVerification} readiness={route.inputReadiness} reason={route.reasonCode} />
-          {route.reasonCode === "MULTIPLE_ATTACHMENTS" ? (
-            <div className="chooser" role="group" aria-label="Choose an attachment">
-              <p className="row__meta">This session has several live attachments. Choose one; the newest is never picked for you.</p>
-              {route.choices.map((choice) => (
-                <button key={choice.bindingId} type="button" className="button button--quiet" onClick={() => void client.returnTo(inspector.sessionId, choice.bindingId)}>
-                  pid {choice.pid} · {choice.tty}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          <RouteProof result={route} />
-        </>
+      <ReturnResult result={route ?? session?.lastRoute ?? null} failure={failure} heading={route || failure ? "Return" : "Last recorded return"} />
+      {route?.reasonCode === "MULTIPLE_ATTACHMENTS" ? (
+        <div className="chooser" role="group" aria-label="Choose an attachment">
+          <p className="row__meta">This session has several live attachments. Choose one; the newest is never picked for you.</p>
+          {route.choices.map((choice) => (
+            <button
+              key={choice.bindingId}
+              type="button"
+              className="button button--quiet"
+              onClick={() => void client.returnTo(inspector.sessionId, choice.bindingId)}
+              disabled={!live || state.routing !== null}
+            >
+              pid {choice.pid} · {choice.tty}
+            </button>
+          ))}
+        </div>
       ) : null}
+      {route ? <RouteProof result={route} /> : null}
       <div className="actions">
-        {session && !session.fixture ? (
-          <button type="button" className="button" onClick={() => void client.returnTo(session.sessionId)} disabled={state.phase !== "live" || state.routing !== null}>
-            Return
+        {session && gate ? (
+          <button
+            type="button"
+            className="button"
+            onClick={() => void client.returnTo(session.sessionId)}
+            disabled={!gate.enabled}
+            title={gate.reason ?? undefined}
+            data-testid="inspector-return"
+          >
+            {state.routing === session.sessionId ? "Returning…" : "Return"}
           </button>
         ) : null}
-        {item && item.acknowledgedAtMs === null ? (
-          <button type="button" className="button" onClick={() => void client.acknowledge(item.attentionId)} disabled={state.phase !== "live"}>
+        {item && canAcknowledge(item) ? (
+          <button type="button" className="button" onClick={() => void client.acknowledge(item.attentionId)} disabled={!live} data-testid="inspector-acknowledge">
             Acknowledge
           </button>
         ) : null}
-        {item && item.resolvedAtMs === null ? (
-          <button type="button" className="button button--quiet" onClick={() => void client.resolve(item.attentionId, "Marked handled in the inspector")} disabled={state.phase !== "live"}>
-            Mark handled
+        {item ? (
+          <button
+            type="button"
+            className="button button--quiet"
+            onClick={() => void client.resolve(item.attentionId, MARK_HANDLED_REASON)}
+            disabled={!live || !canMarkHandled(item) || state.resolving !== null}
+            data-testid="inspector-mark-handled"
+          >
+            {state.resolving === item.attentionId ? "Marking handled…" : "Mark handled"}
           </button>
         ) : null}
         <button type="button" className="button button--quiet" onClick={() => client.select(null)}>
           Close
         </button>
       </div>
+      {gate && !gate.enabled && gate.reason ? (
+        <p className="row__meta" data-testid="inspector-return-gate">
+          Return unavailable: {gate.reason}
+        </p>
+      ) : null}
+      {resolution ? (
+        <p className={resolution.ok ? "row__meta" : "row__meta warning"} role="status" data-testid="inspector-resolution">
+          {resolutionText(resolution)}
+        </p>
+      ) : null}
     </section>
   );
 }

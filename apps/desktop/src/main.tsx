@@ -6,6 +6,7 @@ import { launch } from "./launch";
 import { runAclProbe } from "./qualification/aclProbe";
 import { installQualificationCommands } from "./qualification/commands";
 import { runIpcSelfTest } from "./qualification/ipcSelfTest";
+import { m2Commands } from "./qualification/m2";
 import { App } from "./ui/App";
 import "./styles.css";
 
@@ -26,7 +27,7 @@ if (launch.probe === "acl") {
       void runIpcSelfTest(hydrated);
     });
   }
-  if (launch.qualificationBuild) installQualificationCommands(client);
+  if (launch.qualificationBuild) installQualificationCommands(client, [m2Commands(client)]);
   client.start();
   createRoot(root).render(
     <StrictMode>

@@ -1,7 +1,9 @@
 // One imperative scene controller over provider-neutral view models
-// (SPEC §15.1–15.2). M0A uses a deliberately simple geometric qualification
-// skin: a floor, one desk per worker, a capsule worker and a TSL-shaded
-// attention marker whose colour and motion follow the projected state.
+// (SPEC §15.1–15.2). A deliberately simple geometric skin: a floor, one desk
+// per worker, a capsule worker whose colour, opacity and motion follow its
+// projected state, and a TSL-shaded marker for owner needs. The marker
+// follows open attention independently of the state, so new work never
+// erases older attention (SPEC §15.3).
 //
 // An OfficeScene is built on an already initialized renderer and lives for
 // exactly one renderer generation; `RendererLifecycle` creates, attests and
@@ -29,12 +31,16 @@ import { color, float, mix, oscSine, texture, time, uniform, uv, vec2 } from "th
 
 import type { LifecycleScene, SceneAsset } from "./lifecycle";
 
-export type WorkerVisualState = "attention" | "acknowledged" | "idle";
+export type WorkerVisualState = "working" | "waiting" | "attention" | "acknowledged" | "idle" | "ended" | "stale";
+
+/** Open attention at the worker's desk: some needing attention, only items awaiting action, or none. */
+export type WorkerAttention = "needs" | "awaiting" | "none";
 
 export interface SceneWorker {
   id: string;
   label: string;
   state: WorkerVisualState;
+  attention: WorkerAttention;
 }
 
 export interface SceneModel {
@@ -62,19 +68,45 @@ export interface FloorTexture extends SceneAsset {
 const PALETTE = {
   floor: "#EFEBE3",
   desk: "#D8D2C6",
-  worker: "#195C5D",
-  selected: "#379489",
+  working: "#195C5D",
+  settled: "#379489",
+  muted: "#736E67",
+  selectedGlow: "#C58AE5",
   attentionA: "#C58AE5",
   attentionB: "#195C5D",
   acknowledged: "#55AAA4",
 };
 
+/**
+ * The body carries activity and presence. Working is deep teal (and moves
+ * unless motion is reduced); a provider wait is lavender; the settled states
+ * share the lighter teal and differ by marker; a stale worker is muted, and
+ * an ended one is a faint, still selectable trace at its desk.
+ */
+const BODY: Record<WorkerVisualState, { color: string; opacity: number }> = {
+  working: { color: PALETTE.working, opacity: 1 },
+  waiting: { color: PALETTE.attentionA, opacity: 1 },
+  attention: { color: PALETTE.settled, opacity: 1 },
+  acknowledged: { color: PALETTE.settled, opacity: 1 },
+  idle: { color: PALETTE.settled, opacity: 1 },
+  stale: { color: PALETTE.muted, opacity: 0.7 },
+  ended: { color: PALETTE.muted, opacity: 0.3 },
+};
+
+const BODY_Y = 0.62;
+
 interface WorkerNodes {
   root: Object3D;
   body: Mesh;
   marker: Mesh;
+  state: WorkerVisualState;
+  bodyColor: ReturnType<typeof uniform>;
+  /** 1 = selected (lavender glow), 0 = not. */
+  selected: ReturnType<typeof uniform>;
   /** 1 = outstanding attention (pulsing), 0 = acknowledged (steady). */
   pulse: ReturnType<typeof uniform>;
+  /** 1 = the provider is waiting on the owner (steady lavender call). */
+  call: ReturnType<typeof uniform>;
 }
 
 export class OfficeScene implements LifecycleScene<FloorTexture> {
@@ -139,29 +171,37 @@ export class OfficeScene implements LifecycleScene<FloorTexture> {
     desk.position.set(0, 0.4, -0.7);
     root.add(desk);
 
-    const bodyMaterial = new MeshStandardNodeMaterial({ roughness: 0.6 });
-    bodyMaterial.colorNode = color(PALETTE.worker);
+    // Body colour and selection are uniforms, so a state change never
+    // recompiles the material.
+    const bodyColor = uniform(new Color(PALETTE.settled));
+    const selected = uniform(0);
+    const bodyMaterial = new MeshStandardNodeMaterial({ roughness: 0.6, transparent: true });
+    bodyMaterial.colorNode = bodyColor;
+    bodyMaterial.emissiveNode = color(PALETTE.selectedGlow).mul(selected.mul(0.4));
     const body = new Mesh(new CapsuleGeometry(0.32, 0.6, 6, 16), bodyMaterial);
-    body.position.set(0, 0.62, 0.35);
+    body.position.set(0, BODY_Y, 0.35);
     body.userData.workerId = id;
     root.add(body);
 
     // TSL: the marker blends between lavender and teal over time while the
     // worker needs attention; once acknowledged the pulse uniform drops to 0
-    // and it settles on a steady teal. Reduced motion holds the blend still
-    // while keeping the attention and acknowledged colours distinct.
+    // and it settles on a steady teal. A provider wait overrides both with a
+    // steady, larger lavender call. Reduced motion holds the blend still while
+    // keeping the three colours distinct.
     const pulse = uniform(1);
+    const call = uniform(0);
     const markerMaterial = new MeshStandardNodeMaterial({ roughness: 0.35, metalness: 0.1 });
     const wave = mix(float(0.5), oscSine(time.mul(0.6)), this.motion);
-    markerMaterial.colorNode = mix(color(PALETTE.acknowledged), mix(color(PALETTE.attentionB), color(PALETTE.attentionA), wave), pulse);
-    markerMaterial.emissiveNode = mix(color("#000000"), color(PALETTE.attentionA).mul(0.35), pulse.mul(wave));
+    const attentionColor = mix(color(PALETTE.acknowledged), mix(color(PALETTE.attentionB), color(PALETTE.attentionA), wave), pulse);
+    markerMaterial.colorNode = mix(attentionColor, color(PALETTE.attentionA), call);
+    markerMaterial.emissiveNode = color(PALETTE.attentionA).mul(pulse.mul(wave).add(call.mul(0.5)).mul(0.35));
     const marker = new Mesh(new OctahedronGeometry(0.22), markerMaterial);
     marker.position.set(0, 1.55, 0.35);
     marker.userData.workerId = id;
     root.add(marker);
 
     this.scene.add(root);
-    return { root, body, marker, pulse };
+    return { root, body, marker, state: "idle", bodyColor, selected, pulse, call };
   }
 
   /** Applies a projected model. Missing workers are removed and their GPU resources released. */
@@ -173,11 +213,17 @@ export class OfficeScene implements LifecycleScene<FloorTexture> {
       const nodes = this.workers.get(worker.id) ?? this.createWorker(worker.id);
       this.workers.set(worker.id, nodes);
       nodes.root.position.set((index - (model.workers.length - 1) / 2) * 3, 0, 0);
-      nodes.marker.visible = worker.state !== "idle";
-      nodes.pulse.value = worker.state === "attention" ? 1 : 0;
-      const bodyMaterial = nodes.body.material as MeshStandardNodeMaterial;
-      bodyMaterial.colorNode = color(worker.id === model.selectedId ? PALETTE.selected : PALETTE.worker);
-      bodyMaterial.needsUpdate = true;
+      nodes.state = worker.state;
+      const body = BODY[worker.state];
+      (nodes.bodyColor.value as Color).set(body.color);
+      (nodes.body.material as MeshStandardNodeMaterial).opacity = body.opacity;
+      nodes.selected.value = worker.id === model.selectedId ? 1 : 0;
+      if (worker.state !== "working") nodes.body.position.y = BODY_Y;
+      const waiting = worker.state === "waiting";
+      nodes.marker.visible = waiting || worker.attention !== "none";
+      nodes.marker.scale.setScalar(waiting ? 1.35 : 1);
+      nodes.call.value = waiting ? 1 : 0;
+      nodes.pulse.value = worker.attention === "needs" ? 1 : 0;
     });
     for (const [id, nodes] of this.workers) {
       if (!seen.has(id)) {
@@ -189,10 +235,13 @@ export class OfficeScene implements LifecycleScene<FloorTexture> {
     this.stats.modelRevision += 1;
   }
 
-  /** Stops idle motion (marker spin and pulse) without changing any state-driven appearance. */
+  /** Stops idle motion (marker spin, pulse and work motion) without changing any state-driven appearance. */
   setReducedMotion(reduced: boolean): void {
     this.reducedMotion = reduced;
     this.motion.value = reduced ? 0 : 1;
+    if (reduced) {
+      for (const nodes of this.workers.values()) nodes.body.position.y = BODY_Y;
+    }
   }
 
   /** Adds the bundled paper grain to the floor. The texture stays owned by its generation's asset. */
@@ -215,8 +264,11 @@ export class OfficeScene implements LifecycleScene<FloorTexture> {
   private frame(): void {
     if (this.released) return;
     if (!this.reducedMotion) {
+      const seconds = performance.now() / 1000;
       for (const nodes of this.workers.values()) {
-        nodes.marker.rotation.y += 0.02;
+        // Uncertain and historical workers stay still (SPEC §15.3).
+        if (nodes.state !== "stale" && nodes.state !== "ended") nodes.marker.rotation.y += 0.02;
+        if (nodes.state === "working") nodes.body.position.y = BODY_Y + 0.05 * Math.sin(seconds * 4);
       }
     }
     this.renderer.render(this.scene, this.camera);

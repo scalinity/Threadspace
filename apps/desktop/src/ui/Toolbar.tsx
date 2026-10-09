@@ -16,7 +16,6 @@ export function Toolbar({ state }: { state: ViewState }) {
   return (
     <header className="toolbar" data-tauri-drag-region="deep">
       <h1 className="wordmark">Threadspace</h1>
-      <span className="toolbar__meta">M0A platform foundation</span>
       <span className={`pill pill--${state.phase}`} title={state.detail ?? undefined}>
         <span className="pill__dot" aria-hidden="true" />
         {PHASE_LABEL[state.phase]}

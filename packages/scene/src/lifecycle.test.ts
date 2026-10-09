@@ -297,7 +297,7 @@ class FakeEnv {
 const naturalLoss: RendererLossInfo = { api: "WebGPU", message: "GPU process reset", reason: "unknown", originalEvent: { secret: "raw" } };
 
 function model(...ids: string[]): SceneModel {
-  return { workers: ids.map((id) => ({ id, label: id, state: "attention" as const })), selectedId: null };
+  return { workers: ids.map((id) => ({ id, label: id, state: "attention" as const, attention: "needs" as const })), selectedId: null };
 }
 
 /** Terminal outcomes; after quiescence they must equal `started`. */

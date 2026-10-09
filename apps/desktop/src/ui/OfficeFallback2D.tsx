@@ -1,13 +1,8 @@
-import type { RendererLifecycleSnapshot, WorkerVisualState } from "@threadspace/scene";
+import type { RendererLifecycleSnapshot } from "@threadspace/scene";
 
 import type { BridgeClient, ViewState } from "../bridge/client";
-import { sceneModel } from "./SceneView";
-
-const STATE_TEXT: Record<WorkerVisualState, string> = {
-  attention: "Needs attention",
-  acknowledged: "Acknowledged, awaiting action",
-  idle: "No open attention",
-};
+import { openItemsFor } from "./attention";
+import { WORKER_STATE_TEXT, sceneModel } from "./worker";
 
 /**
  * The DOM office: the same workers and attention the 3D scene draws, from the
@@ -29,17 +24,17 @@ export function OfficeFallback2D({ state, client, renderer }: { state: ViewState
       <ul className="list">
         {model.workers.map((worker) => {
           const selected = worker.id === model.selectedId;
-          const open = state.attention.filter((item) => item.sessionId === worker.id && item.resolvedAtMs === null);
+          const open = openItemsFor(state.attention, worker.id);
           const categories = [...new Set(open.map((item) => item.category.toLowerCase().replaceAll("_", " ")))];
           return (
-            <li key={worker.id} className={`row ${selected ? "row--selected" : ""}`}>
+            <li key={worker.id} className={`row ${selected ? "row--selected" : ""} ${worker.state === "ended" ? "row--ended" : ""}`}>
               <button type="button" className="row__main" onClick={() => client.select(worker.id)} aria-current={selected ? "true" : undefined}>
                 <span className="row__label">
                   <span className={`office-2d__marker office-2d__marker--${worker.state}`} aria-hidden="true" />
                   {worker.label}
                 </span>
                 <span className="row__meta">
-                  {STATE_TEXT[worker.state]}
+                  {WORKER_STATE_TEXT[worker.state]}
                   {open.length > 0 ? ` · ${open.length} open · ${categories.join(", ")}` : ""}
                 </span>
               </button>

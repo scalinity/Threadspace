@@ -1,5 +1,5 @@
 export { OfficeScene } from "./controller";
-export type { FloorTexture, FrameStats, OfficeSceneOptions, SceneModel, SceneWorker, WorkerVisualState } from "./controller";
+export type { FloorTexture, FrameStats, OfficeSceneOptions, SceneModel, SceneWorker, WorkerAttention, WorkerVisualState } from "./controller";
 export { PINNED_THREE_REVISION, attest, inspectPinnedRendererBackend } from "./backend";
 export type { AdapterSummary, RendererAttestation, RendererBackend } from "./backend";
 export { RendererLifecycle, documentVisibilityConfirmation } from "./lifecycle";
