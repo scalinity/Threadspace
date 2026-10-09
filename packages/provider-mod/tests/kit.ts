@@ -59,6 +59,7 @@ export const spawnInput = (toolUseId: string) => ({
 export type Batch = {
   at: number
   argv: string[]
+  budgetMs: number | undefined
   timeoutMs: number | undefined
   envelope: any
   records: any[]
@@ -75,6 +76,13 @@ export const receipt = (batch: Batch, status: (record: any, index: number) => st
 
 export const commitAll: Mode = batch => ({ stdout: receipt(batch) })
 
+// The helper takes its budget as the argv's last two parts,
+// `--budget-ms <ms>`; without them it answers a usage error and no receipt.
+const budgetOf = (argv: readonly string[]): number | undefined => {
+  const [flag, value] = argv.slice(-2)
+  return flag === '--budget-ms' && /^[0-9]+$/.test(value ?? '') ? Number(value) : undefined
+}
+
 export function installHelper(on: any, clock: any, mode: Mode = commitAll) {
   const batches: Batch[] = []
   let active = 0
@@ -88,12 +96,13 @@ export function installHelper(on: any, clock: any, mode: Mode = commitAll) {
       const batch: Batch = {
         at: clock.now(),
         argv: [...e.argv],
+        budgetMs: budgetOf(e.argv),
         timeoutMs: e.init?.timeoutMs,
         envelope,
         records: envelope?.records ?? [],
       }
       batches.push(batch)
-      const answer = current(batch, batches.length)
+      const answer: Answer = batch.budgetMs === undefined ? { exitCode: 2 } : current(batch, batches.length)
       if (answer.delayMs) await clock.sleep(answer.delayMs)
       if (answer.reject) return { deny: answer.reject }
       return {

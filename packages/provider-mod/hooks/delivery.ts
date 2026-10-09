@@ -3,10 +3,12 @@
 // Records leave the queue only on a valid typed receipt. Exit code 0, a
 // missing or malformed receipt and a timeout are never acceptance: the
 // records stay, with their original UUIDs, and one retry timer backs off
-// from 250 ms to 5 s. The host reaches this file only through the `Io`
-// closures a hook binds; a hot reload drops the environment and with it
-// any pending timer (`$.clock`: "a hot reload of the plugin cancels its
-// pending waits with the old environment").
+// from 250 ms to 5 s. Every run appends `--budget-ms` to the configured
+// argv, 20 ms under the run's `timeoutMs` (10 ms at least), so the helper
+// answers before the host kills it. The host reaches this file only
+// through the `Io` closures a hook binds; a hot reload drops the
+// environment and with it any pending timer (`$.clock`: "a hot reload of
+// the plugin cancels its pending waits with the old environment").
 
 import type { ProcessRunInit, ProcessRunResult, Timer } from 'claude-code'
 
@@ -148,7 +150,8 @@ export function createDelivery(argv: readonly string[] | undefined, sourceEpoch:
       batch = takeBatch(prefix)
       for (const item of batch) item.inFlight = true
       const stdin = `${prefix}${batch.map(item => item.json).join(',')}]}`
-      const result = await io.run(argv, { stdin, timeoutMs })
+      const budgetMs = Math.max(10, timeoutMs - 20)
+      const result = await io.run([...argv, '--budget-ms', String(budgetMs)], { stdin, timeoutMs })
       const statuses = readReceipt(result, batch.map(item => item.id))
       if (statuses) {
         const accepted = new Set([...statuses].filter(([, status]) => ACCEPTED.includes(status)).map(([id]) => id))

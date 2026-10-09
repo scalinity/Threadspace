@@ -1,6 +1,7 @@
 // Mod delivery (SPEC §8.3): the typed mod-batch receipt, retry with the
 // original UUIDs, queue and batch bounds, one retry timer with backoff, one
-// in-flight drain, and no timer while idle. The test's `process.run` hook
+// in-flight drain, no timer while idle, and the helper's budget on every
+// run's argv. The test's `process.run` hook
 // stands for the capture helper; a `{ deny }` answer reaches the observer as
 // the rejection a timed-out `$.process.run` gives.
 
@@ -54,7 +55,7 @@ describe('mod delivery', () => {
 
     expect(helper.batches.length).toBe(1)
     const [batch] = helper.batches
-    expect(batch?.argv).toEqual(ARGV)
+    expect(batch?.argv).toEqual([...ARGV, '--budget-ms', '230'])
     expect(batch?.timeoutMs).toBe(250)
     expect(batch?.envelope).toEqual(
       expect.objectContaining({ receiptVersion: 1, kind: 'mod-batch', sourceEpoch: expect.stringMatching(UUID), droppedRecords: 0 }),
@@ -370,6 +371,28 @@ describe('mod delivery', () => {
     // so reload and timer cancellation are qualified in a native session.
     const epochsSeen = new Set(helper.batches.map(batch => batch.envelope.sourceEpoch))
     expect(epochsSeen.size).toBe(1)
-    expect(helper.batches.every(batch => batch.argv.join(' ') === ARGV.join(' '))).toBe(true)
+    expect(helper.batches.every(batch => batch.argv.join(' ') === [...ARGV, '--budget-ms', '230'].join(' '))).toBe(true)
+  })
+
+  test('budget argv is appended', OPTIONS, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock, (batch, call) => (call === 1 ? timeout : commitAll(batch, call)))
+    installCore(on)
+
+    // A prompt drain, its retry after a timeout, then the end-of-session drain.
+    await $.classic.SessionStart({ source: 'startup', session_id: 'S1' } as any)
+    await clock.settle()
+    await clock.advance(250)
+    await $.session.end({ reason: 'prompt_input_exit', sessionId: 'S1', resume: { id: 'S1' } } as any)
+
+    expect(helper.batches.map(batch => batch.timeoutMs)).toEqual([250, 250, 100])
+    const [first, retry, end] = helper.batches
+    for (const batch of [first, retry]) {
+      expect(batch?.argv).toEqual([...ARGV, '--budget-ms', '230'])
+      expect(batch?.budgetMs).toBe(230)
+    }
+    expect(end?.argv).toEqual([...ARGV, '--budget-ms', '80'])
+    expect(end?.budgetMs).toBe(80)
+    expect(end?.records.some((record: any) => record.nativeEvent === 'session.end')).toBe(true)
   })
 })
