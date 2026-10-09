@@ -17,7 +17,7 @@ use threadspace_relay::paths::redact_home;
 
 use crate::ctx::Ctx;
 use crate::m2::{
-    Activation, Observed, activate, claude_command, completed_turns, disposable, finish, integration, journal_query,
+    Activation, Observed, Scratch, activate, claude_command, completed_turns, disposable, finish, integration, journal_query,
     launcher, session_view, start_observed, wait_view,
 };
 
@@ -342,8 +342,8 @@ fn partial_receipt(ctx: &Ctx, a: &Activation, kind: &str) -> Result<Value, Strin
 
 pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "faults", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = disposable("faults")?;
-    let activation = activate(ctx, &scratch)?;
+    let scratch = Scratch::new(ctx, "faults")?;
+    let activation = activate(ctx, &scratch.dir)?;
     let all = which == "all";
     let mut verdicts = Vec::new();
     let mut case = |name: &str, run: &mut dyn FnMut() -> Result<Value, String>| {
@@ -353,7 +353,7 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
             verdicts.push(outcome);
         }
     };
-    case("stop", &mut || stop_continuation(ctx, &activation, &scratch));
+    case("stop", &mut || stop_continuation(ctx, &activation, &scratch.dir));
     case("interrupt", &mut || interrupted(ctx, &activation));
     case("failed", &mut || failed(ctx, &activation));
     case("blocked", &mut || blocked_submission(ctx, &activation));
@@ -361,7 +361,7 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     case("reload", &mut || mod_reload(ctx, &activation));
     case("child", &mut || child_waiting(ctx, &activation));
     case("delayed", &mut || delayed_submission(ctx, &activation));
-    case("forged", &mut || forged(ctx, &activation, &scratch));
+    case("forged", &mut || forged(ctx, &activation, &scratch.dir));
     case("partial", &mut || partial_receipt(ctx, &activation, "partial"));
     case("malformed", &mut || partial_receipt(ctx, &activation, "malformed"));
     case("exit1", &mut || partial_receipt(ctx, &activation, "exit1"));
@@ -369,14 +369,14 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     case("terminal", &mut || {
         crate::terminal_gates::negatives(ctx).map(|summary| verdict("terminal-negatives", summary["pass"] == json!(true), summary))
     });
-    let removed = integration(ctx, "uninstall", &scratch.join("session-config"), "session");
-    let _ = std::fs::remove_dir_all(&scratch);
+    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
     let pass = verdicts.iter().all(|v| v["pass"] == json!(true));
     let summary = json!({
         "pass": pass,
         "cases": verdicts.iter().map(|v| json!({ "case": v["case"], "pass": v["pass"] })).collect::<Vec<_>>(),
         "integrationRemoved": removed.ok().map(|r| r["ok"].clone()),
         "activation": redact_home(&activation.plugin_dir),
+        "terminalRefusals": crate::m2::refusals(),
     });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(summary)

@@ -127,7 +127,9 @@ pub fn start_observed(ctx: &Ctx, dir: PathBuf, command: &str) -> Result<Observed
     terminal::wait_scriptable(TERMINAL_WAIT)?;
     let tab = {
         let _gui = ctx.gui("m2 start observed Claude")?;
-        let tab = Tab::open(dir.clone(), command)?;
+        let tab = Tab::open(dir.clone(), command).inspect_err(|_| {
+            let _ = std::fs::remove_dir_all(&dir);
+        })?;
         threadspace_harness::pause_ms(4000);
         // The folder-trust dialog preselects "No, exit": Down then Return.
         tab.type_line("\u{1b}[B");
@@ -346,6 +348,27 @@ pub fn front_other(ctx: &Ctx, other: &Tab) {
     threadspace_harness::pause_ms(400);
 }
 
+/// A runner's scratch directory and the session-scope install made in it,
+/// both removed however the runner ends (a second uninstall after an
+/// explicit one answers NOT_INSTALLED).
+pub struct Scratch<'a> {
+    ctx: &'a Ctx,
+    pub dir: PathBuf,
+}
+
+impl<'a> Scratch<'a> {
+    pub fn new(ctx: &'a Ctx, label: &str) -> Result<Self, String> {
+        Ok(Self { ctx, dir: disposable(label)? })
+    }
+}
+
+impl Drop for Scratch<'_> {
+    fn drop(&mut self) {
+        let _ = integration(self.ctx, "uninstall", &self.dir.join("session-config"), "session");
+        let _ = std::fs::remove_dir_all(&self.dir);
+    }
+}
+
 pub fn disposable(label: &str) -> Result<PathBuf, String> {
     let dir = std::env::temp_dir().join(format!("ts-m2-{label}-{}", uuid::Uuid::new_v4()));
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
@@ -467,8 +490,8 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
 /// and one worker; then a clean exit leaves the worker as history.
 pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "vertical", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = disposable("vertical")?;
-    let activation = activate(ctx, &scratch)?;
+    let scratch = Scratch::new(ctx, "vertical")?;
+    let activation = activate(ctx, &scratch.dir)?;
     let ui_state = ensure_ui(ctx)?;
     let dir = disposable("vertical-work")?;
     let command = claude_command(&dir, &activation, &launcher()?, &["--allowedTools", "Bash(echo:*)"], &[]);
@@ -533,8 +556,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let closed = finish(&observed);
     let _ = other.close();
     let _ = std::fs::remove_dir_all(&other.dir);
-    let removed = integration(ctx, "uninstall", &scratch.join("session-config"), "session");
-    let _ = std::fs::remove_dir_all(&scratch);
+    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
     let summary = json!({
         "pass": pass,
         "cycles": cycles,
@@ -547,9 +569,16 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         "windowClosed": closed,
         "activation": activation.record["detail"]["pluginDir"].as_str().map(redact_home),
         "integrationRemoved": removed.ok().map(|r| r["ok"].clone()),
+        "terminalRefusals": refusals(),
     });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(summary)
+}
+
+/// Terminal scripting refusals the harness waited out in this run.
+pub fn refusals() -> Value {
+    let (count, ms) = terminal::refusals();
+    json!({ "count": count, "waitedMs": ms })
 }
 
 // ------------------------------------------------------------------ routes
@@ -559,8 +588,8 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
 /// by independent readback; zero wrong targets.
 pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "routes", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = disposable("routes")?;
-    let activation = activate(ctx, &scratch)?;
+    let scratch = Scratch::new(ctx, "routes")?;
+    let activation = activate(ctx, &scratch.dir)?;
     ensure_ui(ctx)?;
     let mut sessions = Vec::new();
     for index in 0..3 {
@@ -599,13 +628,14 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     }
     threadspace_harness::pause_ms(3000);
     let closed: Vec<Value> = sessions.iter().map(finish).collect();
-    let _ = integration(ctx, "uninstall", &scratch.join("session-config"), "session");
-    let _ = std::fs::remove_dir_all(&scratch);
+    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
     let summary = json!({
         "pass": exact == count && wrong == 0,
         "requested": count, "exactVerified": exact, "wrongTargets": wrong,
         "routeLatencyP95Ms": p95, "routeLatencyMaxMs": latencies.last(),
         "windowsClosed": closed,
+        "integrationRemoved": removed.ok().map(|r| r["ok"].clone()),
+        "terminalRefusals": refusals(),
     });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(summary)

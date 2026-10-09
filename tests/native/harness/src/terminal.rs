@@ -9,13 +9,14 @@
 //! except the harness-generated marker, which is a UUID.
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use serde::Serialize;
 use serde_json::{Value, json};
 
 use crate::procs::{self, Incarnation};
-use crate::run::{osascript, run};
+use crate::run::{Output, osascript, run};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -113,6 +114,39 @@ end run"#;
 const SELECTED_TTY: &str =
     r#"tell application "Terminal" to return tty of selected tab of front window"#;
 
+const PROBE: &str = r#"tell application "Terminal" to get id of every window"#;
+
+/// How long a script waits for Terminal to answer element queries again.
+const SCRIPTING_WAIT: Duration = Duration::from_secs(600);
+
+static REFUSALS: AtomicU64 = AtomicU64::new(0);
+static REFUSED_MS: AtomicU64 = AtomicU64::new(0);
+
+/// Runs a Terminal script, waiting out a scripting refusal. When the script
+/// fails and Terminal also refuses `id of every window`, the failure is
+/// Terminal's, not the script's (it can last minutes), so the script runs
+/// again once Terminal answers. A failure Terminal answers around (a closed
+/// window, a missing tab) is returned as it is.
+fn scripted(script: &str, args: &[&str], timeout: Duration) -> Output {
+    let out = osascript(script, args, timeout);
+    if out.ok || osascript(PROBE, &[], timeout).ok {
+        return out;
+    }
+    match wait_scriptable(SCRIPTING_WAIT) {
+        Ok(waited) => {
+            REFUSALS.fetch_add(1, Ordering::Relaxed);
+            REFUSED_MS.fetch_add(waited, Ordering::Relaxed);
+            osascript(script, args, timeout)
+        }
+        Err(_) => out,
+    }
+}
+
+/// Scripting refusals this process waited out, and the milliseconds spent.
+pub fn refusals() -> (u64, u64) {
+    (REFUSALS.load(Ordering::Relaxed), REFUSED_MS.load(Ordering::Relaxed))
+}
+
 fn timeout() -> Duration {
     Duration::from_secs(15)
 }
@@ -130,7 +164,7 @@ impl Tab {
         let marker = uuid::Uuid::new_v4().to_string();
         std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
         let title = format!("TSQ-{marker}");
-        let out = osascript(OPEN, &[command, &title], timeout());
+        let out = scripted(OPEN, &[command, &title], timeout());
         let text = out.stdout.trim().to_owned();
         let (window, tty) = text
             .split_once('\t')
@@ -180,7 +214,7 @@ impl Tab {
     /// Ownership: the recorded window still holds the recorded TTY, and a
     /// process on it runs in this tab's disposable directory.
     pub fn owned(&self) -> Value {
-        let ttys = osascript(WINDOW_TTYS, &[&self.window_id.to_string()], timeout());
+        let ttys = scripted(WINDOW_TTYS, &[&self.window_id.to_string()], timeout());
         let window_has_tty = ttys.stdout.lines().any(|line| line.trim() == self.tty);
         let dir = self.dir.canonicalize().unwrap_or_else(|_| self.dir.clone());
         let in_dir: Vec<i32> = self
@@ -198,7 +232,7 @@ impl Tab {
 
     /// Types `text` + Return into this tab (setup of the harness's own tab).
     pub fn type_line(&self, text: &str) -> bool {
-        osascript(
+        scripted(
             TYPE_INTO,
             &[&self.window_id.to_string(), &self.tty, text],
             timeout(),
@@ -219,11 +253,11 @@ impl Tab {
 
     /// The tab's visible text.
     pub fn contents(&self) -> String {
-        osascript(CONTENTS, &[&self.window_id.to_string(), &self.tty], timeout()).stdout
+        scripted(CONTENTS, &[&self.window_id.to_string(), &self.tty], timeout()).stdout
     }
 
     pub fn select(&self) -> bool {
-        osascript(
+        scripted(
             SELECT_TAB,
             &[&self.window_id.to_string(), &self.tty],
             timeout(),
@@ -236,17 +270,17 @@ impl Tab {
     /// Minimizes or restores this window by its recorded ID (the title is
     /// unreliable once a provider sets its own terminal title).
     pub fn set_miniaturized(&self, miniaturized: bool) -> Option<bool> {
-        let out = osascript(SET_MINIATURIZED, &[&self.window_id.to_string(), if miniaturized { "true" } else { "false" }], timeout());
+        let out = scripted(SET_MINIATURIZED, &[&self.window_id.to_string(), if miniaturized { "true" } else { "false" }], timeout());
         out.ok.then(|| out.stdout.trim() == "true")
     }
 
     pub fn miniaturized(&self) -> Option<bool> {
-        let out = osascript(MINIATURIZED, &[&self.window_id.to_string()], timeout());
+        let out = scripted(MINIATURIZED, &[&self.window_id.to_string()], timeout());
         out.ok.then(|| out.stdout.trim() == "true")
     }
 
     pub fn set_bounds(&self, left: i32, top: i32, right: i32, bottom: i32) -> bool {
-        osascript(
+        scripted(
             SET_BOUNDS,
             &[
                 &self.window_id.to_string(),
@@ -279,8 +313,8 @@ impl Tab {
         }
         crate::pause_ms(800);
         // Terminal may already have closed the window when its shell ended.
-        let close = osascript(CLOSE, &[&self.window_id.to_string()], timeout());
-        let remains = osascript(WINDOW_TTYS, &[&self.window_id.to_string()], timeout()).ok;
+        let close = scripted(CLOSE, &[&self.window_id.to_string()], timeout());
+        let remains = scripted(WINDOW_TTYS, &[&self.window_id.to_string()], timeout()).ok;
         json!({ "closed": !remains, "closedByHarness": close.ok, "endedPids": ended, "ownership": ownership })
     }
 }
@@ -291,7 +325,7 @@ impl Tab {
 pub fn wait_scriptable(limit: Duration) -> Result<u64, String> {
     let started = std::time::Instant::now();
     loop {
-        let out = osascript(r#"tell application "Terminal" to get id of every window"#, &[], timeout());
+        let out = osascript(PROBE, &[], timeout());
         if out.ok {
             return Ok(started.elapsed().as_millis() as u64);
         }
@@ -312,7 +346,7 @@ pub fn selected_tty() -> Option<String> {
 pub fn selected_tty_read() -> Result<String, String> {
     let mut last = String::new();
     for _ in 0..5 {
-        let out = osascript(SELECTED_TTY, &[], timeout());
+        let out = scripted(SELECTED_TTY, &[], timeout());
         if out.ok {
             return Ok(out.stdout.trim().to_owned());
         }
