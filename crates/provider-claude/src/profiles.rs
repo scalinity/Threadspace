@@ -36,10 +36,11 @@ pub fn observer_profile(version: &str) -> Option<ObserverProfile> {
 }
 
 /// The version of a direct CLI executable from its path in the installer's
-/// versions directory (`…/claude/versions/2.1.295`). Any other layout, such
+/// versions directory (`…/claude/versions/2.1.295`), given as a path or as a
+/// kernel image identity (`<path>#<device>:<inode>`). Any other layout, such
 /// as the desktop app's bundled `claude`, names no version.
 pub fn version_from_executable(path: &str) -> Option<String> {
-    let path = Path::new(path);
+    let path = Path::new(path.split_once('#').map_or(path, |(path, _)| path));
     if path
         .components()
         .any(|part| !matches!(part, Component::RootDir | Component::Normal(_)))
@@ -88,8 +89,14 @@ mod tests {
             version_from_executable("/Users/u/.local/share/claude/versions/2.1.295").as_deref(),
             Some("2.1.295")
         );
+        assert_eq!(
+            version_from_executable("/Users/u/.local/share/claude/versions/2.1.295#16777234:152193867").as_deref(),
+            Some("2.1.295"),
+            "a kernel image identity names its path"
+        );
         for path in [
             "/Users/u/.local/share/claude/ClaudeCode.app/Contents/MacOS/claude",
+            "/Users/u/.local/share/claude/versions/2.1.295-beta#1:2",
             "/Users/u/.local/share/claude/versions/../versions/2.1.295",
             "/Users/u/.local/share/claude/versions/2.1.295-beta",
             "/Users/u/.local/share/other/versions/2.1.295",

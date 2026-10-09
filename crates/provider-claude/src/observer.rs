@@ -187,12 +187,13 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
     let lifecycle = record.qualified && record.engine && record.settled;
     let event = envelope.native_event.as_str();
     let drafts = match (event, record.phase) {
-        // Bootstrap metadata: a host read, placed first in its load (its
-        // entry), after every report of the load it says it replaced.
+        // Bootstrap: placed first in its load (its entry), after every report
+        // of the load it says it replaced. Its identity is the engine's when
+        // classic.SessionStart came first, otherwise a host read.
         ("session.start", "bootstrap") => vec![record.link(
             &refs,
             ObservationState::Current,
-            EvidenceClass::HostRead,
+            record.provenance(),
             record.point(envelope.callback_entry_sequence.as_ref(), text(detail, "predecessorEpoch")),
         )],
         ("classic.SessionStart", "entry") if record.qualified => vec![draft(
@@ -460,8 +461,21 @@ mod tests {
     }
 
     #[test]
+    fn a_bootstrap_after_the_engine_identity_keeps_it() {
+        // Natively classic.SessionStart can fire before session.start, so the
+        // bootstrap's frozen session is already the engine's.
+        let d = drafts(rec("session.start", "bootstrap", json!({ "hostSessionId": "S1", "version": { "version": "2.1.295" } })));
+        assert_eq!(d[0].provenance, EvidenceClass::ProviderEvent);
+        let mut executable = rec("turn.complete", "result", json!({ "reason": "answer", "core": settled() }));
+        executable.executable = "/Users/u/.local/share/claude/versions/2.1.295#16777234:152193867";
+        assert_eq!(kinds(&drafts(executable)), vec![CanonicalFactKind::TurnOutcomeObserved], "a kernel image identity qualifies");
+    }
+
+    #[test]
     fn a_reload_bootstrap_follows_its_predecessor_load() {
-        let d = drafts(rec("session.start", "bootstrap", json!({ "hostSessionId": "S1", "predecessorEpoch": "earlier-epoch", "version": { "version": "2.1.295" } })));
+        let mut reloaded = rec("session.start", "bootstrap", json!({ "hostSessionId": "S1", "predecessorEpoch": "earlier-epoch", "version": { "version": "2.1.295" } }));
+        reloaded.identity = "session.id";
+        let d = drafts(reloaded);
         assert_eq!(kinds(&d), vec![CanonicalFactKind::ObservationLinkChanged]);
         assert_eq!(d[0].provenance, EvidenceClass::HostRead, "a host read until corroborated");
         let point = d[0].causal.as_ref().expect("point");
