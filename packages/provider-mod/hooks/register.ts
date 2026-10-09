@@ -37,6 +37,11 @@ const ADAPTER_VERSION = '0.1.0'
 const MAX_ID_CHARS = 256
 const DETAIL_EVENTS: readonly string[] = ['turn.step', 'tool.call', 'tool.check']
 
+// The session value holding the source epoch of the load that last
+// bootstrapped (types/index.d.ts). It survives a hot reload; module
+// variables do not.
+const EPOCH = { plugin: 'threadspace-observer', key: 'epoch' } as const
+
 const id = (value: unknown): string | undefined => (typeof value === 'string' ? value.slice(0, MAX_ID_CHARS) : undefined)
 
 const promptOrigin = (origin: PromptOrigin | undefined): Payload[string] => {
@@ -174,15 +179,26 @@ export const register: Register = (on, options) => {
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('session.start', next.origin, {}, () => ({ isInteractive: e.isInteractive, surface: e.surface }))
     const settled = pass(ctx, () => next(e), () => next.trace, () => ({}))
-    // Bootstrap metadata only: both reads are middleware-interceptable, so
+    // Bootstrap metadata only: every read here is middleware-interceptable, so
     // the session ID they give stays at a lower tier than classic.SessionStart.
+    // The previous load's epoch is read before this load's is written; a
+    // failed read or write leaves it null and never reaches the provider path.
     void (async () => {
+      let predecessorEpoch: string | null = null
+      try {
+        const held = await $.state.get(EPOCH)
+        await $.state.set(EPOCH, sourceEpoch)
+        predecessorEpoch = id(held.value) ?? null
+      } catch {
+        // The predecessor stays unknown.
+      }
       try {
         const [hostSessionId, version] = await Promise.all([$.session.id(), $.session.version()])
         if (session.id === undefined) changeSession(id(hostSessionId), 'session.id')
         if (ctx) {
           settle(ctx, 'bootstrap', () => ({
             hostSessionId: id(hostSessionId),
+            predecessorEpoch,
             version: { version: id(version.version), base: id(version.base), builtAt: id(version.builtAt) },
           }))
         }

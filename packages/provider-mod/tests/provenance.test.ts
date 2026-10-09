@@ -103,6 +103,11 @@ const lister = {
   },
 }
 
+// The observer's session value (types/index.d.ts), and the epochs each load
+// left there, kept across this file's tests in order.
+const OBSERVER_EPOCH = { plugin: 'threadspace-observer', key: 'epoch' } as const
+const loads: string[] = []
+
 const fabricator = {
   name: 'fabricator',
   tier: 'append' as const,
@@ -358,6 +363,91 @@ describe('provenance and identity', () => {
     expect(bootstrap.payload.hostSessionId).toBe('S-fabricated')
     const after = records.find(record => record.nativeOccurrenceId === 'tu-after-bootstrap' && record.phase === 'entry')
     expect([after.sessionId, after.sessionIdSource]).toEqual(['S1', 'classic.SessionStart'])
+  })
+
+  test('first load records a null predecessor epoch and leaves its own in session state', OPTIONS, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    installCore(on)
+    // The kit holds `$.state` for the test's session, beneath this hook; the
+    // test's own `$` has no `state` noun, so the write is seen on its way
+    // down, with `previous`, what the host held before it. The version the
+    // write lands at is not asserted: the kit does not reset its version
+    // count between the tests of a file (a probe read version 0, then its
+    // write landed at version 2).
+    const writes: unknown[] = []
+    on('state.set', async (_$: any, e: any, next: any) => {
+      const answer = await next(e)
+      writes.push({ plugin: e.plugin, key: e.key, value: e.value, previous: e.previous, answer })
+      return answer
+    })
+
+    await $.session.start(START as any)
+    await clock.settle()
+
+    const bootstrap = helper.records().find(record => record.phase === 'bootstrap')
+    expect(bootstrap.payload.predecessorEpoch).toBeNull()
+    expect(writes).toEqual([
+      { ...OBSERVER_EPOCH, value: bootstrap.sourceEpoch, previous: undefined, answer: { value: { isSet: true, version: expect.any(Number) } } },
+    ])
+    loads.push(bootstrap.sourceEpoch)
+  })
+
+  test('reload records predecessor epoch', OPTIONS, async ($, on) => {
+    // What this can show: the kit cannot hot-reload a module (`config.set`
+    // re-runs nothing, delivery.test.ts), but each test loads the module
+    // afresh, so `register` runs again with new module variables and a new
+    // source epoch, as after a reload. The kit keeps no `$.state` value
+    // between tests (a probe's second test read `undefined`), so the session
+    // value a real reload would find is answered beneath the observer with
+    // the epoch the previous test's load wrote. The test shows
+    // that a later load reads that value before writing its own and records
+    // it as `predecessorEpoch`. What it cannot show: that the host keeps
+    // `$.state` across a real hot reload (the declarations state it: "plain
+    // data that survives a hot reload"); a native session qualifies that.
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    installCore(on)
+    const calls: string[] = []
+    on('state.get', (_$: any, e: any) => {
+      calls.push(`get ${e.plugin}.${e.key}`)
+      return { value: { value: loads[0], version: 1 } }
+    })
+    on('state.set', (_$: any, e: any, next: any) => {
+      calls.push(`set ${e.plugin}.${e.key} ${e.value}`)
+      return next(e)
+    })
+
+    expect(loads.length).toBe(1)
+    await $.session.start(START as any)
+    await clock.settle()
+
+    const bootstrap = helper.records().find(record => record.phase === 'bootstrap')
+    expect(bootstrap.sourceEpoch).not.toBe(loads[0])
+    expect(bootstrap.payload.predecessorEpoch).toBe(loads[0])
+    expect(calls).toEqual(['get threadspace-observer.epoch', `set threadspace-observer.epoch ${bootstrap.sourceEpoch}`])
+  })
+
+  test('a failed session state read or write records a null predecessor epoch', OPTIONS, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    const core = installCore(on)
+    let failing: 'get' | 'set' = 'get'
+    on('state.get', () => (failing === 'get' ? { deny: 'state read refused' } : { value: { value: 'epoch-before', version: 1 } }))
+    on('state.set', () => (failing === 'set' ? { deny: 'state write refused' } : { value: { isSet: true, version: 2 } }))
+
+    // Two bootstraps in one load, one per failing call; a load bootstraps
+    // once natively, but each run takes the same guarded path.
+    expect(await $.session.start(START as any)).toEqual({ cwd: START.cwd } as any)
+    await clock.settle()
+    failing = 'set'
+    expect(await $.session.start(START as any)).toEqual({ cwd: START.cwd } as any)
+    await clock.settle()
+
+    expect(core.count('session.start')).toBe(2)
+    const bootstraps = helper.records().filter(record => record.phase === 'bootstrap')
+    expect(bootstraps.map(record => record.payload.predecessorEpoch)).toEqual([null, null])
+    expect(bootstraps.map(record => record.payload.hostSessionId)).toEqual(['S-host', 'S-host'])
   })
 
   test('logical session changes (session.end clear, classic.SessionStart clear and resume)', OPTIONS, async ($, on) => {
