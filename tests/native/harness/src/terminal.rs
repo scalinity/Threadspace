@@ -65,6 +65,17 @@ end tell
 return "missing"
 end run"#;
 
+// By index: `contents of x` on a loop reference returns the reference.
+const CONTENTS: &str = r#"on run argv
+tell application "Terminal"
+  set w to window id ((item 1 of argv) as integer)
+  repeat with i from 1 to (count of tabs of w)
+    if tty of tab i of w is (item 2 of argv) then return (contents of tab i of w) as text
+  end repeat
+end tell
+return ""
+end run"#;
+
 const CLOSE: &str = r#"on run argv
 tell application "Terminal" to close (window id ((item 1 of argv) as integer))
 return "closed"
@@ -197,6 +208,20 @@ impl Tab {
             == "ok"
     }
 
+    /// Submits `text` to a provider's prompt. `do script` ends what it types
+    /// with a line feed, which Claude's prompt editor inserts as a newline
+    /// rather than a submit; the carriage return goes as its own write.
+    pub fn submit_line(&self, text: &str) -> bool {
+        let typed = self.type_line(text);
+        crate::pause_ms(400);
+        typed && self.type_line("\r")
+    }
+
+    /// The tab's visible text.
+    pub fn contents(&self) -> String {
+        osascript(CONTENTS, &[&self.window_id.to_string(), &self.tty], timeout()).stdout
+    }
+
     pub fn select(&self) -> bool {
         osascript(
             SELECT_TAB,
@@ -257,6 +282,23 @@ impl Tab {
         let close = osascript(CLOSE, &[&self.window_id.to_string()], timeout());
         let remains = osascript(WINDOW_TTYS, &[&self.window_id.to_string()], timeout()).ok;
         json!({ "closed": !remains, "closedByHarness": close.ok, "endedPids": ended, "ownership": ownership })
+    }
+}
+
+/// Waits until Terminal answers element queries. A long-running Terminal
+/// can refuse every one of them for minutes (`-1728`/`-1708`) while its
+/// application properties still answer; returns the milliseconds waited.
+pub fn wait_scriptable(limit: Duration) -> Result<u64, String> {
+    let started = std::time::Instant::now();
+    loop {
+        let out = osascript(r#"tell application "Terminal" to get id of every window"#, &[], timeout());
+        if out.ok {
+            return Ok(started.elapsed().as_millis() as u64);
+        }
+        if started.elapsed() >= limit {
+            return Err(format!("Terminal refused element queries for {limit:?}: {}", out.stderr.trim()));
+        }
+        crate::pause_ms(5000);
     }
 }
 

@@ -120,11 +120,16 @@ function readInspector() {
   };
 }
 
-async function fleet(client: BridgeClient) {
+/**
+ * The rendered fleet. With `sessionId`, only that session's rows: a report
+ * is bounded at 64 KiB, which a whole long-lived fleet exceeds.
+ */
+async function fleet(client: BridgeClient, sessionId: string | null) {
   await settle();
   const state = client.getSnapshot();
-  const rows = [...document.querySelectorAll<HTMLElement>('[data-testid="fleet-row"]')].map(readFleetRow);
-  return { phase: state.phase, cursor: state.cursor, sessionsInView: state.sessions.length, rows };
+  const all = [...document.querySelectorAll<HTMLElement>('[data-testid="fleet-row"]')];
+  const rows = all.filter((row) => sessionId === null || row.dataset.sessionId === sessionId).map(readFleetRow);
+  return { phase: state.phase, cursor: state.cursor, sessionsInView: state.sessions.length, rowsInView: all.length, rows };
 }
 
 async function select(client: BridgeClient, sessionId: string) {
@@ -216,7 +221,7 @@ export function m2Commands(client: BridgeClient): ExtraHandler {
     const input = (args ?? {}) as Record<string, unknown>;
     switch (command) {
       case "m2-fleet":
-        return fleet(client);
+        return fleet(client, input.sessionId === undefined ? null : requireString(input.sessionId, "sessionId"));
       case "m2-select":
         return select(client, requireString(input.sessionId, "sessionId"));
       case "m2-press-return":

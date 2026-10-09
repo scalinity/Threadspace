@@ -30,6 +30,8 @@ use crate::ctx::Ctx;
 /// person passes when starting `claude`.
 pub const MODEL: &str = "haiku";
 const TURN_TIMEOUT: Duration = Duration::from_secs(150);
+/// How long a runner waits for Terminal to answer element queries again.
+pub const TERMINAL_WAIT: Duration = Duration::from_secs(600);
 
 pub fn integration(ctx: &Ctx, op: &str, config_dir: &Path, scope: &str) -> Result<Value, String> {
     let out = run(
@@ -122,6 +124,7 @@ pub struct Observed {
 /// only, and waits for inventory and the companion to bind the session to
 /// that window's TTY.
 pub fn start_observed(ctx: &Ctx, dir: PathBuf, command: &str) -> Result<Observed, String> {
+    terminal::wait_scriptable(TERMINAL_WAIT)?;
     let tab = {
         let _gui = ctx.gui("m2 start observed Claude")?;
         let tab = Tab::open(dir.clone(), command)?;
@@ -146,12 +149,26 @@ pub fn start_observed(ctx: &Ctx, dir: PathBuf, command: &str) -> Result<Observed
         let _ = std::fs::remove_dir_all(&dir);
         return Err(error);
     };
+    // Inventory and binding follow the process, not the prompt editor:
+    // text typed before the editor is ready is held unsubmitted.
+    let ready = Instant::now();
+    while ready.elapsed() < Duration::from_secs(30) && !prompt_ready(&started.tab.contents()) {
+        threadspace_harness::pause_ms(500);
+    }
+    threadspace_harness::pause_ms(1000);
     Ok(Observed {
         native_session_id: started.native_session_id.clone(),
         session_id,
         dir,
         tab: started.tab,
     })
+}
+
+/// Claude's banner and prompt footer are drawn and the trust dialog is gone.
+fn prompt_ready(screen: &str) -> bool {
+    screen.contains("Claude Code v")
+        && !screen.contains("Enter to confirm")
+        && (screen.contains("shift+tab to cycle") || screen.contains("? for shortcuts"))
 }
 
 /// The interactive inventory row whose cwd is `dir`.
@@ -220,6 +237,16 @@ pub fn completed_turns(ctx: &Ctx, session_id: &str) -> usize {
         .unwrap_or(0) as usize
 }
 
+/// Inputs the companion recorded for a session.
+fn submitted_inputs(ctx: &Ctx, session_id: &str) -> usize {
+    let sql = format!("SELECT COUNT(*) AS n FROM inputs WHERE session_id = '{}'", session_id.replace('\'', ""));
+    journal_query(ctx, &sql)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+        .and_then(|rows| rows[0]["n"].as_u64())
+        .unwrap_or(0) as usize
+}
+
 /// Waits until `condition` holds for the session's view.
 pub fn wait_view(ctx: &Ctx, native: &str, timeout: Duration, condition: impl Fn(&SessionView) -> bool) -> Result<(SessionView, u64), String> {
     let started = Instant::now();
@@ -239,8 +266,23 @@ pub fn wait_view(ctx: &Ctx, native: &str, timeout: Duration, condition: impl Fn(
 /// Types a prompt and waits for the session's completed-turn count to reach
 /// `expected`; returns the elapsed milliseconds.
 pub fn prompt_and_complete(ctx: &Ctx, observed: &Observed, text: &str, expected: usize) -> Result<u64, String> {
-    observed.tab.type_line(text);
+    let before = submitted_inputs(ctx, &observed.session_id);
+    observed.tab.submit_line(text);
     let started = Instant::now();
+    // A submit the editor did not take is retried once, with the
+    // carriage return alone: the text is already in the prompt.
+    let mut retried = false;
+    while submitted_inputs(ctx, &observed.session_id) <= before {
+        let waited = started.elapsed();
+        if waited > Duration::from_secs(40) {
+            return Err(format!("prompt {expected} was never submitted"));
+        }
+        if waited > Duration::from_secs(20) && !retried {
+            observed.tab.type_line("\r");
+            retried = true;
+        }
+        threadspace_harness::pause_ms(250);
+    }
     while started.elapsed() < TURN_TIMEOUT {
         if completed_turns(ctx, &observed.session_id) >= expected {
             return Ok(started.elapsed().as_millis() as u64);
@@ -258,7 +300,8 @@ pub fn ui(ctx: &Ctx, command: &str, args: Value) -> Result<Value, String> {
 /// Ensures one hydrated packaged UI.
 pub fn ensure_ui(ctx: &Ctx) -> Result<Value, String> {
     let app = ctx.app();
-    if !app.processes().is_empty() && ui(ctx, "m2-fleet", json!({})).is_ok() {
+    // A filter no session matches keeps the liveness probe's report small.
+    if !app.processes().is_empty() && ui(ctx, "m2-fleet", json!({ "sessionId": uuid::Uuid::nil().to_string() })).is_ok() {
         return Ok(json!({ "reused": true }));
     }
     app.stop_all();
@@ -276,7 +319,7 @@ pub fn press_return(ctx: &Ctx, observed: &Observed) -> Value {
     threadspace_harness::pause_ms(300);
     let selected = terminal::selected_tty_read();
     let front = crate::terminal_gates::frontmost_bundle();
-    let result = pressed.as_ref().ok().and_then(|p| p.get("route").cloned()).unwrap_or(Value::Null);
+    let result = pressed.as_ref().ok().and_then(|p| p["result"].get("route").cloned()).unwrap_or(Value::Null);
     let exact = result["surfaceResult"] == "EXACT_NATIVE_SURFACE" && result["sessionVerification"] == "CURRENT_NATIVE_REVALIDATED";
     let readback = selected.as_ref().ok().map(String::as_str) == Some(observed.tab.tty.as_str());
     json!({
@@ -434,11 +477,12 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let mut pass = true;
     let mut completed = 0usize;
     for cycle in 1..=cycles {
+        let terminal_wait = terminal::wait_scriptable(TERMINAL_WAIT);
         let prompt = format!("Use the Bash tool to run exactly: echo threadspace-m2-{cycle}. Then reply with only the word done.");
         completed += 1;
         let turn_ms = prompt_and_complete(ctx, &observed, &prompt, completed);
         let after = session_view(ctx, &observed.native_session_id);
-        let fleet = ui(ctx, "m2-fleet", json!({}));
+        let fleet = ui(ctx, "m2-fleet", json!({ "sessionId": observed.session_id }));
         front_other(ctx, &other);
         let returned = {
             let _gui = ctx.gui("m2 vertical Return");
@@ -451,7 +495,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         let workers = fleet
             .as_ref()
             .ok()
-            .and_then(|f| f["rows"].as_array())
+            .and_then(|f| f["result"]["rows"].as_array())
             .map(|rows| rows.iter().filter(|r| r["sessionId"] == json!(observed.session_id)).count())
             .unwrap_or(0);
         let ok = turn_ms.is_ok()
@@ -465,23 +509,25 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         pass &= ok;
         run_dir
             .append("cycles.jsonl", &json!({
-                "cycle": cycle, "ok": ok, "turnMs": turn_ms.as_ref().ok(), "turnError": turn_ms.as_ref().err(),
+                "cycle": cycle, "ok": ok, "terminalWaitMs": terminal_wait.as_ref().ok(), "terminalWaitError": terminal_wait.as_ref().err(), "turnMs": turn_ms.as_ref().ok(), "turnError": turn_ms.as_ref().err(),
                 "followUpMs": follow_ms.as_ref().ok(), "followUpError": follow_ms.as_ref().err(),
-                "sessionViews": sessions, "workers": workers,
+                "sessionViews": sessions, "workers": workers, "fleetError": fleet.as_ref().err(),
+                "fleetRow": fleet.as_ref().ok().and_then(|f| f["result"]["rows"].get(0).cloned()),
+                "fleetRowsInView": fleet.as_ref().ok().map(|f| f["result"]["rowsInView"].clone()),
                 "afterTurn": after.as_ref().ok().map(|v| json!({ "turnState": v.turn_state, "observation": v.observation, "observerTier": v.observer_tier, "observerVersion": v.observer_version, "presence": v.execution_presence })),
                 "return": returned,
             }))
             .map_err(|e| e.to_string())?;
     }
-    observed.tab.type_line("/exit");
+    observed.tab.submit_line("/exit");
     let exited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
         format!("{:?}", v.execution_presence) == "Ended"
     });
-    let history = ui(ctx, "m2-fleet", json!({}));
+    let history = ui(ctx, "m2-fleet", json!({ "sessionId": observed.session_id }));
     let worker_kept = history
         .as_ref()
         .ok()
-        .and_then(|f| f["rows"].as_array())
+        .and_then(|f| f["result"]["rows"].as_array())
         .is_some_and(|rows| rows.iter().any(|r| r["sessionId"] == json!(observed.session_id)));
     pass &= exited.is_ok() && worker_kept;
     let closed = finish(&observed);
@@ -526,7 +572,8 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     for index in 0..count as usize {
         let target = &sessions[index % sessions.len()];
         let other = &sessions[(index + 1) % sessions.len()];
-        let result = {
+        let terminal_wait = terminal::wait_scriptable(TERMINAL_WAIT);
+        let mut result = {
             let _gui = ctx.gui("m2 route");
             other.tab.select();
             threadspace_harness::pause_ms(400);
@@ -541,12 +588,14 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
         if let Some(ms) = result["route"]["latencyMs"].as_u64() {
             latencies.push(ms);
         }
+        result["terminalWaitMs"] = json!(terminal_wait.as_ref().ok());
+        result["terminalWaitError"] = json!(terminal_wait.as_ref().err());
         run_dir.append("routes.jsonl", &result).map_err(|e| e.to_string())?;
     }
     latencies.sort_unstable();
     let p95 = latencies.get((latencies.len() * 95).div_ceil(100).saturating_sub(1)).copied();
     for observed in &sessions {
-        observed.tab.type_line("/exit");
+        observed.tab.submit_line("/exit");
     }
     threadspace_harness::pause_ms(3000);
     let closed: Vec<Value> = sessions.iter().map(finish).collect();

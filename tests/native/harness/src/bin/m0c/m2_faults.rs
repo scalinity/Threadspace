@@ -123,7 +123,7 @@ fn stop_continuation(ctx: &Ctx, a: &Activation, scratch: &Path) -> Result<Value,
     )?;
     let settings = case_settings(a, &dir, hooks("Stop", &script))?;
     let observed = start_case(ctx, a, "stop", Some(settings), None, &[], &[])?;
-    observed.tab.type_line("Reply with exactly the word: ok");
+    observed.tab.submit_line("Reply with exactly the word: ok");
     let done = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
     threadspace_harness::pause_ms(3000);
     let states = turn_states(ctx, &observed.session_id);
@@ -139,7 +139,7 @@ fn stop_continuation(ctx: &Ctx, a: &Activation, scratch: &Path) -> Result<Value,
 
 fn interrupted(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "interrupt", None, None, &[], &[])?;
-    observed.tab.type_line("Write the numbers from 1 to 600, one per line, with no other text.");
+    observed.tab.submit_line("Write the numbers from 1 to 600, one per line, with no other text.");
     threadspace_harness::pause_ms(5000);
     // Esc interrupts the running turn (the trailing Return is an empty
     // submission the composer ignores).
@@ -159,7 +159,7 @@ fn interrupted(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 
 fn failed(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "failed", None, None, &[("ANTHROPIC_BASE_URL", "http://127.0.0.1:9"), ("CLAUDE_CODE_MAX_RETRIES", "0")], &[])?;
-    observed.tab.type_line("Reply with exactly the word: ok");
+    observed.tab.submit_line("Reply with exactly the word: ok");
     let settled = wait_for(Duration::from_secs(90), || turn_states(ctx, &observed.session_id).iter().any(|s| s == "FAILED"));
     let items = rows(ctx, &format!("SELECT category FROM attention_items WHERE session_id = '{}'", quote(&observed.session_id)));
     let states = turn_states(ctx, &observed.session_id);
@@ -173,7 +173,7 @@ fn blocked_submission(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let script = hook_script(&dir, "block.sh", "printf '{\"decision\":\"block\",\"reason\":\"blocked by the qualification hook\"}'")?;
     let settings = case_settings(a, &dir, hooks("UserPromptSubmit", &script))?;
     let observed = start_case(ctx, a, "blocked", Some(settings), None, &[], &[])?;
-    observed.tab.type_line("Reply with exactly the word: ok");
+    observed.tab.submit_line("Reply with exactly the word: ok");
     let rejected = wait_for(Duration::from_secs(60), || {
         rows(ctx, &format!(
             "SELECT COUNT(*) AS n FROM facts WHERE session_id = '{}' AND kind = 'INPUT_REJECTED'",
@@ -192,10 +192,10 @@ fn blocked_submission(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 
 fn relay_unavailable(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "relay", None, None, &[], &[])?;
-    observed.tab.type_line("Reply with exactly the word: first");
+    observed.tab.submit_line("Reply with exactly the word: first");
     let first = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
     let stopped = service::bootstrap(&ctx.id, "stop");
-    observed.tab.type_line("Reply with exactly the word: second");
+    observed.tab.submit_line("Reply with exactly the word: second");
     // With no companion, the turn's records go to the local spool.
     threadspace_harness::pause_ms(20_000);
     let spooled = std::fs::read_dir(ctx.id.agent.store_dir.join("capture-spool/ready")).map(|d| d.count()).unwrap_or(0);
@@ -217,7 +217,7 @@ fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let limited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
         v.observer_version.as_deref() == Some("2.1.292")
     });
-    observed.tab.type_line("Reply with exactly the word: ok");
+    observed.tab.submit_line("Reply with exactly the word: ok");
     threadspace_harness::pause_ms(30_000);
     let view = session_view(ctx, &observed.native_session_id);
     let states = turn_states(ctx, &observed.session_id);
@@ -229,7 +229,7 @@ fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 
 fn mod_reload(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "reload", None, None, &[], &[])?;
-    observed.tab.type_line("Reply with exactly the word: before");
+    observed.tab.submit_line("Reply with exactly the word: before");
     let before = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
     let native = session_view(ctx, &observed.native_session_id).ok().and_then(|v| v.observer_tier);
     // Saving a watched plugin folder reloads the module: a new load that
@@ -242,7 +242,7 @@ fn mod_reload(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let restored = wait_view(ctx, &observed.native_session_id, Duration::from_secs(90), |v| {
         format!("{:?}", v.observer_tier) == "Some(Restored)"
     });
-    observed.tab.type_line("Reply with exactly the word: after");
+    observed.tab.submit_line("Reply with exactly the word: after");
     let after = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 2);
     std::fs::write(&register, &original).map_err(|e| e.to_string())?;
     let epochs = rows(ctx, &format!(
@@ -258,7 +258,7 @@ fn mod_reload(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 
 fn child_waiting(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "child-wait", None, None, &[], &[])?;
-    observed.tab.type_line(
+    observed.tab.submit_line(
         "Use the Agent tool with run_in_background set to true to start one subagent whose prompt is: Use the Bash tool to run ls /. Do not wait for it; reply with only the word started.",
     );
     let parent = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
@@ -280,10 +280,10 @@ fn child_waiting(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 
 fn delayed_submission(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let observed = start_case(ctx, a, "delayed", None, None, &[], &[])?;
-    observed.tab.type_line("Write the numbers from 1 to 150, one per line, with no other text.");
+    observed.tab.submit_line("Write the numbers from 1 to 150, one per line, with no other text.");
     threadspace_harness::pause_ms(2500);
     // Submitted while the first turn runs: queued, then accepted.
-    observed.tab.type_line("Then reply with only the word queued.");
+    observed.tab.submit_line("Then reply with only the word queued.");
     let both = wait_for(Duration::from_secs(200), || completed_turns(ctx, &observed.session_id) >= 2);
     let inputs = rows(ctx, &format!("SELECT COUNT(*) AS n FROM facts WHERE session_id = '{}' AND kind = 'INPUT_SUBMITTED' AND json_extract(fact_json, '$.refs.turnId') IS NOT NULL", quote(&observed.session_id)));
     finish(&observed);
@@ -330,7 +330,7 @@ fn partial_receipt(ctx: &Ctx, a: &Activation, kind: &str) -> Result<Value, Strin
     std::fs::write(&arm, b"").map_err(|e| e.to_string())?;
     let fault = format!("{kind}:{}", arm.display());
     let observed = start_case(ctx, a, &format!("receipt-{kind}"), None, None, &[("THREADSPACE_QUALIFY_MOD_BATCH_FAULT", &fault)], &[])?;
-    observed.tab.type_line("Reply with exactly the word: ok");
+    observed.tab.submit_line("Reply with exactly the word: ok");
     let completed = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
     let fired = !arm.exists();
     let duplicates = rows(ctx, "SELECT COUNT(*) - COUNT(DISTINCT observation_id) AS n FROM observations");
