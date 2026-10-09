@@ -8,6 +8,7 @@
 pub mod discovery;
 pub mod hooks;
 pub mod inventory;
+pub mod observer;
 pub mod profiles;
 pub mod reconcile;
 pub mod setup;
