@@ -1,0 +1,49 @@
+{
+  "companionAbsent": {
+    "allSpooled": true,
+    "runs": 25,
+    "wall": {
+      "count": 25,
+      "maxUs": 50828,
+      "minUs": 38951,
+      "p50Us": 44864,
+      "p95Us": 48886,
+      "p99Us": 50828
+    }
+  },
+  "drain": {
+    "allCommitted": 500,
+    "expectedRecords": 3060,
+    "journalRecords": 3060,
+    "p95TargetUs": 25000,
+    "runs": 500,
+    "wall": {
+      "count": 500,
+      "maxUs": 9008,
+      "minUs": 2253,
+      "p50Us": 3943,
+      "p95Us": 5426,
+      "p99Us": 6197
+    }
+  },
+  "endOfSessionDrain": {
+    "allCommitted": true,
+    "budgetMs": 80,
+    "runs": 25,
+    "wall": {
+      "count": 25,
+      "maxUs": 5470,
+      "minUs": 4358,
+      "p50Us": 4560,
+      "p95Us": 4918,
+      "p99Us": 5470
+    }
+  },
+  "hook": "~/Applications/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook",
+  "pass": true,
+  "recordsPerBatch": 6,
+  "retry": {
+    "allAlreadyCommitted": true,
+    "journalRecordsAfterRetry": 3060
+  }
+}

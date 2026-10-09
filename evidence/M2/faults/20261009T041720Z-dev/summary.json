@@ -1,0 +1,67 @@
+{
+  "activation": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/91f7d3336d24822f",
+  "cases": [
+    {
+      "case": "stop-continuation",
+      "pass": true
+    },
+    {
+      "case": "interrupted",
+      "pass": false
+    },
+    {
+      "case": "failed",
+      "pass": true
+    },
+    {
+      "case": "blocked-submission",
+      "pass": true
+    },
+    {
+      "case": "incompatible-profile",
+      "pass": true
+    },
+    {
+      "case": "mod-reload",
+      "pass": true
+    },
+    {
+      "case": "parent-completed-child-waiting",
+      "pass": false
+    },
+    {
+      "case": "delayed-submission",
+      "pass": false
+    },
+    {
+      "case": "forged-and-nonengine",
+      "pass": true
+    },
+    {
+      "case": "mod-batch-partial",
+      "pass": true
+    },
+    {
+      "case": "mod-batch-malformed",
+      "pass": true
+    },
+    {
+      "case": "mod-batch-exit1",
+      "pass": true
+    },
+    {
+      "case": "relay-unavailable",
+      "pass": true
+    },
+    {
+      "case": "terminal-negatives",
+      "pass": false
+    }
+  ],
+  "integrationRemoved": true,
+  "pass": false,
+  "terminalRefusals": {
+    "count": 5,
+    "waitedMs": 25816
+  }
+}

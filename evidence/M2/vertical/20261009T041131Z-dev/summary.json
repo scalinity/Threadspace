@@ -1,0 +1,569 @@
+{
+  "activation": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/91f7d3336d24822f",
+  "cycles": 10,
+  "exit": {
+    "ms": 1609,
+    "observation": "DISCONNECTED",
+    "presence": "ENDED"
+  },
+  "exitError": null,
+  "integrationRemoved": true,
+  "latency": {
+    "bySource": {
+      "claude.hook": {
+        "captureToCommitMs": {
+          "max": 7,
+          "n": 81,
+          "p50": 0,
+          "p95": 2
+        },
+        "commitToDomMs": {
+          "max": 31,
+          "n": 81,
+          "p50": 4,
+          "p95": 8
+        },
+        "eventToDomMs": {
+          "max": 32,
+          "n": 81,
+          "p50": 5,
+          "p95": 9
+        }
+      },
+      "claude.observer": {
+        "captureToCommitMs": {
+          "max": 208,
+          "n": 225,
+          "p50": 17,
+          "p95": 36
+        },
+        "commitToDomMs": {
+          "max": 33,
+          "n": 127,
+          "p50": 4,
+          "p95": 8
+        },
+        "eventToDomMs": {
+          "max": 207,
+          "n": 127,
+          "p50": 20,
+          "p95": 41
+        }
+      }
+    },
+    "normalPathPass": true,
+    "observations": 306,
+    "targets": {
+      "captureToCommitP95Ms": 100,
+      "commitToDomP95Ms": 100,
+      "eventToDomP95Ms": 250
+    },
+    "viewMarks": 235
+  },
+  "markHandled": {
+    "items": [
+      {
+        "attentionId": "7a9b35ef-9e53-8f9e-b4a2-664f5e676ea3",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "7ee43129-4712-4e80-a63e-819b2c86cfbb",
+            "cursor": "5033",
+            "status": "COMMITTED",
+            "targetRevision": "5033"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "4fb91fe2-b393-8fdc-b25e-13550af5e5ff",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "0e22f2fb-557f-4247-b844-991e76ca887c",
+            "cursor": "5034",
+            "status": "COMMITTED",
+            "targetRevision": "5034"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "a1fc7427-7f19-848a-90d6-34ada8f3ee7f",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "25e52ae5-765e-4c57-afcf-859325d1304f",
+            "cursor": "5035",
+            "status": "COMMITTED",
+            "targetRevision": "5035"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "49b4cfe0-a8e6-8a7d-b20d-8e458aadce9a",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "740994c3-f230-4ab1-97f9-b711ecd58cab",
+            "cursor": "5036",
+            "status": "COMMITTED",
+            "targetRevision": "5036"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "0a534e20-acab-82fe-a90f-832f18cfe96e",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "fbce0638-2ae6-4807-997a-404a9ab9997f",
+            "cursor": "5037",
+            "status": "COMMITTED",
+            "targetRevision": "5037"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "6ddcd3bd-64a1-8afc-b072-87a33bbef737",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "6181c284-eafd-4845-ba31-58f1bf81779a",
+            "cursor": "5038",
+            "status": "COMMITTED",
+            "targetRevision": "5038"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "91c02115-62e0-809e-ae3d-590021809a69",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "9eeb6794-7f1b-43a7-8f0e-fe7e9c482a89",
+            "cursor": "5039",
+            "status": "COMMITTED",
+            "targetRevision": "5039"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "9a6c6ba4-4ae9-8ea2-875d-272f4d6bbf52",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "c8ef44b1-37d9-4af4-b8b8-f8408ea6ab9b",
+            "cursor": "5040",
+            "status": "COMMITTED",
+            "targetRevision": "5040"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "663e787a-6062-8edd-9ae3-fdd91c0056bf",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "c2b1997d-5f45-4471-b469-219dcd879195",
+            "cursor": "5041",
+            "status": "COMMITTED",
+            "targetRevision": "5041"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "f346585c-5baa-84ce-9700-ee0ddc7be344",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "bb6790dd-2596-45b4-83ed-2f0dc53d0237",
+            "cursor": "5042",
+            "status": "COMMITTED",
+            "targetRevision": "5042"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "ab554c9c-5c9b-8bd8-8534-59f0644004e6",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "a6ef4e14-0a84-49eb-b897-dd90e5532dd8",
+            "cursor": "5043",
+            "status": "COMMITTED",
+            "targetRevision": "5043"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "d028dbac-7c0b-8316-bcde-5902ba5a723d",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "8abb9fee-5e9a-4ae2-b8ee-81d39f2ba0ae",
+            "cursor": "5044",
+            "status": "COMMITTED",
+            "targetRevision": "5044"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "4088649b-a685-8b4b-a090-958b36aa1fc7",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "ba034448-96f8-4c03-a94b-327a8bb67d70",
+            "cursor": "5045",
+            "status": "COMMITTED",
+            "targetRevision": "5045"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "9d91c52f-f7a1-82c3-aafe-319eea852eb4",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "01498077-cc54-499b-bda3-16880382600d",
+            "cursor": "5046",
+            "status": "COMMITTED",
+            "targetRevision": "5046"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "5836a124-763b-806c-b205-f7a7f959acb9",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "a79cfd76-5fcb-4cde-906f-ef20b2eb7447",
+            "cursor": "5047",
+            "status": "COMMITTED",
+            "targetRevision": "5047"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "3a91f240-8e4d-82fb-80f1-b0088da3e225",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "d625a07b-e02f-49f3-9c81-d842ea2778c3",
+            "cursor": "5048",
+            "status": "COMMITTED",
+            "targetRevision": "5048"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "51adbf32-508f-8e66-8213-8ca2dd67b95a",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "86174336-f750-4538-8279-ba4e1fdc27db",
+            "cursor": "5049",
+            "status": "COMMITTED",
+            "targetRevision": "5049"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "0e94fe09-a802-8f6b-9b22-2da6b9484ba1",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "55798cb5-54e2-486f-ada4-5dc93c7e4b9d",
+            "cursor": "5050",
+            "status": "COMMITTED",
+            "targetRevision": "5050"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "4d2db580-2eed-8f48-9347-854087ffb9a9",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "6f834eba-c283-46cc-9438-58f68dba71b6",
+            "cursor": "5051",
+            "status": "COMMITTED",
+            "targetRevision": "5051"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "32fc7276-2b50-8686-88ec-21a985411390",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "b8334b6d-c595-43a0-b12e-2fac0a651dc6",
+            "cursor": "5052",
+            "status": "COMMITTED",
+            "targetRevision": "5052"
+          },
+          "resolvedInView": true
+        }
+      }
+    ],
+    "openBefore": 20,
+    "pass": true
+  },
+  "nativeSessionId": "724d085d-ae55-499d-be75-ac34c07e4ae8",
+  "pass": true,
+  "recording": {
+    "assembleError": null,
+    "assembled": true,
+    "bytes": 2093076,
+    "file": "m2-vertical-1791519092448.mp4",
+    "frameIntervalMs": 1000,
+    "frames": 190,
+    "framesKept": false,
+    "kind": "uncut time-lapse, one still per second, played at one frame per second",
+    "privateDirectory": "THREADSPACE_M2_RECORDING_DIR (outside the repository)",
+    "sha256": "f92fc892052321b359bde9a53a1d9e78f35c279a92357bf1626bc9ec021a2b7e",
+    "wallMs": 190005
+  },
+  "sessionId": "944d64b3-7e9d-4455-83c2-150995a83778",
+  "terminalRefusals": {
+    "count": 0,
+    "waitedMs": 0
+  },
+  "traceRows": 357,
+  "ui": {
+    "reused": true
+  },
+  "windowClosed": {
+    "closed": true,
+    "closedByHarness": false,
+    "endedPids": [
+      27852
+    ],
+    "ownership": {
+      "owned": true,
+      "processesInDir": [
+        27852
+      ],
+      "windowHasTty": true
+    }
+  },
+  "workerAfterMarkHandled": true,
+  "workerKeptAfterExit": true
+}

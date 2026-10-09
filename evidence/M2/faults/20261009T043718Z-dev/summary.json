@@ -1,0 +1,27 @@
+{
+  "activation": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/91f7d3336d24822f",
+  "cases": [
+    {
+      "case": "interrupted",
+      "pass": true
+    },
+    {
+      "case": "parent-completed-child-waiting",
+      "pass": true
+    },
+    {
+      "case": "delayed-submission",
+      "pass": true
+    },
+    {
+      "case": "terminal-negatives",
+      "pass": false
+    }
+  ],
+  "integrationRemoved": true,
+  "pass": false,
+  "terminalRefusals": {
+    "count": 12,
+    "waitedMs": 229725
+  }
+}

@@ -1,0 +1,14 @@
+{"case":"stop-continuation","detail":{"attentionItems":[{"category":"TURN_COMPLETE"}],"stopBlockedOnce":true,"turnStates":["COMPLETED"]},"pass":true}
+{"case":"interrupted","detail":{"abandonedStepRecords":[{"n":0}],"turnStates":["COMPLETED"]},"pass":false}
+{"case":"failed","detail":{"attentionItems":[{"category":"ERROR"}],"turnStates":["FAILED"]},"pass":true}
+{"case":"blocked-submission","detail":{"inputRejected":true,"turnStates":[]},"pass":true}
+{"case":"incompatible-profile","detail":{"observerTier":"LOWER_TIER","observerVersion":"2.1.292","turnStates":[]},"pass":true}
+{"case":"mod-reload","detail":{"completedAfterReload":true,"epochs":[{"n":2}],"hostReadFacts":[{"n":5}],"restoreError":null,"restored":{"ms":819,"tier":"RESTORED"},"tierBefore":"NATIVE"},"pass":true}
+{"case":"parent-completed-child-waiting","detail":{"attentionItems":[{"category":"TURN_COMPLETE","scope_kind":"TURN_OUTPUT","turn_id":"4a948c56-65a5-41e1-b544-179182e5659d"},{"category":"TURN_COMPLETE","scope_kind":"TURN_OUTPUT","turn_id":"5ee53932-b43f-445f-8c6c-3eec8b443411"},{"category":"TURN_COMPLETE","scope_kind":"TURN_OUTPUT","turn_id":"9edc9b36-ab90-494b-a7fe-b97ec4ad550f"}],"inventoryWaiting":null,"parentCompleted":true,"turnStates":["COMPLETED","COMPLETED","COMPLETED","COMPLETED","COMPLETED"]},"pass":false}
+{"case":"delayed-submission","detail":{"bothCompleted":false,"submissionsWithActiveTurn":1},"pass":false}
+{"case":"forged-and-nonengine","detail":{"fabricatedActors":0,"forgedTurns":0,"pluginOriginInputs":1},"pass":true}
+{"case":"mod-batch-partial","detail":{"duplicateObservations":[{"n":0}],"faultFired":true,"quarantined":0,"turnCompletedAfterRetry":true},"pass":true}
+{"case":"mod-batch-malformed","detail":{"duplicateObservations":[{"n":0}],"faultFired":true,"quarantined":0,"turnCompletedAfterRetry":true},"pass":true}
+{"case":"mod-batch-exit1","detail":{"duplicateObservations":[{"n":0}],"faultFired":true,"quarantined":0,"turnCompletedAfterRetry":true},"pass":true}
+{"case":"relay-unavailable","detail":{"drainedAfterRestart":true,"duplicateObservations":[{"n":0}],"enable":true,"spooledWhileStopped":11,"stop":true},"pass":true}
+{"case":"terminal-negatives","detail":{"dir":"evidence/M2/g08-terminal/20261009T042955Z-dev","summary":{"cases":[{"case":"baseline-exact","pass":true},{"case":"reorder","pass":true},{"case":"move","pass":true},{"case":"minimize-then-return","pass":false},{"case":"fullscreen-space-then-return","pass":true},{"case":"foreground-process-mismatch","pass":true},{"case":"selection-readback-race","pass":true},{"case":"target-closed","pass":true},{"case":"stale-tty-pathname","pass":true},{"case":"target-closed-during-route","pass":true},{"case":"terminal-restart","pass":false}],"disposableRoot":"/private/tmp/ts-m0c-route-ea41b581","gate":"G08","pass":false,"terminalIncarnationUnchanged":true,"terminalRestart":"BLOCKED (quitting Terminal would end unrelated owner sessions)","wrongTargets":0}},"pass":false}

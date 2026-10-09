@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "purpose": "Observer lifecycle records for the human-typed M2 vertical sessions on Claude Code 2.1.295, grouped by original prompt origin, host-stamped dispatch and outcome reason (read-only from the dev journal).",
+  "query": "observations WHERE source_id = claude.observer AND sessionKey.nativeSessionId = <run session>",
+  "runs": [
+    {
+      "run": "vertical/20261009T040337Z-dev",
+      "nativeSessionId": "fdbeb140-d3bd-454c-9bd0-5f951f7a0a6d",
+      "groups": [
+        {
+          "nativeEvent": "prompt.submit",
+          "phase": "entry",
+          "origin": "composer",
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "prompt.submit",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.complete",
+          "phase": "entry",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": "answer",
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.complete",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": "answer",
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.start",
+          "phase": "entry",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.start",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        }
+      ]
+    },
+    {
+      "run": "vertical/20261009T041131Z-dev",
+      "nativeSessionId": "724d085d-ae55-499d-be75-ac34c07e4ae8",
+      "groups": [
+        {
+          "nativeEvent": "prompt.submit",
+          "phase": "entry",
+          "origin": "composer",
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "prompt.submit",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.complete",
+          "phase": "entry",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": "answer",
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.complete",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": "answer",
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.start",
+          "phase": "entry",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        },
+        {
+          "nativeEvent": "turn.start",
+          "phase": "result",
+          "origin": null,
+          "dispatchPlugin": "engine",
+          "dispatchTier": "core",
+          "engineDispatch": 1,
+          "reason": null,
+          "records": 20
+        }
+      ]
+    }
+  ]
+}

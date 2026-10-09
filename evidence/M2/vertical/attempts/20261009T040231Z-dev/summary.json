@@ -1,0 +1,143 @@
+{
+  "activation": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/91f7d3336d24822f",
+  "cycles": 1,
+  "exit": {
+    "ms": 9,
+    "observation": "DISCONNECTED",
+    "presence": "ENDED"
+  },
+  "exitError": null,
+  "integrationRemoved": true,
+  "latency": {
+    "bySource": {
+      "claude.hook": {
+        "captureToCommitMs": {
+          "max": 1,
+          "n": 9,
+          "p50": 0,
+          "p95": 1
+        },
+        "commitToDomMs": {
+          "max": 8,
+          "n": 9,
+          "p50": 4,
+          "p95": 8
+        },
+        "eventToDomMs": {
+          "max": 8,
+          "n": 9,
+          "p50": 4,
+          "p95": 8
+        }
+      },
+      "claude.observer": {
+        "captureToCommitMs": {
+          "max": 130,
+          "n": 27,
+          "p50": 23,
+          "p95": 127
+        },
+        "commitToDomMs": {
+          "max": 18,
+          "n": 16,
+          "p50": 4,
+          "p95": 18
+        },
+        "eventToDomMs": {
+          "max": 137,
+          "n": 16,
+          "p50": 22,
+          "p95": 137
+        }
+      }
+    },
+    "normalPathPass": true,
+    "observations": 36,
+    "targets": {
+      "captureToCommitP95Ms": 100,
+      "commitToDomP95Ms": 100,
+      "eventToDomP95Ms": 250
+    },
+    "viewMarks": 28
+  },
+  "markHandled": {
+    "items": [
+      {
+        "attentionId": "942e7e27-7446-8e15-ac9a-4e96b8e00098",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "891c4d1f-02cf-43e2-96ca-5c1fc7b27082",
+            "cursor": "4327",
+            "status": "COMMITTED",
+            "targetRevision": "4327"
+          },
+          "resolvedInView": true
+        }
+      },
+      {
+        "attentionId": "2f57dcab-6906-8fb7-b3c5-c985e3cb28ec",
+        "category": "TURN_COMPLETE",
+        "journal": {
+          "commands": 1,
+          "reason": "Marked handled in the inspector",
+          "resolved": 1
+        },
+        "ok": true,
+        "uiError": null,
+        "view": {
+          "clicked": true,
+          "error": null,
+          "listedAfter": false,
+          "receipt": {
+            "commandId": "50949693-5efc-4672-a137-ee76a4522177",
+            "cursor": "4328",
+            "status": "COMMITTED",
+            "targetRevision": "4328"
+          },
+          "resolvedInView": true
+        }
+      }
+    ],
+    "openBefore": 2,
+    "pass": true
+  },
+  "nativeSessionId": "d0d0e138-0777-44d8-a383-628ddc87ecde",
+  "pass": true,
+  "recording": null,
+  "sessionId": "b3619668-b88f-47dd-9693-718b869a7040",
+  "terminalRefusals": {
+    "count": 0,
+    "waitedMs": 0
+  },
+  "ui": {
+    "hydrated": true,
+    "uiPid": 9616
+  },
+  "windowClosed": {
+    "closed": true,
+    "closedByHarness": false,
+    "endedPids": [
+      9646
+    ],
+    "ownership": {
+      "owned": true,
+      "processesInDir": [
+        9646
+      ],
+      "windowHasTty": true
+    }
+  },
+  "workerAfterMarkHandled": true,
+  "workerKeptAfterExit": true
+}

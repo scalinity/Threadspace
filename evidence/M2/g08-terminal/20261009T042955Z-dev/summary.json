@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "case": "baseline-exact",
+      "pass": true
+    },
+    {
+      "case": "reorder",
+      "pass": true
+    },
+    {
+      "case": "move",
+      "pass": true
+    },
+    {
+      "case": "minimize-then-return",
+      "pass": false
+    },
+    {
+      "case": "fullscreen-space-then-return",
+      "pass": true
+    },
+    {
+      "case": "foreground-process-mismatch",
+      "pass": true
+    },
+    {
+      "case": "selection-readback-race",
+      "pass": true
+    },
+    {
+      "case": "target-closed",
+      "pass": true
+    },
+    {
+      "case": "stale-tty-pathname",
+      "pass": true
+    },
+    {
+      "case": "target-closed-during-route",
+      "pass": true
+    },
+    {
+      "case": "terminal-restart",
+      "pass": false
+    }
+  ],
+  "disposableRoot": "/private/tmp/ts-m0c-route-ea41b581",
+  "gate": "G08",
+  "pass": false,
+  "terminalIncarnationUnchanged": true,
+  "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+  "wrongTargets": 0
+}
