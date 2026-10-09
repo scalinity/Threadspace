@@ -2,11 +2,25 @@
 import type { BindingView } from "./BindingView";
 import type { ExecutionPresence } from "./ExecutionPresence";
 import type { ObservationState } from "./ObservationState";
+import type { ObserverTier } from "./ObserverTier";
 import type { ProcessView } from "./ProcessView";
 import type { RouteSummary } from "./RouteSummary";
 import type { TurnState } from "./TurnState";
 
-export type SessionView = { sessionId: string, provider: string, nativeSessionId: string, displayName: string, activation: string | null, turnState: TurnState, executionPresence: ExecutionPresence, observation: ObservationState, process: ProcessView | null, binding: BindingView | null, 
+export type SessionView = { sessionId: string, provider: string, nativeSessionId: string, displayName: string, activation: string | null, turnState: TurnState, executionPresence: ExecutionPresence, observation: ObservationState, 
+/**
+ * The evidence tier of the session's observer: native, restored after a
+ * reload by kernel/inventory proof, or lower tier (D-0010).
+ */
+observerTier: ObserverTier | null, 
+/**
+ * The provider version the observer's latest reports agree on.
+ */
+observerVersion: string | null, 
+/**
+ * The latest observer reports disagree.
+ */
+linkConflict: boolean, process: ProcessView | null, binding: BindingView | null, 
 /**
  * Valid bindings across live attachments; more than one requires a chooser.
  */

@@ -73,6 +73,7 @@ pub fn session_page(
     after: Option<&str>,
     limit: u32,
     budget: usize,
+    observers: &projection::Observers,
 ) -> Result<Page<SessionView>, JournalError> {
     let total: u32 = conn.query_row("SELECT COUNT(*) FROM sessions", [], |row| row.get(0))?;
     let ids = ids(
@@ -81,7 +82,7 @@ pub fn session_page(
         after,
     )?;
     page(ids, limit, budget, total, |id| {
-        projection::session(conn, id)
+        projection::session(conn, id, observers)
     })
 }
 
@@ -111,8 +112,9 @@ pub fn attention_page(
 pub fn initial_view(
     conn: &Connection,
     view_revision: String,
+    observers: &projection::Observers,
 ) -> Result<FleetSnapshot, JournalError> {
-    let sessions = projection::sessions(conn)?;
+    let sessions = projection::sessions(conn, observers)?;
     let attention = projection::open_attention(conn)?;
     let counts = projection::counts(conn)?;
     let complete = FleetSnapshot {
@@ -131,7 +133,7 @@ pub fn initial_view(
     }
     let mut budget = INITIAL_LIST_BUDGET;
     loop {
-        let sessions = session_page(conn, None, u32::MAX, budget)?;
+        let sessions = session_page(conn, None, u32::MAX, budget, observers)?;
         let attention = attention_page(conn, None, u32::MAX, budget)?;
         let bounded = FleetSnapshot {
             view_revision: view_revision.clone(),

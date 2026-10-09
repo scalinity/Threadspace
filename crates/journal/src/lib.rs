@@ -477,7 +477,7 @@ impl Journal {
             [],
             |row| row.get(0),
         )?;
-        let snapshot = paging::initial_view(&tx, format_cursor(cursor))?;
+        let snapshot = paging::initial_view(&tx, format_cursor(cursor), &self.engine.state.sessions)?;
         tx.finish()?;
         Ok((cursor, snapshot))
     }
@@ -503,7 +503,7 @@ impl Journal {
             [],
             |row| row.get(0),
         )?;
-        let page = paging::session_page(&tx, after, limit, paging::PAGE_BUDGET)?;
+        let page = paging::session_page(&tx, after, limit, paging::PAGE_BUDGET, &self.engine.state.sessions)?;
         tx.finish()?;
         Ok((cursor, page))
     }
@@ -540,7 +540,7 @@ impl Journal {
     ) -> Result<ProjectionPatch, JournalError> {
         let mut session_upserts = Vec::with_capacity(change.session_ids.len());
         for id in &change.session_ids {
-            session_upserts.push(projection::session(&self.conn, id)?);
+            session_upserts.push(projection::session(&self.conn, id, &self.engine.state.sessions)?);
         }
         let mut attention_upserts = Vec::with_capacity(change.attention_ids.len());
         for id in &change.attention_ids {

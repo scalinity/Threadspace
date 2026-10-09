@@ -28,4 +28,8 @@ fixture: boolean, executionPresence: ExecutionPresence, observation: Observation
 /**
  * The latest link reports disagree.
  */
-linkConflict: boolean, observerTier: ObserverTier | null, createdCursor: number, revision: number, };
+linkConflict: boolean, observerTier: ObserverTier | null, 
+/**
+ * The provider version the latest link reports agree on.
+ */
+observerVersion: string | null, createdCursor: number, revision: number, };

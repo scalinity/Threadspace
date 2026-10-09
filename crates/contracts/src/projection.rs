@@ -117,6 +117,13 @@ pub struct SessionView {
     pub turn_state: TurnState,
     pub execution_presence: ExecutionPresence,
     pub observation: ObservationState,
+    /// The evidence tier of the session's observer: native, restored after a
+    /// reload by kernel/inventory proof, or lower tier (D-0010).
+    pub observer_tier: Option<crate::canonical::records::ObserverTier>,
+    /// The provider version the observer's latest reports agree on.
+    pub observer_version: Option<String>,
+    /// The latest observer reports disagree.
+    pub link_conflict: bool,
     pub process: Option<ProcessView>,
     pub binding: Option<BindingView>,
     /// Valid bindings across live attachments; more than one requires a chooser.

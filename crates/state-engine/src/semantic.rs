@@ -197,6 +197,7 @@ pub fn projection(state: &CanonicalState) -> Value {
             "turnState": s.turn_state,
             "linkConflict": s.link_conflict,
             "observerTier": s.observer_tier,
+            "observerVersion": s.observer_version,
         })))),
         "actors": map(state.actors.values().map(|a| (n.actor(&a.id), json!({
             "role": a.role,

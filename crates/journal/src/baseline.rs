@@ -136,6 +136,7 @@ pub(crate) fn from_m0(conn: &Connection) -> Result<(CanonicalState, Vec<Assignme
                 turn_state: TurnState::Unknown,
                 link_conflict: false,
                 observer_tier: None,
+                observer_version: None,
                 created_cursor: revision,
                 revision,
             },

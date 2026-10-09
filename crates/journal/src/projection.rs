@@ -34,7 +34,12 @@ type SessionRow = (
     String,
 );
 
-pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, JournalError> {
+/// The canonical sessions a view reads its observer's evidence tier and
+/// version from (D-0010): the writer's engine state, which is the state the
+/// rows were committed from.
+pub type Observers = std::collections::BTreeMap<String, threadspace_contracts::canonical::records::SessionRecord>;
+
+pub fn session(conn: &Connection, session_id: &str, observers: &Observers) -> Result<SessionView, JournalError> {
     let row: Option<SessionRow> = conn
         .query_row(
             "SELECT n.provider, s.native_session_id, s.display_name, s.fixture, s.revision,
@@ -83,6 +88,10 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
     let turn_state: TurnState = parse_enum(turn_state)?;
     let execution_presence: ExecutionPresence = parse_enum(execution_presence)?;
     let observation: ObservationState = parse_enum(observation)?;
+    let observer = observers.get(session_id);
+    let observer_tier = observer.and_then(|s| s.observer_tier);
+    let observer_version = observer.and_then(|s| s.observer_version.clone());
+    let link_conflict = observer.is_some_and(|s| s.link_conflict);
 
     // The displayed activation (its process and binding): the newest live
     // one, else the newest.
@@ -198,6 +207,9 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
         turn_state,
         execution_presence,
         observation,
+        observer_tier,
+        observer_version,
+        link_conflict,
         process,
         binding,
         live_bindings,
@@ -210,12 +222,12 @@ pub fn session(conn: &Connection, session_id: &str) -> Result<SessionView, Journ
     })
 }
 
-pub fn sessions(conn: &Connection) -> Result<Vec<SessionView>, JournalError> {
+pub fn sessions(conn: &Connection, observers: &Observers) -> Result<Vec<SessionView>, JournalError> {
     let mut statement = conn.prepare("SELECT id FROM sessions ORDER BY revision DESC")?;
     let ids = statement
         .query_map([], |row| row.get::<_, String>(0))?
         .collect::<Result<Vec<_>, _>>()?;
-    ids.iter().map(|id| session(conn, id)).collect()
+    ids.iter().map(|id| session(conn, id, observers)).collect()
 }
 
 fn attention_from_row(

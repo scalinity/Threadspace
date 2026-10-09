@@ -563,6 +563,7 @@ impl Tx<'_> {
                     turn_state: TurnState::Unknown,
                     link_conflict: false,
                     observer_tier: None,
+                    observer_version: None,
                     created_cursor: cursor,
                     revision: cursor,
                 },
@@ -1745,6 +1746,7 @@ impl Tx<'_> {
         let states: BTreeSet<ObservationState> = newest.iter().map(|l| l.link.clone()).collect();
         let link = states.iter().max_by_key(|s| link_rank(s)).cloned();
         let conflict = states.len() > 1;
+        let (version, _) = agreed(newest.iter().filter_map(|l| l.version.clone()));
         let tier = if newest.iter().any(|l| l.qualified && l.provenance != EvidenceClass::HostRead) {
             ObserverTier::Native
         } else if newest.iter().any(|l| {
@@ -1758,6 +1760,7 @@ impl Tx<'_> {
             session.link = link;
             session.link_conflict = conflict;
             session.observer_tier = Some(tier);
+            session.observer_version = version;
         }
     }
 

@@ -90,6 +90,9 @@ pub struct SessionRecord {
     pub link_conflict: bool,
     #[serde(default)]
     pub observer_tier: Option<ObserverTier>,
+    /// The provider version the latest link reports agree on.
+    #[serde(default)]
+    pub observer_version: Option<String>,
     pub created_cursor: i64,
     pub revision: i64,
 }
