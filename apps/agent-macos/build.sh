@@ -32,8 +32,9 @@ if [ -z "$IDENTITY" ]; then
   exit 1
 fi
 
-echo "==> Rust core (release, qualification)"
+echo "==> Rust core and capture helper (release, qualification)"
 cargo build --manifest-path "$ROOT/Cargo.toml" -p threadspace-agent --release --features qualification --target "$TARGET"
+cargo build --manifest-path "$ROOT/Cargo.toml" -p threadspace-relay --bin threadspace-hook --release --features qualification --target "$TARGET"
 
 echo "==> Swift AppKit shell"
 rm -rf "$APP"
@@ -51,14 +52,23 @@ sed -e "s/@AGENT_IDENTIFIER@/$AGENT_IDENTIFIER/" -e "s/@AGENT_NAME@/$AGENT_NAME/
 plutil -lint "$APP/Contents/Info.plist" >/dev/null
 cp "$HERE/Resources/terminal-inventory.applescript" "$HERE/Resources/terminal-focus.applescript" "$APP/Contents/Resources/"
 cp "$ROOT/apps/desktop/src-tauri/icons/icon.icns" "$APP/Contents/Resources/icon.icns"
+# The capture helper and the pinned observer mod (without its tests), which
+# the integration setup stages into a Threadspace-owned directory (SPEC §19.2).
+cp "$ROOT/target/$TARGET/release/threadspace-hook" "$APP/Contents/MacOS/threadspace-hook"
+mkdir -p "$APP/Contents/Resources/provider-mod"
+cp -R "$ROOT/packages/provider-mod/.claude-plugin" "$ROOT/packages/provider-mod/hooks" "$ROOT/packages/provider-mod/types" \
+  "$APP/Contents/Resources/provider-mod/"
+rm -rf "$APP/Contents/Resources/provider-mod/.claude-plugin/types"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 
-echo "==> Sign (hardened runtime, companion entitlements)"
+echo "==> Sign (nested helper, then hardened runtime with companion entitlements)"
+codesign --force --sign "$IDENTITY" --options runtime --timestamp=none "$APP/Contents/MacOS/threadspace-hook"
 codesign --force --sign "$IDENTITY" --options runtime --timestamp=none \
   --entitlements "$HERE/ThreadspaceAgent.entitlements" "$APP"
 codesign --verify --strict --verbose=2 "$APP"
 
 EXECUTABLE_SHA256="$(shasum -a 256 "$APP/Contents/MacOS/ThreadspaceAgent" | awk '{ print $1 }')"
+HELPER_SHA256="$(shasum -a 256 "$APP/Contents/MacOS/threadspace-hook" | awk '{ print $1 }')"
 cat > "$OUT_DIR/build-info.json" <<EOF
 {
   "channel": "$CHANNEL",
@@ -67,6 +77,7 @@ cat > "$OUT_DIR/build-info.json" <<EOF
   "sourceCommit": "$(git -C "$ROOT" rev-parse HEAD)",
   "sourceTreeDirty": $( [ -n "$(git -C "$ROOT" status --porcelain --untracked-files=no)" ] && echo true || echo false ),
   "executableSha256": "$EXECUTABLE_SHA256",
+  "helperSha256": "$HELPER_SHA256",
   "qualificationBuild": true
 }
 EOF

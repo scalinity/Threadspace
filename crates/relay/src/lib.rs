@@ -11,6 +11,7 @@ pub mod client;
 pub mod events;
 pub mod frame;
 pub mod locator;
+pub mod modbatch;
 pub mod paths;
 pub mod peer;
 pub mod runtime;

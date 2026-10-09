@@ -73,12 +73,13 @@ pub enum CaptureReply {
     },
 }
 
-/// The typed receipt `threadspace-hook mod-batch` prints for the calling mod.
-/// Exit status, a missing receipt and a timeout are never acceptance.
+/// The typed receipt `threadspace-hook mod-batch` prints for the calling mod:
+/// exactly one result per submitted record (SPEC §8.3). Exit status, a
+/// missing receipt and a timeout are never acceptance.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct ModBatchReceipt {
     pub receipt_version: u32,
-    pub receipts: Vec<RecordReceipt>,
+    pub results: Vec<RecordReceipt>,
 }

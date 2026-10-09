@@ -13,27 +13,29 @@
 //! exits 0 on every path, so capture failure can never become a provider
 //! decision. A watchdog ends the process at the wall budget.
 //!
-//! `mod-batch` reads a JSON array of envelopes and prints one typed receipt
-//! (`ModBatchReceipt`) for the calling mod; exit status alone is never
-//! acceptance.
+//! `mod-batch [--budget-ms <ms>]` reads the observer mod's batch on stdin
+//! and prints one typed receipt (`ModBatchReceipt`) for the calling mod, with
+//! exactly one result per submitted record (`modbatch`); exit status alone is
+//! never acceptance. The mod passes the time its host allows the call, so
+//! the receipt is printed before the host stops waiting.
 
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use threadspace_contracts::canonical::capture::{
-    CAPTURE_PROTOCOL_VERSION, CaptureBatch, CaptureReply, MOD_BATCH_RECEIPT_VERSION,
-    ModBatchReceipt, RecordReceipt, RecordStatus,
+    CAPTURE_PROTOCOL_VERSION, CaptureBatch, CaptureReply, ModBatchReceipt, RecordReceipt, RecordStatus,
 };
 use threadspace_contracts::canonical::envelope::{ObservationEnvelope, ProcessRole, ProcessSample};
 use threadspace_contracts::limits::capture::{
-    BATCH_MAX_RECORDS, CONNECT_BUDGET_MS, FRAME_MAX_BYTES, RAW_INPUT_MAX_BYTES, RECEIPT_BUDGET_MS,
+    CONNECT_BUDGET_MS, FRAME_MAX_BYTES, RAW_INPUT_MAX_BYTES, RECEIPT_BUDGET_MS,
     RECEIPT_MAX_BYTES, WALL_BUDGET_MS,
 };
 use threadspace_contracts::route::ProcessKey;
 use threadspace_relay::capture::{HookCapture, claude_hook_envelope, local_clock, parse_bounded};
 use threadspace_relay::events::send;
 use threadspace_relay::locator;
+use threadspace_relay::modbatch::{self, BatchContext, Sink};
 use threadspace_relay::paths::{AgentPaths, claude_profile_ref, home_dir};
 use threadspace_relay::spool::Spool;
 use threadspace_surfaces_macos::{ancestry, process};
@@ -95,7 +97,11 @@ fn monotonic_ns() -> Option<u64> {
 
 /// This process and its validated ancestors, as capture evidence.
 fn own_evidence(boot_id: &str) -> Vec<ProcessSample> {
-    let walk = ancestry::walk(&ancestry::KernelSampler, std::process::id() as i32, ANCESTRY_LINKS);
+    own_evidence_links(boot_id, ANCESTRY_LINKS)
+}
+
+fn own_evidence_links(boot_id: &str, links: usize) -> Vec<ProcessSample> {
+    let walk = ancestry::walk(&ancestry::KernelSampler, std::process::id() as i32, links);
     walk.chain
         .iter()
         .enumerate()
@@ -116,6 +122,16 @@ fn own_evidence(boot_id: &str) -> Vec<ProcessSample> {
             }
         })
         .collect()
+}
+
+/// This process and the parent that ran it, the provider, as mod-batch
+/// evidence (kernel samples, never the mod's claims).
+fn provider_evidence(boot_id: &str) -> Vec<ProcessSample> {
+    let mut samples = own_evidence_links(boot_id, 2);
+    if let Some(parent) = samples.get_mut(1) {
+        parent.role = ProcessRole::Provider;
+    }
+    samples
 }
 
 /// Delivers a batch to the event socket within the receipt budget; `None`
@@ -176,38 +192,93 @@ fn hook(args: &[String], started: Instant) {
     }
 }
 
-fn mod_batch(args: &[String], started: Instant) -> ModBatchReceipt {
-    let mut receipt = ModBatchReceipt {
-        receipt_version: MOD_BATCH_RECEIPT_VERSION,
-        receipts: Vec::new(),
-    };
-    let Some(store) = store_dir(args) else { return receipt };
-    let Some(records) = read_stdin(FRAME_MAX_BYTES)
-        .and_then(|bytes| serde_json::from_slice::<Vec<ObservationEnvelope>>(&bytes).ok())
-        .filter(|records| records.len() <= BATCH_MAX_RECORDS)
-    else {
-        return receipt;
-    };
-    let delivered = deliver(&store, &records, started).unwrap_or_default();
-    let spool = Spool::at(&store);
-    for record in &records {
-        let status = delivered
-            .iter()
-            .find(|r| r.observation_id == record.observation_id)
-            .map(|r| r.status)
-            .filter(|s| matches!(s, RecordStatus::Committed | RecordStatus::AlreadyCommitted | RecordStatus::NotAccepted));
-        let status = match status {
-            Some(status) => status,
-            None if spool.publish(record).is_ok() => RecordStatus::LocalSpooled,
-            None => RecordStatus::NotAccepted,
+/// The companion's event socket, then the local spool.
+struct LiveSink {
+    socket: Option<PathBuf>,
+    spool: Spool,
+}
+
+impl Sink for LiveSink {
+    fn deliver(&mut self, frame: &[ObservationEnvelope], deadline: Instant) -> Option<Vec<RecordReceipt>> {
+        let socket = self.socket.as_ref()?;
+        let batch = CaptureBatch {
+            protocol_version: CAPTURE_PROTOCOL_VERSION,
+            records: frame.to_vec(),
         };
-        receipt.receipts.push(RecordReceipt {
-            observation_id: record.observation_id.clone(),
-            status,
-            reason: None,
-        });
+        match send(socket, &batch, deadline).ok()? {
+            CaptureReply::Receipts { receipts, .. } => Some(receipts),
+            CaptureReply::Refused { .. } => None,
+        }
     }
-    receipt
+
+    fn spool(&mut self, envelope: &ObservationEnvelope) -> bool {
+        self.spool.publish(envelope).is_ok()
+    }
+}
+
+/// A qualification-only delivery fault (`THREADSPACE_QUALIFY_MOD_BATCH_FAULT`):
+/// `partial` commits the first half then lets the caller time out, `slow`
+/// answers after the budget, `malformed` prints an invalid receipt and
+/// `exit1` exits 1 after a valid one. Release builds have none.
+#[cfg(feature = "qualification")]
+fn fault() -> Option<String> {
+    std::env::var("THREADSPACE_QUALIFY_MOD_BATCH_FAULT").ok()
+}
+
+#[cfg(not(feature = "qualification"))]
+fn fault() -> Option<String> {
+    None
+}
+
+/// The answer and the exit status to leave with.
+fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
+    let budget = arg(args, "--budget-ms")
+        .and_then(|ms| ms.parse::<u64>().ok())
+        .map_or(WALL_BUDGET_MS, |ms| ms.min(WALL_BUDGET_MS));
+    let fault = fault();
+    let late = || std::thread::sleep(Duration::from_millis(budget + 50));
+    if fault.as_deref() == Some("slow") {
+        late();
+    }
+    let Some(store) = store_dir(args) else { return (None, 0) };
+    let Some(stdin) = read_stdin(2 * FRAME_MAX_BYTES) else { return (None, 0) };
+    let home = arg(args, "--home").map(PathBuf::from).or_else(home_dir);
+    let Some(home) = home else { return (None, 0) };
+    let boot = process::boot_session_id().ok();
+    let context = BatchContext {
+        profile_ref: claude_profile_ref(&home),
+        clock: local_clock(boot.clone(), now_ms(), monotonic_ns()),
+        evidence: provider_evidence(boot.as_deref().unwrap_or_default()),
+    };
+    let socket = locator::read(&store.join("runtime-locator.json"))
+        .ok()
+        .and_then(|locator| locator.events_socket)
+        .map(PathBuf::from);
+    let mut sink = LiveSink {
+        socket,
+        spool: Spool::at(&store),
+    };
+    // The companion round trips take at most the capture receipt budget, and
+    // half the caller's, leaving the rest for the spool.
+    let delivery = started + Duration::from_millis((CONNECT_BUDGET_MS + RECEIPT_BUDGET_MS).min(budget / 2));
+    let deadline = started + Duration::from_millis(budget.saturating_sub(10));
+    if fault.as_deref() == Some("partial") {
+        let mut request: serde_json::Value = serde_json::from_slice(&stdin).unwrap_or_default();
+        if let Some(records) = request.get_mut("records").and_then(serde_json::Value::as_array_mut) {
+            let keep = records.len().div_ceil(2);
+            records.truncate(keep);
+        }
+        let half = serde_json::to_vec(&request).unwrap_or_default();
+        let _ = modbatch::answer(&half, &context, &mut sink, delivery, delivery);
+        late();
+        return (None, 0);
+    }
+    let receipt: ModBatchReceipt = modbatch::answer(&stdin, &context, &mut sink, delivery, deadline);
+    match fault.as_deref() {
+        Some("malformed") => (Some(br#"{"receiptVersion":1,"results":"malformed"}"#.to_vec()), 0),
+        Some("exit1") => (serde_json::to_vec(&receipt).ok(), 1),
+        _ => (serde_json::to_vec(&receipt).ok(), 0),
+    }
 }
 
 fn main() {
@@ -217,14 +288,16 @@ fn main() {
     watchdog(Duration::from_millis(WALL_BUDGET_MS));
     match args.get(1).map(String::as_str) {
         Some("mod-batch") => {
-            let receipt = std::panic::catch_unwind(|| mod_batch(&args, started)).ok();
-            if let Some(text) = receipt
-                .and_then(|r| serde_json::to_vec(&r).ok())
-                .filter(|text| text.len() <= RECEIPT_MAX_BYTES)
-            {
+            let (text, status) = std::panic::catch_unwind(|| mod_batch(&args, started)).unwrap_or((None, 0));
+            if let Some(text) = text.filter(|text| text.len() <= RECEIPT_MAX_BYTES) {
                 // Flushed here: the exit below discards buffered output.
                 let mut stdout = std::io::stdout().lock();
                 let _ = stdout.write_all(&text).and_then(|()| stdout.flush());
+            }
+            if status != 0 {
+                // SAFETY: as in `quiet_exit`; only the qualification `exit1`
+                // fault leaves with a non-zero status.
+                unsafe { libc::_exit(status) }
             }
         }
         _ => {

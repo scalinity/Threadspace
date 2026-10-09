@@ -2,7 +2,8 @@
 import type { RecordReceipt } from "./RecordReceipt";
 
 /**
- * The typed receipt `threadspace-hook mod-batch` prints for the calling mod.
- * Exit status, a missing receipt and a timeout are never acceptance.
+ * The typed receipt `threadspace-hook mod-batch` prints for the calling mod:
+ * exactly one result per submitted record (SPEC §8.3). Exit status, a
+ * missing receipt and a timeout are never acceptance.
  */
-export type ModBatchReceipt = { receiptVersion: number, receipts: Array<RecordReceipt>, };
+export type ModBatchReceipt = { receiptVersion: number, results: Array<RecordReceipt>, };

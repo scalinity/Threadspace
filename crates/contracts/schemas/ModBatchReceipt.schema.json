@@ -34,14 +34,14 @@
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "The typed receipt `threadspace-hook mod-batch` prints for the calling mod.\nExit status, a missing receipt and a timeout are never acceptance.",
+  "description": "The typed receipt `threadspace-hook mod-batch` prints for the calling mod:\nexactly one result per submitted record (SPEC §8.3). Exit status, a\nmissing receipt and a timeout are never acceptance.",
   "properties": {
     "receiptVersion": {
       "format": "uint32",
       "minimum": 0,
       "type": "integer"
     },
-    "receipts": {
+    "results": {
       "items": {
         "$ref": "#/$defs/RecordReceipt"
       },
@@ -50,7 +50,7 @@
   },
   "required": [
     "receiptVersion",
-    "receipts"
+    "results"
   ],
   "title": "ModBatchReceipt",
   "type": "object"
