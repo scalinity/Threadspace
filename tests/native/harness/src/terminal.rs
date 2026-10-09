@@ -133,11 +133,7 @@ fn scripted(script: &str, args: &[&str], timeout: Duration) -> Output {
         return out;
     }
     match wait_scriptable(SCRIPTING_WAIT) {
-        Ok(waited) => {
-            REFUSALS.fetch_add(1, Ordering::Relaxed);
-            REFUSED_MS.fetch_add(waited, Ordering::Relaxed);
-            osascript(script, args, timeout)
-        }
+        Ok(_) => osascript(script, args, timeout),
         Err(_) => out,
     }
 }
@@ -321,16 +317,24 @@ impl Tab {
     }
 }
 
-/// Waits until Terminal answers element queries. A long-running Terminal
-/// can refuse every one of them for minutes (`-1728`/`-1708`) while its
-/// application properties still answer; returns the milliseconds waited.
+/// Waits until Terminal answers element queries. Terminal can refuse every
+/// one of them for minutes (`-1728`/`-1708`) while its application
+/// properties still answer, for one: while the display is being recorded.
+/// Returns the milliseconds waited; each refusal waited out is counted.
 pub fn wait_scriptable(limit: Duration) -> Result<u64, String> {
     let started = std::time::Instant::now();
+    let mut refused = false;
     loop {
         let out = osascript(PROBE, &[], timeout());
         if out.ok {
-            return Ok(started.elapsed().as_millis() as u64);
+            let waited = started.elapsed().as_millis() as u64;
+            if refused {
+                REFUSALS.fetch_add(1, Ordering::Relaxed);
+                REFUSED_MS.fetch_add(waited, Ordering::Relaxed);
+            }
+            return Ok(waited);
         }
+        refused = true;
         if started.elapsed() >= limit {
             return Err(format!("Terminal refused element queries for {limit:?}: {}", out.stderr.trim()));
         }

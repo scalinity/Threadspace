@@ -571,6 +571,9 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let exited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
         format!("{:?}", v.execution_presence) == "Ended"
     });
+    let trace = trace(ctx, &observed.native_session_id, &observed.session_id, start_cursor);
+    let trace_rows = trace.as_array().map_or(0, Vec::len);
+    run_dir.write_json("trace.json", &trace).map_err(|e| e.to_string())?;
     let history = ui(ctx, "m2-fleet", json!({ "sessionId": observed.session_id }));
     let worker_kept = history
         .as_ref()
@@ -593,6 +596,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         "exit": exited.as_ref().ok().map(|(v, ms)| json!({ "presence": v.execution_presence, "observation": v.observation, "ms": ms })),
         "exitError": exited.as_ref().err(),
         "latency": latency,
+        "traceRows": trace_rows,
         "markHandled": handled,
         "workerAfterMarkHandled": still_one,
         "workerKeptAfterExit": worker_kept,
@@ -611,66 +615,133 @@ pub fn refusals() -> Value {
     json!({ "count": count, "waitedMs": ms })
 }
 
-/// An uncut recording of the main display for a run, written only to the
-/// private directory `THREADSPACE_M2_RECORDING_DIR` outside the repository
-/// (it shows whatever the display shows); the evidence keeps its digest.
+/// An uncut 1 fps time-lapse of the main display for a run, written only to
+/// the private directory `THREADSPACE_M2_RECORDING_DIR` outside the
+/// repository (it shows whatever the display shows); the evidence keeps its
+/// digest. A video recording cannot be used: while any screen video
+/// capture runs, Terminal refuses every scripting element query, which
+/// both the harness and the companion's Return need. Stills do not.
 struct Recording {
-    child: std::process::Child,
-    path: PathBuf,
+    dir: PathBuf,
+    movie: PathBuf,
+    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    worker: Option<std::thread::JoinHandle<u64>>,
     started: Instant,
-    stopped: bool,
 }
+
+const FRAME_INTERVAL: Duration = Duration::from_secs(1);
 
 impl Recording {
     fn start() -> Result<Option<Self>, String> {
-        let Some(dir) = std::env::var_os("THREADSPACE_M2_RECORDING_DIR").map(PathBuf::from) else {
+        let Some(root) = std::env::var_os("THREADSPACE_M2_RECORDING_DIR").map(PathBuf::from) else {
             return Ok(None);
         };
-        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-        let dir = dir.canonicalize().map_err(|e| e.to_string())?;
+        std::fs::create_dir_all(&root).map_err(|e| e.to_string())?;
+        let root = root.canonicalize().map_err(|e| e.to_string())?;
         let repo = std::env::current_dir().and_then(|d| d.canonicalize()).map_err(|e| e.to_string())?;
-        if dir.starts_with(&repo) {
+        if root.starts_with(&repo) {
             return Err("THREADSPACE_M2_RECORDING_DIR must be outside the repository".into());
         }
-        let path = dir.join(format!("m2-vertical-{}.mov", threadspace_harness::now_ms()));
-        let child = std::process::Command::new("/usr/sbin/screencapture")
-            .args(["-x", "-v", "-D1"])
-            .arg(&path)
-            .stdin(std::process::Stdio::null())
-            .stdout(std::process::Stdio::null())
-            .stderr(std::process::Stdio::null())
-            .spawn()
-            .map_err(|e| format!("screencapture: {e}"))?;
-        Ok(Some(Self { child, path, started: Instant::now(), stopped: false }))
+        let name = format!("m2-vertical-{}", threadspace_harness::now_ms());
+        let dir = root.join(&name);
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let (frames, flag) = (dir.clone(), stop.clone());
+        let worker = std::thread::spawn(move || {
+            let mut count = 0u64;
+            let begun = Instant::now();
+            while !flag.load(std::sync::atomic::Ordering::Relaxed) {
+                let frame = frames.join(format!("frame-{count:05}.jpg"));
+                run("/usr/sbin/screencapture", &["-x", "-t", "jpg", "-D1", &frame.display().to_string()], Duration::from_secs(5));
+                count += 1;
+                // Frames stay on a fixed one-second grid, so the movie plays in real time.
+                let next = FRAME_INTERVAL * count as u32;
+                if let Some(wait) = next.checked_sub(begun.elapsed()) {
+                    std::thread::sleep(wait);
+                }
+            }
+            count
+        });
+        Ok(Some(Self { movie: root.join(format!("{name}.mp4")), dir, stop, worker: Some(worker), started: Instant::now() }))
     }
 
-    /// Ends the recording (SIGINT finalizes the movie) and describes it.
+    /// Stops the frames, assembles them at one frame per second, keeps the
+    /// movie and removes the frames once the movie exists.
     fn stop(&mut self) -> Value {
+        self.stop.store(true, std::sync::atomic::Ordering::Relaxed);
+        let frames = self.worker.take().and_then(|w| w.join().ok()).unwrap_or(0);
         let wall_ms = self.started.elapsed().as_millis() as u64;
-        self.stopped = true;
-        threadspace_harness::procs::signal(self.child.id() as i32, libc::SIGINT);
-        let status = self.child.wait().ok().and_then(|s| s.code());
-        let bytes = std::fs::metadata(&self.path).map(|m| m.len()).ok();
-        let digest = run("/usr/bin/shasum", &["-a", "256", &self.path.display().to_string()], Duration::from_secs(120));
+        let pattern = self.dir.join("frame-%05d.jpg").display().to_string();
+        let movie = self.movie.display().to_string();
+        let assembled = run(
+            "/opt/homebrew/bin/ffmpeg",
+            &["-v", "error", "-y", "-framerate", "1", "-i", &pattern, "-vf", "scale=trunc(iw/4)*2:trunc(ih/4)*2", "-c:v", "libx264", "-pix_fmt", "yuv420p", &movie],
+            Duration::from_secs(600),
+        );
+        let bytes = std::fs::metadata(&self.movie).map(|m| m.len()).ok();
+        if assembled.ok && bytes.is_some_and(|b| b > 0) {
+            let _ = std::fs::remove_dir_all(&self.dir);
+        }
+        let digest = run("/usr/bin/shasum", &["-a", "256", &movie], Duration::from_secs(120));
         json!({
-            "file": self.path.file_name().map(|n| n.to_string_lossy().into_owned()),
+            "kind": "uncut time-lapse, one still per second, played at one frame per second",
+            "file": self.movie.file_name().map(|n| n.to_string_lossy().into_owned()),
             "privateDirectory": "THREADSPACE_M2_RECORDING_DIR (outside the repository)",
+            "frames": frames,
+            "frameIntervalMs": FRAME_INTERVAL.as_millis() as u64,
+            "wallMs": wall_ms,
+            "assembled": assembled.ok,
+            "assembleError": (!assembled.ok).then(|| assembled.stderr.trim().to_owned()),
+            "framesKept": !(assembled.ok && bytes.is_some_and(|b| b > 0)),
             "sha256": digest.stdout.split_whitespace().next(),
             "bytes": bytes,
-            "wallMs": wall_ms,
-            "exit": status,
         })
     }
 }
 
-/// A run that ends early still finalizes its recording.
+/// A run that ends early still stops its frames.
 impl Drop for Recording {
     fn drop(&mut self) {
-        if !self.stopped {
-            threadspace_harness::procs::signal(self.child.id() as i32, libc::SIGINT);
-            let _ = self.child.wait();
+        if self.worker.is_some() {
+            let _ = self.stop();
         }
     }
+}
+
+/// The session's hook, observer and inventory observations after `after`,
+/// in ingest order, each with the canonical fact kinds it produced: the
+/// journal IDs that join the native trace to canonical state. Payloads are
+/// not copied.
+fn trace(ctx: &Ctx, native: &str, session_id: &str, after: u64) -> Value {
+    let (native, session) = (native.replace('\'', ""), session_id.replace('\'', ""));
+    journal_query(ctx, &format!(
+        "SELECT o.ingest_seq AS cursor, o.observation_id AS observationId, o.source_id AS source, o.native_event AS nativeEvent,
+                o.sequence_meaning AS sequenceMeaning, o.captured_wall_ms AS capturedWallMs, o.received_wall_ms AS receivedWallMs,
+                (SELECT json_group_array(f.kind) FROM facts f WHERE f.observation_id = o.observation_id) AS facts
+           FROM observations o
+          WHERE o.ingest_seq > {after}
+            AND (json_extract(o.payload_json, '$.sessionKey.nativeSessionId') = '{native}'
+                 OR EXISTS (SELECT 1 FROM facts f WHERE f.observation_id = o.observation_id AND f.session_id = '{session}'))
+          ORDER BY o.ingest_seq"
+    ))
+    .ok()
+    .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+    .map(|rows| {
+        Value::Array(
+            rows.as_array()
+                .into_iter()
+                .flatten()
+                .map(|row| {
+                    let mut row = row.clone();
+                    if let Some(facts) = row["facts"].as_str().and_then(|t| serde_json::from_str::<Value>(t).ok()) {
+                        row["facts"] = facts;
+                    }
+                    row
+                })
+                .collect(),
+        )
+    })
+    .unwrap_or(Value::Null)
 }
 
 /// The journal's last ingest sequence (the projection cursor).
