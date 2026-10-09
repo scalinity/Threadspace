@@ -17,6 +17,10 @@
 //!   threadspace-m0c g11-restarts <prod|dev> [cycles]
 //!   threadspace-m0c maintenance <prod|dev>
 //!   threadspace-m0c g08-terminal <prod|dev>
+//!   threadspace-m0c m2-cycles <prod|dev> [count]       # M2: integration install/reinstall/remove
+//!   threadspace-m0c m2-vertical <prod|dev> [cycles]    # M2: observed session, Return, follow-up
+//!   threadspace-m0c m2-routes <prod|dev> [count]       # M2: exact Returns through the UI
+//!   threadspace-m0c m2-faults <prod|dev> [all|case,...] # M2: fault and boundary cases
 //!   threadspace-m0c g06-notifications prod
 //!   threadspace-m0c g05-denied dev
 //!   threadspace-m0c g13-renderer prod
@@ -42,6 +46,8 @@ mod graphics_overlap;
 mod handoff;
 mod install;
 mod launches;
+mod m2;
+mod m2_faults;
 mod notifications;
 mod ownership;
 mod power;
@@ -88,6 +94,10 @@ fn main() -> ExitCode {
             supervision::c02(&ctx, args.get(2).map(String::as_str).unwrap_or("all"))
         }
         "g08-terminal" => terminal_gates::negatives(&ctx),
+        "m2-cycles" => m2::cycles(&ctx, number(&args, 2, 10)),
+        "m2-vertical" => m2::vertical(&ctx, number(&args, 2, 10)),
+        "m2-routes" => m2::routes(&ctx, number(&args, 2, 30)),
+        "m2-faults" => m2_faults::faults(&ctx, args.get(2).map_or("all", String::as_str)),
         "h10-terminal" => terminal_gates::remediation(&ctx),
         "c11-deadline" => deadline::c11(&ctx),
         "c02-durable" => ownership::c02_durable(&ctx, args.get(2).map_or("all", String::as_str)),

@@ -170,7 +170,7 @@ fn foreground_group(pid: i32) -> Option<(i64, i64)> {
     Some((fields.next()??, fields.next()??))
 }
 
-fn frontmost_bundle() -> Option<String> {
+pub(crate) fn frontmost_bundle() -> Option<String> {
     let front = run("/usr/bin/lsappinfo", &["front"], Duration::from_secs(3));
     let info = run(
         "/usr/bin/lsappinfo",

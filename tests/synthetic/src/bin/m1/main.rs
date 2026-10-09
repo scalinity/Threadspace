@@ -22,6 +22,7 @@ mod crash;
 mod evidence;
 mod manifest;
 mod migration;
+mod mod_batch;
 mod permutations;
 mod replay;
 mod sanitization;
@@ -81,6 +82,11 @@ fn main() -> ExitCode {
                 capture::measure(&root, Path::new(hook), runs)
             }
             Some("migration") => migration::run(&repo, &root),
+            Some("capture-mod-batch") => {
+                let hook = args.get(2).ok_or("capture-mod-batch <hook executable> [runs]")?;
+                let runs = args.get(3).and_then(|n| n.parse().ok()).unwrap_or(500);
+                mod_batch::measure(&root, Path::new(hook), runs)
+            }
             Some("sanitization") => {
                 let hook = args.get(2).ok_or("sanitization <hook executable>")?;
                 sanitization::run(&root, Path::new(hook))
