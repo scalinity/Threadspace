@@ -15,6 +15,8 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
+use threadspace_contracts::control::{ControlRequestBody, ControlResponseBody};
+use threadspace_contracts::diagnostics::AutomationPermission;
 use threadspace_contracts::projection::{FleetSnapshot, SessionView};
 use threadspace_harness::evidence::{Run, sha256_file};
 use threadspace_harness::run::run;
@@ -46,6 +48,21 @@ pub struct Activation {
 }
 
 pub fn activate(ctx: &Ctx, scratch: &Path) -> Result<Activation, String> {
+    // Without Terminal consent no session can bind to its tab; name that
+    // blocker instead of timing out on the first binding.
+    match ctx.companion().request(ControlRequestBody::IntegrationStatus, Duration::from_secs(20))? {
+        ControlResponseBody::IntegrationStatus { report } if report.terminal.automation == AutomationPermission::Authorized => {}
+        ControlResponseBody::IntegrationStatus { report } => {
+            return Err(format!(
+                "BLOCKED: Terminal automation is {:?} ({}) for the {} channel; `threadspace-qualify {} request-terminal` asks the owner once",
+                report.terminal.automation,
+                report.terminal.automation_status_code,
+                ctx.channel_name(),
+                ctx.channel_name()
+            ));
+        }
+        other => return Err(format!("integration status: unexpected {other:?}")),
+    }
     let config = scratch.join("session-config");
     std::fs::create_dir_all(&config).map_err(|e| e.to_string())?;
     let installed = integration(ctx, "install", &config, "session")?;
@@ -113,14 +130,22 @@ pub fn start_observed(ctx: &Ctx, dir: PathBuf, command: &str) -> Result<Observed
         tab.type_line("\u{1b}[B");
         tab
     };
-    let started = crate::terminal_gates::StartedClaude {
-        native_session_id: wait_inventory(&dir, Duration::from_secs(60))?,
-        pid: 0,
-        tab,
+    // A start that fails closes its own window and directory.
+    let native_session_id = match wait_inventory(&dir, Duration::from_secs(60)) {
+        Ok(id) => id,
+        Err(error) => {
+            let _ = tab.close();
+            let _ = std::fs::remove_dir_all(&dir);
+            return Err(error);
+        }
     };
-    let session_id = started
-        .bound_session(ctx, Duration::from_secs(90))
-        .ok_or_else(|| format!("companion never bound {} to {}", started.native_session_id, started.tab.tty))?;
+    let started = crate::terminal_gates::StartedClaude { native_session_id, pid: 0, tab };
+    let Some(session_id) = started.bound_session(ctx, Duration::from_secs(90)) else {
+        let error = format!("companion never bound {} to {}", started.native_session_id, started.tab.tty);
+        let _ = started.tab.close();
+        let _ = std::fs::remove_dir_all(&dir);
+        return Err(error);
+    };
     Ok(Observed {
         native_session_id: started.native_session_id.clone(),
         session_id,
@@ -422,8 +447,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         completed += 1;
         let follow_ms = prompt_and_complete(ctx, &observed, "Reply with only the word again.", completed);
         let again = session_view(ctx, &observed.native_session_id);
-        let (_, snapshot) = companion_snapshot(ctx)?;
-        let sessions = view(&snapshot, &observed.native_session_id).len();
+        let sessions = companion_snapshot(ctx).map_or(0, |(_, snapshot)| view(&snapshot, &observed.native_session_id).len());
         let workers = fleet
             .as_ref()
             .ok()
@@ -462,6 +486,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     pass &= exited.is_ok() && worker_kept;
     let closed = finish(&observed);
     let _ = other.close();
+    let _ = std::fs::remove_dir_all(&other.dir);
     let removed = integration(ctx, "uninstall", &scratch.join("session-config"), "session");
     let _ = std::fs::remove_dir_all(&scratch);
     let summary = json!({
