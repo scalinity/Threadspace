@@ -213,7 +213,7 @@ Synthetic scenarios cover every canonical transition and all requested failures:
 
 **Purpose.** Make the primary workflow useful end to end using an independently launched real session.
 
-**Prerequisites.** M1, M0B's proven direct-Claude Return path and the exact M0C-qualified Claude native-observer profile.
+**Prerequisites.** M1, M0B's proven direct-Claude Return path and the qualified Claude native-observer profile: 2.1.291 as M0C qualified it ([D-0005](decisions/D-0005-claude-2.1.291-observer-semantics.md)) and the installed 2.1.295, requalified for the paths M2 exercises ([D-0009](decisions/D-0009-claude-2.1.295-observer-requalification.md)).
 
 **Scope.** Explicit reversible setup; command registration; native inventory; observer mod; one Terminal surface adapter; minimal project desk/worker; fleet/inspector/attention controls; native Return-to-Agent.
 
@@ -229,7 +229,7 @@ Render one simple worker from canonical view state and provide an explicit Retur
 
 **Quantified acceptance.** Ten repeated prompt/completion/follow-up cycles keep one Session and worker; completion never removes it. Thirty successful exact-current-session routes reach the right live tab; all negative routes return an honest typed failure without moving to an unrelated target. Existing hooks retain behavior; ten install/reinstall/remove cycles create no duplicate handlers and preserve unrelated settings. Capture/commit-to-view meet the normal latency targets.
 
-**Required evidence/artifacts.** Uncut native vertical-slice recording; redacted hook/mod/inventory trace joined to journal IDs; install diff/rollback; tab readbacks; native outcome and acceptance fixtures; route timings.
+**Required evidence/artifacts.** Uncut native vertical-slice time-lapse, one still per second (screen video capture blocks Terminal scripting, SPEC §13.3); redacted hook/mod/inventory trace joined to journal IDs; install diff/rollback; tab readbacks; native outcome and acceptance fixtures; route timings.
 
 **Exit gate.** A normal manually launched Claude session is discovered, works, completes while staying present, accepts follow-up as the same worker, and returns to its freshly verified original surface. The three fields [D-0007 §10](decisions/D-0007-m1-canonical-engine.md) leaves as last-observation become evidence sets before any M2 producer can emit competing observations of them: (1) an execution's attach mode and presence, once more than one attach observation or producer mode is possible; (2) the human follow-up frontier, once acceptance and rejection evidence can both exist for one input; (3) a session's observer link state, once a production observer reports it. Each needs adversarial reorder and duplicate scenarios in the seeded permutation campaign that converge in state and semantic hash; last-arrival-wins behaviour is not kept for any of them once conflicting valid observations can be emitted.
 

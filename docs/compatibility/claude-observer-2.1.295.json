@@ -1,0 +1,472 @@
+{
+  "schema": 1,
+  "milestone": "M2",
+  "status": "Requalification of the pinned observer mod on Claude Code 2.1.295 with the 2.1.291 capability profile unchanged; see docs/decisions/D-0009-claude-2.1.295-observer-requalification.md and evidence/M2/.",
+  "capabilities": {
+    "profileId": "CLAUDE_NATIVE_OBSERVER",
+    "testedVersions": [
+      "2.1.295"
+    ],
+    "stableSessionIdentity": true,
+    "nativeTurnIdentity": true,
+    "nativeTurnOutcome": true,
+    "acceptedInputProvenance": true,
+    "automaticHumanFollowupResolution": false,
+    "exactRequestIdentity": false,
+    "aggregateHumanWait": false,
+    "liveInventory": true,
+    "replayableTurnHistory": false,
+    "immediateParentIdentity": true,
+    "currentSessionProcessLookup": true,
+    "supportedSurfaces": [
+      "local-cli"
+    ]
+  },
+  "capabilityEvidence": {
+    "stableSessionIdentity": {
+      "value": true,
+      "basis": "Full native session IDs from `claude agents --json --all` (M0B). In the mod, classic.SessionStart carries the engine-stamped session_id, equal to $.session.id() and to session.end's sessionId and resume id in every native run; clear/resume/compact are tracked as logical changes without deleting identity.",
+      "classes": [
+        "native session",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M0B/gate-checklist.md (GO criterion 3)",
+        "evidence/M0C/provider/claude/native/run1-batches.jsonl",
+        "test: provenance and identity > logical session changes (session.end clear, classic.SessionStart clear and resume)"
+      ]
+    },
+    "nativeTurnIdentity": {
+      "value": true,
+      "basis": "turn.start mints turnId; every turn.step and the turn.complete of that turn carry it; a subagent's run carries its own turnId on steps and completion, with no turn.start (declaration lines 12982-12993, 12903-12906; native runs 1-3).",
+      "classes": [
+        "declaration",
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/native/run1-batches.jsonl",
+        "evidence/M0C/provider/claude/native/run3-batches.jsonl"
+      ]
+    },
+    "nativeTurnOutcome": {
+      "value": true,
+      "basis": "turn.complete reason answer|aborted|refusal|error with isAborted and agentId, dispatched with next.origin engine/core and a settled core link (coreSettled true natively). A plugin cannot raise turn.complete through $ in 2.1.291. Natively exercised: reason answer (main loop and subagent); aborted, refusal and error rest on the declaration and pass unchanged in the kit. Stop-veto/automatic-continuation behaviour is not qualified here.",
+      "classes": [
+        "declaration",
+        "engine test kit",
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/native/run3-batches.jsonl",
+        "test: provenance and identity > plugin-raised lifecycle-shaped events cannot forge a native outcome",
+        "test: middleware contract > event passed unchanged"
+      ]
+    },
+    "acceptedInputProvenance": {
+      "value": true,
+      "basis": "See facets.acceptedInputProvenance.",
+      "classes": [
+        "declaration",
+        "engine test kit",
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/README.md#acceptedinputprovenance--true"
+      ]
+    },
+    "automaticHumanFollowupResolution": {
+      "value": false,
+      "basis": "See facets.automaticHumanFollowupResolution.",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/README.md#automatichumanfollowupresolution--false-facet-not_supported"
+      ]
+    },
+    "exactRequestIdentity": {
+      "value": false,
+      "basis": "Not qualified. The mod sees tool.check (a permission preflight that can also be answered by a classifier or headless host) with a decision and tool_use_id, not a native identity for an open human request; PermissionRequest carries no tool_use_id (SPEC §11.2).",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "SPEC §11.2",
+        "SPEC §11.5"
+      ]
+    },
+    "aggregateHumanWait": {
+      "value": false,
+      "basis": "Not qualified by this profile's evidence. The source is native inventory waitingFor (SPEC §11.3); M0B qualified inventory identity but not the waitingFor mapping, and the mod exposes no wait state.",
+      "classes": [],
+      "refs": [
+        "SPEC §11.3",
+        "evidence/M0B/gate-checklist.md"
+      ]
+    },
+    "liveInventory": {
+      "value": true,
+      "basis": "`claude agents --json --all` supplies live sessions with full sessionId, pid and status without a prompt or hook (M0B).",
+      "classes": [
+        "native session (M0B)"
+      ],
+      "refs": [
+        "evidence/M0B/gate-checklist.md (GO criterion 3)"
+      ]
+    },
+    "replayableTurnHistory": {
+      "value": false,
+      "basis": "Not qualified. The mod observes live callbacks only; transcript files are not a stable API (SPEC §11.3), and records unacknowledged at a reload or host exit are lost (native run 2: 13 records).",
+      "classes": [
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/native/run2-analysis.json"
+      ]
+    },
+    "immediateParentIdentity": {
+      "value": true,
+      "basis": "agent.spawn carries the spawning loop as parentAgentId (absent for the main loop) and, from a spawn that settled in core, the started agentId; the subagent's turn.step/turn.complete carry that agentId. A spawn answered by a lower middleware leaves coreSettled false and establishes nothing. Natively exercised at depth 1 (main loop -> general-purpose subagent); nested spawns rest on the declaration and the kit.",
+      "classes": [
+        "declaration",
+        "engine test kit",
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/native/run3-batches.jsonl",
+        "test: provenance and identity > agent.spawn provenance requires a settled core trace"
+      ]
+    },
+    "currentSessionProcessLookup": {
+      "value": true,
+      "basis": "Session -> current ProcessKey join with stable birth time, executable and controlling device (M0B).",
+      "classes": [
+        "native session (M0B)"
+      ],
+      "refs": [
+        "evidence/M0B/gate-checklist.md (GO criterion 4)"
+      ]
+    },
+    "supportedSurfaces": {
+      "value": [
+        "local-cli"
+      ],
+      "basis": "The mod loaded and observed natively in headless `claude -p` (single prompt and long-lived stream-json with plugin-folder watch). Interactive terminal sessions were not started in this qualification; Desktop Code, VS Code, remote and cloud surfaces are not qualified (SPEC §11.6).",
+      "classes": [
+        "native session"
+      ],
+      "refs": [
+        "evidence/M0C/provider/claude/native/run1.json",
+        "evidence/M0C/provider/claude/native/run2.json"
+      ]
+    }
+  },
+  "facets": {
+    "acceptedInputProvenance": {
+      "value": true,
+      "status": "PASS",
+      "requires": {
+        "engineDispatchOrigin": {
+          "present": true,
+          "field": "next.origin (host-stamped { plugin, tier }; the engine reads { plugin: \"engine\", tier: \"core\" })",
+          "declaration": "claude-code.d.ts lines 6366-6377",
+          "evidence": [
+            "test: provenance and identity > plugin-raised lifecycle-shaped events cannot forge a native outcome",
+            "native runs 1-3: engine/core on every prompt.submit"
+          ]
+        },
+        "originalComposerOrBridgeOrigin": {
+          "present": true,
+          "field": "prompt.submit e.origin: PromptOrigin, kinds composer | bridge | sdk | task-notification | scheduled-trigger | peer | ... | plugin; set by the engine where queued, no hook may set one",
+          "declaration": "claude-code.d.ts lines 8554-8669, 8776-8782",
+          "evidence": [
+            "test: provenance and identity > upstream middleware cannot rewrite prompt origin",
+            "test: provenance and identity > accepted-human core-acceptance proof for prompt.submit"
+          ],
+          "nativeNote": "composer is not exercised natively (no interactive session); sdk and task-notification were observed natively."
+        },
+        "settledCoreAcceptanceProof": {
+          "present": true,
+          "field": "next.trace after next(e) resolves: last entry { plugin: \"engine\", tier: \"core\", outcome: returned|passed } and a result without drop",
+          "declaration": "claude-code.d.ts lines 6378-6386, 12832, 8785-8829",
+          "evidence": [
+            "test: provenance and identity > engine dispatch origin alone does not prove downstream core execution",
+            "native runs 1-3: coreSettled true on every prompt.submit"
+          ]
+        }
+      },
+      "retained": "Only { links, endPlugin, endTier, endOutcome, coreSettled }, outcome and the origin kind/name; no prompt text or full trace.",
+      "limits": "A hook above the observer (another user-tier plugin or a managed prepend plugin) can still delay or hide a submission before the observer sees it."
+    },
+    "automaticHumanFollowupResolution": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "reason": "2.1.291 exposes no positive original-order witness: prompt.submit carries text, attachments, context, turnId (the turn running at submission, absent when idle), wait and origin, but no original-submission sequence, timestamp or predecessor relation; session.append keeps row timestamps off the event; telemetry loggedAt is wall time on an untyped, operator-only stream; the observer's own capture counters do not order upstream-delayed dispatches.",
+      "declaration": "claude-code.d.ts lines 8740-8783, 10230-10231, 12119-12136",
+      "fallback": "Explicit Mark handled resolves a previous output; a follow-up prompt never clears it automatically. Native outcomes, identity, actors and exact current-session Return are unaffected."
+    }
+  },
+  "unavailableCapabilities": [
+    {
+      "capability": "automaticHumanFollowupResolution",
+      "uiMeaning": "A previous-output attention item stays until the owner presses Mark handled; replying to the session does not clear it."
+    },
+    {
+      "capability": "exactRequestIdentity",
+      "uiMeaning": "An approval or input wait is shown as a session-level category episode, not as one named pending request."
+    },
+    {
+      "capability": "aggregateHumanWait",
+      "uiMeaning": "No waiting badge comes from this profile; the session shows reported activity until the inventory waitingFor mapping is qualified."
+    },
+    {
+      "capability": "replayableTurnHistory",
+      "uiMeaning": "Turns before observation began, or records lost across a mod reload or host exit, are not reconstructed; the timeline shows a coverage gap."
+    }
+  ],
+  "classicLimitedFallback": {
+    "profileId": "CLAUDE_CLASSIC_LIMITED",
+    "when": "The mod is absent, fails to load or validate, or the build's generated declarations name another version.",
+    "behaviour": "Safe command hooks plus native inventory: sessions are still discovered and native reported activity/waits shown, but no definitive per-turn outcome and no accepted-human provenance is inferred from weaker fields (SPEC §11.1).",
+    "qualifiedHere": false
+  },
+  "observedSemantics": {
+    "dispatchOrigin": "Every engine-raised event natively carried next.origin { plugin: \"engine\", tier: \"core\" } and a one-link trace ending in the engine's core.",
+    "pluginRaisedLifecycle": "The plugin-facing $ declares turn as { abort } and session without start/end; a plugin's $.turn.start/step/complete and $.session.start/end are not functions at run time.",
+    "hostReads": "$.agent.list() and $.session.id() are middleware-interceptable and return bare values without provenance; kept at a lower tier.",
+    "sessionStartOrder": "Natively classic.SessionStart(startup) fires before the mod's session.start; after a hot reload session.start fires again and classic.SessionStart does not.",
+    "reload": "A hot reload runs register in a fresh environment with a new source epoch and drops the old environment's pending $.clock waits and unacknowledged records.",
+    "toolTurnLink": "tool.call carries tool_use_id and agentId but no turnId.",
+    "spawn": "In headless -p the Agent tool ran in the background; its completion re-entered as prompt.submit with origin task-notification."
+  },
+  "requiredFields": {
+    "prompt.submit": [
+      "origin",
+      "turnId?",
+      "wait",
+      "attachments?.length",
+      "next.origin",
+      "next.trace"
+    ],
+    "turn.start": [
+      "turnId"
+    ],
+    "turn.step": [
+      "turnId",
+      "index",
+      "agentId?",
+      "model",
+      "messageCount",
+      "result.stopReason",
+      "result.toolUses.length"
+    ],
+    "turn.complete": [
+      "turnId",
+      "agentId?",
+      "reason",
+      "isAborted",
+      "durationMs",
+      "refusal.category?"
+    ],
+    "tool.call": [
+      "tool",
+      "tool_use_id",
+      "agentId?",
+      "result.deny|isError|isReadOnly"
+    ],
+    "tool.check": [
+      "tool",
+      "tool_use_id",
+      "agentId?",
+      "ceiling?",
+      "result.decision"
+    ],
+    "agent.spawn": [
+      "tool_use_id",
+      "parentAgentId?",
+      "subagentType",
+      "provider",
+      "background",
+      "fork",
+      "isTeammate?",
+      "result.agentId",
+      "result.teammateId?",
+      "next.trace"
+    ],
+    "session.end": [
+      "reason",
+      "sessionId",
+      "resume.id"
+    ],
+    "classic.SessionStart": [
+      "session_id",
+      "source",
+      "agent_type?"
+    ],
+    "session.start": [
+      "isInteractive",
+      "surface"
+    ],
+    "session.attach": [
+      "surface",
+      "clientId"
+    ],
+    "session.detach": [
+      "surface",
+      "clientId",
+      "reason"
+    ]
+  },
+  "limits": {
+    "queueRecords": 2048,
+    "queueBytes": 8388608,
+    "batchRecords": 128,
+    "batchBytes": 65536,
+    "receiptBytes": 16384,
+    "retryBackoffMs": [
+      250,
+      5000
+    ],
+    "drainTimeoutMs": 250,
+    "endDrainTimeoutMs": 100,
+    "identifierChars": 256,
+    "hookBudgetMs": 10000
+  },
+  "installation": {
+    "mod": "packages/provider-mod (plugin threadspace-observer 0.1.0, tier user)",
+    "capturedArgvFrom": "userConfig captureArgv (settings pluginConfigs[\"threadspace-observer\" | \"threadspace-observer@inline\"].options, read from user, --settings or managed settings; never project settings)",
+    "neverInstalled": [
+      "classic.WorktreeCreate",
+      "classic.WorktreeRemove",
+      "tool.call/tool.check for EnterWorktree and ExitWorktree"
+    ],
+    "loadSideEffect": "Each load from a person-owned folder writes .claude-plugin/types/ (with its own .gitignore) and a root tsconfig.json into the mod folder.",
+    "ownedCopy": "<integration dir>/observer/<sha256 prefix>/, staged by Threadspace --integration install (SPEC 19.2)"
+  },
+  "declarations": {
+    "bundledSkill": {
+      "firstLine": "// Written by Claude Code 2.1.295.",
+      "sha256": "e2e13b2ceb80ff3cde49d8427ebe19c782a24caa817c7b20c56f91925a06f9cb",
+      "lines": 21463
+    },
+    "generatedBesideMod": {
+      "path": ".claude-plugin/types/claude-code/index.d.ts",
+      "firstLine": "// Written by Claude Code 2.1.295.",
+      "sha256": "b45a8c7d21abd38a5753080526e423ea73d1061c4c3423755e789deb45e0f60d",
+      "lines": 15982,
+      "writtenAlso": [
+        ".claude-plugin/types/claude-code-mcp/",
+        ".claude-plugin/types/claude-code-tools/",
+        ".claude-plugin/types/tsconfig.json"
+      ],
+      "observedIn": "the Threadspace-owned mod copy loaded by the M2 vertical session"
+    },
+    "committed": false,
+    "comparedWith2_1_291": "evidence/M2/provider/claude/declarations.json"
+  },
+  "modFiles": {
+    "source": "packages/provider-mod at the M2 candidate",
+    "files": {
+      ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+      "hooks/delivery.ts": "6ae1741b5e5a80cceb8a091f34d89f682fcdbec2bb37000d2006f91175df26dc",
+      "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+      "hooks/register.ts": "9ee0705cdf835d5d78f01fde131bbad241011386deaae65140603440dcab453d",
+      "tests/delivery.test.ts": "9615b87f4208b6c1e8d2cf7ac0c523cbd7b7f0c87f8887eda1c7b5adcd84087a",
+      "tests/kit.ts": "9cd76ea902aaaeb5fdad7c5ae012f353383af54ce65a4891c36d17fdb9f06969",
+      "tests/middleware.test.ts": "eca43eb50c7ae4aa3ae7567e2f2a4e5c1431694b3e70f5406ac47485f4f72b57",
+      "tests/provenance.test.ts": "6e4dd18acfcec7c27a15bc4d80dc1f2674bca65c9d057037a3d845768e565a5a",
+      "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+    }
+  },
+  "nativeAcceptance": {
+    "engineTestKit": "38 pass, 0 fail (claude plugin test, exit 0)",
+    "validate": "passed (claude plugin validate, exit 0)",
+    "verticalSlice": "evidence/M2/vertical/20261009T041131Z-dev",
+    "routes": "evidence/M2/routes/20261009T041519Z-dev",
+    "faults": {
+      "stop-continuation": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "interrupted": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T043718Z-dev"
+      },
+      "failed": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "blocked-submission": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "incompatible-profile": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "mod-reload": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "parent-completed-child-waiting": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T043718Z-dev"
+      },
+      "delayed-submission": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T043718Z-dev"
+      },
+      "forged-and-nonengine": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "mod-batch-partial": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "mod-batch-malformed": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "mod-batch-exit1": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "relay-unavailable": {
+        "pass": true,
+        "run": "evidence/M2/faults/20261009T041720Z-dev"
+      },
+      "terminal-negatives": {
+        "pass": false,
+        "run": "evidence/M2/faults/20261009T043718Z-dev"
+      }
+    },
+    "humanTypedOrigins": "evidence/M2/provider/claude/native-origins.json"
+  },
+  "evidenceHashes": {
+    "evidence/M2/provider/claude/declarations.json": "6a0c325de5233415172c83c9e3abd6517e40aae45160cf28d950c93a1912be86",
+    "evidence/M2/provider/claude/native-origins.json": "23fbfe308a1efa8729ebf579e46a40efd1b0b8a984ac9948c41bf5263c54eca8",
+    "evidence/M2/provider/claude/test-output.txt": "c0c4c17b4393f0fc3b5212df5b210eebcbcda4f9443f568a50285f0b7ace2a94",
+    "evidence/M2/provider/claude/validate-output.txt": "d681b814418a5cee7570c64a32ab3d049070acd111b595465634dbd36e94d778",
+    "evidence/M2/vertical/20261009T041131Z-dev/summary.json": "9d5f1931e99e2cdfd5ca3eaf941f0b493e4d3a9e2314a583f554b982cef11403",
+    "evidence/M2/vertical/20261009T041131Z-dev/cycles.jsonl": "44c89b1f750e80ed6eccfac6098290858140ad733e719149536aa147c7f6990c",
+    "evidence/M2/vertical/20261009T041131Z-dev/trace.json": "00b1f96893c0b4b4f8f6487799622ebedb235a8d758537ca07fcaa464ea242c3",
+    "evidence/M2/routes/20261009T041519Z-dev/summary.json": "81eddbd5b322c1ee19ef8bfbcc440645ccde2421ee57c252d95c867f1ac1c002",
+    "evidence/M2/routes/20261009T041519Z-dev/routes.jsonl": "08bbc639b4543f99f86c6d66ecce2d1f8e17cf8d65e8839bc1dc7fb0377efc71",
+    "evidence/M2/faults/20261009T041720Z-dev/summary.json": "204308c50a8171ee0bc64004aced80d54f48186d154c645f75cc1e48398056d8",
+    "evidence/M2/faults/20261009T041720Z-dev/cases.jsonl": "9a7ea76b12ecadd2b84e4e2db91ba30948987edaec811a6ba6a0cfa70a70f94b",
+    "evidence/M2/faults/20261009T043718Z-dev/summary.json": "60d98e927fe5926c4ecee8390c27f567e8ed4abb7e051f76d7cfd8a5fc8bdd23",
+    "evidence/M2/faults/20261009T043718Z-dev/cases.jsonl": "3a096afcb3d63aac496733fb64a080d4dfd54a25fb911a178b633cee3b4cff55"
+  },
+  "requalification": {
+    "from": "2.1.291 (D-0005)",
+    "decision": "docs/decisions/D-0009-claude-2.1.295-observer-requalification.md",
+    "basis": [
+      "92 of the 97 dependent declarations identical; five additive changes the observer does not read",
+      "engine test kit 38/38 and validate under 2.1.295",
+      "human-typed composer submissions and answer outcomes with engine/core dispatch in the native vertical slice",
+      "native fault cases in evidence/M2/faults"
+    ],
+    "unqualifiedVersions": "every version other than 2.1.291 and 2.1.295 runs lower-tier (crates/provider-claude/src/profiles.rs)"
+  }
+}
