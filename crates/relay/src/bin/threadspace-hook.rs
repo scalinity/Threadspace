@@ -124,13 +124,16 @@ fn own_evidence_links(boot_id: &str, links: usize) -> Vec<ProcessSample> {
         .collect()
 }
 
-/// This process and the parent that ran it, the provider, as mod-batch
-/// evidence (kernel samples, never the mod's claims).
+/// The parent that ran this process, the provider, as mod-batch evidence (a
+/// kernel sample, never the mod's claim). This process's own sample changes
+/// with every invocation, so it is not part of a record that may be retried.
 fn provider_evidence(boot_id: &str) -> Vec<ProcessSample> {
     let mut samples = own_evidence_links(boot_id, 2);
-    if let Some(parent) = samples.get_mut(1) {
-        parent.role = ProcessRole::Provider;
-    }
+    samples.retain_mut(|sample| {
+        let parent = sample.role == ProcessRole::Ancestor;
+        sample.role = ProcessRole::Provider;
+        parent
+    });
     samples
 }
 
@@ -253,8 +256,8 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
     let boot = process::boot_session_id().ok();
     let context = BatchContext {
         profile_ref: claude_profile_ref(&home),
-        clock: local_clock(boot.clone(), now_ms(), monotonic_ns()),
         evidence: provider_evidence(boot.as_deref().unwrap_or_default()),
+        boot_id: boot,
     };
     let socket = locator::read(&store.join("runtime-locator.json"))
         .ok()

@@ -24,7 +24,7 @@ fn record(epoch: &str, batch: usize, index: u32) -> Value {
     let n = batch as u32 * RECORDS_PER_BATCH + index + 1;
     let (event, phase) = [("prompt.submit", "entry"), ("turn.start", "result"), ("tool.call", "entry"), ("tool.call", "result"), ("turn.step", "result"), ("turn.complete", "result")][index as usize];
     json!({
-        "schemaVersion": 1, "observationId": format!("{}-{n:012x}", &epoch[..23]), "adapterId": "threadspace-observer", "adapterVersion": "0.1.0",
+        "schemaVersion": 1, "observationId": format!("{}-{n:012x}", &epoch[..23]), "capturedAtMs": 1_791_000_000_000_i64 + i64::from(n), "adapterId": "threadspace-observer", "adapterVersion": "0.1.0",
         "sourceEpoch": epoch, "sequenceMeaning": "OBSERVER_CAPTURE",
         "callbackEntrySequence": n.to_string(), "callbackResultSequence": if phase == "entry" { Value::Null } else { Value::from((n + 1).to_string()) },
         "phase": phase, "nativeEvent": event,

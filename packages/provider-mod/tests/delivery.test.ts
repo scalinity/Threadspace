@@ -191,27 +191,31 @@ describe('mod delivery', () => {
     }
   })
 
-  test('batch record bound (128) binds for small records', { ...OPTIONS, timeoutMs: 60_000 }, async ($, on) => {
+  test('batches are as full as both bounds allow (128 records, 64 KiB)', { ...OPTIONS, timeoutMs: 60_000 }, async ($, on) => {
     const clock = mock.clock(on)
     const helper = installHelper(on, clock)
     installCore(on)
 
-    // session.attach records carry no session, turn or actor IDs and average
-    // under 512 bytes, so 128 of them fit in 64 KiB and the record bound binds.
+    // session.attach records carry no session, turn or actor IDs: small
+    // records, near the point where the record and byte bounds meet.
     for (let call = 0; call < 300; call += 1) await $.session.attach({ surface: 'terminal', clientId: `c${call}` } as any)
     await clock.settle()
     for (let step = 0; step < 40; step += 1) await clock.advance(250)
 
     const encoder = new TextEncoder()
     const bytesOf = (value: unknown) => encoder.encode(JSON.stringify(value)).length
-    const largest = Math.max(...helper.records().map(bytesOf))
-    expect(helper.records().length).toBe(600)
-    expect(helper.batches.map(batch => batch.records.length).slice(0, 4)).toEqual([128, 128, 128, 128])
-    for (const batch of helper.batches) {
+    const records = helper.records()
+    expect(records.length).toBe(600)
+    let delivered = 0
+    for (const [index, batch] of helper.batches.entries()) {
+      expect(batch.records.length).toBeLessThanOrEqual(128)
       expect(bytesOf(batch.envelope)).toBeLessThanOrEqual(64 * 1024)
-      // Room for one more record remained: the record bound, not the byte
-      // bound, ended each full batch.
-      if (batch.records.length === 128) expect(bytesOf(batch.envelope) + largest + 1).toBeLessThanOrEqual(64 * 1024)
+      delivered += batch.records.length
+      // Each batch but the last ended at a bound: 128 records, or the next
+      // record would not have fit in 64 KiB.
+      if (index < helper.batches.length - 1 && batch.records.length < 128) {
+        expect(bytesOf(batch.envelope) + bytesOf(records[delivered]) + 1).toBeGreaterThan(64 * 1024)
+      }
     }
   })
 

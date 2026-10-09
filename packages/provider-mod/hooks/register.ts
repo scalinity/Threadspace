@@ -92,11 +92,15 @@ export const register: Register = (on, options) => {
   const emit = (ctx: EntryContext, phase: string, resultSequence: string | undefined, payload: () => Payload): void => {
     try {
       const observationId = crypto.randomUUID()
+      // The callback's own time: a retried record carries it unchanged, so
+      // the helper rebuilds the same envelope and the journal recognizes it.
+      const capturedAtMs = Date.now()
       delivery.enqueue(
         observationId,
         {
           schemaVersion: 1,
           observationId,
+          capturedAtMs,
           adapterId: ADAPTER_ID,
           adapterVersion: ADAPTER_VERSION,
           sourceEpoch: ctx.sourceEpoch,

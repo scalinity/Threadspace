@@ -19,7 +19,7 @@ use threadspace_contracts::canonical::capture::{
     MOD_BATCH_RECEIPT_VERSION, ModBatchReceipt, RecordReceipt, RecordStatus,
 };
 use threadspace_contracts::canonical::envelope::{
-    CaptureClock, OBSERVATION_SCHEMA_VERSION, ObservationEnvelope, ProcessSample, SequenceMeaning,
+    CaptureClock, ClockQuality, OBSERVATION_SCHEMA_VERSION, ObservationEnvelope, ProcessSample, SequenceMeaning,
 };
 use threadspace_contracts::canonical::keys::NativeSessionRef;
 use threadspace_contracts::limits::capture::{BATCH_MAX_RECORDS, FRAME_MAX_BYTES, OBSERVATION_MAX_BYTES};
@@ -58,15 +58,31 @@ pub struct ModBatchRequest {
     pub records: Vec<Value>,
 }
 
-/// What the helper itself knows about this invocation.
+/// What the helper itself knows about this invocation. Everything an
+/// envelope takes from here is the same on every attempt, so a record the
+/// mod retries becomes the same envelope and the journal recognizes it
+/// (ALREADY_COMMITTED) instead of refusing a conflicting reuse of its UUID.
 pub struct BatchContext {
     /// `claude-cli:<home>/.claude`, the namespace inventory uses.
     pub profile_ref: String,
-    pub clock: CaptureClock,
-    /// The helper's own kernel sample and its parent's, the process that
-    /// ran it (`$.process.run`), as the provider. The adapter reads the
-    /// provider's version from that executable's path.
+    /// This boot's identity; the capture time is the record's own.
+    pub boot_id: Option<String>,
+    /// The kernel sample of the helper's parent, the process that ran it
+    /// (`$.process.run`), as the provider. The adapter reads the provider's
+    /// version from that executable's path.
     pub evidence: Vec<ProcessSample>,
+}
+
+/// The record's own capture time, as the mod stamped it at the callback.
+fn record_clock(record: &Value, context: &BatchContext) -> CaptureClock {
+    let at = record.get("capturedAtMs").and_then(Value::as_i64).filter(|ms| *ms > 0);
+    CaptureClock {
+        endpoint_id: None,
+        boot_id: context.boot_id.clone(),
+        monotonic_ns: None,
+        wall_time_ms: at.unwrap_or(0),
+        clock_quality: if at.is_some() { ClockQuality::RemoteReported } else { ClockQuality::ReceiptOnly },
+    }
 }
 
 fn uuid_like(text: &str) -> bool {
@@ -189,7 +205,7 @@ pub fn envelope(record: &Value, batch_epoch: &str, context: &BatchContext) -> Re
         native_prompt_id: (event == "prompt.submit").then(|| format!("observer:{source_epoch}:{entry}")),
         native_occurrence_id: optional_identifier(record, "nativeOccurrenceId")?,
         activation_ref: None,
-        captured_at: context.clock.clone(),
+        captured_at: record_clock(record, context),
         evidence: context.evidence.clone(),
         payload,
     };
@@ -234,7 +250,7 @@ pub fn queue_dropped(source_epoch: &str, dropped: u64, context: &BatchContext) -
         native_prompt_id: None,
         native_occurrence_id: None,
         activation_ref: None,
-        captured_at: context.clock.clone(),
+        captured_at: record_clock(&Value::Null, context),
         evidence: context.evidence.clone(),
         payload: Value::Object(Map::from_iter([("droppedRecords".to_owned(), Value::from(dropped))])),
     }
@@ -354,7 +370,7 @@ mod tests {
     use std::time::Duration;
 
     use serde_json::json;
-    use threadspace_contracts::canonical::envelope::{ClockQuality, ProcessRole};
+    use threadspace_contracts::canonical::envelope::ProcessRole;
     use threadspace_contracts::limits::capture::RECEIPT_MAX_BYTES;
     use threadspace_contracts::route::ProcessKey;
 
@@ -378,14 +394,8 @@ mod tests {
         };
         BatchContext {
             profile_ref: "claude-cli:/Users/u/.claude".into(),
-            clock: CaptureClock {
-                endpoint_id: None,
-                boot_id: Some("boot".into()),
-                monotonic_ns: Some("1".into()),
-                wall_time_ms: 1,
-                clock_quality: ClockQuality::LocalMonotonic,
-            },
-            evidence: vec![sample(ProcessRole::Capture, 101), sample(ProcessRole::Provider, 100)],
+            boot_id: Some("boot".into()),
+            evidence: vec![sample(ProcessRole::Provider, 100)],
         }
     }
 
@@ -395,7 +405,7 @@ mod tests {
 
     fn record(n: u32, event: &str, phase: &str) -> Value {
         json!({
-            "schemaVersion": 1, "observationId": id(n), "adapterId": OBSERVER_ADAPTER, "adapterVersion": "0.1.0",
+            "schemaVersion": 1, "observationId": id(n), "capturedAtMs": 1_791_000_000_000_i64 + i64::from(n), "adapterId": OBSERVER_ADAPTER, "adapterVersion": "0.1.0",
             "sourceEpoch": EPOCH, "sequenceMeaning": "OBSERVER_CAPTURE",
             "callbackEntrySequence": n.to_string(), "callbackResultSequence": if phase == "entry" { Value::Null } else { Value::from((n + 1).to_string()) },
             "phase": phase, "nativeEvent": event,
@@ -537,6 +547,12 @@ mod tests {
         let second = answer(&batch(records, 0), &context(), &mut sink, delivery, deadline);
         let retried: Vec<String> = sink.delivered.iter().map(|e| e.observation_id.clone()).collect();
         assert_eq!(&retried[..first_ids.len()], &first_ids[..], "the same UUIDs, in the same order");
+        // Another invocation, at another time: each record is the same envelope.
+        let again = envelope(&record(1, "tool.call", "result"), EPOCH, &context()).expect("envelope");
+        std::thread::sleep(Duration::from_millis(5));
+        let later = envelope(&record(1, "tool.call", "result"), EPOCH, &context()).expect("envelope");
+        assert_eq!(serde_json::to_vec(&again).expect("json"), serde_json::to_vec(&later).expect("json"), "a retried record is byte-identical");
+        assert_eq!(again.captured_at.wall_time_ms, 1_791_000_000_001, "the record's own capture time");
         assert_eq!(second.results.iter().filter(|r| r.status == RecordStatus::AlreadyCommitted).count(), 3);
         assert_eq!(second.results.iter().filter(|r| r.status == RecordStatus::Committed).count(), 3);
     }

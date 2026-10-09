@@ -11,9 +11,7 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Value, json};
 use threadspace_agent::fixture;
-use threadspace_contracts::canonical::envelope::{
-    CaptureClock, ClockQuality, ProcessRole, ProcessSample,
-};
+use threadspace_contracts::canonical::envelope::{ProcessRole, ProcessSample};
 use threadspace_contracts::canonical::keys::NativeSessionRef;
 use threadspace_contracts::canonical::records::ObserverTier;
 use threadspace_contracts::projection::{ObservationState, TurnState};
@@ -36,13 +34,7 @@ fn temp() -> PathBuf {
 fn context() -> BatchContext {
     BatchContext {
         profile_ref: PROFILE.into(),
-        clock: CaptureClock {
-            endpoint_id: None,
-            boot_id: Some("boot".into()),
-            monotonic_ns: None,
-            wall_time_ms: 1_791_000_000_000,
-            clock_quality: ClockQuality::ReceiptOnly,
-        },
+        boot_id: Some("boot".into()),
         evidence: vec![ProcessSample {
             role: ProcessRole::Provider,
             key: ProcessKey {
@@ -68,7 +60,7 @@ fn record(epoch: &str, n: u32, event: &str, phase: &str, identity: Option<&str>,
     }
     json!({
         "schemaVersion": 1, "observationId": format!("00000000-0000-4000-8{}{:02x}-{:012x}", &epoch[35..], phase.len(), n),
-        "adapterId": "threadspace-observer", "adapterVersion": "0.1.0", "sourceEpoch": epoch,
+        "capturedAtMs": 1_791_000_000_000_i64 + i64::from(n), "adapterId": "threadspace-observer", "adapterVersion": "0.1.0", "sourceEpoch": epoch,
         "sequenceMeaning": "OBSERVER_CAPTURE",
         "callbackEntrySequence": n.to_string(),
         "callbackResultSequence": if phase == "entry" { Value::Null } else { Value::from((n + 1).to_string()) },
