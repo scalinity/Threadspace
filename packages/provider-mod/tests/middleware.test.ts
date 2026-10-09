@@ -95,6 +95,23 @@ describe('middleware contract', () => {
     ])
   })
 
+  test('result records carry what an adapter needs on their own', OPTIONS, async ($, on) => {
+    const clock = mock.clock(on)
+    const helper = installHelper(on, clock)
+    installCore(on)
+    await $.session.start(START as any)
+    await $.classic.SessionStart({ source: 'startup', session_id: 'S1' } as any)
+    await $.tool.call(toolCallInput('tu-1') as any)
+    await $.turn.complete(turnCompleteInput('turn-1') as any)
+    await clock.settle()
+    const result = (event: string) => helper.records().find(r => r.nativeEvent === event && r.phase === 'result')
+    // Only the result shows core settlement, so it repeats the entry's
+    // reason and tool; no text, input or output travels with them.
+    expect(result('turn.complete')?.payload).toEqual(expect.objectContaining({ reason: 'answer', isAborted: false }))
+    expect(result('tool.call')?.payload).toEqual(expect.objectContaining({ tool: 'Read', resultKind: 'result' }))
+    expect(JSON.stringify(helper.records())).not.toContain(SECRET.toolOutput)
+  })
+
   test('event passed unchanged', OPTIONS, async ($, on) => {
     mock.clock(on)
     const core = installCore(on)

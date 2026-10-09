@@ -313,7 +313,9 @@ export const register: Register = (on, options) => {
       durationMs: e.durationMs,
       refusalCategory: e.reason === 'refusal' ? id(e.refusal.category) : undefined,
     }))
-    return pass(ctx, () => next(e), () => next.trace, () => ({}))
+    // The result carries the reason too: only it shows core settlement, and
+    // a capture adapter reads each record on its own.
+    return pass(ctx, () => next(e), () => next.trace, () => ({ reason: e.reason, isAborted: e.isAborted }))
   })
 
   on('tool.call', { tool: /^(?!(?:EnterWorktree|ExitWorktree)$)/ }, ($, e, next) => {
@@ -322,6 +324,7 @@ export const register: Register = (on, options) => {
       tool: id(String(e.tool)),
     }))
     return pass(ctx, () => next(e), () => next.trace, result => ({
+      tool: id(String(e.tool)),
       resultKind: result.deny !== undefined ? 'deny' : result.isError === true ? 'error' : 'result',
       isReadOnly: result.isReadOnly === true,
     }))
