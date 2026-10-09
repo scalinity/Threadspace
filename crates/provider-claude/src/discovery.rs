@@ -13,7 +13,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use threadspace_surfaces_macos::ancestry::Sampler;
 use threadspace_surfaces_macos::process::{Incarnation, ProcessError};
 
-use crate::inventory::{Inventory, InventoryError, InventoryRow, InventorySnapshot};
+use crate::inventory::{
+    Inventory, InventoryError, InventoryRow, InventorySnapshot, KIND_INTERACTIVE, bounded_label,
+};
 
 /// An accepted join: this full native session ID was the provider's mapping
 /// for this process incarnation across the bracket.
@@ -49,6 +51,8 @@ pub struct ObservedSession {
     pub waiting_for: Option<String>,
     /// Provider display label; never a key.
     pub name: Option<String>,
+    /// A background row's job state (bounded); never a turn outcome.
+    pub state: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -211,22 +215,36 @@ pub fn discover(
         }
     }
 
+    // One row per full session ID, in first-seen order. A session's
+    // interactive row describes it ahead of a background row naming it, so
+    // the response's row order cannot flip its reported wait.
     let latest = second.as_ref().unwrap_or(&first);
-    let mut seen = BTreeSet::new();
-    let sessions = latest
-        .rows
-        .iter()
-        .filter_map(|row| {
-            let id = row.full_session_id()?;
-            seen.insert(id.to_owned()).then(|| ObservedSession {
-                native_session_id: id.to_owned(),
-                kind: row.kind.clone(),
-                status: row.status.clone(),
-                waiting_for: row.waiting_for.clone(),
-                name: row.name.clone(),
-            })
-        })
-        .collect();
+    let mut sessions: Vec<ObservedSession> = Vec::new();
+    let mut seen: BTreeMap<String, usize> = BTreeMap::new();
+    for row in &latest.rows {
+        let Some(id) = row.full_session_id() else { continue };
+        let observed = ObservedSession {
+            native_session_id: id.to_owned(),
+            kind: row.kind.clone(),
+            status: row.status.clone(),
+            waiting_for: row.waiting_for.clone(),
+            name: row.name.clone(),
+            state: row.state.as_deref().map(bounded_label),
+        };
+        match seen.get(id) {
+            None => {
+                seen.insert(id.to_owned(), sessions.len());
+                sessions.push(observed);
+            }
+            Some(&index)
+                if row.is_interactive()
+                    && sessions[index].kind.as_deref() != Some(KIND_INTERACTIVE) =>
+            {
+                sessions[index] = observed;
+            }
+            Some(_) => {}
+        }
+    }
 
     Ok(DiscoveryPass {
         first,
@@ -482,6 +500,37 @@ pub(crate) mod tests {
         );
         // The background row's full session ID is still an identity fact.
         assert!(pass.sessions.iter().any(|s| s.native_session_id == "BG"));
+    }
+
+    #[test]
+    fn background_state_describes_its_session_and_an_interactive_row_wins() {
+        let job = |session: &str, state: &str| InventoryRow {
+            kind: Some("background".into()),
+            id: Some("ab12".into()),
+            session_id: Some(session.into()),
+            state: Some(state.into()),
+            ..InventoryRow::default()
+        };
+        let kernel = || Kernel::new(vec![(11, vec![Ok(claude(11, 1000, Some(5)))])]);
+        let rows = vec![job("BG", "blocked"), job("A", "working"), row(11, "A")];
+        let pass = run(rows.clone(), Ok(rows), kernel());
+        let bg = pass.sessions.iter().find(|s| s.native_session_id == "BG").expect("BG");
+        assert_eq!(bg.state.as_deref(), Some("blocked"));
+        assert_eq!(pass.joins.len(), 1, "a background row never joins");
+        let order: Vec<&str> = pass.sessions.iter().map(|s| s.native_session_id.as_str()).collect();
+        assert_eq!(order, vec!["BG", "A"]);
+        // A, named by both rows, is described by its interactive row in
+        // either response order.
+        for rows in [
+            vec![job("A", "working"), row(11, "A")],
+            vec![row(11, "A"), job("A", "working")],
+        ] {
+            let pass = run(rows.clone(), Ok(rows), kernel());
+            let a = pass.sessions.iter().find(|s| s.native_session_id == "A").expect("A");
+            assert_eq!(a.kind.as_deref(), Some("interactive"));
+            assert_eq!(a.state, None);
+            assert_eq!(a.status.as_deref(), Some("idle"));
+        }
     }
 
     #[test]

@@ -21,13 +21,16 @@ use std::thread;
 use std::time::Duration;
 
 use serde_json::{Value, json};
+use threadspace_contracts::canonical::fact::SnapshotRow;
 use threadspace_contracts::route::{AppGeneration, DiscoverySummary, ProvisionalCandidate};
 use threadspace_journal::{
     ActivationChange, DiscoveryApplication, LiveExecutionRow, ObservedSessionRecord, ProcessRecord,
-    SurfaceRecord,
+    SessionWait, SurfaceRecord,
 };
 use threadspace_provider_claude::discovery::{DiscoveryPass, Join, discover};
-use threadspace_provider_claude::inventory::{ClaudeCli, ClaudeInstall};
+use threadspace_provider_claude::inventory::{
+    ClaudeCli, ClaudeInstall, InventoryRow, InventoryWait, interpret_status,
+};
 use threadspace_provider_claude::reconcile::{self, LiveExecution};
 use threadspace_surfaces_macos::ancestry::KernelSampler;
 use threadspace_surfaces_macos::process::{self, Incarnation};
@@ -119,6 +122,25 @@ struct State {
     /// a final answer (no tab / several tabs); retried only on a forced pass.
     attempted: HashSet<(i32, u64, u32, String)>,
     versions: HashMap<PathBuf, Option<String>>,
+    /// Passes applied by this companion incarnation; the sequence of each
+    /// pass's inventory causal point (the epoch is the core generation the
+    /// journal was opened with).
+    passes: u64,
+}
+
+/// The provider's wait mapping (SPEC §11.3) of a stored or new inventory row.
+fn row_wait(row: &SnapshotRow) -> Option<SessionWait> {
+    let row = InventoryRow {
+        kind: row.kind.clone(),
+        status: row.status.clone(),
+        waiting_for: row.waiting_for.clone(),
+        state: row.state.clone(),
+        ..InventoryRow::default()
+    };
+    match interpret_status(&row) {
+        InventoryWait::NotWaiting => None,
+        InventoryWait::Waiting { category, subtype } => Some(SessionWait { category, subtype }),
+    }
 }
 
 fn writer_call<T>(
@@ -428,6 +450,7 @@ fn run_pass(state: &mut State, force_surface: bool) -> DiscoverySummary {
             display_name: session.name.clone(),
             status: session.status.clone(),
             waiting_for: session.waiting_for.clone(),
+            state: session.state.clone(),
         })
         .collect();
 
@@ -464,12 +487,15 @@ fn run_pass(state: &mut State, force_surface: bool) -> DiscoverySummary {
         "surfaceJoins": surface_ledger,
         "forcedSurface": force_surface,
     });
+    state.passes += 1;
     let application = DiscoveryApplication {
         provider: PROVIDER.to_owned(),
         profile_ref: state.context.profile_ref(),
         sessions,
         changes,
         payload,
+        pass: state.passes,
+        wait_of: row_wait,
     };
     let applied = writer_call(&state.context.writer, |reply| {
         WriterCommand::ApplyDiscovery {
@@ -551,6 +577,7 @@ pub fn spawn(context: DiscoveryContext) -> std::io::Result<SyncSender<Trigger>> 
                 context,
                 attempted: HashSet::new(),
                 versions: HashMap::new(),
+                passes: 0,
             };
             // Late start: discover sessions that predate this companion now,
             // without waiting for any provider hook.
@@ -579,4 +606,37 @@ pub fn spawn(context: DiscoveryContext) -> std::io::Result<SyncSender<Trigger>> 
             log::warn("DISCOVERY_STOPPED", json!({}));
         })?;
     Ok(trigger)
+}
+
+#[cfg(test)]
+mod tests {
+    use threadspace_contracts::canonical::fact::WaitCategory;
+
+    use super::*;
+
+    fn row(kind: &str, status: Option<&str>, waiting_for: Option<&str>, state: Option<&str>) -> SnapshotRow {
+        SnapshotRow {
+            kind: Some(kind.into()),
+            status: status.map(str::to_owned),
+            waiting_for: waiting_for.map(str::to_owned),
+            display_name: Some("label".into()),
+            state: state.map(str::to_owned),
+        }
+    }
+
+    #[test]
+    fn stored_rows_read_through_the_provider_wait_mapping() {
+        let wait = |category, subtype: &str| Some(SessionWait { category, subtype: subtype.into() });
+        assert_eq!(
+            row_wait(&row("interactive", Some("waiting"), Some("permission prompt"), None)),
+            wait(WaitCategory::Approval, "permission prompt")
+        );
+        assert_eq!(
+            row_wait(&row("interactive", Some("waiting"), Some("input needed"), None)),
+            wait(WaitCategory::Input, "input needed")
+        );
+        assert_eq!(row_wait(&row("background", None, None, Some("blocked"))), wait(WaitCategory::JobBlocked, ""));
+        assert_eq!(row_wait(&row("background", None, None, Some("done"))), None);
+        assert_eq!(row_wait(&row("interactive", Some("idle"), None, None)), None);
+    }
 }

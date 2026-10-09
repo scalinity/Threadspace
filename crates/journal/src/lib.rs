@@ -56,7 +56,7 @@ pub use crash::{CRASH_AT_ENV, CRASH_POINT_ENV, CrashPlan, CrashPoint};
 pub use identity::ObservationExport;
 pub use identity::{
     ActivationChange, ApplyOutcome, BindingRow, DiscoveryApplication, LiveExecutionRow,
-    ObservedSessionRecord, ProcessRecord, RouteTargetRow, SurfaceRecord,
+    ObservedSessionRecord, ProcessRecord, RouteTargetRow, SessionWait, SurfaceRecord,
 };
 pub use canonical::{
     BatchOutcome, CHECKPOINT_INTERVAL, EnvelopeAdmission, OBSERVATION_MAX_BYTES, RecordOutcome,

@@ -1320,6 +1320,85 @@ pub fn host_read_outcome() -> Scenario {
     })
 }
 
+// ------------------------------------------------------------------ inventory waits
+
+/// An inventory wait as a discovery pass reports it (SPEC §11.3): the
+/// session's, with no turn or actor, ordered by the pass sequence of one
+/// companion incarnation.
+fn inventory_wait(b: &mut Builder, s: &NativeSessionRef, pass: u64, signal: &str) -> usize {
+    let mut payload = json!({ "category": "INPUT", "signal": signal, "orderDomain": "inventory" });
+    if signal == "POSITIVE" {
+        payload["subtype"] = json!("input needed");
+    }
+    b.obs(Some(s), "wait").source("synthetic.inventory", "inv-epoch-1").sequence(pass).payload(payload).push()
+}
+
+/// The parent turn answered while a child agent's turn still runs.
+fn parent_completed(name: &str, native: &str) -> (Builder, NativeSessionRef) {
+    let mut b = Builder::new(name, "wait-events");
+    let s = session(CLAUDE_LIKE, native);
+    b.obs(Some(&s), "session.start").push();
+    b.obs(Some(&s), "turn.start").turn("t1").push();
+    b.obs(Some(&s), "agent.spawn").agent("a1").payload(json!({ "agentType": "general" })).push();
+    b.obs(Some(&s), "turn.start").agent("a1").turn("a1-t1").push();
+    complete(&mut b, &s, "t1", "answer");
+    (b, s)
+}
+
+/// An inventory wait never reopens the completed parent turn or sets a
+/// child turn WAITING; its item is the session's.
+fn session_wait_only(state: &CanonicalState, native: &str) -> Result<(), String> {
+    let v = View::new(state);
+    ensure!(turn_state(&v, native, "t1")? == TurnState::Completed, "the parent turn stays COMPLETED");
+    let child = v.turn(native, Some("a1"), "a1-t1").ok_or("child turn")?;
+    ensure!(child.state == TurnState::Working, "the child turn is not WAITING");
+    ensure!(v.session(native).ok_or("session")?.turn_state != TurnState::Waiting, "no turn is WAITING");
+    let items = v.wait_items(native);
+    ensure!(items.len() == 1, "one wait item, got {}", items.len());
+    ensure!(items[0].turn_id.is_none() && items[0].actor_id.is_none(), "a session-scoped item");
+    ensure!(items[0].category == AttentionCategory::InputRequired, "an input wait");
+    Ok(())
+}
+
+pub fn parent_completed_child_waiting() -> Scenario {
+    let (mut b, s) = parent_completed("parent-completed-child-waiting", "sess-parent-done");
+    inventory_wait(&mut b, &s, 1, "POSITIVE");
+    b.build(|state| {
+        session_wait_only(state, "sess-parent-done")?;
+        let v = View::new(state);
+        ensure!(wait_eligibility_matches(state, &v, "sess-parent-done")? == 1, "the session's input wait is open and notifiable");
+        Ok(())
+    })
+}
+
+pub fn parent_completed_child_wait_cleared() -> Scenario {
+    let (mut b, s) = parent_completed("parent-completed-child-wait-cleared", "sess-parent-cleared");
+    inventory_wait(&mut b, &s, 1, "POSITIVE");
+    inventory_wait(&mut b, &s, 2, "CLEARED");
+    b.build(|state| {
+        session_wait_only(state, "sess-parent-cleared")?;
+        let v = View::new(state);
+        ensure!(resolved_by(v.wait_items("sess-parent-cleared")[0], ResolutionKind::WaitEnded), "the later clear resolves it natively");
+        ensure!(wait_eligibility_matches(state, &v, "sess-parent-cleared")? == 0, "nothing stays notifiable");
+        Ok(())
+    })
+}
+
+/// The clear arrives before the positive it ends: their pass points, not
+/// arrival, order them.
+pub fn parent_completed_child_wait_reordered() -> Scenario {
+    let (mut b, s) = parent_completed("parent-completed-child-wait-reordered", "sess-parent-reordered");
+    inventory_wait(&mut b, &s, 2, "CLEARED");
+    inventory_wait(&mut b, &s, 1, "POSITIVE");
+    b.build(|state| {
+        session_wait_only(state, "sess-parent-reordered")?;
+        let v = View::new(state);
+        ensure!(resolved_by(v.wait_items("sess-parent-reordered")[0], ResolutionKind::WaitEnded), "the earlier-arriving clear still ends it");
+        ensure!(wait_eligibility_matches(state, &v, "sess-parent-reordered")? == 0, "no live banner for a historical wait");
+        Ok(())
+    })
+}
+
 /// Every catalogued scenario.
 pub fn catalog() -> Vec<Scenario> {
     vec![
@@ -1370,5 +1449,9 @@ pub fn catalog() -> Vec<Scenario> {
         followup_frontier_evidence(),
         observer_link_evidence(),
         host_read_outcome(),
+        // M2: session-scoped inventory waits.
+        parent_completed_child_waiting(),
+        parent_completed_child_wait_cleared(),
+        parent_completed_child_wait_reordered(),
     ]
 }

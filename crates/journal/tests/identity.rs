@@ -3,13 +3,18 @@
 //! store never lets a reused PID or TTY path inherit an old binding.
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 
+use threadspace_contracts::canonical::causal::CausalPoint;
+use threadspace_contracts::canonical::fact::{FactPayload, SnapshotRow, WaitCategory, WaitSignal};
+use threadspace_contracts::canonical::records::{AttentionScope, ResolutionKind};
+use threadspace_contracts::projection::AttentionCategory;
 use threadspace_contracts::route::{
     InputReadiness, RouteEvidence, RouteResult, SessionVerification, SurfaceResult,
 };
 use threadspace_journal::{
     ActivationChange, DiscoveryApplication, Journal, ObservedSessionRecord, ProcessRecord,
-    RouteTargetRow, SCHEMA_VERSION, SurfaceRecord,
+    RouteTargetRow, SCHEMA_VERSION, SessionWait, SurfaceRecord,
 };
 
 struct TempStore(PathBuf);
@@ -64,7 +69,27 @@ fn observed(id: &str) -> ObservedSessionRecord {
         display_name: Some(format!("label {id}")),
         status: Some("idle".into()),
         waiting_for: None,
+        state: None,
     }
+}
+
+/// Passes of this test process, strictly increasing like a companion's.
+static PASSES: AtomicU64 = AtomicU64::new(0);
+
+/// A provider-shaped wait mapping: an interactive `waiting` row waits for
+/// approval when `waitingFor` names a permission and for input otherwise;
+/// a background `blocked` row is a blocked job.
+fn wait_of(row: &SnapshotRow) -> Option<SessionWait> {
+    let subtype = row.waiting_for.clone().unwrap_or_default();
+    let category = match (row.kind.as_deref(), row.status.as_deref(), row.state.as_deref()) {
+        (Some("interactive"), Some("waiting"), _) if subtype.contains("permission") => {
+            WaitCategory::Approval
+        }
+        (Some("interactive"), Some("waiting"), _) => WaitCategory::Input,
+        (Some("background"), _, Some("blocked")) => WaitCategory::JobBlocked,
+        _ => return None,
+    };
+    Some(SessionWait { category, subtype })
 }
 
 fn application(
@@ -77,6 +102,8 @@ fn application(
         sessions,
         changes,
         payload: serde_json::json!({ "test": true }),
+        pass: PASSES.fetch_add(1, Ordering::SeqCst) + 1,
+        wait_of,
     }
 }
 
@@ -459,4 +486,259 @@ fn route_results_are_journaled_with_their_evidence() {
         .expect("evidence")
         .expect("present");
     assert!(stored.contains("\"nativeSessionId\":\"A\""));
+}
+
+// ------------------------------------------------- inventory points and waits
+
+fn reporting(id: &str, status: &str, waiting_for: Option<&str>) -> ObservedSessionRecord {
+    ObservedSessionRecord {
+        status: Some(status.into()),
+        waiting_for: waiting_for.map(str::to_owned),
+        ..observed(id)
+    }
+}
+
+fn job(id: &str, state: &str) -> ObservedSessionRecord {
+    ObservedSessionRecord {
+        kind: Some("background".into()),
+        status: None,
+        state: Some(state.into()),
+        ..observed(id)
+    }
+}
+
+fn inventory_point(epoch: &str, pass: u64) -> CausalPoint {
+    CausalPoint {
+        source_id: "claude.inventory".into(),
+        source_epoch: epoch.into(),
+        order_domain: "inventory".into(),
+        sequence: Some(pass.to_string()),
+        native_key: None,
+        native_predecessor_keys: Vec::new(),
+    }
+}
+
+/// Applies one pass and returns its pass number.
+fn pass(journal: &mut Journal, sessions: Vec<ObservedSessionRecord>, changes: Vec<ActivationChange>) -> u64 {
+    let application = application(sessions, changes);
+    journal.apply_discovery(&application, NOW).expect("apply");
+    application.pass
+}
+
+/// Every wait fact journaled so far as (category, signal, subtype, pass),
+/// after checking it is session-scoped and ordered.
+fn wait_facts(journal: &Journal) -> Vec<(WaitCategory, WaitSignal, Option<String>, String)> {
+    let mut out = Vec::new();
+    for fact in journal.journal_entries(0).expect("entries").into_iter().flat_map(|e| e.facts) {
+        let FactPayload::WaitStateObserved { category, signal, subtype, generation } = fact.payload else {
+            continue;
+        };
+        assert_eq!(generation, None);
+        assert!(fact.refs.session_id.is_some(), "the session's wait");
+        assert!(
+            fact.refs.turn_id.is_none() && fact.refs.actor_id.is_none() && fact.refs.execution_id.is_none(),
+            "an inventory wait names no turn, actor or execution: {:?}",
+            fact.refs
+        );
+        let point = fact.causal.expect("an ordered inventory point");
+        assert_eq!((point.source_id.as_str(), point.order_domain.as_str()), ("claude.inventory", "inventory"));
+        out.push((category, signal, subtype, point.sequence.expect("sequence")));
+    }
+    out
+}
+
+fn input(signal: WaitSignal, subtype: Option<&str>, pass: u64) -> (WaitCategory, WaitSignal, Option<String>, String) {
+    (WaitCategory::Input, signal, subtype.map(str::to_owned), pass.to_string())
+}
+
+/// The session's wait items as (category, resolved natively, open).
+fn wait_items(journal: &Journal, session: &str) -> Vec<(AttentionCategory, bool, bool)> {
+    journal
+        .canonical_state()
+        .attention
+        .values()
+        .filter(|a| a.session_id == session && matches!(a.scope, AttentionScope::SessionWaitCategory { .. }))
+        .map(|a| {
+            assert_eq!(a.turn_id, None, "never a turn's item");
+            let ended = a.resolutions.iter().any(|c| c.kind == ResolutionKind::WaitEnded);
+            (a.category.clone(), ended, !a.resolved())
+        })
+        .collect()
+}
+
+#[test]
+fn inventory_facts_carry_the_pass_point_and_kernel_facts_do_not() {
+    let store = TempStore::new();
+    let mut journal = Journal::open(&store.db(), "core-generation-1", NOW).expect("open");
+    let first = pass(&mut journal, vec![observed("A")], vec![start("A", 11, 1000, "/dev/ttys011", 5)]);
+    // B is started before any listing names it; its snapshot is drafted too.
+    let second = pass(&mut journal, vec![reporting("A", "busy", None)], vec![start("B", 12, 1001, "/dev/ttys012", 6)]);
+    let third = pass(&mut journal, vec![], vec![]);
+    let mut snapshots = Vec::new();
+    for fact in journal.journal_entries(0).expect("entries").into_iter().flat_map(|e| e.facts) {
+        match &fact.payload {
+            FactPayload::ProviderSnapshotObserved { present, .. } => {
+                let point = fact.causal.clone().expect("a snapshot is ordered");
+                snapshots.push((*present, point));
+            }
+            FactPayload::ProcessObserved { .. }
+            | FactPayload::ExecutionAttached { .. }
+            | FactPayload::SurfaceBindingRecorded { .. }
+            | FactPayload::SurfaceBindingUnproven { .. }
+            | FactPayload::ExecutionEnded { .. } => {
+                assert_eq!(fact.causal, None, "kernel and binding drafts are unchanged");
+            }
+            _ => {}
+        }
+    }
+    let epoch = "core-generation-1";
+    assert_eq!(
+        snapshots,
+        vec![
+            (true, inventory_point(epoch, first)),
+            (true, inventory_point(epoch, second)),
+            (true, inventory_point(epoch, second)),
+            (false, inventory_point(epoch, third)),
+            (false, inventory_point(epoch, third)),
+        ]
+    );
+    let a = session_id(&mut journal, "A");
+    let inventory = journal.canonical_state().sessions[&a].inventory.clone().expect("inventory");
+    assert_eq!(inventory.point, Some(inventory_point(epoch, third)));
+    assert_eq!(inventory.row.and_then(|r| r.status).as_deref(), Some("busy"));
+    assert_eq!(journal.live_executions("claude").expect("live").len(), 2, "absence never ends an execution");
+}
+
+#[test]
+fn entering_waiting_raises_a_session_wait_and_leaving_it_clears() {
+    let store = TempStore::new();
+    let mut journal = Journal::open(&store.db(), "epoch", NOW).expect("open");
+    pass(&mut journal, vec![observed("A")], vec![]);
+    assert!(wait_facts(&journal).is_empty(), "an idle row reports no wait");
+    let raised = pass(&mut journal, vec![reporting("A", "waiting", Some("input needed"))], vec![]);
+    assert_eq!(wait_facts(&journal), vec![input(WaitSignal::Positive, Some("input needed"), raised)]);
+    let a = session_id(&mut journal, "A");
+    assert_eq!(wait_items(&journal, &a), vec![(AttentionCategory::InputRequired, false, true)]);
+    let scope = journal.canonical_state().waits.values().find(|w| w.session_id == a).expect("scope");
+    assert!(scope.turn_id.is_none() && scope.actor_id.is_none() && scope.execution_id.is_none());
+
+    // The same report again changes nothing.
+    let again = application(vec![reporting("A", "waiting", Some("input needed"))], vec![]);
+    assert!(journal.apply_discovery(&again, NOW).expect("apply").change.is_none());
+
+    let cleared = pass(&mut journal, vec![reporting("A", "busy", None)], vec![]);
+    assert_eq!(
+        wait_facts(&journal),
+        vec![
+            input(WaitSignal::Positive, Some("input needed"), raised),
+            input(WaitSignal::Cleared, None, cleared),
+        ]
+    );
+    assert_eq!(wait_items(&journal, &a), vec![(AttentionCategory::InputRequired, true, false)]);
+}
+
+#[test]
+fn absence_from_the_inventory_is_never_a_clear() {
+    let store = TempStore::new();
+    let mut journal = Journal::open(&store.db(), "epoch", NOW).expect("open");
+    let raised = pass(
+        &mut journal,
+        vec![reporting("A", "waiting", Some("input needed"))],
+        vec![start("A", 11, 1000, "/dev/ttys011", 5)],
+    );
+    let a = session_id(&mut journal, "A");
+    pass(&mut journal, vec![], vec![]);
+    assert_eq!(wait_facts(&journal).len(), 1, "absence adds no wait evidence");
+    assert_eq!(wait_items(&journal, &a), vec![(AttentionCategory::InputRequired, false, true)]);
+    assert_eq!(journal.live_executions("claude").expect("live").len(), 1, "nor ends the execution");
+    // Reappearing with the same wait is the same wait.
+    pass(&mut journal, vec![reporting("A", "waiting", Some("input needed"))], vec![]);
+    assert_eq!(wait_facts(&journal).len(), 1);
+    // Only a present row that stopped waiting clears it.
+    pass(&mut journal, vec![], vec![]);
+    let cleared = pass(&mut journal, vec![reporting("A", "idle", None)], vec![]);
+    assert_eq!(
+        wait_facts(&journal),
+        vec![
+            input(WaitSignal::Positive, Some("input needed"), raised),
+            input(WaitSignal::Cleared, None, cleared),
+        ]
+    );
+    assert_eq!(wait_items(&journal, &a), vec![(AttentionCategory::InputRequired, true, false)]);
+}
+
+#[test]
+fn a_changed_wait_clears_its_category_and_background_jobs_map_to_job_blocked() {
+    let store = TempStore::new();
+    let mut journal = Journal::open(&store.db(), "epoch", NOW).expect("open");
+    let a_waits = |text: &str| reporting("A", "waiting", Some(text));
+    let p1 = pass(&mut journal, vec![a_waits("input needed"), job("J", "working")], vec![]);
+    let p2 = pass(&mut journal, vec![a_waits("permission prompt"), job("J", "blocked")], vec![]);
+    // A new detail in the same category is a further witness, not a clear.
+    let p3 = pass(&mut journal, vec![a_waits("permission prompt (Bash)"), job("J", "working")], vec![]);
+    // A job state after the block is display metadata only.
+    pass(&mut journal, vec![a_waits("permission prompt (Bash)"), job("J", "done")], vec![]);
+    use WaitCategory::{Approval, Input, JobBlocked};
+    use WaitSignal::{Cleared, Positive};
+    let text = |s: &str| Some(s.to_owned());
+    assert_eq!(
+        wait_facts(&journal),
+        vec![
+            (Input, Positive, text("input needed"), p1.to_string()),
+            (Input, Cleared, None, p2.to_string()),
+            (Approval, Positive, text("permission prompt"), p2.to_string()),
+            (JobBlocked, Positive, None, p2.to_string()),
+            (Approval, Positive, text("permission prompt (Bash)"), p3.to_string()),
+            (JobBlocked, Cleared, None, p3.to_string()),
+        ]
+    );
+    let a = session_id(&mut journal, "A");
+    let j = session_id(&mut journal, "J");
+    let mut items = wait_items(&journal, &a);
+    items.sort_by_key(|(category, ..)| format!("{category:?}"));
+    assert_eq!(
+        items,
+        vec![(AttentionCategory::ApprovalRequired, false, true), (AttentionCategory::InputRequired, true, false)]
+    );
+    assert_eq!(wait_items(&journal, &j), vec![(AttentionCategory::Blocked, true, false)]);
+    let row = journal.canonical_state().sessions[&j].inventory.clone().and_then(|i| i.row).expect("row");
+    assert_eq!(row.state.as_deref(), Some("done"), "the job state stays visible");
+    assert!(
+        journal.canonical_state().turns.values().all(|t| t.session_id != j && t.session_id != a),
+        "no turn, and so no turn outcome, from an inventory row"
+    );
+}
+
+#[test]
+fn rows_stored_before_wait_mapping_are_observed_once() {
+    // The M0 fixture's sessions carry inventory rows without a causal point.
+    let fixture = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../fixtures/m1/m0-store-v2/journal.sqlite3");
+    let store = TempStore::new();
+    rusqlite::Connection::open_with_flags(
+        format!("file:{}?mode=ro&immutable=1", fixture.display()),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_URI,
+    )
+    .expect("open fixture read-only")
+    .execute("VACUUM INTO ?1", [store.db().to_string_lossy()])
+    .expect("copy fixture");
+    let mut journal = Journal::open(&store.db(), "epoch", NOW).expect("open");
+    let a = session_id(&mut journal, "A");
+    let stored = journal.canonical_state().sessions[&a].inventory.clone().expect("inventory");
+    assert_eq!(stored.point, None);
+    let fixture_row = stored.row.expect("row");
+    let record = ObservedSessionRecord {
+        native_session_id: "A".into(),
+        kind: fixture_row.kind.clone(),
+        display_name: fixture_row.display_name.clone(),
+        status: fixture_row.status.clone(),
+        waiting_for: fixture_row.waiting_for.clone(),
+        state: None,
+    };
+    let first = pass(&mut journal, vec![record.clone()], vec![]);
+    let inventory = journal.canonical_state().sessions[&a].inventory.clone().expect("inventory");
+    assert_eq!(inventory.point, Some(inventory_point("epoch", first)), "re-observed with a point");
+    assert_eq!(inventory.row, Some(fixture_row));
+    let again = application(vec![record], vec![]);
+    assert!(journal.apply_discovery(&again, NOW).expect("apply").change.is_none(), "then only on change");
+    assert!(wait_facts(&journal).is_empty());
 }

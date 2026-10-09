@@ -113,7 +113,7 @@ pub(crate) fn from_m0(conn: &Connection) -> Result<(CanonicalState, Vec<Assignme
         principal.insert(id.clone(), actor_id);
         let inventory = (kind.is_some() || present == 1).then_some(InventoryObservation {
             present: present == 1,
-            row: Some(SnapshotRow { kind, status, waiting_for: waiting, display_name: None }),
+            row: Some(SnapshotRow { kind, status, waiting_for: waiting, display_name: None, state: None }),
             interval: SnapshotInterval { start_ms: 0, end_ms: 0 },
             point: None,
         });

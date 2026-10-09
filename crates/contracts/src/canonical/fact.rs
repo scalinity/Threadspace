@@ -267,6 +267,10 @@ pub struct SnapshotRow {
     pub status: Option<String>,
     pub waiting_for: Option<String>,
     pub display_name: Option<String>,
+    /// A background row's job state (`working`, `blocked`, `done`, ...):
+    /// display metadata, never a turn outcome. Absent before M2.
+    #[serde(default)]
+    pub state: Option<String>,
 }
 
 /// A snapshot without a native revision is an interval observation (SPEC

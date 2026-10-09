@@ -7,12 +7,15 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use serde::Deserialize;
+use threadspace_contracts::canonical::fact::WaitCategory;
 use threadspace_contracts::route::{InventoryEvidence, InventoryRowEvidence};
 use threadspace_surfaces_macos::exec::{BoundedCommand, run_bounded};
 
 const MAX_OUTPUT_BYTES: usize = 1024 * 1024;
 const MAX_ROWS: usize = 1024;
 const MAX_SESSION_ID_CHARS: usize = 200;
+/// Wait detail and job-state text keeps the canonical category bound.
+const MAX_LABEL_CHARS: usize = 64;
 
 /// One inventory row. Only `kind`, `pid` and `sessionId` take part in
 /// identity; `name`, `cwd` and `startedAt` are labels/diagnostics and never
@@ -44,6 +47,63 @@ pub struct InventoryRow {
 }
 
 pub const KIND_INTERACTIVE: &str = "interactive";
+const STATUS_WAITING: &str = "waiting";
+const STATE_BLOCKED: &str = "blocked";
+/// `waitingFor` words that name an owner decision rather than input
+/// (`permission prompt`, `sandbox request`; SPEC §11.3).
+const APPROVAL_WORDS: [&str; 3] = ["permission", "approval", "sandbox"];
+
+/// The native wait one inventory row reports. Rows carry no turn or actor
+/// identity, so the wait is the Session's and is never guessed onto a turn
+/// (SPEC §11.3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InventoryWait {
+    NotWaiting,
+    Waiting {
+        category: WaitCategory,
+        /// The row's bounded `waitingFor` text; empty when it gives none.
+        subtype: String,
+    },
+}
+
+/// At most 64 characters, with control characters dropped.
+pub fn bounded_label(text: &str) -> String {
+    text.chars()
+        .filter(|c| !c.is_control())
+        .take(MAX_LABEL_CHARS)
+        .collect()
+}
+
+/// SPEC §11.3: an interactive row whose `status` is `waiting` waits for an
+/// approval when its `waitingFor` names a permission, approval or sandbox
+/// decision, and for input otherwise (`input needed`, `dialog open`,
+/// `worker request`). A background row whose `state` is `blocked` is a
+/// blocked job. Every other row reports no wait: `busy`/`idle` and the
+/// background `working`/`done`/`failed`/`stopped` states describe activity
+/// or job state, never a turn outcome or an execution end.
+pub fn interpret_status(row: &InventoryRow) -> InventoryWait {
+    let subtype = row
+        .waiting_for
+        .as_deref()
+        .map(bounded_label)
+        .unwrap_or_default();
+    let category = if row.is_interactive() {
+        if row.status.as_deref() != Some(STATUS_WAITING) {
+            return InventoryWait::NotWaiting;
+        }
+        let detail = subtype.to_lowercase();
+        if APPROVAL_WORDS.iter().any(|word| detail.contains(word)) {
+            WaitCategory::Approval
+        } else {
+            WaitCategory::Input
+        }
+    } else if row.state.as_deref() == Some(STATE_BLOCKED) {
+        WaitCategory::JobBlocked
+    } else {
+        return InventoryWait::NotWaiting;
+    };
+    InventoryWait::Waiting { category, subtype }
+}
 
 impl InventoryRow {
     /// The full native session ID, if present and well-formed (opaque, but
@@ -330,6 +390,77 @@ mod tests {
             None,
             "pid 1 is launchd, never a provider"
         );
+    }
+
+    fn interactive(status: Option<&str>, waiting_for: Option<&str>) -> InventoryRow {
+        InventoryRow {
+            kind: Some(KIND_INTERACTIVE.into()),
+            status: status.map(str::to_owned),
+            waiting_for: waiting_for.map(str::to_owned),
+            ..InventoryRow::default()
+        }
+    }
+
+    fn background(state: Option<&str>) -> InventoryRow {
+        InventoryRow {
+            kind: Some("background".into()),
+            id: Some("ab12".into()),
+            state: state.map(str::to_owned),
+            ..InventoryRow::default()
+        }
+    }
+
+    fn waiting(category: WaitCategory, subtype: &str) -> InventoryWait {
+        InventoryWait::Waiting {
+            category,
+            subtype: subtype.into(),
+        }
+    }
+
+    #[test]
+    fn interpret_status_maps_session_waits() {
+        use WaitCategory::{Approval, Input, JobBlocked};
+        let waiting_for = |text: &str| interactive(Some("waiting"), Some(text));
+        let cases = [
+            (waiting_for("input needed"), waiting(Input, "input needed")),
+            (waiting_for("dialog open"), waiting(Input, "dialog open")),
+            (waiting_for("worker request"), waiting(Input, "worker request")),
+            (interactive(Some("waiting"), None), waiting(Input, "")),
+            (waiting_for("permission prompt"), waiting(Approval, "permission prompt")),
+            (waiting_for("Approval Required"), waiting(Approval, "Approval Required")),
+            (waiting_for("sandbox request"), waiting(Approval, "sandbox request")),
+            (interactive(Some("busy"), None), InventoryWait::NotWaiting),
+            (interactive(Some("idle"), None), InventoryWait::NotWaiting),
+            (interactive(Some("idle"), Some("input needed")), InventoryWait::NotWaiting),
+            (interactive(None, None), InventoryWait::NotWaiting),
+            (background(Some("blocked")), waiting(JobBlocked, "")),
+            (background(Some("working")), InventoryWait::NotWaiting),
+            (background(Some("done")), InventoryWait::NotWaiting),
+            (background(Some("failed")), InventoryWait::NotWaiting),
+            (background(Some("stopped")), InventoryWait::NotWaiting),
+            (background(None), InventoryWait::NotWaiting),
+        ];
+        for (row, expected) in cases {
+            assert_eq!(interpret_status(&row), expected, "{row:?}");
+        }
+        // Only an interactive row's status is a session wait.
+        let mut row = background(Some("working"));
+        row.status = Some("waiting".into());
+        assert_eq!(interpret_status(&row), InventoryWait::NotWaiting);
+    }
+
+    #[test]
+    fn wait_detail_is_bounded_and_printable() {
+        let long = format!("input\nneeded {}", "x".repeat(100));
+        let InventoryWait::Waiting { category, subtype } =
+            interpret_status(&interactive(Some("waiting"), Some(&long)))
+        else {
+            panic!("a waiting row");
+        };
+        assert_eq!(category, WaitCategory::Input);
+        assert_eq!(subtype.chars().count(), 64);
+        assert!(subtype.starts_with("inputneeded "));
+        assert!(!subtype.chars().any(char::is_control));
     }
 
     #[test]

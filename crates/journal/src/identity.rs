@@ -12,9 +12,11 @@ use std::collections::BTreeSet;
 
 use rusqlite::{OptionalExtension, TransactionBehavior, params};
 use serde_json::{Value, json};
+use threadspace_contracts::canonical::causal::CausalPoint;
 use threadspace_contracts::canonical::fact::{
     AttachedPresence, BindingMethod, BindingProof, CanonicalRefs, Delivery, EvidenceClass,
     ExecutionMode, FactPayload, NativeFactDraft, NativeRefs, SnapshotInterval, SnapshotRow,
+    WaitCategory, WaitSignal,
 };
 use threadspace_contracts::canonical::keys::{NativeExecutionRef, NativeSessionRef, NativeSurfaceRef};
 use threadspace_contracts::projection::ExecutionPresence;
@@ -66,6 +68,8 @@ fn surface_draft(
 }
 
 pub const SOURCE_CLAUDE_INVENTORY: &str = "claude.inventory";
+/// The order domain of a companion incarnation's inventory passes.
+pub const ORDER_DOMAIN_INVENTORY: &str = "inventory";
 pub const SOURCE_ROUTE: &str = "companion.route";
 pub const SURFACE_TERMINAL: &str = "terminal.app";
 
@@ -98,6 +102,17 @@ pub struct ObservedSessionRecord {
     pub display_name: Option<String>,
     pub status: Option<String>,
     pub waiting_for: Option<String>,
+    /// A background row's job state.
+    pub state: Option<String>,
+}
+
+/// A session-scoped native wait an inventory row reports: no turn, actor or
+/// execution identity (SPEC §11.3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SessionWait {
+    pub category: WaitCategory,
+    /// Bounded wait detail; empty when the row gives none.
+    pub subtype: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -122,7 +137,8 @@ pub enum ActivationChange {
     },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// One discovery pass. Not comparable: it carries the provider's mapping.
+#[derive(Debug, Clone)]
 pub struct DiscoveryApplication {
     pub provider: String,
     pub profile_ref: String,
@@ -131,6 +147,12 @@ pub struct DiscoveryApplication {
     pub changes: Vec<ActivationChange>,
     /// Sanitized pass summary journaled with the observation.
     pub payload: Value,
+    /// This pass's position among the companion incarnation's passes,
+    /// strictly increasing: the sequence of its inventory causal point.
+    pub pass: u64,
+    /// The provider's wait mapping of a row, applied to the stored and the
+    /// new row of each session to find wait transitions.
+    pub wait_of: fn(&SnapshotRow) -> Option<SessionWait>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -247,14 +269,38 @@ impl Journal {
                 .map(str::to_owned)
         };
         let interval = SnapshotInterval { start_ms: now_ms, end_ms: now_ms };
+        // Every fact describing an inventory row carries this pass's point:
+        // one companion incarnation's passes are ordered, another's (another
+        // epoch) stay incomparable (SPEC §5.4).
+        let point = CausalPoint {
+            source_id: SOURCE_CLAUDE_INVENTORY.to_owned(),
+            source_epoch: self.source_epoch.clone(),
+            order_domain: ORDER_DOMAIN_INVENTORY.to_owned(),
+            sequence: Some(application.pass.to_string()),
+            native_key: None,
+            native_predecessor_keys: Vec::new(),
+        };
         let snapshot = |native: &str, present: bool, row: SnapshotRow| NativeFactDraft {
             refs: NativeRefs {
                 session: Some(session_ref(native)),
                 ..NativeRefs::default()
             },
             provenance: EvidenceClass::ProviderSnapshot,
-            causal: None,
+            causal: Some(point.clone()),
             payload: FactPayload::ProviderSnapshotObserved { present, row: Some(row), interval },
+        };
+        // Inventory rows name no turn, actor or execution: their waits are
+        // the session's (SPEC §11.3).
+        let wait = |native: &str, category: WaitCategory, signal: WaitSignal, subtype: Option<String>| {
+            NativeFactDraft {
+                refs: NativeRefs {
+                    session: Some(session_ref(native)),
+                    ..NativeRefs::default()
+                },
+                provenance: EvidenceClass::ProviderSnapshot,
+                causal: Some(point.clone()),
+                payload: FactPayload::WaitStateObserved { category, signal, subtype, generation: None },
+            }
         };
         let mut drafts = Vec::new();
         let mut outcome = ApplyOutcome::default();
@@ -266,13 +312,32 @@ impl Journal {
                 status: record.status.clone(),
                 waiting_for: record.waiting_for.clone(),
                 display_name: record.display_name.clone(),
+                state: record.state.clone(),
             };
-            let unchanged = session_id_of(&record.native_session_id)
+            // A row stored without a point predates the wait mapping: no wait
+            // fact describes it, so it is observed once more.
+            let stored = session_id_of(&record.native_session_id)
                 .and_then(|id| state.sessions.get(&id))
                 .and_then(|s| s.inventory.as_ref())
-                .is_some_and(|i| i.present && i.row.as_ref() == Some(&row));
-            if !unchanged {
-                drafts.push(snapshot(&record.native_session_id, true, row));
+                .filter(|i| i.point.is_some());
+            if stored.is_some_and(|i| i.present && i.row.as_ref() == Some(&row)) {
+                continue;
+            }
+            // An absent snapshot keeps the stored row, so a wait seen before
+            // a gap ends only on a present row that no longer reports it.
+            let before = stored.and_then(|i| i.row.as_ref()).and_then(application.wait_of);
+            let after = (application.wait_of)(&row);
+            drafts.push(snapshot(&record.native_session_id, true, row));
+            if before != after {
+                if let Some(old) = &before
+                    && after.as_ref().is_none_or(|new| new.category != old.category)
+                {
+                    drafts.push(wait(&record.native_session_id, old.category, WaitSignal::Cleared, None));
+                }
+                if let Some(new) = after {
+                    let subtype = (!new.subtype.is_empty()).then_some(new.subtype);
+                    drafts.push(wait(&record.native_session_id, new.category, WaitSignal::Positive, subtype));
+                }
             }
         }
         // Sessions that left the inventory stay; only their presence changes.
@@ -290,6 +355,7 @@ impl Journal {
                             status: None,
                             waiting_for: None,
                             display_name: None,
+                            state: None,
                         }),
                     ));
                 }
@@ -370,6 +436,7 @@ impl Journal {
                                 status: None,
                                 waiting_for: None,
                                 display_name: None,
+                                state: None,
                             },
                         ));
                     }
