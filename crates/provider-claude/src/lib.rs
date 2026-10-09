@@ -7,4 +7,5 @@
 pub mod discovery;
 pub mod hooks;
 pub mod inventory;
+pub mod profiles;
 pub mod reconcile;
