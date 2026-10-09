@@ -9,6 +9,7 @@ mod commands;
 mod diagnostics;
 mod incarnation;
 mod instance;
+mod integration;
 mod launch;
 #[cfg(test)]
 mod mock_ipc_tests;
@@ -45,6 +46,9 @@ pub fn main_entry() -> i32 {
     let app_identifier = context.config().identifier.clone();
     if let Some(command) = launch.service {
         return bootstrap::run_cli(command, &app_identifier);
+    }
+    if let Some(command) = &launch.integration {
+        return integration::run_cli(command, &app_identifier);
     }
 
     let incumbent = match instance::claim(&app_identifier) {

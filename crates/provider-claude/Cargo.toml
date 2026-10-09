@@ -12,7 +12,9 @@ threadspace-contracts.workspace = true
 threadspace-state-engine.workspace = true
 threadspace-surfaces-macos.workspace = true
 serde.workspace = true
-serde_json.workspace = true
+# raw_value keeps number text as written in edited provider settings.
+serde_json = { workspace = true, features = ["raw_value"] }
+sha2.workspace = true
 
 [lints]
 workspace = true

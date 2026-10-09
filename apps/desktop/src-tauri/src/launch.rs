@@ -1,9 +1,13 @@
 //! Launch arguments. The renderer receives its launch configuration through a
 //! native initialization script, so production URLs never carry flags.
 
+use std::path::PathBuf;
+
 use serde_json::json;
+use threadspace_provider_claude::setup::Scope;
 
 use crate::bootstrap::ServiceCommand;
+use crate::integration::{self, IntegrationAction, IntegrationCommand};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RendererMode {
@@ -18,6 +22,7 @@ pub enum RendererMode {
 #[derive(Debug, Clone, Default)]
 pub struct LaunchOptions {
     pub service: Option<ServiceCommand>,
+    pub integration: Option<IntegrationCommand>,
     pub renderer: RendererMode,
     /// Qualification builds only: run the in-app IPC self-test after hydration.
     pub qualify_ipc: bool,
@@ -32,12 +37,22 @@ pub struct LaunchOptions {
 impl LaunchOptions {
     pub fn parse(args: impl IntoIterator<Item = String>) -> Self {
         let mut options = Self::default();
+        let mut integration = None;
+        let mut config_dir = None;
+        // An unrecognized scope cancels the command instead of falling back
+        // to editing the user settings.
+        let mut scope = Some(Scope::User);
         let mut args = args.into_iter();
         while let Some(arg) = args.next() {
             match arg.as_str() {
                 "--service" => {
                     options.service = args.next().as_deref().and_then(ServiceCommand::parse)
                 }
+                "--integration" => {
+                    integration = args.next().as_deref().and_then(IntegrationAction::parse)
+                }
+                "--config-dir" => config_dir = args.next().map(PathBuf::from),
+                "--scope" => scope = args.next().as_deref().and_then(integration::parse_scope),
                 "--renderer=webgl2-compatibility" => {
                     options.renderer = RendererMode::Webgl2Compatibility
                 }
@@ -59,6 +74,13 @@ impl LaunchOptions {
                 _ => {}
             }
         }
+        options.integration = integration
+            .zip(scope)
+            .map(|(action, scope)| IntegrationCommand {
+                action,
+                config_dir,
+                scope,
+            });
         options
     }
 
@@ -94,5 +116,41 @@ mod tests {
                 .initialization_script(None)
                 .contains("webgl2-compatibility")
         );
+    }
+
+    #[test]
+    fn parses_integration_flags() {
+        let parse = |args: &[&str]| {
+            LaunchOptions::parse(args.iter().map(|arg| (*arg).to_owned())).integration
+        };
+        assert_eq!(
+            parse(&["--integration", "status"]),
+            Some(IntegrationCommand {
+                action: IntegrationAction::Status,
+                config_dir: None,
+                scope: Scope::User,
+            })
+        );
+        assert_eq!(
+            parse(&[
+                "--scope",
+                "session",
+                "--integration",
+                "install",
+                "--config-dir",
+                "/tmp/c"
+            ]),
+            Some(IntegrationCommand {
+                action: IntegrationAction::Install,
+                config_dir: Some(PathBuf::from("/tmp/c")),
+                scope: Scope::Session,
+            })
+        );
+        assert_eq!(
+            parse(&["--integration", "install", "--scope", "sesion"]),
+            None
+        );
+        assert_eq!(parse(&["--integration", "reinstall"]), None);
+        assert_eq!(parse(&["--scope", "user"]), None);
     }
 }
