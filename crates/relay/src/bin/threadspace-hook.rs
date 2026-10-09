@@ -216,13 +216,19 @@ impl Sink for LiveSink {
     }
 }
 
-/// A qualification-only delivery fault (`THREADSPACE_QUALIFY_MOD_BATCH_FAULT`):
-/// `partial` commits the first half then lets the caller time out, `slow`
-/// answers after the budget, `malformed` prints an invalid receipt and
-/// `exit1` exits 1 after a valid one. Release builds have none.
+/// A qualification-only delivery fault, armed once:
+/// `THREADSPACE_QUALIFY_MOD_BATCH_FAULT=<kind>:<arming file>` fires `kind` on
+/// the first batch that finds the arming file and removes it, so the mod's
+/// retry meets a healthy helper. `partial` commits the first half then lets
+/// the caller time out, `slow` answers after the budget, `malformed` prints
+/// an invalid receipt and `exit1` exits 1 after a valid one. Release builds
+/// have none.
 #[cfg(feature = "qualification")]
 fn fault() -> Option<String> {
-    std::env::var("THREADSPACE_QUALIFY_MOD_BATCH_FAULT").ok()
+    let armed = std::env::var("THREADSPACE_QUALIFY_MOD_BATCH_FAULT").ok()?;
+    let (kind, file) = armed.split_once(':')?;
+    std::fs::remove_file(file).ok()?;
+    Some(kind.to_owned())
 }
 
 #[cfg(not(feature = "qualification"))]
