@@ -138,24 +138,24 @@ fn stop_continuation(ctx: &Ctx, a: &Activation, scratch: &Path) -> Result<Value,
 }
 
 fn interrupted(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
-    let observed = start_case(ctx, a, "interrupt", None, None, &[], &["--allowedTools", "Bash(sleep:*)"])?;
-    // A tool call that keeps the turn running until it is interrupted.
-    let _ = submit(ctx, &observed, "Use the Bash tool to run exactly: sleep 60. Then reply with only the word slept.");
-    threadspace_harness::pause_ms(4000);
-    // Esc interrupts the running turn (the trailing Return is an empty
-    // submission the composer ignores).
-    observed.tab.type_line("\u{1b}");
+    let observed = start_case(ctx, a, "interrupt", None, None, &[], &[])?;
+    // A long streamed answer keeps the turn running (2.1.295 moves a long
+    // shell command into a background shell and completes the turn).
+    let _ = submit(ctx, &observed, "Write the numbers from 1 to 2000 in English words, one per line, with no other text.");
+    let running = wait_for(Duration::from_secs(60), || {
+        turn_states(ctx, &observed.session_id).iter().any(|s| s == "WORKING")
+    });
+    threadspace_harness::pause_ms(3000);
+    // Ctrl+C interrupts the running turn. Esc cannot be sent: `do script`
+    // follows it with a line feed, which reads as Alt+Return.
+    observed.tab.type_line("\u{3}");
     let settled = wait_for(Duration::from_secs(90), || {
         turn_states(ctx, &observed.session_id).iter().any(|s| s == "INTERRUPTED")
     });
     threadspace_harness::pause_ms(2000);
-    let abandoned = rows(
-        ctx,
-        "SELECT COUNT(*) AS n FROM observations WHERE source_id = 'claude.observer' AND native_event = 'turn.step' AND json_extract(payload_json, '$.phase') = 'abandoned'",
-    );
     let states = turn_states(ctx, &observed.session_id);
     finish(&observed);
-    Ok(verdict("interrupted", settled, json!({ "turnStates": states, "abandonedStepRecords": abandoned })))
+    Ok(verdict("interrupted", running && settled, json!({ "runningBeforeInterrupt": running, "turnStates": states })))
 }
 
 fn failed(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
@@ -258,11 +258,13 @@ fn mod_reload(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 }
 
 fn child_waiting(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
-    let observed = start_case(ctx, a, "child-wait", None, None, &[], &[])?;
+    // In the default permission mode the background child's command waits
+    // on a permission prompt, which inventory reports for the session.
+    let observed = start_case(ctx, a, "child-wait", None, None, &[], &["--permission-mode", "default"])?;
     let _ = submit(
         ctx,
         &observed,
-        "Use the Agent tool with run_in_background set to true to start one subagent whose prompt is: Use the Bash tool to run ls /. Do not wait for it; reply with only the word started.",
+        "Use the Agent tool with run_in_background set to true to start one subagent whose prompt is: Use the Bash tool to run exactly: touch threadspace-child-probe. Do not wait for it; reply with only the word started.",
     );
     let parent = wait_for(Duration::from_secs(150), || completed_turns(ctx, &observed.session_id) >= 1);
     let waiting = wait_view(ctx, &observed.native_session_id, Duration::from_secs(120), |v| {
@@ -271,7 +273,6 @@ fn child_waiting(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     threadspace_harness::pause_ms(3000);
     let items = rows(ctx, &format!("SELECT category, scope_kind, turn_id FROM attention_items WHERE session_id = '{}'", quote(&observed.session_id)));
     let states = turn_states(ctx, &observed.session_id);
-    observed.tab.type_line("\u{1b}");
     finish(&observed);
     let session_wait = items.iter().any(|i| i["turn_id"].is_null() && i["category"] != "TURN_COMPLETE");
     let parent_kept = states.first().map(String::as_str) == Some("COMPLETED");
@@ -282,16 +283,40 @@ fn child_waiting(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
 }
 
 fn delayed_submission(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
-    let observed = start_case(ctx, a, "delayed", None, None, &[], &["--allowedTools", "Bash(sleep:*)"])?;
-    let _ = submit(ctx, &observed, "Use the Bash tool to run exactly: sleep 25. Then reply with only the word slept.");
-    threadspace_harness::pause_ms(2000);
-    // Submitted while the first turn runs: queued, then accepted.
+    let observed = start_case(ctx, a, "delayed", None, None, &[], &[])?;
+    let _ = submit(ctx, &observed, "Write the numbers from 1 to 600 in English words, one per line, with no other text.");
+    let running = wait_for(Duration::from_secs(60), || {
+        turn_states(ctx, &observed.session_id).iter().any(|s| s == "WORKING")
+    });
+    // Submitted while the first turn runs. Claude 2.1.295 can steer it into
+    // the running turn or start its own turn after; either way the input
+    // keeps the turn that was running when it was submitted.
     submit_unconfirmed(&observed, "Then reply with only the word queued.");
-    let both = wait_for(Duration::from_secs(200), || completed_turns(ctx, &observed.session_id) >= 2);
-    let inputs = rows(ctx, &format!("SELECT COUNT(*) AS n FROM facts WHERE session_id = '{}' AND kind = 'INPUT_SUBMITTED' AND json_extract(fact_json, '$.refs.turnId') IS NOT NULL", quote(&observed.session_id)));
+    let settled = wait_for(Duration::from_secs(200), || {
+        let states = turn_states(ctx, &observed.session_id);
+        !states.is_empty() && states.iter().all(|s| s != "WORKING" && s != "UNKNOWN" && s != "QUEUED")
+            && accepted_with_active_turn(ctx, &observed.session_id) >= 1
+    });
+    let states = turn_states(ctx, &observed.session_id);
+    let active = accepted_with_active_turn(ctx, &observed.session_id);
     finish(&observed);
-    let active = inputs.first().and_then(|r| r["n"].as_u64()).unwrap_or(0);
-    Ok(verdict("delayed-submission", both && active >= 1, json!({ "bothCompleted": both, "submissionsWithActiveTurn": active })))
+    let pass = running && settled && active >= 1;
+    Ok(verdict("delayed-submission", pass, json!({
+        "runningAtSubmission": running, "acceptedWithActiveTurn": active, "turnStates": states,
+        "providerHandling": if states.len() > 1 { "a separate turn" } else { "steered into the running turn" },
+    })))
+}
+
+/// Accepted human inputs of a session that recorded the turn running when
+/// they were submitted.
+fn accepted_with_active_turn(ctx: &Ctx, session: &str) -> u64 {
+    rows(ctx, &format!(
+        "SELECT COUNT(*) AS n FROM inputs WHERE session_id = '{}' AND accepted = 1 AND active_turn_id IS NOT NULL",
+        quote(session)
+    ))
+    .first()
+    .and_then(|r| r["n"].as_u64())
+    .unwrap_or(0)
 }
 
 fn forged(ctx: &Ctx, a: &Activation, scratch: &Path) -> Result<Value, String> {
@@ -370,7 +395,10 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     case("exit1", &mut || partial_receipt(ctx, &activation, "exit1"));
     case("relay", &mut || relay_unavailable(ctx, &activation));
     case("terminal", &mut || {
-        crate::terminal_gates::negatives(ctx).map(|summary| verdict("terminal-negatives", summary["pass"] == json!(true), summary))
+        // G08's own verdict: every case but the BLOCKED Terminal restart
+        // (D-0006) passes and no route reaches a wrong target.
+        crate::terminal_gates::negatives(ctx)
+            .map(|outcome| verdict("terminal-negatives", outcome["summary"]["pass"] == json!(true), outcome))
     });
     let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
     let pass = verdicts.iter().all(|v| v["pass"] == json!(true));
