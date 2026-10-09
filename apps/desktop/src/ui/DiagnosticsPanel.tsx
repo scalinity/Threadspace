@@ -8,11 +8,11 @@ function observationText(companion: CompanionDiagnostics): string {
   return companion.admissionOpen ? "enabled" : "enabled · paused (maintenance or sleep)";
 }
 
-function Row({ label, value }: { label: string; value: string | number | boolean | null | undefined }) {
+function Row({ label, value, testId }: { label: string; value: string | number | boolean | null | undefined; testId?: string }) {
   return (
     <div className="field">
       <dt>{label}</dt>
-      <dd className="mono">{value === null || value === undefined ? "—" : String(value)}</dd>
+      <dd className="mono" data-testid={testId}>{value === null || value === undefined ? "—" : String(value)}</dd>
     </div>
   );
 }
@@ -54,7 +54,7 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
       <h3 className="section-title">Bridge</h3>
       <dl className="fields">
         <Row label="Phase" value={state.phase} />
-        <Row label="Cursor" value={state.cursor} />
+        <Row label="Cursor" value={state.cursor} testId="diagnostics-cursor" />
         <Row label="Stream seq" value={state.stream.lastSeq} />
         <Row label="Patches applied" value={state.stream.patchesApplied} />
         <Row label="Core generation" value={state.connection?.coreGeneration.slice(0, 8)} />

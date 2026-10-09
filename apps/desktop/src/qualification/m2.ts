@@ -215,11 +215,53 @@ async function pressMarkHandled(client: BridgeClient, attentionId: string) {
   };
 }
 
-/** The M2 extra handler: `m2-fleet`, `m2-select`, `m2-press-return`, `m2-press-mark-handled`. */
+/** Cursors the latency ring keeps; a report is bounded at 64 KiB. */
+const LATENCY_MARKS = 400;
+
+type LatencyMark = { cursor: string; appliedWallMs: number; domWallMs: number | null };
+
+/**
+ * When each projection cursor reached this view's store, and when the
+ * rendered DOM first showed it: the diagnostics cursor is committed in the
+ * same render as the fleet. Wall-clock milliseconds, as the journal records.
+ */
+function latencyMarks(client: BridgeClient): LatencyMark[] {
+  const marks: LatencyMark[] = [];
+  const wall = () => performance.timeOrigin + performance.now();
+  let last = client.getSnapshot().cursor;
+  let watched: Element | null = null;
+  const observer = new MutationObserver(() => {
+    const shown = Number(watched?.textContent?.trim());
+    if (!Number.isFinite(shown)) return;
+    const at = wall();
+    for (const mark of marks) if (mark.domWallMs === null && Number(mark.cursor) <= shown) mark.domWallMs = at;
+  });
+  client.subscribe(() => {
+    const cursor = client.getSnapshot().cursor;
+    if (cursor === last) return;
+    last = cursor;
+    marks.push({ cursor, appliedWallMs: wall(), domWallMs: null });
+    if (marks.length > LATENCY_MARKS) marks.shift();
+    const node = document.querySelector('[data-testid="diagnostics-cursor"]');
+    if (node && node !== watched) {
+      observer.disconnect();
+      watched = node;
+      observer.observe(node, { subtree: true, childList: true, characterData: true });
+    }
+  });
+  return marks;
+}
+
+/** The M2 extra handler: `m2-fleet`, `m2-select`, `m2-press-return`, `m2-press-mark-handled`, `m2-latency`. */
 export function m2Commands(client: BridgeClient): ExtraHandler {
+  const marks = latencyMarks(client);
   return (command, args) => {
     const input = (args ?? {}) as Record<string, unknown>;
     switch (command) {
+      case "m2-latency": {
+        const after = Number(input.afterCursor ?? 0);
+        return Promise.resolve({ marks: marks.filter((mark) => Number(mark.cursor) > after) });
+      }
       case "m2-fleet":
         return fleet(client, input.sessionId === undefined ? null : requireString(input.sessionId, "sessionId"));
       case "m2-select":
