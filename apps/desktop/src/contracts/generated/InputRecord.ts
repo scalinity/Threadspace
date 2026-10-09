@@ -2,12 +2,17 @@
 import type { AcceptanceProof } from "./AcceptanceProof";
 import type { CausalPoint } from "./CausalPoint";
 import type { InputOrigin } from "./InputOrigin";
+import type { InputSubmission } from "./InputSubmission";
 
 /**
  * A submitted input and its provenance (SPEC §6.1, §7.3); distinct from the
  * Turn it may start or steer.
  */
-export type InputRecord = { id: string, sessionId: string, actorId: string, nativeKey: string, origin: InputOrigin | null, submission: CausalPoint | null, 
+export type InputRecord = { id: string, sessionId: string, actorId: string, nativeKey: string, 
+/**
+ * Submission reports; `origin` and `submission` are derived from them.
+ */
+submissions: Array<InputSubmission>, origin: InputOrigin | null, submission: CausalPoint | null, 
 /**
  * The turn running at original submission, kept apart from any later turn.
  */

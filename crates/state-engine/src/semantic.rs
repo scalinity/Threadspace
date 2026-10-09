@@ -195,6 +195,8 @@ pub fn projection(state: &CanonicalState) -> Value {
             "executionPresence": s.execution_presence,
             "observation": s.observation,
             "turnState": s.turn_state,
+            "linkConflict": s.link_conflict,
+            "observerTier": s.observer_tier,
         })))),
         "actors": map(state.actors.values().map(|a| (n.actor(&a.id), json!({
             "role": a.role,
@@ -217,6 +219,7 @@ pub fn projection(state: &CanonicalState) -> Value {
             "controllingDevice": e.controlling_device,
             "endReasons": e.end_reasons,
             "presence": e.presence,
+            "attachmentConflict": e.attachment_conflict,
         })))),
         "turns": map(state.turns.values().map(|t| (n.turn(&t.id), json!({
             "executions": sorted(t.execution_ids.iter().map(|e| n.execution(e)).collect()),
@@ -233,6 +236,12 @@ pub fn projection(state: &CanonicalState) -> Value {
             "outputPoints": t.output_points,
             "state": t.state,
             "outcomeConflict": t.outcome_conflict,
+            "pendingOutcomes": sorted(t.pending_outcomes.iter().map(|p| json!([
+                p.outcome,
+                p.reason,
+                p.point,
+                p.process_id.as_deref().map(|id| n.process(id)),
+            ])).collect()),
         })))),
         "inputs": map(state.inputs.values().map(|i| (n.input(&i.id), json!({
             "actor": n.actor(&i.actor_id),

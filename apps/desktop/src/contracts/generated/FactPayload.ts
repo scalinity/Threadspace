@@ -24,7 +24,17 @@ export type FactPayload = { "kind": "SESSION_IDENTIFIED", displayName: string | 
 /**
  * Native start source (startup, resume, clear, compact, fork).
  */
-startSource: string | null, } | { "kind": "SESSION_RECORD_CHANGED", recordState: SessionRecordState, } | { "kind": "EXECUTION_ATTACHED", mode: ExecutionMode, presence: AttachedPresence, nativeRuntimeId: string | null, controllingDevice: number | null, } | { "kind": "EXECUTION_ENDED", reason: string, } | { "kind": "PROCESS_OBSERVED", executableIdentity: string, } | { "kind": "PROCESS_EXIT_OBSERVED", } | { "kind": "OBSERVATION_LINK_CHANGED", link: ObservationState, } | { "kind": "INPUT_SUBMITTED", origin: InputOrigin, 
+startSource: string | null, } | { "kind": "SESSION_RECORD_CHANGED", recordState: SessionRecordState, } | { "kind": "EXECUTION_ATTACHED", mode: ExecutionMode, presence: AttachedPresence, nativeRuntimeId: string | null, controllingDevice: number | null, } | { "kind": "EXECUTION_ENDED", reason: string, } | { "kind": "PROCESS_OBSERVED", executableIdentity: string, } | { "kind": "PROCESS_EXIT_OBSERVED", } | { "kind": "OBSERVATION_LINK_CHANGED", link: ObservationState, 
+/**
+ * The reporting observer runs a qualified profile. A report from
+ * before this field is read as its reducer treated every report:
+ * qualified.
+ */
+qualified: boolean, 
+/**
+ * The observer's provider version, as the kernel read it.
+ */
+version: string | null, } | { "kind": "INPUT_SUBMITTED", origin: InputOrigin, 
 /**
  * The original submission point when it differs from the capture
  * point (upstream-delayed submission).

@@ -182,6 +182,60 @@
       ],
       "type": "string"
     },
+    "AttachObservation": {
+      "description": "One attach observation of an execution (D-0010). Mode, presence, runtime\nID and device are derived from the observations no other follows, so\narrival order never decides them.",
+      "properties": {
+        "controllingDevice": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mode": {
+          "$ref": "#/$defs/ExecutionMode"
+        },
+        "nativeRuntimeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "presence": {
+          "$ref": "#/$defs/AttachedPresence"
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceClass"
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "provenance",
+        "mode",
+        "presence"
+      ],
+      "type": "object"
+    },
     "AttachedPresence": {
       "description": "What an attachment fact positively observed. ENDED comes only from an\nexplicit end or a qualified process exit, never from silence.",
       "enum": [
@@ -474,6 +528,29 @@
       ],
       "type": "object"
     },
+    "EvidenceClass": {
+      "description": "Provenance, not a confidence score (SPEC §5.1).",
+      "oneOf": [
+        {
+          "enum": [
+            "PROVIDER_EVENT",
+            "PROVIDER_SNAPSHOT",
+            "KERNEL",
+            "USER_ATTESTED",
+            "OWNER_COMMAND",
+            "DERIVED",
+            "SEMANTIC_SELF_REPORT",
+            "UI_INFERRED"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "HOST_READ",
+          "description": "A provider event whose session attribution rests on a\nmiddleware-interceptable host read (a reloaded observer's\n`$.session.id()`). Its lifecycle evidence is retained, and applied only\nonce kernel/inventory evidence shows its provider process runs that\nSession (D-0005, D-0010).",
+          "type": "string"
+        }
+      ]
+    },
     "ExactRequestRecord": {
       "description": "A native exact request (SPEC §7.1), resolved only by its own native ID.",
       "properties": {
@@ -585,6 +662,20 @@
               "type": "null"
             }
           ]
+        },
+        "attachmentConflict": {
+          "default": false,
+          "description": "The latest attach observations disagree.",
+          "type": "boolean"
+        },
+        "attachments": {
+          "default": [],
+          "description": "Attach observations; `mode`, `attached`, `native_runtime_id` and\n`controlling_device` are derived from them, or, with none, keep what\na baseline recorded.",
+          "items": {
+            "$ref": "#/$defs/AttachObservation"
+          },
+          "type": "array",
+          "uniqueItems": true
         },
         "controllingDevice": {
           "format": "uint32",
@@ -812,6 +903,15 @@
               "type": "null"
             }
           ]
+        },
+        "submissions": {
+          "default": [],
+          "description": "Submission reports; `origin` and `submission` are derived from them.",
+          "items": {
+            "$ref": "#/$defs/InputSubmission"
+          },
+          "type": "array",
+          "uniqueItems": true
         }
       },
       "required": [
@@ -824,6 +924,45 @@
         "startedTurns",
         "createdCursor",
         "revision"
+      ],
+      "type": "object"
+    },
+    "InputSubmission": {
+      "description": "One report of how an input was originally submitted (D-0010).",
+      "properties": {
+        "activeTurnId": {
+          "description": "The turn running at original submission.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/InputOrigin"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "origin"
       ],
       "type": "object"
     },
@@ -859,6 +998,60 @@
       "required": [
         "present",
         "interval"
+      ],
+      "type": "object"
+    },
+    "LinkObservation": {
+      "description": "One observer link report for a Session (D-0010).",
+      "properties": {
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "link": {
+          "$ref": "#/$defs/ObservationState"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "processId": {
+          "description": "The provider process the report came from, when the capture knew it.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceClass"
+        },
+        "qualified": {
+          "description": "The observer runs a qualified profile (kernel-read version).",
+          "type": "boolean"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "provenance",
+        "qualified",
+        "link"
       ],
       "type": "object"
     },
@@ -970,6 +1163,26 @@
         "UNKNOWN"
       ],
       "type": "string"
+    },
+    "ObserverTier": {
+      "description": "The evidence tier of a Session's current observer (D-0010).",
+      "oneOf": [
+        {
+          "const": "NATIVE",
+          "description": "Engine-stamped identity under a qualified profile.",
+          "type": "string"
+        },
+        {
+          "const": "RESTORED",
+          "description": "A host-read identity whose provider process kernel/inventory evidence\nshows running this Session.",
+          "type": "string"
+        },
+        {
+          "const": "LOWER_TIER",
+          "description": "A host-read identity without that proof, or an unqualified profile.",
+          "type": "string"
+        }
+      ]
     },
     "OutboxRecord": {
       "description": "A notification intent created in the same transaction as its attention.",
@@ -1103,6 +1316,50 @@
         "SNOOZE"
       ],
       "type": "string"
+    },
+    "PendingOutcome": {
+      "description": "A turn outcome reported at the host-read tier: retained, and applied only\nonce its provider process is shown to run the turn's Session (D-0010).",
+      "properties": {
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/TurnOutcome"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "processId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "outcome"
+      ],
+      "type": "object"
     },
     "ProcessImage": {
       "properties": {
@@ -1349,7 +1606,21 @@
               "type": "null"
             }
           ],
-          "description": "Last explicit observer link fact, if any."
+          "description": "Derived from `links`; with none, the link a baseline recorded."
+        },
+        "linkConflict": {
+          "default": false,
+          "description": "The latest link reports disagree.",
+          "type": "boolean"
+        },
+        "links": {
+          "default": [],
+          "description": "Explicit observer link reports.",
+          "items": {
+            "$ref": "#/$defs/LinkObservation"
+          },
+          "type": "array",
+          "uniqueItems": true
         },
         "namespaceId": {
           "type": "string"
@@ -1359,6 +1630,17 @@
         },
         "observation": {
           "$ref": "#/$defs/ObservationState"
+        },
+        "observerTier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObserverTier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "recordState": {
           "$ref": "#/$defs/SessionRecordState"
@@ -1755,6 +2037,15 @@
         "ownerFacing": {
           "description": "From the originating actor's role when the turn was observed; a later\nrole change never promotes old parent-owned output (SPEC §7.1).",
           "type": "boolean"
+        },
+        "pendingOutcomes": {
+          "default": [],
+          "description": "Host-read-tier outcomes; a corroborated one also enters `outcomes`.",
+          "items": {
+            "$ref": "#/$defs/PendingOutcome"
+          },
+          "type": "array",
+          "uniqueItems": true
         },
         "queuedInputs": {
           "items": {

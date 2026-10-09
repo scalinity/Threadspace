@@ -531,7 +531,7 @@ pub(crate) fn coverage_row(r: &SourceCoverage) -> Row {
     }
 }
 
-fn has_valid_binding(state: &CanonicalState, execution: &str) -> bool {
+pub(crate) fn has_valid_binding(state: &CanonicalState, execution: &str) -> bool {
     state
         .bindings
         .values()

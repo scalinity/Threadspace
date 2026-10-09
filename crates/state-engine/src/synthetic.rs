@@ -28,7 +28,7 @@ pub const RETAINED_KEYS: &[&str] = &[
     "category", "signal", "subtype", "generation", "requestId", "parentAgentId", "teammate",
     "outcome", "surface", "method", "executable", "windowHint", "tabHint", "evidence", "present",
     "row", "interval", "link", "domain", "detail", "stopHookActive", "orderDomain", "nativeKey",
-    "after",
+    "after", "tier", "qualified", "version",
 ];
 
 /// Normalization plus the retained payload for admission.
@@ -135,6 +135,15 @@ fn execution(envelope: &ObservationEnvelope) -> Result<NativeExecutionRef, Norma
         .clone()
         .map(|activation_ref| NativeExecutionRef::Activation { activation_ref })
         .ok_or(NormalizeError::Malformed("activationRef"))
+}
+
+/// A synthetic report's evidence tier: `"tier": "HOST_READ"` stands for a
+/// reloaded observer whose session attribution is a host read.
+fn tier(payload: &Value) -> EvidenceClass {
+    match field(payload, "tier").and_then(Value::as_str) {
+        Some("HOST_READ") => EvidenceClass::HostRead,
+        _ => EvidenceClass::ProviderEvent,
+    }
 }
 
 fn draft(refs: NativeRefs, provenance: EvidenceClass, causal: Option<CausalPoint>, payload: FactPayload) -> NativeFactDraft {
@@ -308,8 +317,11 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Result<Vec<NativeFactDraft>,
                 other => return Err(NormalizeError::Unsupported(format!("turn.complete reason {other}"))),
             };
             vec![draft(
-                refs,
-                e,
+                NativeRefs {
+                    process: provider_process(envelope).map(|(key, _)| key),
+                    ..refs
+                },
+                tier(payload),
                 point,
                 FactPayload::TurnOutcomeObserved {
                     outcome,
@@ -453,11 +465,18 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Result<Vec<NativeFactDraft>,
             },
         )],
         "observer.link" => vec![draft(
-            NativeRefs { actor: None, turn: None, ..refs },
-            e,
+            NativeRefs {
+                actor: None,
+                turn: None,
+                process: provider_process(envelope).map(|(key, _)| key),
+                ..refs
+            },
+            tier(payload),
             point,
             FactPayload::ObservationLinkChanged {
                 link: typed::<ObservationState>(payload, "link")?,
+                qualified: field(payload, "qualified").and_then(Value::as_bool).unwrap_or(true),
+                version: string(payload, "version"),
             },
         )],
         "gap" => vec![draft(NativeRefs::default(), EvidenceClass::Derived, None, FactPayload::ObservationGapDetected {

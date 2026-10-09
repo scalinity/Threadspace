@@ -3,4 +3,4 @@
 /**
  * Provenance, not a confidence score (SPEC §5.1).
  */
-export type EvidenceClass = "PROVIDER_EVENT" | "PROVIDER_SNAPSHOT" | "KERNEL" | "USER_ATTESTED" | "OWNER_COMMAND" | "DERIVED" | "SEMANTIC_SELF_REPORT" | "UI_INFERRED";
+export type EvidenceClass = "PROVIDER_EVENT" | "PROVIDER_SNAPSHOT" | "KERNEL" | "USER_ATTESTED" | "OWNER_COMMAND" | "DERIVED" | "SEMANTIC_SELF_REPORT" | "UI_INFERRED" | "HOST_READ";

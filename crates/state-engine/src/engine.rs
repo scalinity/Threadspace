@@ -28,6 +28,7 @@ pub struct Index {
     pub turn_waits: BTreeMap<String, BTreeSet<String>>,
     pub turn_requests: BTreeMap<String, BTreeSet<String>>,
     pub session_frontiers: BTreeMap<String, BTreeSet<String>>,
+    pub session_inputs: BTreeMap<String, BTreeSet<String>>,
     /// Every intent recorded for an item, whatever its request ID (a migrated
     /// M0 intent keeps its own).
     pub attention_outbox: BTreeMap<String, BTreeSet<String>>,
@@ -62,6 +63,9 @@ impl Index {
         for frontier in state.frontiers.values() {
             link(&mut index.session_frontiers, &frontier.session_id, &frontier.key);
         }
+        for input in state.inputs.values() {
+            link(&mut index.session_inputs, &input.session_id, &input.id);
+        }
         for outbox in state.outbox.values() {
             link(&mut index.attention_outbox, &outbox.attention_id, &outbox.request_id);
         }
@@ -94,6 +98,19 @@ impl Index {
 
     pub(crate) fn link_frontier(&mut self, session: &str, frontier: &str) {
         link(&mut self.session_frontiers, session, frontier);
+    }
+
+    pub(crate) fn unlink_frontier(&mut self, session: &str, frontier: &str) {
+        if let Some(keys) = self.session_frontiers.get_mut(session) {
+            keys.remove(frontier);
+            if keys.is_empty() {
+                self.session_frontiers.remove(session);
+            }
+        }
+    }
+
+    pub(crate) fn link_input(&mut self, session: &str, input: &str) {
+        link(&mut self.session_inputs, session, input);
     }
 
     pub(crate) fn link_outbox(&mut self, attention: &str, request: &str) {

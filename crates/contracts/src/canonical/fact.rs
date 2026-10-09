@@ -31,6 +31,12 @@ pub enum EvidenceClass {
     Derived,
     SemanticSelfReport,
     UiInferred,
+    /// A provider event whose session attribution rests on a
+    /// middleware-interceptable host read (a reloaded observer's
+    /// `$.session.id()`). Its lifecycle evidence is retained, and applied only
+    /// once kernel/inventory evidence shows its provider process runs that
+    /// Session (D-0005, D-0010).
+    HostRead,
 }
 
 #[derive(
@@ -306,6 +312,14 @@ pub enum FactPayload {
     ProcessExitObserved {},
     ObservationLinkChanged {
         link: ObservationState,
+        /// The reporting observer runs a qualified profile. A report from
+        /// before this field is read as its reducer treated every report:
+        /// qualified.
+        #[serde(default = "qualified_by_default")]
+        qualified: bool,
+        /// The observer's provider version, as the kernel read it.
+        #[serde(default)]
+        version: Option<String>,
     },
     InputSubmitted {
         origin: InputOrigin,
@@ -411,6 +425,10 @@ pub enum FactPayload {
         state: NotificationState,
         detail: String,
     },
+}
+
+fn qualified_by_default() -> bool {
+    true
 }
 
 impl FactPayload {

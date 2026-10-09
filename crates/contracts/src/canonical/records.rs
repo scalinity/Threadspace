@@ -19,8 +19,8 @@ use super::command::OwnerAction;
 use super::envelope::SequenceMeaning;
 use super::fact::{
     AcceptanceProof, ActivityResult, ActorRelationKind, ActorRole, AttachedPresence,
-    BindingMethod, ExecutionMode, InputOrigin, SessionRecordState, SnapshotInterval, SnapshotRow,
-    TurnOutcome, WaitCategory,
+    BindingMethod, EvidenceClass, ExecutionMode, InputOrigin, SessionRecordState,
+    SnapshotInterval, SnapshotRow, TurnOutcome, WaitCategory,
 };
 use super::keys::{NativeActorRef, NativeSurfaceRef};
 use crate::projection::{
@@ -72,7 +72,10 @@ pub struct SessionRecord {
     pub record_state: SessionRecordState,
     pub display_name: Option<String>,
     pub start_sources: BTreeSet<String>,
-    /// Last explicit observer link fact, if any.
+    /// Explicit observer link reports.
+    #[serde(default)]
+    pub links: BTreeSet<LinkObservation>,
+    /// Derived from `links`; with none, the link a baseline recorded.
     pub link: Option<ObservationState>,
     pub inventory: Option<InventoryObservation>,
     pub last_route: Option<RouteRecord>,
@@ -82,6 +85,11 @@ pub struct SessionRecord {
     pub execution_presence: ExecutionPresence,
     pub observation: ObservationState,
     pub turn_state: TurnState,
+    /// The latest link reports disagree.
+    #[serde(default)]
+    pub link_conflict: bool,
+    #[serde(default)]
+    pub observer_tier: Option<ObserverTier>,
     pub created_cursor: i64,
     pub revision: i64,
 }
@@ -140,6 +148,91 @@ pub struct ProcessImage {
     pub point: Option<CausalPoint>,
 }
 
+/// One attach observation of an execution (D-0010). Mode, presence, runtime
+/// ID and device are derived from the observations no other follows, so
+/// arrival order never decides them.
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct AttachObservation {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub point: Option<CausalPoint>,
+    pub provenance: EvidenceClass,
+    pub mode: ExecutionMode,
+    pub presence: AttachedPresence,
+    pub native_runtime_id: Option<String>,
+    pub controlling_device: Option<u32>,
+}
+
+/// One observer link report for a Session (D-0010).
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct LinkObservation {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub point: Option<CausalPoint>,
+    pub provenance: EvidenceClass,
+    /// The provider process the report came from, when the capture knew it.
+    pub process_id: Option<String>,
+    /// The observer runs a qualified profile (kernel-read version).
+    pub qualified: bool,
+    pub version: Option<String>,
+    pub link: ObservationState,
+}
+
+/// One report of how an input was originally submitted (D-0010).
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct InputSubmission {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub origin: InputOrigin,
+    pub point: Option<CausalPoint>,
+    /// The turn running at original submission.
+    pub active_turn_id: Option<String>,
+}
+
+/// A turn outcome reported at the host-read tier: retained, and applied only
+/// once its provider process is shown to run the turn's Session (D-0010).
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct PendingOutcome {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub outcome: TurnOutcome,
+    pub reason: Option<String>,
+    pub point: Option<CausalPoint>,
+    pub process_id: Option<String>,
+}
+
+/// The evidence tier of a Session's current observer (D-0010).
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema,
+)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
+pub enum ObserverTier {
+    /// Engine-stamped identity under a qualified profile.
+    Native,
+    /// A host-read identity whose provider process kernel/inventory evidence
+    /// shows running this Session.
+    Restored,
+    /// A host-read identity without that proof, or an unqualified profile.
+    LowerTier,
+}
+
 /// One logical activation of a Session/Actor in a runtime (SPEC §4.2).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -152,6 +245,11 @@ pub struct ExecutionRecord {
     pub process_id: Option<String>,
     /// Per-session allocation order; presentation, not identity.
     pub activation: u64,
+    /// Attach observations; `mode`, `attached`, `native_runtime_id` and
+    /// `controlling_device` are derived from them, or, with none, keep what
+    /// a baseline recorded.
+    #[serde(default)]
+    pub attachments: BTreeSet<AttachObservation>,
     pub mode: Option<ExecutionMode>,
     pub attached: Option<AttachedPresence>,
     pub native_runtime_id: Option<String>,
@@ -159,6 +257,9 @@ pub struct ExecutionRecord {
     pub end_reasons: BTreeSet<String>,
     pub surface_status: Option<String>,
     // Derived.
+    /// The latest attach observations disagree.
+    #[serde(default)]
+    pub attachment_conflict: bool,
     pub presence: ExecutionPresence,
     pub started_cursor: Option<i64>,
     pub ended_cursor: Option<i64>,
@@ -197,6 +298,9 @@ pub struct TurnRecord {
     pub started_by_inputs: BTreeSet<String>,
     pub outcomes: BTreeSet<TurnOutcome>,
     pub outcome_reasons: BTreeSet<String>,
+    /// Host-read-tier outcomes; a corroborated one also enters `outcomes`.
+    #[serde(default)]
+    pub pending_outcomes: BTreeSet<PendingOutcome>,
     pub output_ready: bool,
     pub output_points: BTreeSet<CausalPoint>,
     pub summary: Option<String>,
@@ -217,6 +321,9 @@ pub struct InputRecord {
     pub session_id: String,
     pub actor_id: String,
     pub native_key: String,
+    /// Submission reports; `origin` and `submission` are derived from them.
+    #[serde(default)]
+    pub submissions: BTreeSet<InputSubmission>,
     pub origin: Option<InputOrigin>,
     pub submission: Option<CausalPoint>,
     /// The turn running at original submission, kept apart from any later turn.

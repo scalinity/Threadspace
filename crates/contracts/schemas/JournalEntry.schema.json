@@ -242,17 +242,26 @@
     },
     "EvidenceClass": {
       "description": "Provenance, not a confidence score (SPEC §5.1).",
-      "enum": [
-        "PROVIDER_EVENT",
-        "PROVIDER_SNAPSHOT",
-        "KERNEL",
-        "USER_ATTESTED",
-        "OWNER_COMMAND",
-        "DERIVED",
-        "SEMANTIC_SELF_REPORT",
-        "UI_INFERRED"
-      ],
-      "type": "string"
+      "oneOf": [
+        {
+          "enum": [
+            "PROVIDER_EVENT",
+            "PROVIDER_SNAPSHOT",
+            "KERNEL",
+            "USER_ATTESTED",
+            "OWNER_COMMAND",
+            "DERIVED",
+            "SEMANTIC_SELF_REPORT",
+            "UI_INFERRED"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "HOST_READ",
+          "description": "A provider event whose session attribution rests on a\nmiddleware-interceptable host read (a reloaded observer's\n`$.session.id()`). Its lifecycle evidence is retained, and applied only\nonce kernel/inventory evidence shows its provider process runs that\nSession (D-0005, D-0010).",
+          "type": "string"
+        }
+      ]
     },
     "ExecutionMode": {
       "enum": [
@@ -394,6 +403,19 @@
             },
             "link": {
               "$ref": "#/$defs/ObservationState"
+            },
+            "qualified": {
+              "default": true,
+              "description": "The reporting observer runs a qualified profile. A report from\nbefore this field is read as its reducer treated every report:\nqualified.",
+              "type": "boolean"
+            },
+            "version": {
+              "default": null,
+              "description": "The observer's provider version, as the kernel read it.",
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "required": [

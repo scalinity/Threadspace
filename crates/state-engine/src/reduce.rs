@@ -13,14 +13,15 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use threadspace_contracts::canonical::causal::{CausalOrder, CausalPoint};
 use threadspace_contracts::canonical::fact::{
-    ActorRole, AttachedPresence, Delivery, ExecutionMode, FactPayload, JournalEntry, ResolvedFact,
-    TurnOutcome, WaitCategory, WaitSignal,
+    ActorRole, AttachedPresence, Delivery, EvidenceClass, ExecutionMode, FactPayload, InputOrigin,
+    JournalEntry, ResolvedFact, TurnOutcome, WaitCategory, WaitSignal,
 };
 use threadspace_contracts::canonical::keys::{NativeActorRef, NativeExecutionRef};
 use threadspace_contracts::canonical::records::{
-    ActivityRecord, ActorRecord, ActorRelationRecord, AttentionRecord, AttentionScope,
-    CommandEffect, ExactRequestRecord, ExecutionRecord, HumanFrontier, InputRecord,
-    InventoryObservation, NamespaceRecord, OutboxRecord, OutboxState, OwnerActionKind,
+    ActivityRecord, ActorRecord, ActorRelationRecord, AttachObservation, AttentionRecord,
+    AttentionScope, CanonicalState, CommandEffect, ExactRequestRecord, ExecutionRecord,
+    HumanFrontier, InputRecord, InputSubmission, InventoryObservation, LinkObservation,
+    NamespaceRecord, ObserverTier, OutboxRecord, OutboxState, OwnerActionKind, PendingOutcome,
     ProcessImage, ProcessRecord, ResolutionCause, ResolutionKind, RouteRecord, SequenceRange, SessionRecord,
     SourceCoverage, SourceSurfaceRecord, SummaryAuthority, SurfaceBindingRecord,
     TurnIdentityKind, TurnRecord, WaitEpisode, WaitOwnerDecision, WaitScopeRecord,
@@ -118,6 +119,9 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, deli
     for id in ids(tx.state.turns.keys().collect()) {
         tx.touch_turn(&id);
     }
+    for id in ids(tx.state.inputs.keys().collect()) {
+        tx.touch_input(&id);
+    }
     for id in ids(tx.state.waits.keys().collect()) {
         tx.touch_wait(&id);
     }
@@ -130,6 +134,139 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, deli
     tx.derive();
     tx.state.through_cursor = tx.state.through_cursor.max(cursor);
     tx.finish()
+}
+
+/// Adds the evidence-set part of a fact (D-0010) to the record it names:
+/// attach, link and submission reports, and host-read outcomes. The reducer
+/// and the reconstruction of an earlier reducer's checkpoint both use it, so
+/// both hold exactly the same sets. False when the fact is none of those or
+/// its record does not exist.
+pub fn record_evidence(state: &mut CanonicalState, fact: &ResolvedFact) -> bool {
+    let refs = &fact.refs;
+    let observation_id = fact.observation_id.clone();
+    let fact_index = fact.fact_index;
+    let point = fact.causal.clone();
+    match &fact.payload {
+        FactPayload::ExecutionAttached {
+            mode,
+            presence,
+            native_runtime_id,
+            controlling_device,
+        } => refs
+            .execution_id
+            .as_ref()
+            .and_then(|id| state.executions.get_mut(id))
+            .is_some_and(|execution| {
+                execution.attachments.insert(AttachObservation {
+                    observation_id,
+                    fact_index,
+                    point,
+                    provenance: fact.provenance,
+                    mode: *mode,
+                    presence: *presence,
+                    native_runtime_id: native_runtime_id.clone(),
+                    controlling_device: *controlling_device,
+                });
+                true
+            }),
+        FactPayload::ObservationLinkChanged {
+            link,
+            qualified,
+            version,
+        } => refs
+            .session_id
+            .as_ref()
+            .and_then(|id| state.sessions.get_mut(id))
+            .is_some_and(|session| {
+                session.links.insert(LinkObservation {
+                    observation_id,
+                    fact_index,
+                    point,
+                    provenance: fact.provenance,
+                    process_id: refs.process_id.clone(),
+                    qualified: *qualified,
+                    version: version.clone(),
+                    link: link.clone(),
+                });
+                true
+            }),
+        FactPayload::InputSubmitted { origin, submission } => refs
+            .input_id
+            .as_ref()
+            .and_then(|id| state.inputs.get_mut(id))
+            .is_some_and(|input| {
+                input.submissions.insert(InputSubmission {
+                    observation_id,
+                    fact_index,
+                    origin: *origin,
+                    point: submission.clone().or(point),
+                    active_turn_id: refs.turn_id.clone(),
+                });
+                true
+            }),
+        FactPayload::TurnOutcomeObserved { outcome, reason, .. } if fact.provenance == EvidenceClass::HostRead => refs
+            .turn_id
+            .as_ref()
+            .and_then(|id| state.turns.get_mut(id))
+            .is_some_and(|turn| {
+                turn.pending_outcomes.insert(PendingOutcome {
+                    observation_id,
+                    fact_index,
+                    outcome: *outcome,
+                    reason: reason.clone(),
+                    point,
+                    process_id: refs.process_id.clone(),
+                });
+                true
+            }),
+        _ => false,
+    }
+}
+
+/// The items no other item's point causally follows; with unordered
+/// evidence, all of them (D-0010).
+fn latest<T>(items: Vec<&T>, point: impl Fn(&T) -> Option<&CausalPoint>) -> Vec<&T> {
+    items
+        .iter()
+        .copied()
+        .filter(|a| {
+            !items.iter().any(|b| match (point(a), point(b)) {
+                (Some(p), Some(q)) => compare(p, q) == CausalOrder::Before,
+                _ => false,
+            })
+        })
+        .collect()
+}
+
+/// The one value the items agree on and whether they disagree: `(None,
+/// true)` for disagreement, `(None, false)` when none names a value.
+fn agreed<T: Ord + Clone>(values: impl IntoIterator<Item = T>) -> (Option<T>, bool) {
+    let distinct: BTreeSet<T> = values.into_iter().collect();
+    match distinct.len() {
+        0 => (None, false),
+        1 => (distinct.into_iter().next(), false),
+        _ => (None, true),
+    }
+}
+
+/// Disagreeing presence settles on the least live (D-0010).
+fn presence_rank(presence: AttachedPresence) -> u8 {
+    match presence {
+        AttachedPresence::Live => 0,
+        AttachedPresence::Parked => 1,
+        AttachedPresence::Detached => 2,
+    }
+}
+
+/// Disagreeing link reports settle on the most degraded (D-0010).
+fn link_rank(link: &ObservationState) -> u8 {
+    match link {
+        ObservationState::Current => 0,
+        ObservationState::Unknown => 1,
+        ObservationState::Stale => 2,
+        ObservationState::Conflict => 3,
+        ObservationState::Disconnected => 4,
+    }
 }
 
 const SUPPRESSED_BEFORE_SUBMISSION: &str = "ineligible before submission";
@@ -416,6 +553,7 @@ impl Tx<'_> {
                         threadspace_contracts::canonical::fact::SessionRecordState::Known,
                     display_name: None,
                     start_sources: BTreeSet::new(),
+                    links: BTreeSet::new(),
                     link: None,
                     inventory: None,
                     last_route: None,
@@ -423,6 +561,8 @@ impl Tx<'_> {
                     execution_presence: ExecutionPresence::Unknown,
                     observation: ObservationState::Unknown,
                     turn_state: TurnState::Unknown,
+                    link_conflict: false,
+                    observer_tier: None,
                     created_cursor: cursor,
                     revision: cursor,
                 },
@@ -515,12 +655,14 @@ impl Tx<'_> {
                 activation_ref: activation_ref.clone(),
                 process_id: refs.process_id.clone(),
                 activation,
+                attachments: BTreeSet::new(),
                 mode: None,
                 attached: None,
                 native_runtime_id: None,
                 controlling_device: None,
                 end_reasons: BTreeSet::new(),
                 surface_status: None,
+                attachment_conflict: false,
                 presence: ExecutionPresence::Unknown,
                 started_cursor: None,
                 ended_cursor: None,
@@ -572,6 +714,7 @@ impl Tx<'_> {
                     started_by_inputs: BTreeSet::new(),
                     outcomes: BTreeSet::new(),
                     outcome_reasons: BTreeSet::new(),
+                    pending_outcomes: BTreeSet::new(),
                     output_ready: false,
                     output_points: BTreeSet::new(),
                     summary: None,
@@ -597,6 +740,7 @@ impl Tx<'_> {
             && !self.state.inputs.contains_key(input_id)
         {
             self.touch_input(input_id);
+            self.index.link_input(session_id, input_id);
             self.state.inputs.insert(
                 input_id.clone(),
                 InputRecord {
@@ -604,6 +748,7 @@ impl Tx<'_> {
                     session_id: session_id.clone(),
                     actor_id: actor_id.clone(),
                     native_key: native_input.clone(),
+                    submissions: BTreeSet::new(),
                     origin: None,
                     submission: None,
                     active_turn_id: None,
@@ -746,21 +891,11 @@ impl Tx<'_> {
                     session.record_state = *record_state;
                 }
             }
-            FactPayload::ExecutionAttached {
-                mode,
-                presence,
-                native_runtime_id,
-                controlling_device,
-            } => {
-                if let Some(execution) = refs.execution_id.as_ref().and_then(|id| self.state.executions.get_mut(id)) {
-                    execution.mode = Some(*mode);
-                    execution.attached = Some(*presence);
-                    if native_runtime_id.is_some() {
-                        execution.native_runtime_id.clone_from(native_runtime_id);
-                    }
-                    if controlling_device.is_some() {
-                        execution.controlling_device = *controlling_device;
-                    }
+            FactPayload::ExecutionAttached { .. } => {
+                // Mode and presence are derived from the attach observations.
+                if record_evidence(self.state, fact)
+                    && let Some(execution) = refs.execution_id.as_ref().and_then(|id| self.state.executions.get_mut(id))
+                {
                     execution.started_cursor.get_or_insert(cursor);
                 }
             }
@@ -791,19 +926,10 @@ impl Tx<'_> {
                     }
                 }
             }
-            FactPayload::ObservationLinkChanged { link } => {
-                if let Some(session) = refs.session_id.as_ref().and_then(|id| self.state.sessions.get_mut(id)) {
-                    session.link = Some(link.clone());
-                }
-            }
-            FactPayload::InputSubmitted { origin, submission } => {
-                if let Some(input) = refs.input_id.as_ref().and_then(|id| self.state.inputs.get_mut(id)) {
-                    input.origin = Some(*origin);
-                    input.submission = submission.clone().or_else(|| fact.causal.clone());
-                    if refs.turn_id.is_some() {
-                        input.active_turn_id.clone_from(&refs.turn_id);
-                    }
-                }
+            // The link, and an input's origin, submission point and active
+            // turn, are derived from their reports.
+            FactPayload::ObservationLinkChanged { .. } | FactPayload::InputSubmitted { .. } => {
+                record_evidence(self.state, fact);
             }
             FactPayload::InputAccepted { proof } => {
                 if let Some(input) = refs.input_id.as_ref().and_then(|id| self.state.inputs.get_mut(id)) {
@@ -847,6 +973,10 @@ impl Tx<'_> {
                         turn.summary.clone_from(summary);
                     }
                 }
+            }
+            FactPayload::TurnOutcomeObserved { .. } if fact.provenance == EvidenceClass::HostRead => {
+                // Retained; applied once corroborated (`derive_turn`).
+                record_evidence(self.state, fact);
             }
             FactPayload::TurnOutcomeObserved {
                 outcome,
@@ -1267,6 +1397,7 @@ impl Tx<'_> {
         // end or the provider process's exit in an embedded runtime.
         let executions: Vec<String> = self.before.executions.keys().cloned().collect();
         for id in &executions {
+            self.derive_attachment(id);
             let Some(execution) = self.state.executions.get(id) else { continue };
             let exited = execution
                 .process_id
@@ -1292,6 +1423,21 @@ impl Tx<'_> {
                 execution.presence = presence;
             }
             self.touch_session(&session);
+            // Its process evidence may corroborate a host-read outcome.
+            let pending: Vec<String> = self
+                .index
+                .session_turns
+                .get(&session)
+                .map(|ids| {
+                    ids.iter()
+                        .filter(|t| self.state.turns.get(*t).is_some_and(|t| !t.pending_outcomes.is_empty()))
+                        .cloned()
+                        .collect()
+                })
+                .unwrap_or_default();
+            for turn in pending {
+                self.touch_turn(&turn);
+            }
             let bindings: Vec<String> = self
                 .index
                 .execution_bindings
@@ -1350,11 +1496,19 @@ impl Tx<'_> {
             self.touch_execution(&execution_id);
         }
 
-        // Inputs that now carry verified accepted human provenance advance
-        // their scope's frontier.
+        // Each touched input re-derives its origin and submission; its
+        // session's frontiers are then re-derived from all its inputs, so a
+        // late rejection withdraws what an earlier acceptance advanced.
         let inputs: Vec<String> = self.before.inputs.keys().cloned().collect();
+        let mut sessions = BTreeSet::new();
         for id in &inputs {
-            self.advance_frontier(id);
+            self.derive_input(id);
+            if let Some(input) = self.state.inputs.get(id) {
+                sessions.insert(input.session_id.clone());
+            }
+        }
+        for session in &sessions {
+            self.derive_frontiers(session);
         }
 
         // Turns whose waits, requests or frontier changed are re-derived.
@@ -1412,60 +1566,199 @@ impl Tx<'_> {
         }
     }
 
-    fn advance_frontier(&mut self, input_id: &str) {
-        let Some(input) = self.state.inputs.get(input_id) else { return };
-        let qualified = input.origin.is_some_and(|o| o.is_human())
-            && input.acceptances.iter().any(|proof| proof.qualified())
-            && input.rejections.is_empty();
-        let Some(point) = input.submission.clone().filter(|_| qualified) else {
-            return;
-        };
-        let Some(namespace) = self
-            .state
-            .sessions
-            .get(&input.session_id)
-            .and_then(|s| self.state.namespaces.get(&s.namespace_id))
-        else {
-            return;
-        };
-        if !profiles::capabilities(&namespace.provider, &namespace.profile_ref)
-            .accepted_input_provenance
-        {
+    /// Mode, presence, runtime ID and device from the attach observations no
+    /// other follows. Disagreement settles conservatively and is flagged: the
+    /// lowest mode, the least live presence, no runtime ID or device. With no
+    /// observation the baseline's values stand.
+    fn derive_attachment(&mut self, id: &str) {
+        let Some(execution) = self.state.executions.get(id) else { return };
+        if execution.attachments.is_empty() {
             return;
         }
-        let key = keys::frontier(
-            &input.session_id,
-            &input.actor_id,
-            &point.source_id,
-            &point.source_epoch,
-            &point.order_domain,
+        let all: Vec<&AttachObservation> = execution.attachments.iter().collect();
+        let newest = latest(all.clone(), |a| a.point.as_ref());
+        let modes: BTreeSet<ExecutionMode> = newest.iter().map(|a| a.mode).collect();
+        let presences: BTreeSet<AttachedPresence> = newest.iter().map(|a| a.presence).collect();
+        let named = |field: fn(&AttachObservation) -> bool| -> Vec<&AttachObservation> {
+            latest(all.iter().copied().filter(|a| field(a)).collect(), |a| a.point.as_ref())
+        };
+        let (runtime, runtime_conflict) = agreed(
+            named(|a| a.native_runtime_id.is_some())
+                .into_iter()
+                .filter_map(|a| a.native_runtime_id.clone()),
         );
-        let (session, actor) = (input.session_id.clone(), input.actor_id.clone());
-        self.touch_frontier(&key);
-        self.index.link_frontier(&session, &key);
-        let frontier = self
+        let (device, device_conflict) =
+            agreed(named(|a| a.controlling_device.is_some()).into_iter().filter_map(|a| a.controlling_device));
+        let mode = modes.first().copied();
+        let attached = presences.iter().copied().max_by_key(|p| presence_rank(*p));
+        let conflict = modes.len() > 1 || presences.len() > 1 || runtime_conflict || device_conflict;
+        if let Some(execution) = self.state.executions.get_mut(id) {
+            execution.mode = mode;
+            execution.attached = attached;
+            execution.native_runtime_id = runtime;
+            execution.controlling_device = device;
+            execution.attachment_conflict = conflict;
+        }
+        if conflict {
+            self.note("ATTACHMENT_CONFLICT", id.to_owned());
+        }
+    }
+
+    /// Origin, original submission point and active turn from the
+    /// submission reports no other follows. Disagreeing origins are
+    /// UNCLASSIFIED, which never qualifies a follow-up; disagreeing points or
+    /// turns are unknown.
+    fn derive_input(&mut self, id: &str) {
+        let Some(input) = self.state.inputs.get(id) else { return };
+        if input.submissions.is_empty() {
+            return;
+        }
+        let newest = latest(input.submissions.iter().collect(), |s| s.point.as_ref());
+        let origins: BTreeSet<InputOrigin> = newest.iter().map(|s| s.origin).collect();
+        let origin = if origins.len() == 1 {
+            origins.first().copied()
+        } else {
+            Some(InputOrigin::Unclassified)
+        };
+        let (submission, _) = agreed(newest.iter().filter_map(|s| s.point.clone()));
+        let (active, _) = agreed(newest.iter().filter_map(|s| s.active_turn_id.clone()));
+        if let Some(input) = self.state.inputs.get_mut(id) {
+            input.origin = origin;
+            input.submission = submission;
+            input.active_turn_id = active;
+        }
+    }
+
+    /// A session's human-follow-up frontiers, re-derived from every input it
+    /// holds: one per (actor, order domain) of the inputs with verified
+    /// accepted human provenance and no rejection.
+    fn derive_frontiers(&mut self, session_id: &str) {
+        let capable = self
             .state
-            .frontiers
-            .entry(key.clone())
-            .or_insert_with(|| HumanFrontier {
+            .sessions
+            .get(session_id)
+            .and_then(|s| self.state.namespaces.get(&s.namespace_id))
+            .is_some_and(|n| profiles::capabilities(&n.provider, &n.profile_ref).accepted_input_provenance);
+        let mut derived: BTreeMap<String, HumanFrontier> = BTreeMap::new();
+        let inputs = self.index.session_inputs.get(session_id).cloned().unwrap_or_default();
+        for input in inputs.iter().filter_map(|id| self.state.inputs.get(id)).filter(|_| capable) {
+            let qualified = input.origin.is_some_and(|o| o.is_human())
+                && input.acceptances.iter().any(|proof| proof.qualified())
+                && input.rejections.is_empty();
+            let Some(point) = input.submission.as_ref().filter(|_| qualified) else { continue };
+            let key = keys::frontier(
+                session_id,
+                &input.actor_id,
+                &point.source_id,
+                &point.source_epoch,
+                &point.order_domain,
+            );
+            let frontier = derived.entry(key.clone()).or_insert_with(|| HumanFrontier {
                 key,
-                session_id: session,
-                actor_id: actor,
+                session_id: session_id.to_owned(),
+                actor_id: input.actor_id.clone(),
                 source_id: point.source_id.clone(),
                 source_epoch: point.source_epoch.clone(),
                 order_domain: point.order_domain.clone(),
                 max_sequence: None,
                 predecessor_keys: BTreeSet::new(),
             });
-        if let Some(sequence) = point.sequence.as_deref().and_then(parse_cursor) {
-            let current = frontier.max_sequence.as_deref().and_then(parse_cursor);
-            if current.is_none_or(|c| sequence > c) {
-                frontier.max_sequence = Some(format_cursor(sequence));
+            if let Some(sequence) = point.sequence.as_deref().and_then(parse_cursor) {
+                let current = frontier.max_sequence.as_deref().and_then(parse_cursor);
+                if current.is_none_or(|c| sequence > c) {
+                    frontier.max_sequence = Some(format_cursor(sequence));
+                }
+            }
+            frontier
+                .predecessor_keys
+                .extend(point.native_predecessor_keys.iter().cloned());
+        }
+        let existing = self.index.session_frontiers.get(session_id).cloned().unwrap_or_default();
+        let mut changed_actors = BTreeSet::new();
+        for key in existing.iter().chain(derived.keys()).cloned().collect::<BTreeSet<_>>() {
+            let new = derived.remove(&key);
+            if self.state.frontiers.get(&key) == new.as_ref() {
+                continue;
+            }
+            self.touch_frontier(&key);
+            if let Some(actor) = new
+                .as_ref()
+                .or_else(|| self.state.frontiers.get(&key))
+                .map(|f| f.actor_id.clone())
+            {
+                changed_actors.insert(actor);
+            }
+            match new {
+                Some(frontier) => {
+                    self.index.link_frontier(session_id, &key);
+                    self.state.frontiers.insert(key, frontier);
+                }
+                None => {
+                    self.index.unlink_frontier(session_id, &key);
+                    self.state.frontiers.remove(&key);
+                }
             }
         }
-        frontier
-            .predecessor_keys
-            .extend(point.native_predecessor_keys.iter().cloned());
+        let turns: Vec<String> = self
+            .index
+            .session_turns
+            .get(session_id)
+            .map(|ids| {
+                ids.iter()
+                    .filter(|id| self.state.turns.get(*id).is_some_and(|t| changed_actors.contains(&t.actor_id)))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default();
+        for turn in turns {
+            self.touch_turn(&turn);
+        }
+    }
+
+    /// True when kernel/inventory evidence shows `process_id` running one of
+    /// the session's executions: an execution of that process attached by
+    /// anything other than a host-read report.
+    fn corroborated(&self, session_id: &str, process_id: &str) -> bool {
+        self.index.session_executions.get(session_id).is_some_and(|ids| {
+            ids.iter().filter_map(|id| self.state.executions.get(id)).any(|execution| {
+                execution.process_id.as_deref() == Some(process_id)
+                    && execution
+                        .attachments
+                        .iter()
+                        .any(|a| a.provenance != EvidenceClass::HostRead)
+            })
+        })
+    }
+
+    /// The link from the reports no other follows (disagreement settles on
+    /// the most degraded and is flagged), and the observer's evidence tier:
+    /// native when a qualified report carries engine-stamped identity,
+    /// restored when a qualified host-read report's provider process is
+    /// corroborated, lower tier otherwise. With no report the baseline's
+    /// link stands.
+    fn derive_link(&mut self, id: &str) {
+        let Some(session) = self.state.sessions.get(id) else { return };
+        if session.links.is_empty() {
+            return;
+        }
+        let newest = latest(session.links.iter().collect(), |l| l.point.as_ref());
+        let states: BTreeSet<ObservationState> = newest.iter().map(|l| l.link.clone()).collect();
+        let link = states.iter().max_by_key(|s| link_rank(s)).cloned();
+        let conflict = states.len() > 1;
+        let tier = if newest.iter().any(|l| l.qualified && l.provenance != EvidenceClass::HostRead) {
+            ObserverTier::Native
+        } else if newest.iter().any(|l| {
+            l.qualified && l.process_id.as_deref().is_some_and(|p| self.corroborated(id, p))
+        }) {
+            ObserverTier::Restored
+        } else {
+            ObserverTier::LowerTier
+        };
+        if let Some(session) = self.state.sessions.get_mut(id) {
+            session.link = link;
+            session.link_conflict = conflict;
+            session.observer_tier = Some(tier);
+        }
     }
 
     /// Partitions a wait scope's positives into episodes by the comparable
@@ -1624,7 +1917,28 @@ impl Tx<'_> {
         }
     }
 
+    /// Applies each host-read outcome whose provider process is now
+    /// corroborated. Corroboration only grows, so the result does not depend
+    /// on whether the outcome or the process evidence arrived first.
+    fn promote_pending(&mut self, id: &str) {
+        let Some(turn) = self.state.turns.get(id) else { return };
+        let promoted: Vec<PendingOutcome> = turn
+            .pending_outcomes
+            .iter()
+            .filter(|p| p.process_id.as_deref().is_some_and(|process| self.corroborated(&turn.session_id, process)))
+            .cloned()
+            .collect();
+        if let Some(turn) = self.state.turns.get_mut(id) {
+            for pending in promoted {
+                turn.outcomes.insert(pending.outcome);
+                turn.outcome_reasons.extend(pending.reason);
+                turn.output_points.extend(pending.point);
+            }
+        }
+    }
+
     fn derive_turn(&mut self, id: &str) {
+        self.promote_pending(id);
         let Some(turn) = self.state.turns.get(id) else { return };
         let waiting = self.index.turn_waits.get(id).is_some_and(|keys| {
             keys.iter()
@@ -1955,6 +2269,7 @@ impl Tx<'_> {
     }
 
     fn derive_session(&mut self, id: &str) {
+        self.derive_link(id);
         let Some(session) = self.state.sessions.get(id) else { return };
         let executions: Vec<&ExecutionRecord> = self
             .index

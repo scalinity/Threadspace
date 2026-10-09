@@ -518,6 +518,29 @@ fn upgrade_json(version: u32, state: &mut Value) {
     }
 }
 
+/// A checkpoint from before reducer 3 holds an execution's attach values,
+/// a session's link and an input's origin as values, not the reports they
+/// came from, which this reducer derives them from (D-0010). The journal
+/// holds those reports: each fact at or before the checkpoint's cursor is
+/// read back into the sets exactly as reducing it records it
+/// (`record_evidence`), so the sets do not depend on where the checkpoint
+/// sits. A record no fact reported keeps the values the checkpoint holds
+/// (an M0 baseline's).
+fn rebuild_evidence(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Result<(), JournalError> {
+    let mut statement =
+        conn.prepare("SELECT fact_json FROM facts WHERE ingest_seq <= ?1 ORDER BY ingest_seq, fact_index")?;
+    let facts = statement
+        .query_map(params![state.through_cursor], |row| row.get::<_, String>(0))?
+        .collect::<Result<Vec<_>, _>>()?;
+    for json in facts {
+        let fact: ResolvedFact = serde_json::from_str(&json).map_err(|e| JournalError::Invalid {
+            detail: format!("journal fact: {e}"),
+        })?;
+        threadspace_state_engine::record_evidence(state, &fact);
+    }
+    Ok(())
+}
+
 /// A wait owner decision an earlier reducer recorded after its checkpoint,
 /// recovered by this reducer, read as that reducer recorded it, which is
 /// how `upgrade_json` reads the decisions in its checkpoint: reducer 1 kept
@@ -554,7 +577,10 @@ pub(crate) fn load_index(conn: &rusqlite::Connection) -> Result<IdentityIndex, J
 /// eligibility first found by this reducer is held, whether it appears
 /// during the replay or the re-derivation.
 pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Result<(Engine, u64, bool), JournalError> {
-    let (state, version) = latest_checkpoint(conn)?.unwrap_or_else(|| (Engine::empty().state, REDUCER_VERSION));
+    let (mut state, version) = latest_checkpoint(conn)?.unwrap_or_else(|| (Engine::empty().state, REDUCER_VERSION));
+    if version < 3 {
+        rebuild_evidence(conn, &mut state)?;
+    }
     let mut engine = Engine::new(state);
     let after = engine.state.through_cursor;
     let entries = entries_after(conn, after, endpoint_id)?;
@@ -576,6 +602,7 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
         keep_committed(conn, &mut state)?;
         engine = Engine::new(state);
         engine.upgrade(endpoint_id);
+        keep_committed_revisions(conn, &mut engine.state)?;
     } else {
         for entry in &entries {
             engine.apply(entry);
@@ -638,6 +665,68 @@ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Re
         record.updated_at_ms = integer(row, "updated_at_ms").ok_or_else(fail)?;
         record.revision = integer(row, "revision").ok_or_else(fail)?;
     }
+    Ok(())
+}
+
+/// The revision a record takes after an upgrade: its committed row's, when
+/// the row the upgrade materializes for it is that row; otherwise the
+/// upgrade's cursor.
+fn committed_revision(
+    committed: &std::collections::BTreeMap<String, materialize::Named>,
+    id: &str,
+    cursor: i64,
+    row_at: impl Fn(i64) -> materialize::Row,
+) -> i64 {
+    match committed.get(id).map(|row| (row, row.get("revision"))) {
+        Some((row, Some(Sql::Integer(revision)))) if row_at(*revision).named() == *row => *revision,
+        _ => cursor,
+    }
+}
+
+/// After the re-derivation, a record whose materialized row the upgrade
+/// left as the earlier reducer committed it keeps that row's revision, and
+/// one whose row it changed takes the upgrade's cursor. Where in the replay
+/// a value changed is then no part of the result, so the upgraded state does
+/// not depend on where the checkpoint sits (D-0007 §6, D-0010). Attention
+/// and outbox follow `keep_committed`; a binding keeps its proof revision.
+fn keep_committed_revisions(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Result<(), JournalError> {
+    let cursor = state.through_cursor;
+    macro_rules! rebase {
+        ($records:ident, $table:literal, |$record:ident| $row:expr) => {{
+            let committed = materialize::committed_rows(conn, $table)?;
+            let revisions: Vec<(String, i64)> = state
+                .$records
+                .iter()
+                .map(|(id, record)| {
+                    let revision = committed_revision(&committed, id, cursor, |revision| {
+                        let mut probe = record.clone();
+                        probe.revision = revision;
+                        let $record = &probe;
+                        $row
+                    });
+                    (id.clone(), revision)
+                })
+                .collect();
+            for (id, revision) in revisions {
+                if let Some(record) = state.$records.get_mut(&id) {
+                    record.revision = revision;
+                }
+            }
+        }};
+    }
+    rebase!(sessions, "sessions", |r| materialize::session_row(state, r));
+    rebase!(processes, "process_incarnations", |r| materialize::process_row(r));
+    rebase!(actors, "actors", |r| materialize::actor_row(r));
+    rebase!(executions, "executions", |r| materialize::execution_rows(r, materialize::has_valid_binding(state, &r.id))
+        .into_iter()
+        .find(|row| row.table == "executions")
+        .expect("an execution row"));
+    rebase!(surfaces, "source_surfaces", |r| materialize::surface_row(r));
+    rebase!(turns, "turns", |r| materialize::turn_row(r));
+    rebase!(inputs, "inputs", |r| materialize::input_row(r));
+    rebase!(activities, "activities", |r| materialize::activity_row(r));
+    rebase!(waits, "wait_scopes", |r| materialize::wait_row(r));
+    rebase!(coverage, "source_coverage", |r| materialize::coverage_row(r));
     Ok(())
 }
 
