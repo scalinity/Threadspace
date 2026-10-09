@@ -47,7 +47,23 @@ fn main() -> ExitCode {
             return Ok(serde_json::json!({ "worker": "finished without a crash" }));
         }
         let repo = repo_root()?;
-        let root = repo.join("evidence/M1");
+        // A later milestone names its own evidence root; an invalid value is
+        // refused rather than defaulted, so its runs never land in M1's.
+        let milestone = match std::env::var("THREADSPACE_EVIDENCE_MILESTONE") {
+            Ok(milestone)
+                if milestone.len() > 1
+                    && milestone.starts_with('M')
+                    && milestone[1..].starts_with(|c: char| c.is_ascii_digit())
+                    && milestone[1..].chars().all(|c| c.is_ascii_digit() || c.is_ascii_uppercase()) =>
+            {
+                milestone
+            }
+            Ok(milestone) => {
+                return Err(format!("THREADSPACE_EVIDENCE_MILESTONE={milestone:?} must match ^M[0-9][A-Z0-9]*$"));
+            }
+            Err(_) => "M1".to_owned(),
+        };
+        let root = repo.join("evidence").join(milestone);
         match args.get(1).map(String::as_str) {
             Some("fixtures") => replay::catalog_fixtures(&repo, &root),
             Some("replay") => replay::replay_hashes(&root),

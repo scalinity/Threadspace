@@ -31,6 +31,10 @@ pub const REQUIRED_FAMILIES: &[&str] = &[
     "activation-changes",
 ];
 const EXTRA_FAMILIES: &[&str] = &["duplicates", "robustness"];
+/// The M2 adversarial reorder/duplicate family for the reducer-3 evidence
+/// sets (D-0010), budgeted on its own so the M1 families keep their counts.
+const EVIDENCE_SET_FAMILY: &str = "evidence-sets";
+const EVIDENCE_SET_BUDGET: usize = 4_000;
 const EXTRA_PER_FAMILY: usize = 200;
 const SQLITE_EVERY: usize = 10;
 
@@ -54,10 +58,17 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
     let mut required_total = 0usize;
     let mut sqlite_checks = 0usize;
     let mut sequence = 0usize;
-    for (family_index, family) in REQUIRED_FAMILIES.iter().chain(EXTRA_FAMILIES).enumerate() {
+    for (family_index, family) in REQUIRED_FAMILIES
+        .iter()
+        .chain(EXTRA_FAMILIES)
+        .chain(&[EVIDENCE_SET_FAMILY])
+        .enumerate()
+    {
         let members = by_family.get(family).ok_or(format!("no scenarios in family {family}"))?;
         let budget = if REQUIRED_FAMILIES.contains(family) {
             per_required
+        } else if *family == EVIDENCE_SET_FAMILY {
+            EVIDENCE_SET_BUDGET
         } else {
             EXTRA_PER_FAMILY
         };

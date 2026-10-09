@@ -5,7 +5,7 @@
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::command::OwnerAction;
 use threadspace_contracts::canonical::keys::NativeSessionRef;
-use threadspace_contracts::canonical::records::{CanonicalState, OutboxState, ResolutionKind};
+use threadspace_contracts::canonical::records::{CanonicalState, ObserverTier, OutboxState, ResolutionKind};
 use threadspace_contracts::projection::{
     AttentionCategory, ExecutionPresence, ObservationState, TurnState,
 };
@@ -1111,6 +1111,215 @@ pub fn sensitive_payload() -> Scenario {
     })
 }
 
+// ---------------------------------------------------------------- M2 (D-0010)
+//
+// Each field below took the latest arrival before reducer 3. Every scenario
+// holds reports that only their causal points order, and reports nothing
+// orders; the campaign reorders and duplicates them, so any dependence on
+// arrival order shows as a diverging semantic hash.
+
+fn attach_as(
+    b: &mut Builder,
+    s: &NativeSessionRef,
+    activation: &str,
+    presence: &str,
+    device: u32,
+    source: Option<(&str, &str)>,
+) -> usize {
+    let mut obs = b
+        .obs(Some(s), "execution.attach")
+        .activation(activation)
+        .provider(process(71, 301), CLAUDE_EXE, Some(device))
+        .payload(json!({ "mode": "terminal_embedded", "presence": presence, "device": device }));
+    if let Some((source, epoch)) = source {
+        obs = obs.source(source, epoch).unordered();
+    }
+    obs.push()
+}
+
+/// Attach mode and presence (D-0007 §10 (1)): an ordered pair settles on the
+/// later report; reports nothing orders settle on the least live presence and
+/// are flagged; the device is the newest one any report names.
+pub fn attachment_evidence() -> Scenario {
+    let mut b = Builder::new("attachment-evidence", "evidence-sets");
+    let s = session(CLAUDE_LIKE, "sess-attachment-evidence");
+    b.obs(Some(&s), "session.start").push();
+    attach_as(&mut b, &s, "act-ordered", "LIVE", 7, None);
+    attach_as(&mut b, &s, "act-ordered", "DETACHED", 8, None);
+    attach_as(&mut b, &s, "act-ordered", "LIVE", 9, None);
+    attach_as(&mut b, &s, "act-unordered", "LIVE", 7, None);
+    attach_as(&mut b, &s, "act-unordered", "DETACHED", 7, Some(("synthetic.other", "other-1")));
+    b.build(|state| {
+        let v = View::new(state);
+        let s = "sess-attachment-evidence";
+        let ordered = v.execution(s, "act-ordered").ok_or("ordered execution")?;
+        ensure!(ordered.presence == ExecutionPresence::Live && !ordered.attachment_conflict, "the causally latest report decides: LIVE");
+        ensure!(ordered.controlling_device == Some(9), "the newest device: {:?}", ordered.controlling_device);
+        let unordered = v.execution(s, "act-unordered").ok_or("unordered execution")?;
+        ensure!(unordered.attachment_conflict, "unordered disagreement is flagged");
+        ensure!(unordered.presence == ExecutionPresence::Detached, "unordered disagreement settles least live: {:?}", unordered.presence);
+        ensure!(unordered.controlling_device == Some(7), "agreeing devices stand");
+        Ok(())
+    })
+}
+
+/// The human-follow-up frontier (D-0007 §10 (2)): a rejection withdraws the
+/// frontier an acceptance advanced, in any order; disagreeing origins never
+/// qualify; an accepted human input alone still resolves (the control).
+pub fn followup_frontier_evidence() -> Scenario {
+    let mut b = Builder::new("followup-frontier-evidence", "evidence-sets");
+    for (native, prompt) in [
+        ("sess-frontier-rejected", "p-rejected"),
+        ("sess-frontier-origin", "p-origin"),
+        ("sess-frontier-control", "p-control"),
+    ] {
+        let s = session(WITNESSED, native);
+        b.obs(Some(&s), "session.start").push();
+        b.obs(Some(&s), "turn.start").turn("t1").push();
+        b.obs(Some(&s), "notify.output").turn("t1").payload(json!({ "nativeKey": "t1-output" })).push();
+        complete(&mut b, &s, "t1", "answer");
+        b.obs(Some(&s), "prompt.submit").prompt(prompt).payload(json!({ "origin": "HUMAN_COMPOSER" })).push();
+        b.obs(Some(&s), "prompt.accepted").prompt(prompt).payload(accepted()).push();
+        match native {
+            "sess-frontier-rejected" => {
+                b.obs(Some(&s), "prompt.rejected")
+                    .prompt(prompt)
+                    .payload(json!({ "reason": "BLOCKED_BY_HOOK" }))
+                    .source("synthetic.hook", "hook-1")
+                    .unordered()
+                    .push();
+            }
+            "sess-frontier-origin" => {
+                b.obs(Some(&s), "prompt.submit")
+                    .prompt(prompt)
+                    .payload(json!({ "origin": "SCHEDULED" }))
+                    .source("synthetic.hook", "hook-1")
+                    .unordered()
+                    .push();
+            }
+            _ => {}
+        }
+    }
+    b.build(|state| {
+        let v = View::new(state);
+        let item = |s: &str| -> Result<bool, String> {
+            let t1 = v.turn(s, None, "t1").ok_or(format!("{s} t1"))?;
+            Ok(resolved_by(v.output_item(t1).ok_or(format!("{s} item"))?, ResolutionKind::HumanFollowup))
+        };
+        ensure!(!item("sess-frontier-rejected")?, "a rejected input never resolves the earlier output");
+        ensure!(!item("sess-frontier-origin")?, "an input with disagreeing origins never qualifies");
+        ensure!(item("sess-frontier-control")?, "an accepted human input resolves the earlier output");
+        let frontiers = |s: &str| {
+            let id = v.session(s).map(|r| r.id.clone()).unwrap_or_default();
+            state.frontiers.values().filter(|f| f.session_id == id).count()
+        };
+        ensure!(frontiers("sess-frontier-rejected") == 0, "no frontier survives the rejection");
+        ensure!(frontiers("sess-frontier-control") == 1, "the control's frontier stands");
+        Ok(())
+    })
+}
+
+/// Observer link state (D-0007 §10 (3)): an ordered pair settles on the later
+/// report; reports nothing orders settle on the most degraded and are flagged.
+pub fn observer_link_evidence() -> Scenario {
+    let mut b = Builder::new("observer-link-evidence", "evidence-sets");
+    let ordered = session(CLAUDE_LIKE, "sess-link-ordered");
+    b.obs(Some(&ordered), "session.start").push();
+    b.obs(Some(&ordered), "observer.link").payload(json!({ "link": "CURRENT" })).push();
+    b.obs(Some(&ordered), "observer.link").payload(json!({ "link": "STALE" })).push();
+    b.obs(Some(&ordered), "observer.link").payload(json!({ "link": "CURRENT" })).push();
+    let unordered = session(CLAUDE_LIKE, "sess-link-unordered");
+    b.obs(Some(&unordered), "session.start").push();
+    b.obs(Some(&unordered), "observer.link").payload(json!({ "link": "CURRENT" })).push();
+    b.obs(Some(&unordered), "observer.link")
+        .payload(json!({ "link": "DISCONNECTED" }))
+        .source("synthetic.observer", "observer-2")
+        .unordered()
+        .push();
+    b.build(|state| {
+        let v = View::new(state);
+        let ordered = v.session("sess-link-ordered").ok_or("ordered session")?;
+        ensure!(ordered.observation == ObservationState::Current && !ordered.link_conflict, "the causally latest report decides: {:?}", ordered.observation);
+        ensure!(ordered.observer_tier == Some(ObserverTier::Native), "qualified engine-stamped reports are native");
+        let unordered = v.session("sess-link-unordered").ok_or("unordered session")?;
+        ensure!(unordered.link_conflict, "unordered disagreement is flagged");
+        ensure!(unordered.observation == ObservationState::Disconnected, "unordered disagreement settles most degraded: {:?}", unordered.observation);
+        Ok(())
+    })
+}
+
+/// Host-read-tier outcomes (D-0005 reload rule, D-0010): an outcome whose
+/// session attribution is a host read applies only once kernel/inventory
+/// evidence shows its provider process running that Session, whichever
+/// arrives first; one from another process never applies. A qualified
+/// host-read link with a corroborated process is restored; without that
+/// proof, or from an unqualified profile, it stays lower tier.
+pub fn host_read_outcome() -> Scenario {
+    let mut b = Builder::new("host-read-outcome", "evidence-sets");
+    let corroborated = session(CLAUDE_LIKE, "sess-host-read-corroborated");
+    b.obs(Some(&corroborated), "session.start").push();
+    b.obs(Some(&corroborated), "execution.attach")
+        .activation("act-p")
+        .provider(process(81, 401), CLAUDE_EXE, Some(11))
+        .payload(json!({ "mode": "terminal_embedded", "presence": "LIVE", "device": 11 }))
+        .push();
+    b.obs(Some(&corroborated), "turn.start").turn("t1").push();
+    b.obs(Some(&corroborated), "turn.complete")
+        .turn("t1")
+        .provider(process(81, 401), CLAUDE_EXE, None)
+        .payload(json!({ "reason": "answer", "tier": "HOST_READ" }))
+        .source("synthetic.observer", "reloaded-1")
+        .push();
+    b.obs(Some(&corroborated), "observer.link")
+        .provider(process(81, 401), CLAUDE_EXE, None)
+        .payload(json!({ "link": "CURRENT", "tier": "HOST_READ" }))
+        .source("synthetic.observer", "reloaded-1")
+        .push();
+    let foreign = session(CLAUDE_LIKE, "sess-host-read-foreign");
+    b.obs(Some(&foreign), "session.start").push();
+    b.obs(Some(&foreign), "execution.attach")
+        .activation("act-q")
+        .provider(process(82, 402), CLAUDE_EXE, Some(12))
+        .payload(json!({ "mode": "terminal_embedded", "presence": "LIVE", "device": 12 }))
+        .push();
+    b.obs(Some(&foreign), "turn.start").turn("t1").push();
+    b.obs(Some(&foreign), "turn.complete")
+        .turn("t1")
+        .provider(process(83, 403), CLAUDE_EXE, None)
+        .payload(json!({ "reason": "answer", "tier": "HOST_READ" }))
+        .source("synthetic.observer", "reloaded-2")
+        .push();
+    b.obs(Some(&foreign), "observer.link")
+        .provider(process(83, 403), CLAUDE_EXE, None)
+        .payload(json!({ "link": "CURRENT", "tier": "HOST_READ" }))
+        .source("synthetic.observer", "reloaded-2")
+        .push();
+    let unqualified = session(CLAUDE_LIKE, "sess-host-read-unqualified");
+    b.obs(Some(&unqualified), "session.start").push();
+    b.obs(Some(&unqualified), "observer.link")
+        .payload(json!({ "link": "CURRENT", "qualified": false, "version": "2.1.292" }))
+        .push();
+    b.build(|state| {
+        let v = View::new(state);
+        let turn = |s: &str| v.turn(s, None, "t1").map(|t| (t.state.clone(), t.pending_outcomes.len()));
+        ensure!(
+            turn("sess-host-read-corroborated") == Some((TurnState::Completed, 1)),
+            "a corroborated host-read outcome applies: {:?}",
+            turn("sess-host-read-corroborated")
+        );
+        ensure!(
+            turn("sess-host-read-foreign") == Some((TurnState::Working, 1)),
+            "an outcome from another process is retained, never applied: {:?}",
+            turn("sess-host-read-foreign")
+        );
+        let tier = |s: &str| v.session(s).and_then(|r| r.observer_tier);
+        ensure!(tier("sess-host-read-corroborated") == Some(ObserverTier::Restored), "corroborated host read is restored");
+        ensure!(tier("sess-host-read-foreign") == Some(ObserverTier::LowerTier), "uncorroborated host read stays lower tier");
+        ensure!(tier("sess-host-read-unqualified") == Some(ObserverTier::LowerTier), "an unqualified profile stays lower tier");
+        Ok(())
+    })
+}
+
 /// Every catalogued scenario.
 pub fn catalog() -> Vec<Scenario> {
     vec![
@@ -1156,5 +1365,10 @@ pub fn catalog() -> Vec<Scenario> {
         wait_owner_scopes(),
         wait_owner_partial_actions(),
         wait_owner_unordered_coverage(),
+        // M2: the reducer-3 evidence sets (D-0010).
+        attachment_evidence(),
+        followup_frontier_evidence(),
+        observer_link_evidence(),
+        host_read_outcome(),
     ]
 }
