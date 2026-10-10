@@ -51,7 +51,6 @@ tell application "Terminal"
     if (id of w) is ((item 1 of argv) as integer) then
       if (count of tabs of w) is not 1 then return "REFUSED"
       if tty of tab 1 of w is not (item 2 of argv) then return "REFUSED"
-      if custom title of tab 1 of w is not (item 3 of argv) then return "REFUSED"
       close w
       return "CLOSED"
     end if
@@ -345,8 +344,9 @@ impl OwnedTab {
         if self.ownership()["owned"] != true {
             return json!({"closed":false,"refused":"ownership changed before close","ownership":initial});
         }
-        // One dictionary operation rechecks sole-tab TTY and the acquired UUID
-        // marker immediately before closing this window. Never close by order.
+        // One dictionary operation rechecks the recorded sole-tab TTY before
+        // closing this window. Claude changes its custom title during normal
+        // execution; titles supply no ownership authority. Never close by order.
         let closed = osascript(
             CLOSE_VERIFIED_OWNED_WINDOW,
             &[

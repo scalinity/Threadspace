@@ -47,7 +47,7 @@ m2-minimized-finish dev <recorded-run-directory>` executes only the corrected
 absent-Session negative and owned cleanup. It requires the recorded installation,
 original Terminal incarnation and original Claude Session/process/TTY to agree
 with fresh native proof before acting. Original positives remain attributed to
-their original run. Cleanup closes the acquired UUID-marked sole-tab window;
+their original run. Cleanup closes the acquired sole-tab window after native resource proof;
 it sends no direct PID signals. Every readable job must still belong to the
 fixture. A root Terminal login wrapper is identified through its native image,
 UID, parent and TTY and supplies no PID signal authority. Removal of the exact
