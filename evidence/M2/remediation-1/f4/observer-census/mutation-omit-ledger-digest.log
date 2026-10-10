@@ -1,0 +1,19 @@
+   Compiling threadspace-observer-census-portable v0.0.0 (<disposable>/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.44s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-census-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_observer_census_portable-ddf56f0013509bee)
+
+running 1 test
+
+thread 'latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close' (757) panicked at src/latency_census_tests.rs:231:9:
+digest
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close ... FAILED
+
+failures:
+
+failures:
+    latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

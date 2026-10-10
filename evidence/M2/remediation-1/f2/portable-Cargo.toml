@@ -1,0 +1,21 @@
+[package]
+name = "threadspace-f2-portable"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+[workspace]
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["raw_value"] }
+sha2 = "=0.11.0"
+uuid = { version = "=1.27.0", features = ["v4", "serde"] }
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+rust_2018_idioms = { level = "deny", priority = -1 }
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+unwrap_used = "deny"
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"

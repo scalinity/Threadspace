@@ -1,0 +1,24 @@
+   Compiling threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-f2-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_f2_portable-8d9a99313dc5c838)
+
+running 1 test
+test ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install ... FAILED
+
+failures:
+
+---- ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install stdout ----
+
+thread 'ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install' (1337) panicked at src/../../../harness/m2_ownership.rs:252:9:
+assertion `left == right` failed: a failed install never authorizes even an uninstall attempt
+  left: 1
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,32 @@
+(node:13) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/hooks/latency.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/scratch/c8272833f682/Threadspace-review/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ qualification remains opt-in and validates the configured runtime/command (2.619651ms)
+✔ accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger (20.026924ms)
+✔ stable UUID retries do not duplicate the closed capture population (1.545348ms)
+✔ lost last sample cannot reuse an earlier zero-failure prefix as the final census (2.159791ms)
+✔ failed final page, close or confirmation leaves no final native confirmation (2.362266ms)
+✔ malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation (3.203351ms)
+✔ fabricated positive close reply without native close state fails its challenge confirmation (0.999733ms)
+✔ overlapping telemetry exports stay single-flight and retain all omitted-count failures (1.415932ms)
+✔ an in-flight batch or a callback racing census pages invalidates final closure (1.566519ms)
+✔ ledger and page bounds are explicit and overflow cannot seal as a smaller population (13.00784ms)
+✔ the bounded close deadline aborts a slow export without provider rejection (1.092912ms)
+✔ real delivery timeout retains the same UUID and measurement cannot manufacture acceptance (2.137163ms)
+✔ optional measurement throwing leaves successful canonical delivery behavior unchanged (0.451457ms)
+✔ actual Session-end releases the original result at the one deadline when census stays pending (3.731432ms)
+✔ plugin-origin Session end and clear do not close an authoritative source window (1.231353ms)
+✔ immediate census completion uses only the remaining original end-drain budget (1.067682ms)
+✔ a drain that exhausts the original budget cannot reset it for census (0.418933ms)
+✔ failed finalization preserves the original Session-end result and cancels its wait (1.622088ms)
+✔ unverifiable watchdog handles preserve only the original Session-end drain (3.153415ms)
+✔ actual missing-watchdog counterexample releases before 110 ms without starting the 90 ms census (114.918275ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 664.386123

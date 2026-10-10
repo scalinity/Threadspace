@@ -28,7 +28,7 @@ pub use reduce::record_evidence;
 /// The reduction rules this build applies; checkpoints record it. A store
 /// whose newest checkpoint has an earlier version is upgraded when opened
 /// (`Engine::upgrade`); one with a later version is refused.
-pub const REDUCER_VERSION: u32 = 3;
+pub const REDUCER_VERSION: u32 = 4;
 
 /// The M0 fixture worker's synthetic namespace.
 pub const FIXTURE_PROVIDER: &str = "synthetic";

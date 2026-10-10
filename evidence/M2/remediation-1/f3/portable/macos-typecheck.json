@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/workspace/scratch/c8272833f682/remediation-tools/cargo/bin/cargo",
+    "+1.99.0",
+    "check",
+    "-p",
+    "threadspace-harness",
+    "--all-targets",
+    "--target",
+    "aarch64-apple-darwin",
+    "--target-dir",
+    "/workspace/scratch/c8272833f682/remediation-tools/native-check-target",
+    "--offline",
+    "--locked"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 1.4978070259094238,
+  "classification": "Cross-target source/type check on Linux only; no macOS binary execution",
+  "nativeExecution": "NOT_RUN",
+  "sourceFilesSha256Before": {
+    "tests/native/harness/src/bin/m0c/m2_minimized.rs": "e8bb431beb581143912fbf60ca417360162fa0d75b89b4c9df8ed99fef549722",
+    "tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs": "a5ce82c1198f01c0b2a06729e032780457d6fc07b8a2ba44eba3d72d10f4302e",
+    "tests/native/harness/src/bin/m0c/main.rs": "670cea5efe0c308df71b56ea07cfa2033dc107cd46df944cc2dec882a5f12ed8"
+  },
+  "sourceFilesSha256After": {
+    "tests/native/harness/src/bin/m0c/m2_minimized.rs": "e8bb431beb581143912fbf60ca417360162fa0d75b89b4c9df8ed99fef549722",
+    "tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs": "a5ce82c1198f01c0b2a06729e032780457d6fc07b8a2ba44eba3d72d10f4302e",
+    "tests/native/harness/src/bin/m0c/main.rs": "670cea5efe0c308df71b56ea07cfa2033dc107cd46df944cc2dec882a5f12ed8"
+  },
+  "sameF3SourcesBeforeAfter": true,
+  "scope": "Interim F3 harness check; root performs final combined checks after F1B/F4 freezes."
+}

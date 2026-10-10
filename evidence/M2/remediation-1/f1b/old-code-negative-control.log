@@ -1,0 +1,70 @@
+warning: unused import: `CanonicalState`
+  --> crates/journal/tests/f1b_fixture.rs:23:49
+   |
+23 | use threadspace_contracts::canonical::records::{CanonicalState, ObserverTier};
+   |                                                 ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Engine`
+  --> crates/journal/tests/f1b_fixture.rs:27:32
+   |
+27 | use threadspace_state_engine::{Engine, REDUCER_VERSION};
+   |                                ^^^^^^
+
+warning: unused import: `threadspace_state_engine::hash::state_hash`
+  --> crates/journal/tests/f1b_fixture.rs:28:5
+   |
+28 | use threadspace_state_engine::hash::state_hash;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `threadspace_state_engine::semantic::semantic_hash`
+  --> crates/journal/tests/f1b_fixture.rs:31:5
+   |
+31 | use threadspace_state_engine::semantic::semantic_hash;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `TOKEN` is never used
+  --> crates/journal/tests/f1b_fixture.rs:34:7
+   |
+34 | const TOKEN: &str = "33333333-3333-4333-8333-333333333333";
+   |       ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `TempStore` is never constructed
+  --> crates/journal/tests/f1b_fixture.rs:38:8
+   |
+38 | struct TempStore(PathBuf);
+   |        ^^^^^^^^^
+
+warning: associated items `new` and `db` are never used
+  --> crates/journal/tests/f1b_fixture.rs:40:8
+   |
+39 | impl TempStore {
+   | -------------- associated items in this implementation
+40 |     fn new() -> Self {
+   |        ^^^
+...
+45 |     fn db(&self) -> PathBuf { self.0.join("journal.sqlite3") }
+   |        ^^
+
+warning: `threadspace-journal` (test "f1b_fixture") generated 7 warnings (run `cargo fix --test "f1b_fixture" -p threadspace-journal` to apply 4 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/f1b_fixture.rs (/workspace/scratch/c8272833f682/review-build-reducer-old/x86_64-unknown-linux-gnu/debug/deps/f1b_fixture-3197ef5006ad47d3)
+
+running 1 test
+
+thread 'f1b_rejected_candidate_writes_genuine_reducer3_store_and_demonstrates_false_restore' (18) panicked at crates/journal/tests/f1b_fixture.rs:144:17:
+NEGATIVE CONTROL: old same-P attachment incorrectly completed A despite current B; state=Completed,tier=Some(Restored)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f1b_rejected_candidate_writes_genuine_reducer3_store_and_demonstrates_false_restore ... FAILED
+
+failures:
+
+failures:
+    f1b_rejected_candidate_writes_genuine_reducer3_store_and_demonstrates_false_restore
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 23 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p threadspace-journal --test f1b_fixture`

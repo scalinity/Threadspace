@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "purpose": "F1A actual TypeScript original-ownership tests and F1B observer bridge controls",
+  "platform": "linux",
+  "runtime": "v26.11.1",
+  "source": {
+    "registerModule": "/workspace/scratch/c8272833f682/review-checks/f1a-negative-n7z3yfv1/register.ts",
+    "hashes": {
+      "register.ts": "9ee0705cdf835d5d78f01fde131bbad241011386deaae65140603440dcab453d",
+      "ownership.ts": null,
+      "delivery.ts": "6ae1741b5e5a80cceb8a091f34d89f682fcdbec2bb37000d2006f91175df26dc",
+      "latency.ts": null,
+      "ownership.node.mjs": "980aef2b5896bd433c00de35db6323c8eebe66fa06617d3b2b91638071883152"
+    }
+  },
+  "attribution": "Executed with in-memory host origins/traces, helper receipts and timers; not native Claude or macOS execution",
+  "passed": 0,
+  "failed": 1,
+  "results": [
+    {
+      "id": "F1A-1",
+      "description": "Delayed completion ENTRY after A→B resolves the retained A Turn",
+      "records": [
+        {
+          "schemaVersion": 1,
+          "observationId": "05b3fda7-cd60-46dd-b5f6-18b873fba555",
+          "capturedAtMs": 1791603387145,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "1",
+          "phase": "entry",
+          "nativeEvent": "classic.SessionStart",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "payload": {
+            "source": "startup"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "34800ba4-eaa3-42dc-9d7c-eb421eeaa083",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "1",
+          "callbackResultSequence": "2",
+          "phase": "result",
+          "nativeEvent": "classic.SessionStart",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "payload": {
+            "core": {
+              "links": 1,
+              "endPlugin": "engine",
+              "endTier": "core",
+              "endOutcome": "returned",
+              "coreSettled": true
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "c4ee34b2-7a01-4adb-bb37-dd626ea13ad4",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "3",
+          "phase": "entry",
+          "nativeEvent": "turn.start",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "nativeTurnId": "Turn-A",
+          "payload": {}
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "7d7f33b2-72da-4308-9400-aa8169e88990",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "3",
+          "callbackResultSequence": "4",
+          "phase": "result",
+          "nativeEvent": "turn.start",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "nativeTurnId": "Turn-A",
+          "payload": {
+            "echoedTurnId": "Turn-A",
+            "core": {
+              "links": 1,
+              "endPlugin": "engine",
+              "endTier": "core",
+              "endOutcome": "returned",
+              "coreSettled": true
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "78541cc1-af16-4b87-84bb-dc969cf0e486",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "5",
+          "phase": "entry",
+          "nativeEvent": "session.end",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "payload": {
+            "reason": "clear",
+            "endingSessionId": "Session-A",
+            "resumeId": "Session-A"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "839d3653-ab69-4285-83d9-85827b7ea664",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "5",
+          "callbackResultSequence": "6",
+          "phase": "result",
+          "nativeEvent": "session.end",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-A",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 1,
+          "payload": {
+            "core": {
+              "links": 1,
+              "endPlugin": "engine",
+              "endTier": "core",
+              "endOutcome": "returned",
+              "coreSettled": true
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "2e9922ea-033f-46bb-977d-072395660983",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "7",
+          "phase": "entry",
+          "nativeEvent": "classic.SessionStart",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-B",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 3,
+          "payload": {
+            "source": "clear"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "bb353e59-6d8e-47ac-983e-e561a437edfb",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "7",
+          "callbackResultSequence": "8",
+          "phase": "result",
+          "nativeEvent": "classic.SessionStart",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-B",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 3,
+          "payload": {
+            "core": {
+              "links": 1,
+              "endPlugin": "engine",
+              "endTier": "core",
+              "endOutcome": "returned",
+              "coreSettled": true
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "68e797c3-03fc-4e1e-9686-f5ef53a676d9",
+          "capturedAtMs": 1791603387146,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "9",
+          "phase": "entry",
+          "nativeEvent": "turn.complete",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-B",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 3,
+          "nativeTurnId": "Turn-A",
+          "payload": {
+            "reason": "answer",
+            "isAborted": false,
+            "durationMs": 1
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "observationId": "5e27a43f-26d1-4106-ac43-bdab10d6c223",
+          "capturedAtMs": 1791603387147,
+          "adapterId": "threadspace-observer",
+          "adapterVersion": "0.1.0",
+          "sourceEpoch": "90be47c3-da7b-4b78-b116-b4c21d4e9b74",
+          "sequenceMeaning": "OBSERVER_CAPTURE",
+          "callbackEntrySequence": "9",
+          "callbackResultSequence": "10",
+          "phase": "result",
+          "nativeEvent": "turn.complete",
+          "dispatchOrigin": {
+            "plugin": "engine",
+            "tier": "core"
+          },
+          "engineDispatch": true,
+          "sessionId": "Session-B",
+          "sessionIdSource": "classic.SessionStart",
+          "sessionGeneration": 3,
+          "nativeTurnId": "Turn-A",
+          "payload": {
+            "reason": "answer",
+            "isAborted": false,
+            "core": {
+              "links": 1,
+              "endPlugin": "engine",
+              "endTier": "core",
+              "endOutcome": "returned",
+              "coreSettled": true
+            }
+          }
+        }
+      ],
+      "result": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: late A completion must never acquire B\n    at file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/tests/ownership.node.mjs:158:10\n    at async recordCase (file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/tests/ownership.node.mjs:143:5)\n    at async file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/tests/ownership.node.mjs:150:1"
+    }
+  ]
+}

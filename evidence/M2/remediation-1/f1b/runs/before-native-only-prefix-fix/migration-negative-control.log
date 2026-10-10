@@ -1,0 +1,24 @@
+   Compiling threadspace-contracts v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/contracts)
+   Compiling threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.35s
+     Running tests/observer_ownership.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/observer_ownership-facced9b4b9a46a8)
+
+running 1 test
+NEGATIVE CONTROL: relabeled genuine reducer-3 checkpoint without requalifying canonical facts
+
+thread 'f1b_genuine_reducer3_upgrade_preserves_owner_receipts_and_converges_at_three_checkpoints' (2972) panicked at crates/journal/tests/observer_ownership.rs:432:9:
+assertion `left == right` failed
+  left: Some(Restored)
+ right: Some(LowerTier)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f1b_genuine_reducer3_upgrade_preserves_owner_receipts_and_converges_at_three_checkpoints ... FAILED
+
+failures:
+
+failures:
+    f1b_genuine_reducer3_upgrade_preserves_owner_receipts_and_converges_at_three_checkpoints
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 32 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p threadspace-journal --test observer_ownership`

@@ -20,6 +20,7 @@
 //!   threadspace-m0c m2-cycles <prod|dev> [count]       # M2: integration install/reinstall/remove
 //!   threadspace-m0c m2-vertical <prod|dev> [cycles]    # M2: observed session, Return, follow-up
 //!   threadspace-m0c m2-routes <prod|dev> [count]       # M2: exact Returns through the UI
+//!   threadspace-m0c m2-minimized dev [count>=5]        # F3: owned minimized positive and safe negative
 //!   threadspace-m0c m2-faults <prod|dev> [all|case,...] # M2: fault and boundary cases
 //!   threadspace-m0c g06-notifications prod
 //!   threadspace-m0c g05-denied dev
@@ -48,6 +49,8 @@ mod install;
 mod launches;
 mod m2;
 mod m2_faults;
+mod m2_latency;
+mod m2_minimized;
 mod notifications;
 mod ownership;
 mod power;
@@ -69,6 +72,19 @@ fn main() -> ExitCode {
         eprintln!("usage: threadspace-m0c <command> ...; see the module header");
         return ExitCode::from(64);
     };
+    // Refuse before Ctx initialization can inspect any production surface.
+    if command == "m2-minimized" && args.get(1).map(String::as_str) != Some("dev") {
+        eprintln!("m2-minimized requires the explicit dev channel");
+        return ExitCode::from(64);
+    }
+    if command == "m2-minimized"
+        && (args.len() > 3 || args.get(2).is_some_and(|text| {
+            text.parse::<u32>().map_or(true, |count| !(5..=100).contains(&count))
+        }))
+    {
+        eprintln!("m2-minimized accepts one optional repetition count from 5 through 100");
+        return ExitCode::from(64);
+    }
     let ctx = match Ctx::new(args.get(1).map(String::as_str).unwrap_or("prod")) {
         Ok(ctx) => ctx,
         Err(error) => {
@@ -97,7 +113,10 @@ fn main() -> ExitCode {
         "m2-cycles" => m2::cycles(&ctx, number(&args, 2, 10)),
         "m2-vertical" => m2::vertical(&ctx, number(&args, 2, 10)),
         "m2-routes" => m2::routes(&ctx, number(&args, 2, 30)),
+        "m2-minimized" => m2_minimized::qualify(&ctx, number(&args, 2, 5)),
         "m2-faults" => m2_faults::faults(&ctx, args.get(2).map_or("all", String::as_str)),
+        "m2-latency-begin" => m2_latency::begin(&ctx),
+        "m2-latency-end" => m2_latency::end(&ctx, std::path::Path::new(args.get(2).map_or("", String::as_str))),
         "h10-terminal" => terminal_gates::remediation(&ctx),
         "c11-deadline" => deadline::c11(&ctx),
         "c02-durable" => ownership::c02_durable(&ctx, args.get(2).map_or("all", String::as_str)),

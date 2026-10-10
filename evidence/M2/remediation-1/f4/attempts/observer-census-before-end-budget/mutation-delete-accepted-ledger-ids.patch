@@ -1,0 +1,10 @@
+--- repaired/latency.ts
++++ mutant/latency.ts
+@@ -139,6 +139,7 @@
+             capturedMs: captures.get(observationId)?.capturedMs ?? null,
+             status: statuses?.get(observationId) ?? 'UNKNOWN' })),
+         }
++        for (const [id, status] of statuses ?? []) { if (status === 'COMMITTED' || status === 'ALREADY_COMMITTED' || status === 'LOCAL_SPOOLED') captures.delete(id) }
+         if (exporting || closed) { failedExports += 1; return }
+         ownExport = (async () => {
+           try {

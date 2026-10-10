@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/workspace/scratch/c8272833f682/remediation-tools/cargo/bin/cargo",
+    "+1.99.0",
+    "test",
+    "--manifest-path",
+    "/workspace/scratch/c8272833f682/review-checks/f3-oracle/Cargo.toml",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--offline",
+    "--locked"
+  ],
+  "exitCode": 101,
+  "classification": "Portable classification assertions only; no native operation or qualification",
+  "sourceSha256": "156eaf4405acf6b48821aa24e1fc5ae6aa32342f926b0aea2fc5711447b7c7da"
+}

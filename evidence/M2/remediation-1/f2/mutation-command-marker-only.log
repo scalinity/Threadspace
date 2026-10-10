@@ -1,0 +1,41 @@
+   Compiling threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+warning: unused variable: `matcher`
+   --> src/setup/settings.rs:146:5
+    |
+146 |     matcher: &str,
+    |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_matcher`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `unchanged_hook` is never used
+   --> src/setup/settings.rs:186:4
+    |
+186 | fn unchanged_hook(hook: &Value, command: &str) -> bool {
+    |    ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `threadspace-f2-portable` (lib test) generated 2 warnings (run `cargo fix --lib -p threadspace-f2-portable --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.03s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-f2-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_f2_portable-8d9a99313dc5c838)
+
+running 1 test
+test setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives ... FAILED
+
+failures:
+
+---- setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives stdout ----
+
+thread 'setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives' (680) panicked at src/setup/f2_tests.rs:156:9:
+assertion `left == right` failed
+  left: []
+ right: [Hook { event: "PreToolUse", matcher: "*", command: "'<disposable>/fixtures/ts-setup-679-0-1791607690110/Application Support/ai.example.threadspace/integrations/claude/bin/threadspace-hook' hook --agent ai.example.threadspace.agent" }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

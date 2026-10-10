@@ -1,0 +1,48 @@
+
+tests/delivery.test.ts:
+(pass) mod delivery > mod batch receipts: a valid receipt removes the records [137.58ms]
+(pass) mod delivery > partial commit followed by timeout retries with the original UUIDs [73.69ms]
+(pass) mod delivery > malformed receipt is not acceptance [88.88ms]
+(pass) mod delivery > stable UUID replay of unaccepted records [95.05ms]
+(pass) mod delivery > queue bounds (2,048 records) and batch bounds (128 records, 64 KiB) [1223.40ms]
+(pass) mod delivery > batches are as full as both bounds allow (128 records, 64 KiB) [256.97ms]
+(pass) mod delivery > queue byte bound (8 MiB) with long escaped identifiers [1144.51ms]
+(pass) mod delivery > retry backoff runs 250 ms to 5 s and resets on success [85.06ms]
+(pass) mod delivery > one pending retry timer during backoff [85.67ms]
+(pass) mod delivery > no timer while idle [73.70ms]
+(pass) mod delivery > one in-flight drain per module [207.76ms]
+(pass) mod delivery > module load runs register afresh with a new source epoch [59.29ms]
+(pass) mod delivery > module load in a second test has another source epoch and sequence restarts [60.56ms]
+(pass) mod delivery > module retirement/reload: the kit cannot hot-reload a module (config.set) [68.06ms]
+(pass) mod delivery > budget argv is appended [64.83ms]
+
+tests/middleware.test.ts:
+(pass) middleware contract > observer calls next(e) exactly once [158.97ms]
+(pass) middleware contract > result records carry what an adapter needs on their own [67.31ms]
+(pass) middleware contract > event passed unchanged [207.55ms]
+(pass) middleware contract > provider result returned unchanged [68.91ms]
+(pass) middleware contract > provider exceptions propagate [51.75ms]
+(pass) middleware contract > async-generator chunks forwarded correctly (order, count, final value) [53.29ms]
+(pass) middleware contract > async-generator early close is forwarded and recorded as abandoned [64.12ms]
+(pass) middleware contract > observations carry no prompt text, tool input or output, or assistant text [66.01ms]
+
+tests/provenance.test.ts:
+(pass) provenance and identity > callback-entry context frozen [204.02ms]
+(pass) provenance and identity > delayed result uses original identity across a logical session change [100.92ms]
+(pass) provenance and identity > plugin-raised lifecycle-shaped events cannot forge a native outcome [80.80ms]
+(pass) provenance and identity > engine dispatch origin alone does not prove downstream core execution [69.72ms]
+(pass) provenance and identity > short-circuiting downstream middleware is passed through unchanged [59.79ms]
+(pass) provenance and identity > accepted-human core-acceptance proof for prompt.submit [123.53ms]
+(pass) provenance and identity > upstream middleware cannot rewrite prompt origin [184.29ms]
+(pass) provenance and identity > agent.spawn provenance requires a settled core trace [67.93ms]
+(pass) provenance and identity > host reads $.agent.list() and $.session.id() are middleware-interceptable [102.35ms]
+(pass) provenance and identity > first load records a null predecessor epoch and leaves its own in session state [58.38ms]
+(pass) provenance and identity > reload records predecessor epoch [61.71ms]
+(pass) provenance and identity > a failed session state read or write records a null predecessor epoch [57.80ms]
+(pass) provenance and identity > logical session changes (session.end clear, classic.SessionStart clear and resume) [75.05ms]
+(pass) provenance and identity > a normal session end runs one bounded drain; a clear does not [58.05ms]
+(pass) provenance and identity > no worktree handlers or worktree tool interception [50.35ms]
+
+ 38 pass
+ 0 fail
+Ran 38 tests across 3 files. [3.98s]

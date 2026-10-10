@@ -1,0 +1,20 @@
+Read-only independent F1B portable audit, Linux.
+Command: ['/workspace/scratch/c8272833f682/remediation-tools/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo', 'test', '--locked', '--offline', '-p', 'threadspace-journal', '--test', 'observer_ownership', 'f1b_', '--', '--nocapture']
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+error[E0463]: can't find crate for `core`
+  |
+  = note: the `aarch64-apple-darwin` target may not be installed
+  = help: consider downloading the target with `rustup target add aarch64-apple-darwin`
+
+For more information about this error, try `rustc --explain E0463`.
+error: could not compile `cfg-if` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `typenum` (lib) due to 1 previous error

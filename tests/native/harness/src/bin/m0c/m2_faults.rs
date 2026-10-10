@@ -17,7 +17,7 @@ use threadspace_relay::paths::redact_home;
 
 use crate::ctx::Ctx;
 use crate::m2::{
-    Activation, Observed, Scratch, activate, claude_command, completed_turns, disposable, finish, integration, journal_query,
+    Activation, Observed, Scratch, activate, claude_command, completed_turns, disposable, finish, journal_query,
     launcher, session_view, start_observed, submit, submit_unconfirmed, wait_view,
 };
 
@@ -370,8 +370,8 @@ fn partial_receipt(ctx: &Ctx, a: &Activation, kind: &str) -> Result<Value, Strin
 
 pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "faults", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = Scratch::new(ctx, "faults")?;
-    let activation = activate(ctx, &scratch.dir)?;
+    let mut scratch = Scratch::new(ctx, "faults")?;
+    let activation = activate(ctx, &mut scratch)?;
     let all = which == "all";
     let mut verdicts = Vec::new();
     let mut case = |name: &str, run: &mut dyn FnMut() -> Result<Value, String>| {
@@ -400,7 +400,7 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
         crate::terminal_gates::negatives(ctx)
             .map(|outcome| verdict("terminal-negatives", outcome["summary"]["pass"] == json!(true), outcome))
     });
-    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
+    let removed = scratch.remove_integration();
     let pass = verdicts.iter().all(|v| v["pass"] == json!(true));
     let summary = json!({
         "pass": pass,

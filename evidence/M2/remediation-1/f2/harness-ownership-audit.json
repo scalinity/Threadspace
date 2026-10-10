@@ -1,0 +1,66 @@
+{
+  "scope": "Static literal-command audit of implementation languages plus focused cleanup source review. No native commands or process termination executed. Constructed/indirect commands require call-site review; a literal scan is not a complete behavioral proof.",
+  "executions": [
+    {
+      "argv": [
+        "rg",
+        "-n",
+        "\\b(pkill|killall)\\b",
+        "tests",
+        "crates",
+        "apps",
+        "packages",
+        "--glob",
+        "*.rs",
+        "--glob",
+        "*.sh",
+        "--glob",
+        "*.py",
+        "--glob",
+        "*.ts",
+        "--glob",
+        "*.mjs",
+        "--glob",
+        "*.js"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rg",
+        "-n",
+        "\"kill\"|libc::kill|\\.kill\\(",
+        "tests/native/harness/src"
+      ],
+      "exitCode": 0,
+      "stdout": "tests/native/harness/src/procs.rs:135:    unsafe { libc::kill(pid, signal) == 0 }\ntests/native/harness/src/bin/m0c/power.rs:125:            let _ = child.kill();\ntests/native/harness/src/bin/m0c/service_gates.rs:117:        (\"ui-sigkill\", \"kill\"),\ntests/native/harness/src/bin/m0c/window_gates.rs:291:    let _ = hold.kill();\n",
+      "stderr": ""
+    }
+  ],
+  "sourceHashes": {
+    "tests/native/harness/src/procs.rs": "5df99d105cf04fedbaa957eab88e14c5c914c5c6db33459a32c9bb4bade26534",
+    "tests/native/harness/src/bin/m0c/window_gates.rs": "13f79a29e19ab28978a27d078c3792a8abece4da62cb1f80bb9f843e238e0e4c",
+    "tests/native/harness/src/bin/m0c/power.rs": "f5e522495b38171e5b6f81b13e3d35543d392e277e29f64c4a0b521fa54cd3bb",
+    "tests/native/harness/src/bin/m0c/m2_ownership.rs": "9f53cae29cb3046daa2177954357fa2f6723e185e987742c9c5f7eeabb8a7205"
+  },
+  "findings": [
+    {
+      "path": "tests/native/harness/src/procs.rs",
+      "judgment": "A libc::kill primitive exists; its documented contract requires incarnation checks by callers. This scan alone does not establish every caller is safe."
+    },
+    {
+      "path": "tests/native/harness/src/bin/m0c/window_gates.rs",
+      "judgment": "display-mode-hold is a Child returned by the harness spawn; kill/wait target that specific created Child."
+    },
+    {
+      "path": "tests/native/harness/src/bin/m0c/power.rs",
+      "judgment": "KeepAwake owns the Child returned from spawning caffeinate and kills/waits that Child."
+    },
+    {
+      "path": "tests/native/harness/src/bin/m0c/m2_ownership.rs",
+      "judgment": "Cleanup records exclusive directory device/inode and successful installation record; failed acquisition never calls uninstall. The focused test uses disposable real installer fixtures."
+    }
+  ]
+}

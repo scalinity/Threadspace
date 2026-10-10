@@ -1,0 +1,969 @@
+{
+  "title": "M2 — Manually launched Claude vertical slice",
+  "milestone": "M2",
+  "branch": "m2",
+  "verdict": "M2 PASS CANDIDATE — pending independent review",
+  "baseCommit": "af9b285da529890bc441ea00f1a92e73e39902a8",
+  "sourceCommit": "1ffe105fe84a7aab41542bb1a0dbe112bc132050",
+  "harnessCommits": {
+    "vertical, routes, faults 20261009T041720Z-dev": "40869f3",
+    "faults 20261009T043718Z-dev, integration cycles, mod-batch, permutations": "66e53f0"
+  },
+  "nativeBuild": {
+    "buildInfoFrom": "apps/agent-macos/build/dev/build-info.json, written by tests/native/build-app.sh dev; hashes re-read from the installed bundle",
+    "installedBundle": "~/Applications/Threadspace Dev.app (ai.scalinity.threadspace.dev)",
+    "channel": "dev",
+    "sourceCommit": "f4ef5f156f7086962bafa92728cc4cace5a58c3c",
+    "sourceTreeDirty": false,
+    "qualificationBuild": true,
+    "outerExecutableSha256": "f8bd554b01c0611334100316b050dec287a627ac93fa005312c679e96b93c991",
+    "companionSha256": "3b54b8369ecae00b6d53938c790fae69e44dc44bf0d08ad7295a208bbb18dfcc",
+    "helperSha256": "b714aca95e4ac7b262997bec5e4006ef0c4b556a98e090f3cd6d660a0f619c72",
+    "installedMatchesBuild": true,
+    "provider": {
+      "launcher": "~/.local/bin/claude",
+      "reportedVersion": "2.1.295 (Claude Code)",
+      "installedVersions": [
+        "2.1.292",
+        "2.1.293",
+        "2.1.294",
+        "2.1.295"
+      ]
+    }
+  },
+  "provider": {
+    "installedTarget": "Claude Code 2.1.295 (launcher ~/.local/bin/claude)",
+    "qualifiedObserverVersions": [
+      "2.1.291",
+      "2.1.295"
+    ],
+    "profile": "docs/compatibility/claude-observer-2.1.295.json",
+    "decision": "docs/decisions/D-0009-claude-2.1.295-observer-requalification.md",
+    "acceptedInputProvenance": true,
+    "automaticHumanFollowupResolution": false,
+    "declarations": {
+      "compared": 97,
+      "same": 92,
+      "changed": 5
+    },
+    "engineTestKit": "38 pass, 0 fail",
+    "humanTypedOrigins": "evidence/M2/provider/claude/native-origins.json"
+  },
+  "reducer": {
+    "version": 3,
+    "decision": "docs/decisions/D-0010-m2-evidence-sets.md",
+    "permutations": {
+      "area": "permutations",
+      "durationMs": 45616,
+      "failures": 0,
+      "families": {
+        "activation-changes": {
+          "duplicateDeliveriesInjected": 2498,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "resume",
+            "pid-tty-reuse",
+            "executable-replaced",
+            "replaced-then-unordered-image",
+            "executable-requalified",
+            "routing-ambiguity",
+            "execution-end-retained"
+          ],
+          "seedRanges": [
+            {
+              "from": 9000000,
+              "scenario": "resume",
+              "to": 9000357
+            },
+            {
+              "from": 9100000,
+              "scenario": "pid-tty-reuse",
+              "to": 9100356
+            },
+            {
+              "from": 9200000,
+              "scenario": "executable-replaced",
+              "to": 9200356
+            },
+            {
+              "from": 9300000,
+              "scenario": "replaced-then-unordered-image",
+              "to": 9300356
+            },
+            {
+              "from": 9400000,
+              "scenario": "executable-requalified",
+              "to": 9400356
+            },
+            {
+              "from": 9500000,
+              "scenario": "routing-ambiguity",
+              "to": 9500356
+            },
+            {
+              "from": 9600000,
+              "scenario": "execution-end-retained",
+              "to": 9600356
+            }
+          ]
+        },
+        "actor-events": {
+          "duplicateDeliveriesInjected": 2541,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "child-actors",
+            "shared-native-turn-id"
+          ],
+          "seedRanges": [
+            {
+              "from": 1500000,
+              "scenario": "child-actors",
+              "to": 1501249
+            },
+            {
+              "from": 1600000,
+              "scenario": "shared-native-turn-id",
+              "to": 1601249
+            }
+          ]
+        },
+        "completion": {
+          "duplicateDeliveriesInjected": 2532,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "normal-session",
+            "parallel-tools",
+            "outcomes",
+            "latest-turn-outcome"
+          ],
+          "seedRanges": [
+            {
+              "from": 3000000,
+              "scenario": "normal-session",
+              "to": 3000624
+            },
+            {
+              "from": 3100000,
+              "scenario": "parallel-tools",
+              "to": 3100624
+            },
+            {
+              "from": 3200000,
+              "scenario": "outcomes",
+              "to": 3200624
+            },
+            {
+              "from": 3300000,
+              "scenario": "latest-turn-outcome",
+              "to": 3300624
+            }
+          ]
+        },
+        "delayed-callbacks": {
+          "duplicateDeliveriesInjected": 2560,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "a-b-a-delayed"
+          ],
+          "seedRanges": [
+            {
+              "from": 6700000,
+              "scenario": "a-b-a-delayed",
+              "to": 6702499
+            }
+          ]
+        },
+        "duplicates": {
+          "duplicateDeliveriesInjected": 209,
+          "failures": 0,
+          "permutations": 200,
+          "scenarios": [
+            "duplicate-deliveries"
+          ],
+          "seedRanges": [
+            {
+              "from": 8400000,
+              "scenario": "duplicate-deliveries",
+              "to": 8400199
+            }
+          ]
+        },
+        "evidence-sets": {
+          "duplicateDeliveriesInjected": 3974,
+          "failures": 0,
+          "permutations": 4000,
+          "scenarios": [
+            "attachment-evidence",
+            "followup-frontier-evidence",
+            "observer-link-evidence",
+            "host-read-outcome"
+          ],
+          "seedRanges": [
+            {
+              "from": 14000000,
+              "scenario": "attachment-evidence",
+              "to": 14000999
+            },
+            {
+              "from": 14100000,
+              "scenario": "followup-frontier-evidence",
+              "to": 14100999
+            },
+            {
+              "from": 14200000,
+              "scenario": "observer-link-evidence",
+              "to": 14200999
+            },
+            {
+              "from": 14300000,
+              "scenario": "host-read-outcome",
+              "to": 14300999
+            }
+          ]
+        },
+        "output-input": {
+          "duplicateDeliveriesInjected": 2430,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "followup-witnessed",
+            "followup-claude"
+          ],
+          "seedRanges": [
+            {
+              "from": 1700000,
+              "scenario": "followup-witnessed",
+              "to": 1701249
+            },
+            {
+              "from": 1800000,
+              "scenario": "followup-claude",
+              "to": 1801249
+            }
+          ]
+        },
+        "owner-commands": {
+          "duplicateDeliveriesInjected": 2457,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "owner-commands"
+          ],
+          "seedRanges": [
+            {
+              "from": 6900000,
+              "scenario": "owner-commands",
+              "to": 6902499
+            }
+          ]
+        },
+        "robustness": {
+          "duplicateDeliveriesInjected": 198,
+          "failures": 0,
+          "permutations": 200,
+          "scenarios": [
+            "unknown-and-malformed",
+            "sensitive-payload"
+          ],
+          "seedRanges": [
+            {
+              "from": 12000000,
+              "scenario": "unknown-and-malformed",
+              "to": 12000099
+            },
+            {
+              "from": 12100000,
+              "scenario": "sensitive-payload",
+              "to": 12100099
+            }
+          ]
+        },
+        "snapshot-live": {
+          "duplicateDeliveriesInjected": 2479,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "stale-snapshot",
+            "dropped-observation"
+          ],
+          "seedRanges": [
+            {
+              "from": 8800000,
+              "scenario": "stale-snapshot",
+              "to": 8801249
+            },
+            {
+              "from": 8900000,
+              "scenario": "dropped-observation",
+              "to": 8901249
+            }
+          ]
+        },
+        "wait-events": {
+          "duplicateDeliveriesInjected": 2479,
+          "failures": 0,
+          "permutations": 2500,
+          "scenarios": [
+            "waiting",
+            "delayed-positive-wait",
+            "delayed-clear-wait",
+            "wait-reappears",
+            "wait-uncertain-reopens",
+            "wait-owner-resolution-kept",
+            "wait-new-after-resolution",
+            "wait-turn-ownership",
+            "wait-session-scoped",
+            "wait-generations",
+            "wait-owner-partial-coverage",
+            "wait-owner-merge-keeps-coverage",
+            "wait-owner-covered-p",
+            "wait-owner-covered-q",
+            "wait-owner-covers-both",
+            "wait-owner-scopes",
+            "wait-owner-partial-actions",
+            "wait-owner-unordered-coverage",
+            "parent-completed-child-waiting",
+            "parent-completed-child-wait-cleared",
+            "parent-completed-child-wait-reordered"
+          ],
+          "seedRanges": [
+            {
+              "from": 2700000,
+              "scenario": "waiting",
+              "to": 2700119
+            },
+            {
+              "from": 2800000,
+              "scenario": "delayed-positive-wait",
+              "to": 2800118
+            },
+            {
+              "from": 2900000,
+              "scenario": "delayed-clear-wait",
+              "to": 2900118
+            },
+            {
+              "from": 3000000,
+              "scenario": "wait-reappears",
+              "to": 3000118
+            },
+            {
+              "from": 3100000,
+              "scenario": "wait-uncertain-reopens",
+              "to": 3100118
+            },
+            {
+              "from": 3200000,
+              "scenario": "wait-owner-resolution-kept",
+              "to": 3200118
+            },
+            {
+              "from": 3300000,
+              "scenario": "wait-new-after-resolution",
+              "to": 3300118
+            },
+            {
+              "from": 3400000,
+              "scenario": "wait-turn-ownership",
+              "to": 3400118
+            },
+            {
+              "from": 3500000,
+              "scenario": "wait-session-scoped",
+              "to": 3500118
+            },
+            {
+              "from": 3600000,
+              "scenario": "wait-generations",
+              "to": 3600118
+            },
+            {
+              "from": 5200000,
+              "scenario": "wait-owner-partial-coverage",
+              "to": 5200118
+            },
+            {
+              "from": 5300000,
+              "scenario": "wait-owner-merge-keeps-coverage",
+              "to": 5300118
+            },
+            {
+              "from": 5400000,
+              "scenario": "wait-owner-covered-p",
+              "to": 5400118
+            },
+            {
+              "from": 5500000,
+              "scenario": "wait-owner-covered-q",
+              "to": 5500118
+            },
+            {
+              "from": 5600000,
+              "scenario": "wait-owner-covers-both",
+              "to": 5600118
+            },
+            {
+              "from": 5700000,
+              "scenario": "wait-owner-scopes",
+              "to": 5700118
+            },
+            {
+              "from": 5800000,
+              "scenario": "wait-owner-partial-actions",
+              "to": 5800118
+            },
+            {
+              "from": 5900000,
+              "scenario": "wait-owner-unordered-coverage",
+              "to": 5900118
+            },
+            {
+              "from": 6400000,
+              "scenario": "parent-completed-child-waiting",
+              "to": 6400118
+            },
+            {
+              "from": 6500000,
+              "scenario": "parent-completed-child-wait-cleared",
+              "to": 6500118
+            },
+            {
+              "from": 6600000,
+              "scenario": "parent-completed-child-wait-reordered",
+              "to": 6600118
+            }
+          ]
+        }
+      },
+      "pass": true,
+      "requestedRequiredPermutations": 20000,
+      "requiredFamilyPermutations": 20000,
+      "seedScheme": "seed = familyIndex * 1000000 + scenarioIndex * 100000 + index; duplicates injected when Rng(seed ^ 0xD0D0D0D0) draws 1/2",
+      "sqliteCrossChecks": 2440,
+      "totalPermutations": 24400
+    }
+  },
+  "integration": {
+    "run": "evidence/M2/integration-cycles/20261009T044548Z-dev",
+    "pass": true,
+    "summary": {
+      "cycles": 10,
+      "fixtures": [
+        {
+          "finalSha256": null,
+          "fixture": "empty",
+          "originalSha256": null
+        },
+        {
+          "finalSha256": "30416ccb8a63faef372523cfe60898559eeb49f95ba53d6f18c154292545df7a",
+          "fixture": "owner-like",
+          "originalSha256": "30416ccb8a63faef372523cfe60898559eeb49f95ba53d6f18c154292545df7a"
+        }
+      ]
+    }
+  },
+  "verticalSlice": {
+    "run": "evidence/M2/vertical/20261009T041131Z-dev",
+    "pass": true,
+    "cycles": 10,
+    "cyclesOk": 10,
+    "oneSessionViewEveryCycle": true,
+    "oneWorkerEveryCycle": true,
+    "exactReturns": 10,
+    "exit": {
+      "ms": 1609,
+      "observation": "DISCONNECTED",
+      "presence": "ENDED"
+    },
+    "workerAfterMarkHandled": true,
+    "workerKeptAfterExit": true,
+    "markHandled": {
+      "pass": true,
+      "items": 20
+    },
+    "latency": {
+      "bySource": {
+        "claude.hook": {
+          "captureToCommitMs": {
+            "max": 7,
+            "n": 81,
+            "p50": 0,
+            "p95": 2
+          },
+          "commitToDomMs": {
+            "max": 31,
+            "n": 81,
+            "p50": 4,
+            "p95": 8
+          },
+          "eventToDomMs": {
+            "max": 32,
+            "n": 81,
+            "p50": 5,
+            "p95": 9
+          }
+        },
+        "claude.observer": {
+          "captureToCommitMs": {
+            "max": 208,
+            "n": 225,
+            "p50": 17,
+            "p95": 36
+          },
+          "commitToDomMs": {
+            "max": 33,
+            "n": 127,
+            "p50": 4,
+            "p95": 8
+          },
+          "eventToDomMs": {
+            "max": 207,
+            "n": 127,
+            "p50": 20,
+            "p95": 41
+          }
+        }
+      },
+      "normalPathPass": true,
+      "observations": 306,
+      "targets": {
+        "captureToCommitP95Ms": 100,
+        "commitToDomP95Ms": 100,
+        "eventToDomP95Ms": 250
+      },
+      "viewMarks": 235
+    },
+    "traceRows": 357,
+    "recording": {
+      "assembleError": null,
+      "assembled": true,
+      "bytes": 2093076,
+      "file": "m2-vertical-1791519092448.mp4",
+      "frameIntervalMs": 1000,
+      "frames": 190,
+      "framesKept": false,
+      "kind": "uncut time-lapse, one still per second, played at one frame per second",
+      "privateDirectory": "THREADSPACE_M2_RECORDING_DIR (outside the repository)",
+      "sha256": "f92fc892052321b359bde9a53a1d9e78f35c279a92357bf1626bc9ec021a2b7e",
+      "wallMs": 190005
+    },
+    "terminalRefusals": {
+      "count": 0,
+      "waitedMs": 0
+    }
+  },
+  "routes": {
+    "pass": true,
+    "requested": 30,
+    "exactVerified": 30,
+    "wrongTargets": 0,
+    "routeLatencyP95Ms": 895,
+    "routeLatencyMaxMs": 968,
+    "terminalRefusals": {
+      "count": 0,
+      "waitedMs": 0
+    },
+    "run": "evidence/M2/routes/20261009T041519Z-dev",
+    "routeLatencyTargetP95Ms": 750,
+    "routeHardBudgetMs": 2000
+  },
+  "faults": {
+    "stop-continuation": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "attentionItems": [
+          {
+            "category": "TURN_COMPLETE"
+          }
+        ],
+        "stopBlockedOnce": true,
+        "turnStates": [
+          "COMPLETED"
+        ]
+      }
+    },
+    "interrupted": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T043718Z-dev",
+      "detail": {
+        "runningBeforeInterrupt": true,
+        "turnStates": [
+          "INTERRUPTED"
+        ]
+      }
+    },
+    "failed": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "attentionItems": [
+          {
+            "category": "ERROR"
+          }
+        ],
+        "turnStates": [
+          "FAILED"
+        ]
+      }
+    },
+    "blocked-submission": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "inputRejected": true,
+        "turnStates": []
+      }
+    },
+    "incompatible-profile": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "observerTier": "LOWER_TIER",
+        "observerVersion": "2.1.292",
+        "turnStates": []
+      }
+    },
+    "mod-reload": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "completedAfterReload": true,
+        "epochs": [
+          {
+            "n": 2
+          }
+        ],
+        "hostReadFacts": [
+          {
+            "n": 5
+          }
+        ],
+        "restoreError": null,
+        "restored": {
+          "ms": 819,
+          "tier": "RESTORED"
+        },
+        "tierBefore": "NATIVE"
+      }
+    },
+    "parent-completed-child-waiting": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T043718Z-dev",
+      "detail": {
+        "attentionItems": [
+          {
+            "category": "APPROVAL_REQUIRED",
+            "scope_kind": "SESSION_WAIT_CATEGORY",
+            "turn_id": null
+          },
+          {
+            "category": "TURN_COMPLETE",
+            "scope_kind": "TURN_OUTPUT",
+            "turn_id": "75331b02-5565-4ad8-abe4-9169ba61f90b"
+          }
+        ],
+        "inventoryWaiting": {
+          "status": "waiting",
+          "waitingFor": "permission prompt"
+        },
+        "parentCompleted": true,
+        "turnStates": [
+          "COMPLETED",
+          "WORKING"
+        ]
+      }
+    },
+    "delayed-submission": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T043718Z-dev",
+      "detail": {
+        "acceptedWithActiveTurn": 1,
+        "providerHandling": "a separate turn",
+        "runningAtSubmission": true,
+        "turnStates": [
+          "COMPLETED",
+          "COMPLETED"
+        ]
+      }
+    },
+    "forged-and-nonengine": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "fabricatedActors": 0,
+        "forgedTurns": 0,
+        "pluginOriginInputs": 1
+      }
+    },
+    "mod-batch-partial": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "duplicateObservations": [
+          {
+            "n": 0
+          }
+        ],
+        "faultFired": true,
+        "quarantined": 0,
+        "turnCompletedAfterRetry": true
+      }
+    },
+    "mod-batch-malformed": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "duplicateObservations": [
+          {
+            "n": 0
+          }
+        ],
+        "faultFired": true,
+        "quarantined": 0,
+        "turnCompletedAfterRetry": true
+      }
+    },
+    "mod-batch-exit1": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "duplicateObservations": [
+          {
+            "n": 0
+          }
+        ],
+        "faultFired": true,
+        "quarantined": 0,
+        "turnCompletedAfterRetry": true
+      }
+    },
+    "relay-unavailable": {
+      "pass": true,
+      "run": "evidence/M2/faults/20261009T041720Z-dev",
+      "detail": {
+        "drainedAfterRestart": true,
+        "duplicateObservations": [
+          {
+            "n": 0
+          }
+        ],
+        "enable": true,
+        "spooledWhileStopped": 11,
+        "stop": true
+      }
+    },
+    "terminal-negatives": {
+      "pass": false,
+      "run": "evidence/M2/faults/20261009T043718Z-dev",
+      "detail": {
+        "dir": "evidence/M2/g08-terminal/20261009T044059Z-dev",
+        "summary": {
+          "cases": [
+            {
+              "case": "baseline-exact",
+              "pass": true
+            },
+            {
+              "case": "reorder",
+              "pass": true
+            },
+            {
+              "case": "move",
+              "pass": true
+            },
+            {
+              "case": "minimize-then-return",
+              "pass": false
+            },
+            {
+              "case": "fullscreen-space-then-return",
+              "pass": true
+            },
+            {
+              "case": "foreground-process-mismatch",
+              "pass": true
+            },
+            {
+              "case": "selection-readback-race",
+              "pass": true
+            },
+            {
+              "case": "target-closed",
+              "pass": true
+            },
+            {
+              "case": "stale-tty-pathname",
+              "pass": true
+            },
+            {
+              "case": "target-closed-during-route",
+              "pass": true
+            },
+            {
+              "case": "terminal-restart",
+              "pass": false
+            }
+          ],
+          "disposableRoot": "/private/tmp/ts-m0c-route-27457ae4",
+          "gate": "G08",
+          "pass": false,
+          "terminalIncarnationUnchanged": true,
+          "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+          "wrongTargets": 0
+        }
+      }
+    }
+  },
+  "modBatch": {
+    "pass": true,
+    "hook": "~/Applications/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook",
+    "drain": {
+      "allCommitted": 500,
+      "expectedRecords": 3060,
+      "journalRecords": 3060,
+      "p95TargetUs": 25000,
+      "runs": 500,
+      "wall": {
+        "count": 500,
+        "maxUs": 9008,
+        "minUs": 2253,
+        "p50Us": 3943,
+        "p95Us": 5426,
+        "p99Us": 6197
+      }
+    },
+    "retry": {
+      "allAlreadyCommitted": true,
+      "journalRecordsAfterRetry": 3060
+    },
+    "endOfSessionDrain": {
+      "allCommitted": true,
+      "budgetMs": 80,
+      "runs": 25,
+      "wall": {
+        "count": 25,
+        "maxUs": 5470,
+        "minUs": 4358,
+        "p50Us": 4560,
+        "p95Us": 4918,
+        "p99Us": 5470
+      }
+    },
+    "companionAbsent": {
+      "allSpooled": true,
+      "runs": 25,
+      "wall": {
+        "count": 25,
+        "maxUs": 50828,
+        "minUs": 38951,
+        "p50Us": 44864,
+        "p95Us": 48886,
+        "p99Us": 50828
+      }
+    }
+  },
+  "tests": {
+    "workspace": "cargo test --workspace --no-fail-fast --features threadspace-journal/qualification,threadspace-agent/qualification,threadspace-relay/qualification: 55 suites, 513 passed, 0 failed",
+    "clippy": "cargo clippy --workspace --all-targets with the same features: clean",
+    "schemas": "THREADSPACE_CHECK_SCHEMAS=1 cargo test -p threadspace-contracts: generated schemas current",
+    "ui": "vitest: 97 passed; tsc --noEmit clean",
+    "observerMod": "claude plugin test under 2.1.295: 38 passed; claude plugin validate: passed",
+    "permutations": "threadspace-m1 permutations 20000: 24,400 permutations, 0 failures"
+  },
+  "knownLimitations": [
+    {
+      "item": "Minimized-window Return exceeds the 2 s budget on this machine (G08 minimize-then-return, both runs): TIMEOUT, surface UNAVAILABLE, no wrong target; lookup 394 ms, focus + readback 1,609 ms; M0C passed at 1,540 ms; no route code changed in M2",
+      "owner": "M13"
+    },
+    {
+      "item": "Route latency p95 895 ms above the 750 ms target, inside the 2 s hard budget (as M0B recorded)",
+      "owner": "M13"
+    },
+    {
+      "item": "Terminal restart BLOCKED on the owner's machine (D-0006)",
+      "owner": "M15"
+    },
+    {
+      "item": "Two input records per human prompt (classic hook UNCLASSIFIED and unaccepted; observer HUMAN_COMPOSER accepted): no native prompt identity joins them; inputs are not projected and an unaccepted input qualifies nothing",
+      "owner": "M3"
+    },
+    {
+      "item": "Screen video capture blocks Terminal scripting, so the uncut recording is a one-second time-lapse kept privately outside the repository",
+      "owner": "platform"
+    },
+    {
+      "item": "Terminal also refuses element queries without Threadspace capture, cause not established; runners wait and record each wait",
+      "owner": "platform"
+    },
+    {
+      "item": "One owner interaction: the TCC Terminal-automation consent for the dev identity",
+      "owner": "M2"
+    },
+    {
+      "item": "Production remains on accepted main; deploying M2 upgrades a store to reducer 3 through the controlled backup and rehearsal procedure (D-0010)",
+      "owner": "deployment"
+    }
+  ],
+  "evidenceHashes": {
+    "evidence/M2/README.md": "0cbe9f4f9845fae309ca32197567a3e1cb7f962b57385da1d65d8c24d8ca8ed7",
+    "evidence/M2/faults/20261009T041720Z-dev/cases.jsonl": "9a7ea76b12ecadd2b84e4e2db91ba30948987edaec811a6ba6a0cfa70a70f94b",
+    "evidence/M2/faults/20261009T041720Z-dev/summary.json": "204308c50a8171ee0bc64004aced80d54f48186d154c645f75cc1e48398056d8",
+    "evidence/M2/faults/20261009T043718Z-dev/cases.jsonl": "3a096afcb3d63aac496733fb64a080d4dfd54a25fb911a178b633cee3b4cff55",
+    "evidence/M2/faults/20261009T043718Z-dev/summary.json": "60d98e927fe5926c4ecee8390c27f567e8ed4abb7e051f76d7cfd8a5fc8bdd23",
+    "evidence/M2/g08-terminal/20261009T042955Z-dev/cases.jsonl": "16f791507b8d00c4cef83e60e7ec9a385a8030a03a0bd5cc4e5b8a50c15a4ed5",
+    "evidence/M2/g08-terminal/20261009T042955Z-dev/cleanup.jsonl": "7ac691b7620d0dec02e5aa8b986c6e8fcb6ca650cc54cf76eb64b30b307376e7",
+    "evidence/M2/g08-terminal/20261009T042955Z-dev/idle-gate.json": "3c31a0ec6bc54a06043f59c07031577ab4d75c9ab992003734af9f50a7369293",
+    "evidence/M2/g08-terminal/20261009T042955Z-dev/sessions.json": "e3568e7e18395cf4aad7fc905b2988189e472f77cc92c397f9e9bbfd30b8c1ad",
+    "evidence/M2/g08-terminal/20261009T042955Z-dev/summary.json": "6dbfb87281acdc94a77004bd607dead95635145589ef3abef120b499c6341644",
+    "evidence/M2/g08-terminal/20261009T044059Z-dev/cases.jsonl": "3f0aed36cc697a8ee79e3f1086128c33e4aa2657f53db1c3ad8d9a2d719b21a9",
+    "evidence/M2/g08-terminal/20261009T044059Z-dev/cleanup.jsonl": "0a7247478fcb46beccb8af8a2aaec527432d87050cdd1e17d025c475f36a7251",
+    "evidence/M2/g08-terminal/20261009T044059Z-dev/idle-gate.json": "2865fd9a2ba1b0753b8eef2ad72681d8a3c33731711607267f0e524d55ad9dd7",
+    "evidence/M2/g08-terminal/20261009T044059Z-dev/sessions.json": "5b56cbdd628470800c6076af0929b5c374fd8827cdd915ef4f046e830268bbda",
+    "evidence/M2/g08-terminal/20261009T044059Z-dev/summary.json": "a07d5bd667191669562b1b00f884a888cc7732219567434c845f18c4e327b838",
+    "evidence/M2/integration-cycles/20261009T044548Z-dev/cycles.jsonl": "8411c8ff22fd7b6d5cebfdd3206e01a2c5fb0684482a4c127240f47bbbd84303",
+    "evidence/M2/integration-cycles/20261009T044548Z-dev/summary.json": "c277b081263630bf1faf391549a9946fdc81b5ec61c7d88bc101393965872474",
+    "evidence/M2/integration-cycles/attempts/20261009T022915Z-dev/cycles.jsonl": "8411c8ff22fd7b6d5cebfdd3206e01a2c5fb0684482a4c127240f47bbbd84303",
+    "evidence/M2/integration-cycles/attempts/20261009T022915Z-dev/summary.json": "c277b081263630bf1faf391549a9946fdc81b5ec61c7d88bc101393965872474",
+    "evidence/M2/integration-cycles/attempts/README.md": "eeceb0c2907e76223d8c3baa77c531aa811a426e4fa17392038b2f36bec1730d",
+    "evidence/M2/mod-batch/summary.json": "8805525ed049b61b61ed34bc9052cc7f4e90c3a13b8f6af48207270e38392305",
+    "evidence/M2/native-build.json": "0700ed6468dac4b59961cd0b9ce841377fb9500ce6be3fc4a5e9c13f48f1a7af",
+    "evidence/M2/permutations/failing-seeds.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "evidence/M2/permutations/summary.json": "ecd10e8f6495748c8f81111afbe022d5eb85f13570c8e5847aec06b513ef9c73",
+    "evidence/M2/provider/claude/declarations.json": "6a0c325de5233415172c83c9e3abd6517e40aae45160cf28d950c93a1912be86",
+    "evidence/M2/provider/claude/native-origins.json": "23fbfe308a1efa8729ebf579e46a40efd1b0b8a984ac9948c41bf5263c54eca8",
+    "evidence/M2/provider/claude/test-output.txt": "c0c4c17b4393f0fc3b5212df5b210eebcbcda4f9443f568a50285f0b7ace2a94",
+    "evidence/M2/provider/claude/validate-output.txt": "d681b814418a5cee7570c64a32ab3d049070acd111b595465634dbd36e94d778",
+    "evidence/M2/routes/20261009T041519Z-dev/routes.jsonl": "08bbc639b4543f99f86c6d66ecce2d1f8e17cf8d65e8839bc1dc7fb0377efc71",
+    "evidence/M2/routes/20261009T041519Z-dev/summary.json": "81eddbd5b322c1ee19ef8bfbcc440645ccde2421ee57c252d95c867f1ac1c002",
+    "evidence/M2/vertical/20261009T041131Z-dev/cycles.jsonl": "44c89b1f750e80ed6eccfac6098290858140ad733e719149536aa147c7f6990c",
+    "evidence/M2/vertical/20261009T041131Z-dev/summary.json": "9d5f1931e99e2cdfd5ca3eaf941f0b493e4d3a9e2314a583f554b982cef11403",
+    "evidence/M2/vertical/20261009T041131Z-dev/trace.json": "00b1f96893c0b4b4f8f6487799622ebedb235a8d758537ca07fcaa464ea242c3",
+    "evidence/M2/vertical/attempts/20261009T025728Z-dev/cycles.jsonl": "cdd07fdbc10c9fb7897aa683f1be36268f9ab3fa07915c600cdb0f92cf05f62d",
+    "evidence/M2/vertical/attempts/20261009T025728Z-dev/summary.json": "9b8d3324af2ad1083787b681089a6f1ad6dd8fc252e5e8f6dd1106f0dc048ac0",
+    "evidence/M2/vertical/attempts/20261009T031538Z-dev/cycles.jsonl": "8f9d99aadd01c304020f510be81c1aeaace04f63ebe048f62af90d0bc7682859",
+    "evidence/M2/vertical/attempts/20261009T031538Z-dev/summary.json": "59f75e5937b7e62b7c6426179517488e82c69e8adf30e7b20b5f7e30eb39d370",
+    "evidence/M2/vertical/attempts/20261009T032456Z-dev/cycles.jsonl": "91b558dfa6565a6a1bc3942431a7c0b6128289578a5c093575acc6e2d1b3ca92",
+    "evidence/M2/vertical/attempts/20261009T032456Z-dev/summary.json": "6cfbf552b0978596dbaffde56a25dd0e80fc98183e832cad5f5fd585729a5699",
+    "evidence/M2/vertical/attempts/20261009T033254Z-dev/cycles.jsonl": "e286cffdfd31827fad2de308682fb97e538332422839704dcdb7fffe303539ed",
+    "evidence/M2/vertical/attempts/20261009T033254Z-dev/summary.json": "0e66486b364045809f71e59b0614d6f3630b885db41d16366e6929e3e3b6954f",
+    "evidence/M2/vertical/attempts/20261009T033616Z-dev/cycles.jsonl": "1949ea8c65c89736744dae78622f1c02dd701ad347248ff289c7642bce0c2413",
+    "evidence/M2/vertical/attempts/20261009T033616Z-dev/summary.json": "f722a94d2a576a75537031bdca7786cff028b9c5a9eb3ff1cbd5e00fda6fa121",
+    "evidence/M2/vertical/attempts/20261009T034710Z-dev/cycles.jsonl": "165b2d47245cd7980cca12533441025313dc4ee66df1a6b9f3f26b0fb82d5bcc",
+    "evidence/M2/vertical/attempts/20261009T034710Z-dev/summary.json": "02c9fe1d5e614f462c0b46e21293adbcbfc7e8b91b364a33968b23a7be9e595a",
+    "evidence/M2/vertical/attempts/20261009T034825Z-dev/cycles.jsonl": "422d38d55005dfc71d7f5fc1602f246d3b581040c74496c8e9f03acbb4b1ed3b",
+    "evidence/M2/vertical/attempts/20261009T034825Z-dev/summary.json": "34bb00172590240b1e1920c3bfdb605c2fde0febb04ceed9707390b8a8b3770d",
+    "evidence/M2/vertical/attempts/20261009T035405Z-dev/cycles.jsonl": "e88982bee18bc7c94f1405ba5e7125f8e42af33f55952481368ef8c4aa986ecf",
+    "evidence/M2/vertical/attempts/20261009T035405Z-dev/summary.json": "840bad3354ccf87c5212283ff6da0454ab19dea371843a25a5b2ba3fda550e97",
+    "evidence/M2/vertical/attempts/20261009T040231Z-dev/cycles.jsonl": "1ba89bc380a012c0c22f00a064b0f2c86bf44761bbe682bccee3ed4bf7531b1e",
+    "evidence/M2/vertical/attempts/20261009T040231Z-dev/summary.json": "e1b87b98af926c8320dec1dbda76f604a6493ed605c5308419eb9882fcf4c661",
+    "evidence/M2/vertical/attempts/20261009T040337Z-dev/ATTEMPT-NOTE.md": "b00152ed448b129184ad88896876efe3f0efb8c6e57cbadbff63a5fe38836b86",
+    "evidence/M2/vertical/attempts/20261009T040337Z-dev/cycles.jsonl": "d6828e427eebad1e0329033b5babb953d9db1ead61962116b9d30e11ae3aa48f",
+    "evidence/M2/vertical/attempts/20261009T040337Z-dev/summary.json": "d4ef2920d236810eff81d4cab5d9c6a1649920b8c352d33db9c83371eaf1c8d2",
+    "evidence/M2/vertical/attempts/README.md": "3d5b984681bc34e43e8e678b351973a9677d8f42105906a85c2a6180ed4d7b82"
+  }
+}

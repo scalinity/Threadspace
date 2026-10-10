@@ -1,0 +1,207 @@
+{
+  "status": "PASS_PORTABLE_OBSERVER_CENSUS_CONTROLS",
+  "nativeExecution": false,
+  "rustToolchain": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "nodeVersion": "v26.11.1",
+  "positiveRustTests": 16,
+  "positiveNodeTests": 20,
+  "targetedMutationsKilled": 4,
+  "sourceHashes": {
+    "crates/relay/src/latency.rs": "6b9e3904285dd89fdda4ca328d1d72bcc82634398d61c5ab0acd7a4f7ae12573",
+    "crates/relay/src/latency_census.rs": "bac7b598cd9ddbbcf75fc4717a389daaf1c03d4d26765420d17a00a908ce4ffa",
+    "crates/relay/src/latency_census_tests.rs": "a8de3c8b692190c2d47964908d65bd4d83fad71c43932b338287dcd1a75cd7f1",
+    "crates/relay/src/bin/threadspace-hook.rs": "68380170b5296bcb0852850ab246b202afe074f064fd0004aeab4cdef497fd9e",
+    "crates/relay/Cargo.toml": "3fe3dd1520769a45b3254275aaf195bccb6b4509e1d807022b06d74363e345f6",
+    "packages/provider-mod/hooks/latency.ts": "9994519a5266532b29aab54d1ab0d7eee2d771002c045a9d3cb870e60326d68c",
+    "packages/provider-mod/hooks/delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "packages/provider-mod/hooks/register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "packages/provider-mod/hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+    "packages/provider-mod/tests/latency.node.mjs": "f6fe0f0ff8f26e613520897865c7b347989d085d6a539b50ba6a002875fc601e",
+    "tests/native/harness/src/bin/m0c/m2_latency.rs": "4087c265d7800c63446ac299acf8ef3e7cb01a1a26aa247f71f755676afbf37a",
+    "tests/native/harness/Cargo.toml": "c1fc4dbe24f8e4145709f508af1ab3769d7085e0ba22923d7291ebecbdcec869",
+    "crates/contracts/src/canonical/capture.rs": "aac5bf28cb2a2bf0a42a1e43da89d3bce0079947e9a877a6a841adb56d72fc63",
+    "Cargo.lock": "a2dcac0024e3f6bc2f14df2b39468d6ee2ef6145f0818b3eabab12edf71cff88"
+  },
+  "sharedSourceUnchanged": true,
+  "runs": [
+    {
+      "label": "portable-lock",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "generate-lockfile",
+        "--offline"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "5daa8210a42555da56cdb7e11033bfafbc2019070ecab29dd120c9c87aa5c011",
+      "artifacts": {}
+    },
+    {
+      "label": "portable-positive",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [
+        "latency::census::tests::actual_typed_capture_receipt_is_unchanged_and_native_batch_ids_are_metadata_only",
+        "latency::census::tests::fabricated_close_token_wrong_runtime_wrong_boot_or_wrong_store_cannot_confirm",
+        "latency::census::tests::boot_time_and_postclose_identity_tampering_refuse_reexport",
+        "latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close",
+        "latency::census::tests::completion_witness_requires_the_exact_durable_echo_and_deadline_anchor",
+        "latency::census::tests::historical_export_failures_and_missing_capture_clocks_remain_in_final_seal",
+        "latency::census::tests::every_seen_runtime_must_close_and_reused_uuid_between_runtimes_is_refused",
+        "latency::census::tests::protocol_is_bounded_and_metadata_only",
+        "latency::census::tests::native_submitted_uuid_absent_from_source_census_is_an_explicit_missing_tail",
+        "latency::census::tests::native_deadline_rejects_missing_anchor_and_late_durable_confirmation",
+        "latency::census::tests::removing_or_duplicating_native_file_after_ack_never_preserves_qualification",
+        "latency::census::tests::stable_retries_are_idempotent_and_conflicting_page_never_overwrites",
+        "latency::census::tests::missing_final_page_close_or_confirmation_cannot_be_replaced_by_prefix",
+        "latency::tests::metadata_validation_refuses_wall_clocks_bad_ids_future_capture_and_provider_content",
+        "latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation",
+        "latency::census::tests::maximum_bounded_ledger_closes_with_all_4096_uuid_entries"
+      ],
+      "failedTests": [],
+      "outputSha256": "988dfb656b1e04a3f5686091646dcc80e453cdb0dd7da04625317d124b44e5e4",
+      "artifacts": {
+        "rust-close-without-confirmation.json": "1e155b728e33a781114a35bea7835701ebe809736ece5bc85b60b500364bb467",
+        "rust-complete-census.json": "f94bb1fb85c1ccb2ce616ed5c1f22e64d203f871c620f8925a6177f9d8ac1b99",
+        "rust-late-durable-confirmation.json": "41ec117c96c7b92e8b22e09c8f1194172f28e027e6207a0ffe7855860ae74fe1",
+        "rust-native-extra-tail.json": "6fe0635f51d7fb276ff3ec2c1127ca98828da881baafb8c914d5db45dada0de1"
+      }
+    },
+    {
+      "label": "portable-clippy",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "clippy",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "9e86bbcbbe9b95ddd6acda1fc6466e14d4ad51b574834a00d35ba216e0ef9b8b",
+      "artifacts": {}
+    },
+    {
+      "label": "node-positive",
+      "argv": [
+        "/workspace/scratch/c8272833f682/remediation-tools/node-v26.11.1-linux-x64/bin/node",
+        "--test",
+        "--test-reporter=tap",
+        "tests/latency.node.mjs"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "e302e1b76ed43feebb4c71a5d22fb7542b82431b67442212f1f0fda871858294",
+      "artifacts": {
+        "node-lost-final-sample.json": "a1ea4c541d5627f9e86a9bf7e686e30c958bde13af9a73286139d1b70b866254",
+        "node-missing-watchdog-timed.json": "2dd163bddddbe436bd9c6bb0179ba4bdfef4f207f969f6bb5577fa804f0fa0d4",
+        "node-unverifiable-watchdogs.json": "a0dd73356ffda74a4f6f22d3e71426b35a515669b4367ad64af4a15de670b17c"
+      }
+    },
+    {
+      "label": "mutation-prefix-without-confirmation",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "complete_paged_ledger_requires_positive_close_receipt_confirmation",
+        "--",
+        "--nocapture"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation"
+      ],
+      "outputSha256": "4093e9a7b6736999a983240033e947a40c8c1f601eef28b5d2bc07b0eda710bb",
+      "artifacts": {}
+    },
+    {
+      "label": "mutation-omit-ledger-digest",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "changed_count_digest_order_duplicate_or_overflow_refuses_native_close",
+        "--",
+        "--nocapture"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close"
+      ],
+      "outputSha256": "3a3afc3cfba4d1e6641c023620fd5ba604adf071ad4a3b876df4c080e4780554",
+      "artifacts": {}
+    },
+    {
+      "label": "mutation-delete-accepted-ledger-ids",
+      "argv": [
+        "/workspace/scratch/c8272833f682/remediation-tools/node-v26.11.1-linux-x64/bin/node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "accepted, spooled, rejected",
+        "tests/latency.node.mjs"
+      ],
+      "exitCode": 1,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "de8f23c0dc9e73497f007b3a3fa97fdb6eccbbf8f1074de12696c46a771b8169",
+      "artifacts": {}
+    },
+    {
+      "label": "mutation-trust-missing-watchdog",
+      "argv": [
+        "/workspace/scratch/c8272833f682/remediation-tools/node-v26.11.1-linux-x64/bin/node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "unverifiable watchdog handles",
+        "tests/latency.node.mjs"
+      ],
+      "exitCode": 1,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "fc65f7c21d3bc643f1a5160b14cf88fd3e88c38096a414d0e8c59d82b69e16cd",
+      "artifacts": {}
+    }
+  ],
+  "conventionalHookCensus": "INCOMPLETE: no independent host invocation witness covering zero-output delivery-plus-telemetry failures",
+  "nativeClockQualification": "INCOMPLETE: no platform/runtime rate or precision qualification executed",
+  "nativeObserverClose": "NOT_EXECUTED: source close and positive challenge confirmation require native host qualification"
+}

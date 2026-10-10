@@ -68,6 +68,14 @@ fn ids(draft: &NativeFactDraft) -> bool {
                 && parse_cursor(&p.start_seconds).is_some()
                 && p.pid > 0
         })
+        && refs.observer_ownership.as_ref().is_none_or(|o| {
+            !o.source_epoch.is_empty()
+                && bounded(&o.source_epoch, ID_MAX_CHARS)
+                && !o.proof_token.is_empty()
+                && bounded(&o.proof_token, ID_MAX_CHARS)
+                && !o.executable_identity.is_empty()
+                && bounded(&o.executable_identity, 1024)
+        })
 }
 
 fn payload(payload: &FactPayload) -> bool {
@@ -137,6 +145,7 @@ fn payload(payload: &FactPayload) -> bool {
         P::SessionRecordChanged { .. }
         | P::ProcessExitObserved {}
         | P::ObservationLinkChanged { .. }
+        | P::ObserverOwnershipCorroborated {}
         | P::InputAccepted { .. }
         | P::TurnStarted {}
         | P::TurnStepObserved {}

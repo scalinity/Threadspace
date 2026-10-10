@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/workspace/scratch/c8272833f682/remediation-tools/cargo/bin/cargo",
+    "+1.99.0",
+    "test",
+    "--manifest-path",
+    "/workspace/scratch/c8272833f682/review-checks/f3-oracle/Cargo.toml",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--offline",
+    "--locked"
+  ],
+  "exitCode": 0,
+  "classification": "Portable classification assertions only; no native operation or qualification",
+  "sourceSha256": "09a9eab066953802c23c2a250c07141470fde5fa787d197f4efa42f3bf59a6cc",
+  "startedAtUtc": "2026-10-10T04:43:49.310096+00:00",
+  "completedAtUtc": "2026-10-10T04:43:50.091369+00:00",
+  "syntaxOnlyChange": "Replace test-only unwrap with explanatory expect to satisfy workspace Clippy unwrap_used lint; no product or assertion semantics changed."
+}

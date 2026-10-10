@@ -18,12 +18,19 @@ pub mod records;
 use schemars::{JsonSchema, generate::SchemaSettings};
 
 /// Version of the canonical fact payloads journaled by this build.
-pub const FACT_PAYLOAD_VERSION: u32 = 1;
+// Version 2 records the reducer-4 ownership semantics.
+pub const FACT_PAYLOAD_VERSION: u32 = 2;
+
+/// Version of each admitted canonical journal observation, including one
+/// with no facts. Retained version 1 headers locate pre-remediation history;
+/// the first version 2 header fixes the explicit reducer-4 transition.
+pub const JOURNAL_PAYLOAD_VERSION: u32 = 2;
 
 /// The contract versions this build writes, recorded in M1 evidence.
 pub const VERSION_CATALOG: &[(&str, u32)] = &[
     ("observationEnvelope", envelope::OBSERVATION_SCHEMA_VERSION),
     ("factPayload", FACT_PAYLOAD_VERSION),
+    ("journalPayload", JOURNAL_PAYLOAD_VERSION),
     ("captureProtocol", capture::CAPTURE_PROTOCOL_VERSION),
     ("modBatchReceipt", capture::MOD_BATCH_RECEIPT_VERSION),
 ];

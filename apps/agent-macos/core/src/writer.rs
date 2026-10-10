@@ -408,6 +408,23 @@ impl Writer {
         delivery: Delivery,
     ) -> Result<Vec<RecordReceipt>, JournalError> {
         let outcome = self.journal.admit_batch(admissions, delivery, log::now_ms())?;
+        #[cfg(feature = "qualification")]
+        for record in &outcome.records {
+            let envelope = admissions.iter().find(|item| item.envelope.observation_id == record.observation_id).map(|item| item.envelope);
+            log::info("M2_COMMITTED_MEASUREMENT", json!({
+                "observationId": record.observation_id,
+                "source": envelope.map(|e| &e.source_id),
+                "sourceEpoch": envelope.map(|e| &e.source_epoch),
+                "capture": envelope.map(|e| &e.captured_at),
+                "cursor": record.cursor.map(|c| c.to_string()),
+                "status": record.status,
+                "commit": outcome.commit_timing,
+                "bootId": threadspace_surfaces_macos::process::boot_session_id().ok(),
+                "patchCursor": outcome.change.as_ref().map(|change| change.cursor.to_string()),
+                "storeGeneration": self.journal.store_generation(),
+                "delivery": delivery,
+            }));
+        }
         if let Some(change) = &outcome.change {
             self.broadcast(change);
         }

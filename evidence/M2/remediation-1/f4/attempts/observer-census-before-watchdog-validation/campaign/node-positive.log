@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: qualification remains opt-in and validates the configured runtime/command
+ok 1 - qualification remains opt-in and validates the configured runtime/command
+  ---
+  duration_ms: 1.654479
+  type: 'test'
+  ...
+# Subtest: accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+ok 2 - accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+  ---
+  duration_ms: 14.785644
+  type: 'test'
+  ...
+# Subtest: stable UUID retries do not duplicate the closed capture population
+ok 3 - stable UUID retries do not duplicate the closed capture population
+  ---
+  duration_ms: 1.654052
+  type: 'test'
+  ...
+# Subtest: lost last sample cannot reuse an earlier zero-failure prefix as the final census
+ok 4 - lost last sample cannot reuse an earlier zero-failure prefix as the final census
+  ---
+  duration_ms: 2.125105
+  type: 'test'
+  ...
+# Subtest: failed final page, close or confirmation leaves no final native confirmation
+ok 5 - failed final page, close or confirmation leaves no final native confirmation
+  ---
+  duration_ms: 2.904921
+  type: 'test'
+  ...
+# Subtest: malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation
+ok 6 - malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation
+  ---
+  duration_ms: 2.57223
+  type: 'test'
+  ...
+# Subtest: fabricated positive close reply without native close state fails its challenge confirmation
+ok 7 - fabricated positive close reply without native close state fails its challenge confirmation
+  ---
+  duration_ms: 0.713015
+  type: 'test'
+  ...
+# Subtest: overlapping telemetry exports stay single-flight and retain all omitted-count failures
+ok 8 - overlapping telemetry exports stay single-flight and retain all omitted-count failures
+  ---
+  duration_ms: 0.896768
+  type: 'test'
+  ...
+# Subtest: an in-flight batch or a callback racing census pages invalidates final closure
+ok 9 - an in-flight batch or a callback racing census pages invalidates final closure
+  ---
+  duration_ms: 1.109466
+  type: 'test'
+  ...
+# Subtest: ledger and page bounds are explicit and overflow cannot seal as a smaller population
+ok 10 - ledger and page bounds are explicit and overflow cannot seal as a smaller population
+  ---
+  duration_ms: 11.330662
+  type: 'test'
+  ...
+# Subtest: the bounded close deadline aborts a slow export without provider rejection
+ok 11 - the bounded close deadline aborts a slow export without provider rejection
+  ---
+  duration_ms: 1.129033
+  type: 'test'
+  ...
+# Subtest: real delivery timeout retains the same UUID and measurement cannot manufacture acceptance
+ok 12 - real delivery timeout retains the same UUID and measurement cannot manufacture acceptance
+  ---
+  duration_ms: 2.951771
+  type: 'test'
+  ...
+# Subtest: optional measurement throwing leaves successful canonical delivery behavior unchanged
+ok 13 - optional measurement throwing leaves successful canonical delivery behavior unchanged
+  ---
+  duration_ms: 0.4201
+  type: 'test'
+  ...
+# Subtest: actual Session-end releases the original result at the one deadline when census stays pending
+ok 14 - actual Session-end releases the original result at the one deadline when census stays pending
+  ---
+  duration_ms: 2.848298
+  type: 'test'
+  ...
+# Subtest: plugin-origin Session end and clear do not close an authoritative source window
+ok 15 - plugin-origin Session end and clear do not close an authoritative source window
+  ---
+  duration_ms: 0.899981
+  type: 'test'
+  ...
+# Subtest: immediate census completion uses only the remaining original end-drain budget
+ok 16 - immediate census completion uses only the remaining original end-drain budget
+  ---
+  duration_ms: 1.417336
+  type: 'test'
+  ...
+# Subtest: a drain that exhausts the original budget cannot reset it for census
+ok 17 - a drain that exhausts the original budget cannot reset it for census
+  ---
+  duration_ms: 0.366578
+  type: 'test'
+  ...
+# Subtest: failed finalization preserves the original Session-end result and cancels its wait
+ok 18 - failed finalization preserves the original Session-end result and cancels its wait
+  ---
+  duration_ms: 1.680049
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 232.346775

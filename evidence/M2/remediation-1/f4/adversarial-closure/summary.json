@@ -1,0 +1,170 @@
+{
+  "status": "CALCULATOR_COUNTEREXAMPLES_CLOSED_NATIVE_EVIDENCE_INCOMPLETE",
+  "pythonVersion": "3.12.14",
+  "sourceHashes": {
+    "tests/native/tools/m2_latency.py": "6e08fb40e0ceb003b8d39e187dc7edd527bf9fa6dff2f824a089d246d9ff1f03",
+    "tests/native/tools/test_m2_latency.py": "47f8ad1e54376ed2c171e30c37d9c5077f327fb32e3fe12b84dc800d4b9e80ab"
+  },
+  "syntheticPositiveCases": 1,
+  "negativeCasesRejected": 8,
+  "unittest": {
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/native/tools",
+      "-p",
+      "test_m2_latency.py",
+      "-v"
+    ],
+    "exitCode": 0,
+    "testsPassed": 21,
+    "logSha256": "ae28416bfb80cf41d39065676d4afe466eb310e37e02c0eaccbe22be3b8029d0"
+  },
+  "cases": [
+    {
+      "case": "positive-synthetic-sealed",
+      "expectedNormalPathPass": true,
+      "normalPathPass": true,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [],
+      "artifactHashes": {
+        "positive-synthetic-sealed.raw.json": "2fd7d82ef33acb00194aecba4e7ced00db7a5d66e10fa36e7bbf7e87662479ca",
+        "positive-synthetic-sealed.result.json": "16831098ada7948ddce5d427c9bc1780e495b00dccf90dc4143b2f2cf44e424e"
+      }
+    },
+    {
+      "case": "wrong-store-generation",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "incomplete sample 22222222-2222-4222-8222-222222222222: commit belongs to a different/unknown canonical store",
+        "incomplete sample 33333333-3333-4333-8333-333333333333: commit belongs to a different/unknown canonical store",
+        "incomplete sample 44444444-4444-4444-8444-444444444444: commit belongs to a different/unknown canonical store",
+        "one or more mandatory source/metric populations is empty or exceeds its p95 target"
+      ],
+      "artifactHashes": {
+        "wrong-store-generation.raw.json": "47bd5107a040bd1c226aa9ddf2c8687812334a8a562b8c2fcc1d1fe8b0a93498",
+        "wrong-store-generation.result.json": "0706f81d36e564b94505b292c4a6c968a43e9618c30cc9336a9c1ae75ab6a886"
+      }
+    },
+    {
+      "case": "wrong-observer-source-epoch",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "incomplete sample 33333333-3333-4333-8333-333333333333: capture/commit identity or monotonic capture missing",
+        "incomplete sample 44444444-4444-4444-8444-444444444444: capture/commit identity or monotonic capture missing",
+        "one or more mandatory source/metric populations is empty or exceeds its p95 target"
+      ],
+      "artifactHashes": {
+        "wrong-observer-source-epoch.raw.json": "bdbc16340d2c7aa2c5db7608457fc50a548260bcda62770dbea97b70b5dd92a0",
+        "wrong-observer-source-epoch.result.json": "efce0bd5f9490becc7470a0873e0552fbf1d4ce1f2d238339e1c081ce7ad8fc6"
+      }
+    },
+    {
+      "case": "missing-clock-rate",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "missing/invalid rate, resolution or clock qualification evidence"
+      ],
+      "artifactHashes": {
+        "missing-clock-rate.raw.json": "36a78503ee1ee618ef72fa3ef0d11fe1b6a1d5c826d9676f281f1a2bb9526890",
+        "missing-clock-rate.result.json": "97785f885f49ac95f25f431a891aee243a8f44bb633248968d635289953a33ed"
+      }
+    },
+    {
+      "case": "null-dom-identities",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "missing hydrated DOM measurement population",
+        "incomplete sample 22222222-2222-4222-8222-222222222222: commit belongs to a different/unknown canonical store",
+        "incomplete sample 33333333-3333-4333-8333-333333333333: commit belongs to a different/unknown canonical store",
+        "incomplete sample 44444444-4444-4444-8444-444444444444: commit belongs to a different/unknown canonical store",
+        "one or more mandatory source/metric populations is empty or exceeds its p95 target"
+      ],
+      "artifactHashes": {
+        "null-dom-identities.raw.json": "6d84d60c9760baffce1b237cf9f6a0e213280ba0e012e5be2be0aff634a18083",
+        "null-dom-identities.result.json": "a51525453a6806b1d05a9307aed8576da3f5bd4886de888ace4872e1b4392e85"
+      }
+    },
+    {
+      "case": "missing-observer-tail-seal",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "missing/ambiguous closed capture population seal for claude.observer"
+      ],
+      "artifactHashes": {
+        "missing-observer-tail-seal.raw.json": "65f29968e2a524911fa112eeabbed22164d58b27146e18ce5117b840f78388bb",
+        "missing-observer-tail-seal.result.json": "fefa42c9e588a0ca089dbfd6ec21668ae8ce98688ac794e18e6aae25d2da6ccf"
+      }
+    },
+    {
+      "case": "wrong-tail-digest",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "final captured population/loss mismatch for claude.observer"
+      ],
+      "artifactHashes": {
+        "wrong-tail-digest.raw.json": "9ffbd6815f3deb8d42bf4ec598e7daf56f50ca8653d8eea7152b9a7b769dfce0",
+        "wrong-tail-digest.result.json": "e6769145fd3ae372ac77625e64fb3880a1df6671ae290b5435591044027defb5"
+      }
+    },
+    {
+      "case": "lost-tail-with-retained-final-census",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "final captured population/loss mismatch for claude.observer"
+      ],
+      "artifactHashes": {
+        "lost-tail-with-retained-final-census.raw.json": "672bc1b80b5bce9e8e40081f84f20adeeb2fc4978bbed140b84bd4082f10fa94",
+        "lost-tail-with-retained-final-census.result.json": "dcbc7baec764e3cb6baf9aaf107d415649d6d0910ad0d842b37c319b5373375c"
+      }
+    },
+    {
+      "case": "unsealed-unqualified-producer",
+      "expectedNormalPathPass": false,
+      "normalPathPass": false,
+      "nativeExecution": false,
+      "verdict": "INCOMPLETE_OR_FAIL",
+      "errors": [
+        "clock profile is not positively qualified on the recorded native boot",
+        "missing/invalid rate, resolution or clock qualification evidence",
+        "missing/ambiguous closed capture population seal for claude.hook",
+        "missing/ambiguous closed capture population seal for claude.observer"
+      ],
+      "artifactHashes": {
+        "unsealed-unqualified-producer.raw.json": "86c9e5f8c603f987cad171f229b5914616b60c1e31fa7418b708e07bd8240171",
+        "unsealed-unqualified-producer.result.json": "58c8668ee3c09105da6d813af1c07b3a3dd944e2335c4da65f7b99311a611b30"
+      }
+    }
+  ],
+  "limitations": [
+    "The positive fixture's census seals and clock qualification are synthetic test oracles.",
+    "This execution does not produce an independent native hook census or acknowledged final observer population.",
+    "The current native exporter can verify an observer seal only from its independent close/echo records; the conventional-hook population remains unsealed and native clock evidence remains unqualified. F4 native qualification is incomplete.",
+    "The pre-correction observer exporter tail-loss witness is preserved; only the calculator's ability to accept unsealed data is closed here."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "finding": "F4 missing optional deadline timer handle",
+  "status": "FOCUSED_GUARD_REPAIRED_AND_EXACT_WITNESS_PASSED",
+  "nativeExecution": false,
+  "execution": "Actual register.ts under Node26.11.1 with injected host timers/helper receipts; no Claude/Mac execution",
+  "beforeSourceHashes": {
+    "register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "latency.ts": "5ce7fb559ec77779c720d1a224b656a4ebe0c9e02f2b75d5e14f9d2d24fa81b0",
+    "ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275"
+  },
+  "observed": {
+    "immediateCaseConfirmationSent": 1,
+    "delayedCaseElapsedMs": 135.078167,
+    "pendingAt110ms": true,
+    "originalEndDrainDeadlineMs": 100,
+    "originalNextCalls": [
+      1,
+      1
+    ],
+    "originalResultsPreserved": true
+  },
+  "expected": "Missing timer handle leaves optional census incomplete; only the original bounded drain may delay the original Session-end result.",
+  "witnessExitCodeBeforeRepair": 1,
+  "scope": "Qualification instrumentation only; normal mode is disabled and this does not constitute native performance evidence.",
+  "afterSourceHashes": {
+    "register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "latency.ts": "9994519a5266532b29aab54d1ab0d7eee2d771002c045a9d3cb870e60326d68c",
+    "ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275"
+  },
+  "witnessExitCodeAfterRepair": 0,
+  "afterObserved": {
+    "immediateCaseConfirmationSent": 0,
+    "pendingAt110ms": false,
+    "originalNextCalls": [
+      1,
+      1
+    ],
+    "originalResultsPreserved": true,
+    "delayedCaseHarnessObservationElapsedMs": 110.81848599999998,
+    "timingQualification": "The exact original witness elapsedMs includes its deliberate110ms observation wait. Actual result-settlement time is measured separately by the final project control below; neither is native performance qualification."
+  },
+  "command": [
+    "/workspace/scratch/c8272833f682/remediation-tools/node-v26.11.1-linux-x64/bin/node",
+    "/workspace/scratch/c8272833f682/review-checks/f4-timer-review/missing-timer.mjs"
+  ],
+  "finalProjectControls": {
+    "tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "actualMissingTimerResultSettlementMs": 41.504917999999975,
+    "optionalCensusCalls": 0,
+    "independentExecution": "final-census-node-execution.json",
+    "output": "final-census-node-controls.log",
+    "timedWitness": "final-census-node-witnesses/node-missing-watchdog-timed.json"
+  },
+  "remainingNativeQualification": "Not supplied here: source-matched Dev execution, clock-rate/precision and actual closed populations for both conventional-hook and observer producers."
+}

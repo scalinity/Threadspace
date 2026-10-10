@@ -49,7 +49,7 @@ pub struct Activation {
     pub record: Value,
 }
 
-pub fn activate(ctx: &Ctx, scratch: &Path) -> Result<Activation, String> {
+pub fn activate(ctx: &Ctx, scratch: &mut Scratch<'_>) -> Result<Activation, String> {
     // Without Terminal consent no session can bind to its tab; name that
     // blocker instead of timing out on the first binding.
     match ctx.companion().request(ControlRequestBody::IntegrationStatus, Duration::from_secs(20))? {
@@ -65,12 +65,7 @@ pub fn activate(ctx: &Ctx, scratch: &Path) -> Result<Activation, String> {
         }
         other => return Err(format!("integration status: unexpected {other:?}")),
     }
-    let config = scratch.join("session-config");
-    std::fs::create_dir_all(&config).map_err(|e| e.to_string())?;
-    let installed = integration(ctx, "install", &config, "session")?;
-    if installed["ok"] != json!(true) {
-        return Err(format!("session install failed: {installed}"));
-    }
+    let installed = scratch.install_session()?;
     let detail = &installed["detail"];
     let plugin_dir = detail["pluginDir"].as_str().ok_or("no plugin dir in the install record")?.to_owned();
     let owned = PathBuf::from(&plugin_dir)
@@ -364,31 +359,17 @@ pub fn front_other(ctx: &Ctx, other: &Tab) {
     threadspace_harness::pause_ms(400);
 }
 
-/// A runner's scratch directory and the session-scope install made in it,
-/// both removed however the runner ends (a second uninstall after an
-/// explicit one answers NOT_INSTALLED).
-pub struct Scratch<'a> {
-    ctx: &'a Ctx,
-    pub dir: PathBuf,
-}
+#[path = "m2_ownership.rs"]
+mod m2_ownership;
+pub use m2_ownership::{Scratch, disposable};
 
 impl<'a> Scratch<'a> {
     pub fn new(ctx: &'a Ctx, label: &str) -> Result<Self, String> {
-        Ok(Self { ctx, dir: disposable(label)? })
+        Self::with_runner(
+            label,
+            Box::new(move |op, config, scope| integration(ctx, op, config, scope)),
+        )
     }
-}
-
-impl Drop for Scratch<'_> {
-    fn drop(&mut self) {
-        let _ = integration(self.ctx, "uninstall", &self.dir.join("session-config"), "session");
-        let _ = std::fs::remove_dir_all(&self.dir);
-    }
-}
-
-pub fn disposable(label: &str) -> Result<PathBuf, String> {
-    let dir = std::env::temp_dir().join(format!("ts-m2-{label}-{}", uuid::Uuid::new_v4()));
-    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-    Ok(dir)
 }
 
 /// Closes a harness-owned window (ownership proven by `Tab::close`).
@@ -440,7 +421,9 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let mut all_ok = true;
     let mut fixtures = Vec::new();
     for (label, original) in [("empty", None), ("owner-like", Some(complex_settings()))] {
-        let config = disposable(&format!("cycles-{label}"))?;
+        let mut scratch = Scratch::new(ctx, &format!("cycles-{label}"))?;
+        let config = scratch.dir.join("session-config");
+        std::fs::create_dir(&config).map_err(|e| e.to_string())?;
         let settings = config.join("settings.json");
         let original_bytes = original.as_ref().map(|v| format!("{}\n", serde_json::to_string_pretty(v).unwrap_or_default()));
         if let Some(bytes) = &original_bytes {
@@ -448,8 +431,8 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
         }
         let original_sha = sha256_file(&settings);
         for cycle in 1..=count {
-            let install = integration(ctx, "install", &config, "user")?;
-            let reinstall = integration(ctx, "install", &config, "user")?;
+            let install = scratch.install_user()?;
+            let reinstall = scratch.reinstall()?;
             let applied: Value = std::fs::read_to_string(&settings)
                 .ok()
                 .and_then(|t| serde_json::from_str(&t).ok())
@@ -471,11 +454,12 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
                     && plugin_dirs.starts_with("/opt/owner/plugins")
                     && owned_count(&applied, "/opt/owner/bin/") == 3
             });
-            let removed = integration(ctx, "uninstall", &config, "user")?;
+            let removed = scratch.remove_integration()?;
             let restored = sha256_file(&settings) == original_sha;
             let ok = install["ok"] == json!(true)
                 && reinstall["ok"] == json!(true)
                 && removed["ok"] == json!(true)
+                && removed["detail"]["complete"] == json!(true)
                 && owned == 15
                 && !worktree_owned
                 && ours == 1
@@ -492,7 +476,6 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
                 .map_err(|e| e.to_string())?;
         }
         fixtures.push(json!({ "fixture": label, "originalSha256": original_sha, "finalSha256": sha256_file(&settings) }));
-        let _ = std::fs::remove_dir_all(&config);
     }
     let summary = json!({ "pass": all_ok, "cycles": count, "fixtures": fixtures });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
@@ -506,8 +489,8 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
 /// and one worker; then a clean exit leaves the worker as history.
 pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "vertical", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = Scratch::new(ctx, "vertical")?;
-    let activation = activate(ctx, &scratch.dir)?;
+    let mut scratch = Scratch::new(ctx, "vertical")?;
+    let activation = activate(ctx, &mut scratch)?;
     let ui_state = ensure_ui(ctx)?;
     let recording = Recording::start()?;
     let start_cursor = journal_cursor(ctx);
@@ -584,7 +567,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let closed = finish(&observed);
     let _ = other.close();
     let _ = std::fs::remove_dir_all(&other.dir);
-    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
+    let removed = scratch.remove_integration();
     let recording = recording.map(|mut recording| recording.stop());
     let summary = json!({
         "pass": pass,
@@ -745,7 +728,7 @@ fn trace(ctx: &Ctx, native: &str, session_id: &str, after: u64) -> Value {
 }
 
 /// The journal's last ingest sequence (the projection cursor).
-fn journal_cursor(ctx: &Ctx) -> u64 {
+pub(crate) fn journal_cursor(ctx: &Ctx) -> u64 {
     journal_query(ctx, "SELECT COALESCE(MAX(ingest_seq), 0) AS n FROM observations")
         .ok()
         .and_then(|text| serde_json::from_str::<Value>(&text).ok())
@@ -753,69 +736,26 @@ fn journal_cursor(ctx: &Ctx) -> u64 {
         .unwrap_or(0)
 }
 
-fn percentiles(mut values: Vec<i64>) -> Value {
-    values.sort_unstable();
-    let at = |q: usize| values.get((values.len() * q).div_ceil(100).saturating_sub(1)).copied();
-    json!({ "n": values.len(), "p50": at(50), "p95": at(95), "max": values.last() })
-}
-
-/// SPEC §20.2 latency for one session's observations after `after`: local
-/// capture → commit (`received − captured`, per source; the observer's
-/// includes its bounded drain), commit → applied DOM (the view's DOM first
-/// showing that observation's own patch cursor) and native event → DOM.
+/// The original vertical runner has no cross-runtime clock calibration.
+/// Retain its observation count, but never turn pre-transaction receipt time
+/// into a durable-commit or DOM latency PASS. The focused F4 begin/end
+/// collector and `tests/native/tools/m2_latency.py` own those gates.
 fn latency(ctx: &Ctx, native: &str, after: u64) -> Value {
-    let marks = ui(ctx, "m2-latency", json!({ "afterCursor": after.to_string() }))
-        .ok()
-        .and_then(|r| r["result"]["marks"].as_array().cloned())
-        .unwrap_or_default();
-    let dom: std::collections::HashMap<u64, i64> = marks
-        .iter()
-        .filter_map(|m| Some((m["cursor"].as_str()?.parse().ok()?, m["domWallMs"].as_f64()? as i64)))
-        .collect();
-    let rows: Vec<Value> = journal_query(ctx, &format!(
-        "SELECT ingest_seq, source_id, captured_wall_ms, received_wall_ms FROM observations
+    let observed = journal_query(ctx, &format!(
+        "SELECT source_id, COUNT(*) AS observations FROM observations
           WHERE ingest_seq > {after} AND source_id IN ('claude.hook', 'claude.observer')
-            AND json_extract(payload_json, '$.sessionKey.nativeSessionId') = '{}'",
+            AND json_extract(payload_json, '$.sessionKey.nativeSessionId') = '{}'
+          GROUP BY source_id",
         native.replace('\'', "")
-    ))
-    .ok()
-    .and_then(|text| serde_json::from_str::<Value>(&text).ok())
-    .and_then(|v| v.as_array().cloned())
-    .unwrap_or_default();
-    #[derive(Default)]
-    struct Spans {
-        commit: Vec<i64>,
-        view: Vec<i64>,
-        total: Vec<i64>,
-    }
-    let mut by_source: std::collections::BTreeMap<String, Spans> = Default::default();
-    for row in &rows {
-        let (Some(seq), Some(source), Some(captured), Some(received)) =
-            (row["ingest_seq"].as_u64(), row["source_id"].as_str(), row["captured_wall_ms"].as_i64(), row["received_wall_ms"].as_i64())
-        else {
-            continue;
-        };
-        let entry = by_source.entry(source.to_owned()).or_default();
-        entry.commit.push(received - captured);
-        if let Some(&shown) = dom.get(&seq) {
-            entry.view.push(shown - received);
-            entry.total.push(shown - captured);
-        }
-    }
-    let sources: serde_json::Map<String, Value> = by_source
-        .into_iter()
-        .map(|(source, spans)| {
-            (source, json!({ "captureToCommitMs": percentiles(spans.commit), "commitToDomMs": percentiles(spans.view), "eventToDomMs": percentiles(spans.total) }))
-        })
-        .collect();
-    let hook = &sources.get("claude.hook").cloned().unwrap_or(Value::Null);
-    let within = |v: &Value, limit: i64| v["p95"].as_i64().is_some_and(|p| p <= limit);
+    ));
     json!({
+        "schemaVersion": 2,
+        "status": "INCOMPLETE",
+        "normalPathPass": false,
+        "reason": "This runner does not independently collect the calibrated capture/SQLite-COMMIT/DOM population. Use m2-latency-begin/end and the F4 calculator.",
         "targets": { "captureToCommitP95Ms": 100, "commitToDomP95Ms": 100, "eventToDomP95Ms": 250 },
-        "viewMarks": marks.len(),
-        "observations": rows.len(),
-        "bySource": sources,
-        "normalPathPass": within(&hook["captureToCommitMs"], 100) && within(&hook["commitToDomMs"], 100) && within(&hook["eventToDomMs"], 250),
+        "observationsBySource": observed.as_ref().ok().and_then(|text| serde_json::from_str::<Value>(text).ok()),
+        "observationReadError": observed.as_ref().err(),
     })
 }
 
@@ -869,8 +809,8 @@ fn mark_handled(ctx: &Ctx, session_id: &str) -> Value {
 /// by independent readback; zero wrong targets.
 pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "routes", ctx.channel_name()).map_err(|e| e.to_string())?;
-    let scratch = Scratch::new(ctx, "routes")?;
-    let activation = activate(ctx, &scratch.dir)?;
+    let mut scratch = Scratch::new(ctx, "routes")?;
+    let activation = activate(ctx, &mut scratch)?;
     ensure_ui(ctx)?;
     let mut sessions = Vec::new();
     for index in 0..3 {
@@ -909,7 +849,7 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     }
     threadspace_harness::pause_ms(3000);
     let closed: Vec<Value> = sessions.iter().map(finish).collect();
-    let removed = integration(ctx, "uninstall", &scratch.dir.join("session-config"), "session");
+    let removed = scratch.remove_integration();
     let summary = json!({
         "pass": exact == count && wrong == 0,
         "requested": count, "exactVerified": exact, "wrongTargets": wrong,

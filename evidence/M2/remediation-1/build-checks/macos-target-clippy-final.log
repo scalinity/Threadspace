@@ -1,0 +1,14 @@
+error: used `unwrap()` on an `Option` value
+   --> tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs:306:13
+    |
+306 | /             positive
+307 | |                 .as_object()
+308 | |                 .unwrap()
+    | |_________________________^
+    |
+    = note: if this value is `None`, it will panic
+    = help: consider using `expect()` to provide a better panic message
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used
+    = note: requested on the command line with `-D clippy::unwrap-used`
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s

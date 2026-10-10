@@ -18,6 +18,7 @@ use rusqlite::types::Value as Sql;
 use rusqlite::{OptionalExtension, Transaction, TransactionBehavior, params};
 use serde_json::Value;
 use threadspace_contracts::canonical::capture::RecordStatus;
+use threadspace_contracts::canonical::JOURNAL_PAYLOAD_VERSION;
 use threadspace_contracts::canonical::command::{OwnerAction, OwnerCommand};
 use threadspace_contracts::canonical::envelope::{
     OBSERVATION_SCHEMA_VERSION, ObservationEnvelope, SequenceMeaning,
@@ -75,6 +76,10 @@ pub struct BatchOutcome {
     pub notifications: Vec<NotificationIntent>,
     pub unresolved: u64,
     pub unsupported: u64,
+    /// Actual COMMIT-call bracket. Not persisted, not canonical, and absent
+    /// from release builds. Missing clock data never means zero latency.
+    #[cfg(feature = "qualification")]
+    pub commit_timing: Option<crate::latency::CommitTiming>,
 }
 
 /// An observation row admission writes.
@@ -145,7 +150,7 @@ fn insert_observation(
         "INSERT INTO observations (observation_id, source_id, source_epoch, source_sequence,
            native_event, captured_wall_ms, received_wall_ms, payload_version, payload_json,
            canonical, delivery, sequence_meaning)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 1, ?8, 1, ?9, ?10)",
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?11, ?8, 1, ?9, ?10)",
         params![
             row.observation_id,
             row.source_id,
@@ -157,6 +162,7 @@ fn insert_observation(
             row.payload_json,
             enum_text(&delivery),
             row.sequence_meaning.as_ref().and_then(enum_text),
+            JOURNAL_PAYLOAD_VERSION,
         ],
     )?;
     Ok(tx.last_insert_rowid())
@@ -347,6 +353,7 @@ fn admit_step(
     crash::hit(armed, CrashPoint::AfterFacts);
     let entry = JournalEntry {
         cursor,
+        payload_version: JOURNAL_PAYLOAD_VERSION,
         endpoint_id: endpoint_id.to_owned(),
         observation_id: row.observation_id.clone(),
         source_id: row.source_id.clone(),
@@ -415,7 +422,7 @@ fn write_checkpoint(
 fn entries_after(conn: &rusqlite::Connection, after: i64, endpoint_id: &str) -> Result<Vec<JournalEntry>, JournalError> {
     let mut statement = conn.prepare(
         "SELECT ingest_seq, observation_id, source_id, source_epoch, source_sequence,
-                sequence_meaning, captured_wall_ms, delivery
+                sequence_meaning, captured_wall_ms, delivery, payload_version
            FROM observations WHERE canonical = 1 AND ingest_seq > ?1 ORDER BY ingest_seq",
     )?;
     let mut entries: Vec<JournalEntry> = statement
@@ -424,6 +431,7 @@ fn entries_after(conn: &rusqlite::Connection, after: i64, endpoint_id: &str) -> 
             let delivery: Option<String> = row.get(7)?;
             Ok(JournalEntry {
                 cursor: row.get(0)?,
+                payload_version: row.get(8)?,
                 endpoint_id: endpoint_id.to_owned(),
                 observation_id: row.get(1)?,
                 source_id: row.get(2)?,
@@ -440,6 +448,11 @@ fn entries_after(conn: &rusqlite::Connection, after: i64, endpoint_id: &str) -> 
         })?
         .collect::<Result<_, _>>()?;
     drop(statement);
+    if let Some(entry) = entries.iter().find(|entry| entry.payload_version == 0 || entry.payload_version > JOURNAL_PAYLOAD_VERSION) {
+        return Err(JournalError::Invalid {
+            detail: format!("unsupported journal payload version {} at cursor {}", entry.payload_version, entry.cursor),
+        });
+    }
     let mut statement = conn.prepare(
         "SELECT ingest_seq, fact_json FROM facts WHERE ingest_seq > ?1 ORDER BY ingest_seq, fact_index",
     )?;
@@ -541,6 +554,18 @@ fn rebuild_evidence(conn: &rusqlite::Connection, state: &mut CanonicalState) -> 
     Ok(())
 }
 
+/// All retained canonical facts through one cursor, for an explicit reducer
+/// upgrade. No inferred projection fields substitute for missing facts.
+fn facts_through(conn: &rusqlite::Connection, cursor: i64) -> Result<Vec<ResolvedFact>, JournalError> {
+    let mut statement = conn.prepare("SELECT fact_json FROM facts WHERE ingest_seq <= ?1 ORDER BY ingest_seq, fact_index")?;
+    let rows = statement.query_map(params![cursor], |row| row.get::<_, String>(0))?;
+    rows.map(|row| {
+        serde_json::from_str(&row?).map_err(|error| JournalError::Invalid {
+            detail: format!("ownership upgrade fact: {error}"),
+        })
+    }).collect()
+}
+
 /// A wait owner decision an earlier reducer recorded after its checkpoint,
 /// recovered by this reducer, read as that reducer recorded it, which is
 /// how `upgrade_json` reads the decisions in its checkpoint: reducer 1 kept
@@ -587,11 +612,16 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
     let replayed = entries.len() as u64;
     let upgraded = version < REDUCER_VERSION;
     if upgraded {
+        // An older verified checkpoint may precede an already committed
+        // current-version suffix. Recover only the historical prefix under
+        // old authority; its first v2 observation fixes the original
+        // transition even when that observation contains no facts.
+        let transition = entries.iter().position(|entry| entry.payload_version >= 2).unwrap_or(entries.len());
         let decisions = |state: &CanonicalState| -> std::collections::BTreeSet<String> {
             state.waits.values().flat_map(|w| &w.owner_decisions).map(|d| d.command_id.clone()).collect()
         };
         let checkpointed = decisions(&engine.state);
-        for entry in &entries {
+        for entry in &entries[..transition] {
             engine.recover(entry);
         }
         let mut state = engine.state;
@@ -601,8 +631,12 @@ pub(crate) fn load_engine(conn: &rusqlite::Connection, endpoint_id: &str) -> Res
         }
         keep_committed(conn, &mut state)?;
         engine = Engine::new(state);
-        engine.upgrade(endpoint_id);
+        let facts = facts_through(conn, engine.state.through_cursor)?;
+        engine.upgrade(endpoint_id, &facts).map_err(|detail| JournalError::Invalid { detail })?;
         keep_committed_revisions(conn, &mut engine.state)?;
+        for entry in &entries[transition..] {
+            engine.apply(entry);
+        }
     } else {
         for entry in &entries {
             engine.apply(entry);
@@ -642,6 +676,15 @@ fn keep_committed(conn: &rusqlite::Connection, state: &mut CanonicalState) -> Re
         };
         if let Some(row) = committed {
             item.resolved_at_ms = nullable_integer(row, "resolved_at_ms").ok_or_else(|| invalid("attention", &item.id))?;
+            // Outbox dispositions below are rebased onto their committed
+            // values. Preserve their corresponding display state too: an
+            // already suppressed intent need not repeat the transition
+            // that originally changed PENDING to NOT_REQUESTED.
+            item.notification_state = match row.get("notification_state") {
+                Some(Sql::Text(name)) => serde_json::from_value(Value::String(name.clone()))
+                    .map_err(|_| invalid("attention notification_state", &item.id))?,
+                _ => return Err(invalid("attention notification_state", &item.id)),
+            };
         }
         if committed != Some(&materialize::attention_row(item).named()) {
             item.revision = cursor;
@@ -935,7 +978,11 @@ impl Journal {
             accumulated.entries,
             now_ms,
         )?;
+        #[cfg(feature = "qualification")]
+        let commit_begin = crate::latency::now_ns();
         tx.commit()?;
+        #[cfg(feature = "qualification")]
+        { outcome.commit_timing = crate::latency::finish(commit_begin); }
         self.index.apply(&all_assignments);
         outcome.notifications = accumulated
             .outbox
@@ -1263,12 +1310,32 @@ impl Journal {
     }
 
     /// Replays every canonical entry from an empty state, ignoring
-    /// checkpoints (the strongest exact-replay check).
+    /// checkpoints. Payload version 1 identifies history admitted before the
+    /// explicit reducer-4 ownership transition. Its old HOST_READ effects
+    /// must first be reconstructed to retain committed owner decisions and
+    /// notification dispositions; the retained facts then withdraw any
+    /// authority the new proof predicate cannot establish. The first v2
+    /// entry is a permanent transition: later-delivered v1 history never
+    /// switches the reducer back to its previous authority rules.
     pub fn replay_from_genesis(&self) -> Result<CanonicalState, JournalError> {
         let entries = entries_after(&self.conn, 0, &self.endpoint_id)?;
         let mut engine = Engine::empty();
+        // Native-only old stores also need the explicit transition: it
+        // records versioned checkpoint bookkeeping even when no HOST_READ
+        // authority is withdrawn. A current v2 journal has no old prefix.
+        if entries.first().is_some_and(|entry| entry.payload_version < 2) {
+            engine.state.reducer_version = 3;
+        }
+        let mut retained = Vec::new();
         for entry in &entries {
+            if engine.state.reducer_version < 4 && entry.payload_version >= 2 {
+                engine.upgrade(&self.endpoint_id, &retained).map_err(|detail| JournalError::Invalid { detail })?;
+            }
             engine.apply(entry);
+            retained.extend(entry.facts.iter().cloned());
+        }
+        if engine.state.reducer_version < 4 {
+            engine.upgrade(&self.endpoint_id, &retained).map_err(|detail| JournalError::Invalid { detail })?;
         }
         Ok(engine.state)
     }

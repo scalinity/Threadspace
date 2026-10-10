@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 2,
+  "calculation": "nearest-rank p95 of conservative upper bounds in milliseconds",
+  "targets": {
+    "captureToCommitMs": 100,
+    "commitToDomMs": 100,
+    "eventToDomMs": 250
+  },
+  "bySource": {
+    "claude.hook": {
+      "captureToCommitMs": {
+        "n": 1,
+        "p50": 3.0,
+        "p95": 3.0,
+        "max": 3.0
+      },
+      "commitToDomMs": {
+        "n": 1,
+        "p50": 8.002,
+        "p95": 8.002,
+        "max": 8.002
+      },
+      "eventToDomMs": {
+        "n": 1,
+        "p50": 10.002,
+        "p95": 10.002,
+        "max": 10.002
+      },
+      "population": {
+        "totalCaptured": 1,
+        "durablyAccepted": 1,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 1,
+        "noProjectionChange": 0,
+        "matchedDom": 1,
+        "unmatchedDom": 0,
+        "missingTelemetry": 0
+      }
+    },
+    "claude.observer": {
+      "captureToCommitMs": {
+        "n": 2,
+        "p50": 5.001,
+        "p95": 6.001,
+        "max": 6.001
+      },
+      "commitToDomMs": {
+        "n": 1,
+        "p50": 17.002,
+        "p95": 17.002,
+        "max": 17.002
+      },
+      "eventToDomMs": {
+        "n": 1,
+        "p50": 22.003,
+        "p95": 22.003,
+        "max": 22.003
+      },
+      "population": {
+        "totalCaptured": 2,
+        "durablyAccepted": 2,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 1,
+        "noProjectionChange": 1,
+        "matchedDom": 1,
+        "unmatchedDom": 0,
+        "missingTelemetry": 0
+      }
+    }
+  },
+  "joinedSamples": [
+    {
+      "observationId": "22222222-2222-4222-8222-222222222222",
+      "source": "claude.hook",
+      "cursor": "1",
+      "patchCursor": "1",
+      "captureIntervalNs": [
+        "1010000000",
+        "1010000000"
+      ],
+      "commitIntervalNs": [
+        "1012000000",
+        "1013000000"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 3.0,
+        "commitToDomMs": 8.002,
+        "eventToDomMs": 10.002
+      }
+    },
+    {
+      "observationId": "33333333-3333-4333-8333-333333333333",
+      "source": "claude.observer",
+      "cursor": "2",
+      "patchCursor": "2",
+      "captureIntervalNs": [
+        "1007999000",
+        "1012001000"
+      ],
+      "commitIntervalNs": [
+        "1013000000",
+        "1014000000"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6.001,
+        "commitToDomMs": 17.002,
+        "eventToDomMs": 22.003
+      }
+    },
+    {
+      "observationId": "44444444-4444-4444-8444-444444444444",
+      "source": "claude.observer",
+      "cursor": "3",
+      "patchCursor": null,
+      "captureIntervalNs": [
+        "1008999000",
+        "1013001000"
+      ],
+      "commitIntervalNs": [
+        "1013000000",
+        "1014000000"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 5.001
+      }
+    }
+  ],
+  "exclusions": [
+    {
+      "observationId": "44444444-4444-4444-8444-444444444444",
+      "reason": "transaction produced no public projection change",
+      "metrics": [
+        "commitToDomMs",
+        "eventToDomMs"
+      ]
+    }
+  ],
+  "errors": [
+    "missing/ambiguous closed capture population seal for claude.observer"
+  ],
+  "normalPathPass": false,
+  "nativeExecution": false,
+  "verdict": "INCOMPLETE_OR_FAIL"
+}

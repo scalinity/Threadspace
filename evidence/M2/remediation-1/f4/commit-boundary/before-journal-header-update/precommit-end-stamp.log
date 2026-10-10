@@ -1,0 +1,70 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling libc v0.2.190
+   Compiling typenum v1.20.1
+   Compiling serde_json v1.0.151
+   Compiling getrandom v0.4.3
+   Compiling thiserror v2.0.21
+   Compiling serde v1.0.229
+   Compiling shlex v2.0.1
+   Compiling itoa v1.0.18
+   Compiling cfg-if v1.0.5
+   Compiling ref-cast v1.0.27
+   Compiling find-msvc-tools v0.1.14
+   Compiling memchr v2.8.3
+   Compiling cc v1.6.0
+   Compiling hybrid-array v0.4.15
+   Compiling termcolor v1.4.1
+   Compiling pkg-config v0.3.34
+   Compiling vcpkg v0.2.15
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling const-oid v0.10.2
+   Compiling dyn-clone v1.0.20
+   Compiling foldhash v0.2.0
+   Compiling hashbrown v0.17.1
+   Compiling digest v0.11.3
+   Compiling uuid v1.27.0
+   Compiling cpufeatures v0.3.1
+   Compiling sha2 v0.11.0
+   Compiling smallvec v1.16.2
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling bitflags v2.13.2
+   Compiling serde_derive_internals v0.30.0
+   Compiling hashlink v0.12.2
+   Compiling libsqlite3-sys v0.38.2 (/tmp/threadspace-f4-commit-mutant-9s3u4j84/third_party/libsqlite3-sys)
+   Compiling thiserror-impl v2.0.21
+   Compiling ref-cast-impl v1.0.27
+   Compiling serde_derive v1.0.229
+   Compiling schemars_derive v1.2.2
+   Compiling ts-rs-macros v12.0.1
+   Compiling ts-rs v12.0.1
+   Compiling schemars v1.2.2
+   Compiling threadspace-contracts v0.1.0 (/tmp/threadspace-f4-commit-mutant-9s3u4j84/crates/contracts)
+   Compiling rusqlite v0.40.2
+   Compiling threadspace-state-engine v0.1.0 (/tmp/threadspace-f4-commit-mutant-9s3u4j84/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (/tmp/threadspace-f4-commit-mutant-9s3u4j84/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.26s
+     Running unittests src/lib.rs (target/x86_64-unknown-linux-gnu/debug/deps/threadspace_journal-8caee8c740aaff08)
+
+running 1 test
+
+thread 'latency::tests::commit_end_follows_actual_sqlite_commit_hook_not_writer_receipt' (1362) panicked at crates/journal/src/latency.rs:108:9:
+COMMIT end must follow SQLite's actual commit hook: begin=8763053690372, inside=8763058781929, end=8763053690707
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test latency::tests::commit_end_follows_actual_sqlite_commit_hook_not_writer_receipt ... FAILED
+
+failures:
+
+failures:
+    latency::tests::commit_end_follows_actual_sqlite_commit_hook_not_writer_receipt
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p threadspace-journal --lib`

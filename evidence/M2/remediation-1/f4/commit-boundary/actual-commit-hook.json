@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "-p",
+    "threadspace-journal",
+    "--lib",
+    "--features",
+    "qualification",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--offline",
+    "--locked",
+    "latency::tests::",
+    "--",
+    "--nocapture"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 6.225129038000887,
+  "platform": "Linux x86_64; actual SQLite, not native macOS",
+  "sourceHashes": {
+    "crates/journal/src/latency.rs": "a5a36dddd69c933ac5c19649c7cca24899e31db38473366fec7453551b773554",
+    "crates/journal/src/canonical.rs": "a849338686c36c523d5b36e41d92847da8e03c2f616dc80336d0d4f7afba1602",
+    "Cargo.lock": "a2dcac0024e3f6bc2f14df2b39468d6ee2ef6145f0818b3eabab12edf71cff88"
+  },
+  "log": "actual-commit-hook.log"
+}

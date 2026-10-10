@@ -1,0 +1,29 @@
+   Compiling threadspace-f3-oracle-review v0.1.0 (/workspace/scratch/c8272833f682/review-checks/f3-oracle)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/review-checks/f3-oracle/target/x86_64-unknown-linux-gnu/debug/deps/threadspace_f3_oracle_review-b6c7174ad1094346)
+
+running 6 tests
+test oracle::tests::changes_to_unowned_windows_are_visible_on_failure_too ... ok
+test oracle::tests::complete_synthetic_witness_passes_but_not_as_native_qualification ... ok
+test oracle::tests::each_mandatory_proof_and_deadline_controls_the_positive_verdict ... ok
+test oracle::tests::absent_evidence_never_passes ... ok
+test oracle::tests::timeout_with_restoration_and_wrong_target_false_is_not_positive ... FAILED
+test oracle::tests::unknown_negative_does_not_conceal_focus_or_missing_readback ... ok
+
+failures:
+
+---- oracle::tests::timeout_with_restoration_and_wrong_target_false_is_not_positive stdout ----
+
+thread 'oracle::tests::timeout_with_restoration_and_wrong_target_false_is_not_positive' (146) panicked at /workspace/scratch/c8272833f682/Threadspace-review/tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs:313:9:
+assertion `left == right` failed
+  left: Bool(true)
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    oracle::tests::timeout_with_restoration_and_wrong_target_false_is_not_positive
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

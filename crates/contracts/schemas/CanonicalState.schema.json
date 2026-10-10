@@ -1015,6 +1015,17 @@
         "observationId": {
           "type": "string"
         },
+        "ownership": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObserverOwnership"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "point": {
           "anyOf": [
             {
@@ -1163,6 +1174,32 @@
         "UNKNOWN"
       ],
       "type": "string"
+    },
+    "ObserverOwnership": {
+      "description": "A reload ownership witness, scoped to one observer load and immutable\nSession generation. The proof token is created by the native inventory\nprobe, after its kernel bracket. A token reported by middleware alone\nhas no authority; a separately admitted native proof must match it.",
+      "properties": {
+        "executableIdentity": {
+          "type": "string"
+        },
+        "proofToken": {
+          "type": "string"
+        },
+        "sessionGeneration": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sourceEpoch": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceEpoch",
+        "sessionGeneration",
+        "proofToken",
+        "executableIdentity"
+      ],
+      "type": "object"
     },
     "ObserverTier": {
       "description": "The evidence tier of a Session's current observer (D-0010).",
@@ -1317,6 +1354,61 @@
       ],
       "type": "string"
     },
+    "OwnershipProof": {
+      "properties": {
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "ownership": {
+          "$ref": "#/$defs/ObserverOwnership"
+        },
+        "processId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "processId",
+        "ownership"
+      ],
+      "type": "object"
+    },
+    "OwnershipStart": {
+      "description": "The original qualified core start, after the observer has sealed an\nindependently corroborated ownership generation. Later callbacks must\nretain this scope; a new current Session cannot lend it authority.",
+      "properties": {
+        "factIndex": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "ownership": {
+          "$ref": "#/$defs/ObserverOwnership"
+        },
+        "point": {
+          "$ref": "#/$defs/CausalPoint"
+        },
+        "processId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "observationId",
+        "factIndex",
+        "point",
+        "processId",
+        "ownership"
+      ],
+      "type": "object"
+    },
     "PendingOutcome": {
       "description": "A turn outcome reported at the host-read tier: retained, and applied only\nonce its provider process is shown to run the turn's Session (D-0010).",
       "properties": {
@@ -1330,6 +1422,17 @@
         },
         "outcome": {
           "$ref": "#/$defs/TurnOutcome"
+        },
+        "ownership": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObserverOwnership"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "point": {
           "anyOf": [
@@ -1497,6 +1600,11 @@
           "const": "HUMAN_FOLLOWUP",
           "description": "Verified accepted human input causally after the output (SPEC §7.3).",
           "type": "string"
+        },
+        {
+          "const": "EVIDENCE_UNAVAILABLE",
+          "description": "An older reducer applied a lifecycle claim whose independent\nownership evidence is insufficient under the explicit upgrade.",
+          "type": "string"
         }
       ]
     },
@@ -1649,6 +1757,15 @@
             "string",
             "null"
           ]
+        },
+        "ownershipProofs": {
+          "default": [],
+          "description": "Native proofs retained independently of observer-produced seals.",
+          "items": {
+            "$ref": "#/$defs/OwnershipProof"
+          },
+          "type": "array",
+          "uniqueItems": true
         },
         "recordState": {
           "$ref": "#/$defs/SessionRecordState"
@@ -2053,6 +2170,14 @@
         "ownerFacing": {
           "description": "From the originating actor's role when the turn was observed; a later\nrole change never promotes old parent-owned output (SPEC §7.1).",
           "type": "boolean"
+        },
+        "ownershipStarts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OwnershipStart"
+          },
+          "type": "array",
+          "uniqueItems": true
         },
         "pendingOutcomes": {
           "default": [],

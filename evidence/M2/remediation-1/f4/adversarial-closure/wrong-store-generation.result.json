@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 2,
+  "calculation": "nearest-rank p95 of conservative upper bounds in milliseconds",
+  "targets": {
+    "captureToCommitMs": 100,
+    "commitToDomMs": 100,
+    "eventToDomMs": 250
+  },
+  "bySource": {
+    "claude.hook": {
+      "captureToCommitMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "commitToDomMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "eventToDomMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "population": {
+        "totalCaptured": 1,
+        "durablyAccepted": 1,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 0,
+        "noProjectionChange": 0,
+        "matchedDom": 0,
+        "unmatchedDom": 0,
+        "missingTelemetry": 1
+      }
+    },
+    "claude.observer": {
+      "captureToCommitMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "commitToDomMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "eventToDomMs": {
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "population": {
+        "totalCaptured": 2,
+        "durablyAccepted": 2,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 0,
+        "noProjectionChange": 0,
+        "matchedDom": 0,
+        "unmatchedDom": 0,
+        "missingTelemetry": 2
+      }
+    }
+  },
+  "joinedSamples": [],
+  "exclusions": [],
+  "errors": [
+    "incomplete sample 22222222-2222-4222-8222-222222222222: commit belongs to a different/unknown canonical store",
+    "incomplete sample 33333333-3333-4333-8333-333333333333: commit belongs to a different/unknown canonical store",
+    "incomplete sample 44444444-4444-4444-8444-444444444444: commit belongs to a different/unknown canonical store",
+    "one or more mandatory source/metric populations is empty or exceeds its p95 target"
+  ],
+  "normalPathPass": false,
+  "nativeExecution": false,
+  "verdict": "INCOMPLETE_OR_FAIL"
+}

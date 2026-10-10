@@ -1,0 +1,3 @@
+# Earlier portable qualification snapshot
+
+This source-stable run passed its then-existing portable tests and the 24,400 permutation campaign. A subsequent adversarial review found a missing native-only reducer-3 genesis-replay branch: the version transition was selected only when the v1 prefix contained HOST_READ outcomes. The retained full result is therefore superseded for migration completeness by the focused failing/repaired native-only test and final run at the F1B root. It is not an acceptance claim. Product authority and the original causal scenario generator were unchanged by the later version-trigger correction.

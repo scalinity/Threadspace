@@ -26,3 +26,15 @@ fn an_earlier_binding_without_a_proof_point_loads() {
     let binding: SurfaceBindingRecord = serde_json::from_value(json).expect("loads");
     assert!(binding.proof_point.is_none());
 }
+
+#[test]
+fn an_earlier_journal_entry_defaults_to_its_original_admission_version() {
+    let value = serde_json::json!({
+        "cursor": 1, "endpointId": "e", "observationId": "o", "sourceId": "s",
+        "sourceEpoch": "old", "sourceSequence": null, "sequenceMeaning": null,
+        "capturedWallMs": 1, "delivery": "LIVE", "facts": [],
+    });
+    let entry: threadspace_contracts::canonical::fact::JournalEntry = serde_json::from_value(value).expect("old zero-fact journal header");
+    assert_eq!(entry.payload_version, 1);
+    assert_eq!(serde_json::to_value(entry).expect("explicit retained version")["payloadVersion"], 1);
+}

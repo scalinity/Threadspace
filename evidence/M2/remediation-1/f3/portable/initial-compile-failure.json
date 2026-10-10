@@ -1,0 +1,13 @@
+{
+  "phase": "initial large synthetic oracle fixture compile",
+  "portableOracleExitCode": 101,
+  "aarch64CheckExitCode": 101,
+  "nativeExecution": "NOT_RUN",
+  "error": "recursion limit reached while expanding $crate::json_internal! in complete_positive() at m2_minimized_oracle.rs:220",
+  "sourceFilesSha256": {
+    "tests/native/harness/src/bin/m0c/m2_minimized.rs": "f7defb7c20f0819b21d22ccab13e10bc5bb16a681a1c18cae8177421e909789a",
+    "tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs": "c3ee2e601db7be2e1a50c7915193b835f4f4211f7ab6916d5d9757d258096af8",
+    "tests/native/harness/src/bin/m0c/main.rs": "670cea5efe0c308df71b56ea07cfa2033dc107cd46df944cc2dec882a5f12ed8"
+  },
+  "repair": "Split the large synthetic JSON fixture into evidence/result components; do not change verdict assertions or native route code."
+}

@@ -13,6 +13,8 @@ mod canonical;
 mod crash;
 mod identity;
 mod lock;
+#[cfg(feature = "qualification")]
+pub mod latency;
 mod materialize;
 mod owner;
 pub mod paging;

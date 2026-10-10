@@ -1,7 +1,8 @@
 //! Pure edits of a Claude `settings.json` document (SPEC §19.2). Owned
-//! entries are recognized only by their exact command string and plugin
-//! directory, appended after everything foreign, and removed only while they
-//! still match; foreign hooks, matchers and ordering are never rewritten.
+//! entries are identified by their command string and plugin directory,
+//! appended after everything foreign, and removed only while their installed
+//! structure still matches. A marker identifies a possible owned entry; it
+//! does not authorize deleting an owner-modified matcher, hook or group.
 
 use super::OwnedEntry;
 use super::ordered_json::{Map, Value};
@@ -15,6 +16,37 @@ pub struct Removal {
     /// Owned entries no longer found as installed; left untouched.
     pub conflicts: Vec<OwnedEntry>,
     pub changed: bool,
+}
+
+/// Locations of remaining possible owned-resource references. Values are not
+/// exported: an owner command may contain private arguments. This is a
+/// conservative retention check, never a shell interpreter or delete grant.
+pub fn reference_locations(root: &Map, needles: &[String]) -> Vec<String> {
+    fn visit(value: &Value, pointer: &str, needles: &[String], found: &mut Vec<String>) {
+        match value {
+            Value::String(text) if needles.iter().any(|needle| text.contains(needle)) => {
+                found.push(pointer.to_owned());
+            }
+            Value::Array(values) => {
+                for (index, value) in values.iter().enumerate() {
+                    visit(value, &format!("{pointer}/{index}"), needles, found);
+                }
+            }
+            Value::Object(fields) => walk(fields, pointer, needles, found),
+            _ => {}
+        }
+    }
+    fn walk(fields: &Map, pointer: &str, needles: &[String], found: &mut Vec<String>) {
+        for key in fields.keys() {
+            if let Some(value) = fields.get(key) {
+                let escaped = key.replace('~', "~0").replace('/', "~1");
+                visit(value, &format!("{pointer}/{escaped}"), needles, found);
+            }
+        }
+    }
+    let mut found = Vec::new();
+    walk(root, "", needles, &mut found);
+    found
 }
 
 /// Adds every owned entry the document does not already hold. Plugin
@@ -70,9 +102,14 @@ pub fn remove(root: &mut Map, entries: &[OwnedEntry], created: &[String]) -> Rem
     let mut removal = Removal::default();
     for entry in entries {
         let found = match entry {
-            OwnedEntry::Hook { event, command, .. } => remove_hook(
+            OwnedEntry::Hook {
+                event,
+                matcher,
+                command,
+            } => remove_hook(
                 root,
                 event,
+                matcher,
                 command,
                 was_created(&format!("/hooks/{event}")),
                 &mut removal.changed,
@@ -106,6 +143,7 @@ pub fn remove(root: &mut Map, entries: &[OwnedEntry], created: &[String]) -> Rem
 fn remove_hook(
     root: &mut Map,
     event: &str,
+    matcher: &str,
     command: &str,
     created_event: bool,
     changed: &mut bool,
@@ -121,11 +159,18 @@ fn remove_hook(
         let Some(group) = group.as_object_mut() else {
             return true;
         };
+        // The installed group has only matcher/hooks. Foreign sibling hooks
+        // may be added, but a changed matcher or group option is a conflict.
+        if group.get("matcher").and_then(Value::as_str) != Some(matcher)
+            || group.keys().any(|key| key != "matcher" && key != "hooks")
+        {
+            return true;
+        }
         let Some(list) = group.get_mut("hooks").and_then(Value::as_array_mut) else {
             return true;
         };
         let before = list.len();
-        list.retain(|hook| hook.get("command").and_then(Value::as_str) != Some(command));
+        list.retain(|hook| !unchanged_hook(hook, command));
         if list.len() == before {
             return true;
         }
@@ -141,6 +186,16 @@ fn remove_hook(
     }
     *changed |= found;
     found
+}
+
+/// Our complete installed hook shape (including the absence of timeout or
+/// other options). JSON object key order does not change hook behavior.
+fn unchanged_hook(hook: &Value, command: &str) -> bool {
+    hook.as_object().is_some_and(|fields| {
+        fields.get("command").and_then(Value::as_str) == Some(command)
+            && fields.get("type").and_then(Value::as_str) == Some("command")
+            && fields.keys().all(|key| key == "command" || key == "type")
+    })
 }
 
 fn remove_plugin_dir(root: &mut Map, path: &str, created_key: bool, changed: &mut bool) -> bool {

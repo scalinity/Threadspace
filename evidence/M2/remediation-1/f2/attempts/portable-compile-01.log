@@ -1,0 +1,39 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_core v1.0.229
+   Compiling typenum v1.20.1
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling getrandom v0.4.3
+   Compiling cfg-if v1.0.5
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling const-oid v0.10.2
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.3.1
+   Compiling syn v3.0.6
+   Compiling hybrid-array v0.4.15
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling uuid v1.27.0
+   Compiling serde_derive v1.0.229
+   Compiling threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+error: unused extern crate
+ --> src/lib.rs:1:1
+  |
+1 | extern crate self as threadspace_provider_claude;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unused
+  |
+  = note: `-D unused-extern-crates` implied by `-D rust-2018-idioms`
+  = help: to override `-D rust-2018-idioms` add `#[allow(unused_extern_crates)]`
+help: remove the unused `extern crate`
+  |
+1 - extern crate self as threadspace_provider_claude;
+  |
+
+error: could not compile `threadspace-f2-portable` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

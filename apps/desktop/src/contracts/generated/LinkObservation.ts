@@ -2,6 +2,7 @@
 import type { CausalPoint } from "./CausalPoint";
 import type { EvidenceClass } from "./EvidenceClass";
 import type { ObservationState } from "./ObservationState";
+import type { ObserverOwnership } from "./ObserverOwnership";
 
 /**
  * One observer link report for a Session (D-0010).
@@ -14,4 +15,4 @@ processId: string | null,
 /**
  * The observer runs a qualified profile (kernel-read version).
  */
-qualified: boolean, version: string | null, link: ObservationState, };
+qualified: boolean, version: string | null, link: ObservationState, ownership: ObserverOwnership | null, };

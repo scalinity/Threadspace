@@ -1,0 +1,79 @@
+{
+  "baseCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "kitSourceCopy": "/workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/observer",
+  "claudeConfigDir": "/workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/claude-config",
+  "claudeBinarySha256": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358",
+  "sourceHashes": {
+    ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+    "hooks/delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+    "hooks/latency.ts": "5ce7fb559ec77779c720d1a224b656a4ebe0c9e02f2b75d5e14f9d2d24fa81b0",
+    "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+    "hooks/register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "tests/delivery.test.ts": "9615b87f4208b6c1e8d2cf7ac0c523cbd7b7f0c87f8887eda1c7b5adcd84087a",
+    "tests/kit.ts": "9cd76ea902aaaeb5fdad7c5ae012f353383af54ce65a4891c36d17fdb9f06969",
+    "tests/latency.node.mjs": "d81e05e5519b46b86a009c6e144ccdfa72b22310ebd080135b9049a9820da047",
+    "tests/middleware.test.ts": "eca43eb50c7ae4aa3ae7567e2f2a4e5c1431694b3e70f5406ac47485f4f72b57",
+    "tests/ownership.node.mjs": "980aef2b5896bd433c00de35db6323c8eebe66fa06617d3b2b91638071883152",
+    "tests/provenance.test.ts": "112f488578dedc9dd69d2bda5217922e1370f0179edade8915fe47adcb6bbf85",
+    "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+  },
+  "startedAtUtc": "2026-10-10T04:43:42.197653+00:00",
+  "nativeMacOS": "NOT_RUN",
+  "platform": "linux",
+  "test": {
+    "command": [
+      "/workspace/scratch/c8272833f682/remediation-tools/claude/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+      "plugin",
+      "test",
+      "/workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/observer"
+    ],
+    "startedAtUtc": "2026-10-10T04:43:42.198491+00:00",
+    "completedAtUtc": "2026-10-10T04:43:48.244942+00:00",
+    "exitCode": 0,
+    "outputSha256": "762c0e0c5c2fe4501335a352f267002fdfc2ff98cbf1d7da41ae1a6657fe4750"
+  },
+  "validate": {
+    "command": [
+      "/workspace/scratch/c8272833f682/remediation-tools/claude/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+      "plugin",
+      "validate",
+      "/workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/observer"
+    ],
+    "startedAtUtc": "2026-10-10T04:43:48.246185+00:00",
+    "completedAtUtc": "2026-10-10T04:43:49.130528+00:00",
+    "exitCode": 0,
+    "outputSha256": "f0e1bff4095b4f0dbdb21b7b91b7482fda101c4cd1e81746f820041bdcd92561"
+  },
+  "sourceHashesAfter": {
+    ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+    "hooks/delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+    "hooks/latency.ts": "5ce7fb559ec77779c720d1a224b656a4ebe0c9e02f2b75d5e14f9d2d24fa81b0",
+    "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+    "hooks/register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "tests/delivery.test.ts": "9615b87f4208b6c1e8d2cf7ac0c523cbd7b7f0c87f8887eda1c7b5adcd84087a",
+    "tests/kit.ts": "9cd76ea902aaaeb5fdad7c5ae012f353383af54ce65a4891c36d17fdb9f06969",
+    "tests/latency.node.mjs": "d81e05e5519b46b86a009c6e144ccdfa72b22310ebd080135b9049a9820da047",
+    "tests/middleware.test.ts": "eca43eb50c7ae4aa3ae7567e2f2a4e5c1431694b3e70f5406ac47485f4f72b57",
+    "tests/ownership.node.mjs": "980aef2b5896bd433c00de35db6323c8eebe66fa06617d3b2b91638071883152",
+    "tests/provenance.test.ts": "112f488578dedc9dd69d2bda5217922e1370f0179edade8915fe47adcb6bbf85",
+    "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+  },
+  "sourceMatchesRepository": {
+    ".claude-plugin/plugin.json": true,
+    "hooks/delivery.ts": true,
+    "hooks/hooks.json": true,
+    "hooks/latency.ts": true,
+    "hooks/ownership.ts": true,
+    "hooks/register.ts": true,
+    "tests/delivery.test.ts": true,
+    "tests/kit.ts": true,
+    "tests/latency.node.mjs": true,
+    "tests/middleware.test.ts": true,
+    "tests/ownership.node.mjs": true,
+    "tests/provenance.test.ts": true,
+    "types/index.d.ts": true
+  },
+  "finishedAtUtc": "2026-10-10T04:43:49.132551+00:00"
+}

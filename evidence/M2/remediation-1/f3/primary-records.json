@@ -1,0 +1,498 @@
+[
+  {
+    "label": "m0c-inherited-positive",
+    "directory": "evidence/M0C/g08-terminal/20261006T144151Z-prod",
+    "harnessRevision": "89d857267ba0fe5ffde7cbad51db5b4123189f98",
+    "applicationSource": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb",
+    "nativeExecutionAttribution": "retained pre-remediation owner-Mac evidence; not executed in this review",
+    "sourceFilesSha256": {
+      "cases.jsonl": "c1df79a961192ce4c3f30446e3b1d19c588dfea4c410e30a5104d52a1cfc351e",
+      "sessions.json": "c1376b3fd46e4c1e70a7aeebb783ebadc9f0041a219f8d07a1cb8f235fe0a370",
+      "summary.json": "f40ee15a054959ebaa7e8c712ffe7b8c0dcf5d9909308aa16e737a3b848f77c2",
+      "idle-gate.json": "78134aba382ca7d2f24ce85226d8c427a3afd793f3f3977d2809962ed426a8a6",
+      "cleanup.jsonl": "b34421547f4317a3e6b46b51dd57c8b6a4780b1b9d78c078185f03873758c52c"
+    },
+    "minimizedCaseLine": 4,
+    "minimizedCase": {
+      "case": "minimize-then-return",
+      "detail": {
+        "miniaturizedAfterReturn": false,
+        "minimizedByWindowId": true,
+        "route": {
+          "exact": true,
+          "expectedTty": "/dev/ttys002",
+          "focusPerformed": true,
+          "harnessElapsedMs": 1543,
+          "independentFrontmost": "com.apple.Terminal",
+          "independentReadbackError": null,
+          "independentSelectedTty": "/dev/ttys002",
+          "inputReadiness": "FOREGROUND_COMPATIBLE",
+          "latencyMs": 1540,
+          "reasonCode": "OK",
+          "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+          "surfaceResult": "EXACT_NATIVE_SURFACE",
+          "unverifiedExact": false,
+          "wrongTarget": false
+        }
+      },
+      "pass": true
+    },
+    "sameRunBaseline": {
+      "case": "baseline-exact",
+      "detail": {
+        "exact": true,
+        "expectedTty": "/dev/ttys002",
+        "focusPerformed": true,
+        "harnessElapsedMs": 796,
+        "independentFrontmost": "com.apple.Terminal",
+        "independentReadbackError": null,
+        "independentSelectedTty": "/dev/ttys002",
+        "inputReadiness": "FOREGROUND_COMPATIBLE",
+        "latencyMs": 794,
+        "reasonCode": "OK",
+        "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+        "surfaceResult": "EXACT_NATIVE_SURFACE",
+        "unverifiedExact": false,
+        "wrongTarget": false
+      },
+      "pass": true
+    },
+    "sessions": [
+      {
+        "label": "a",
+        "nativeSessionId": "e81d630e-f134-44d5-9034-4ffd90188456",
+        "pid": 63974,
+        "sessionId": "cc8fe4c2-cd39-4064-baf4-0cd38a7727a3",
+        "tty": "/dev/ttys002",
+        "windowId": 14483
+      },
+      {
+        "label": "b",
+        "nativeSessionId": "33d7b8f2-1ff1-4c00-b57c-c3aacc4c8b11",
+        "pid": 64391,
+        "sessionId": "0bbfcb34-021a-4d80-9498-a78210c930cd",
+        "tty": "/dev/ttys004",
+        "windowId": 14484
+      },
+      {
+        "label": "spare",
+        "tty": "/dev/ttys005",
+        "windowId": 14485
+      }
+    ],
+    "idleGate": {
+      "idleAtStart": 1787.056900291,
+      "requiredSeconds": 10.0,
+      "satisfied": true,
+      "waitedMs": 15
+    },
+    "summary": {
+      "cases": [
+        {
+          "case": "baseline-exact",
+          "pass": true
+        },
+        {
+          "case": "reorder",
+          "pass": true
+        },
+        {
+          "case": "move",
+          "pass": true
+        },
+        {
+          "case": "minimize-then-return",
+          "pass": true
+        },
+        {
+          "case": "fullscreen-space-then-return",
+          "pass": true
+        },
+        {
+          "case": "foreground-process-mismatch",
+          "pass": true
+        },
+        {
+          "case": "selection-readback-race",
+          "pass": true
+        },
+        {
+          "case": "target-closed",
+          "pass": true
+        },
+        {
+          "case": "stale-tty-pathname",
+          "pass": true
+        },
+        {
+          "case": "target-closed-during-route",
+          "pass": true
+        },
+        {
+          "case": "terminal-restart",
+          "pass": false
+        }
+      ],
+      "disposableRoot": "/private/tmp/ts-m0c-route-53765c64",
+      "gate": "G08",
+      "pass": true,
+      "terminalIncarnationUnchanged": true,
+      "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+      "wrongTargets": 0
+    }
+  },
+  {
+    "label": "m2-first-failure",
+    "directory": "evidence/M2/g08-terminal/20261009T042955Z-dev",
+    "harnessRevision": "40869f36fda2ca6d504470000bb2d0c4b3e0e72a",
+    "applicationSource": "f4ef5f156f7086962bafa92728cc4cace5a58c3c",
+    "nativeExecutionAttribution": "retained pre-remediation owner-Mac evidence; not executed in this review",
+    "sourceFilesSha256": {
+      "cases.jsonl": "16f791507b8d00c4cef83e60e7ec9a385a8030a03a0bd5cc4e5b8a50c15a4ed5",
+      "sessions.json": "e3568e7e18395cf4aad7fc905b2988189e472f77cc92c397f9e9bbfd30b8c1ad",
+      "summary.json": "6dbfb87281acdc94a77004bd607dead95635145589ef3abef120b499c6341644",
+      "idle-gate.json": "3c31a0ec6bc54a06043f59c07031577ab4d75c9ab992003734af9f50a7369293",
+      "cleanup.jsonl": "7ac691b7620d0dec02e5aa8b986c6e8fcb6ca650cc54cf76eb64b30b307376e7"
+    },
+    "minimizedCaseLine": 4,
+    "minimizedCase": {
+      "case": "minimize-then-return",
+      "detail": {
+        "miniaturizedAfterReturn": false,
+        "minimizedByWindowId": true,
+        "route": {
+          "exact": false,
+          "expectedTty": "/dev/ttys001",
+          "focus": {
+            "elapsedMs": 0,
+            "error": "osascript failed (status None, timed out true): ",
+            "frontWindowId": null,
+            "frontmostApplication": null,
+            "outcome": "FAILED",
+            "readbackRdev": null,
+            "readbackTty": null,
+            "senderPid": null,
+            "startedMs": 1791520220664,
+            "targetTabIndex": null,
+            "targetTabSelected": null,
+            "targetWindowFrontmost": null,
+            "targetWindowId": null
+          },
+          "focusPerformed": true,
+          "harnessElapsedMs": 2009,
+          "independentFrontmost": "com.apple.Terminal",
+          "independentReadbackError": null,
+          "independentSelectedTty": "/dev/ttys011",
+          "inputReadiness": "UNKNOWN",
+          "latencyMs": 2007,
+          "reasonCode": "TIMEOUT",
+          "requestId": "5ae13e5b-49f3-4be7-be7f-ce3e43cb169f",
+          "sessionVerification": "NATIVE_BOUND_LAST_KNOWN",
+          "surfaceResult": "UNAVAILABLE",
+          "unverifiedExact": false,
+          "wrongTarget": false
+        }
+      },
+      "pass": false
+    },
+    "sameRunBaseline": {
+      "case": "baseline-exact",
+      "detail": {
+        "exact": true,
+        "expectedTty": "/dev/ttys001",
+        "focus": {
+          "elapsedMs": 251,
+          "error": null,
+          "frontWindowId": 27819,
+          "frontmostApplication": {
+            "bundleIdentifier": "com.apple.Terminal",
+            "pid": 54375
+          },
+          "outcome": "FOCUSED",
+          "readbackRdev": 268435457,
+          "readbackTty": "/dev/ttys001",
+          "senderPid": 62262,
+          "startedMs": 1791520214231,
+          "targetTabIndex": 1,
+          "targetTabSelected": true,
+          "targetWindowFrontmost": true,
+          "targetWindowId": 27819
+        },
+        "focusPerformed": true,
+        "harnessElapsedMs": 818,
+        "independentFrontmost": "com.apple.Terminal",
+        "independentReadbackError": null,
+        "independentSelectedTty": "/dev/ttys001",
+        "inputReadiness": "FOREGROUND_COMPATIBLE",
+        "latencyMs": 814,
+        "reasonCode": "OK",
+        "requestId": "947c325d-2533-4fa8-b55d-cb595e5d24ae",
+        "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+        "surfaceResult": "EXACT_NATIVE_SURFACE",
+        "unverifiedExact": false,
+        "wrongTarget": false
+      },
+      "pass": true
+    },
+    "sessions": [
+      {
+        "label": "a",
+        "nativeSessionId": "4a770162-3809-4f93-965b-19c05223403d",
+        "pid": 61357,
+        "sessionId": "7d8a60a1-86d6-4d69-af35-327ecea4962c",
+        "tty": "/dev/ttys001",
+        "windowId": 27819
+      },
+      {
+        "label": "b",
+        "nativeSessionId": "8fd3dedd-9e93-46d1-adf7-bd31fd40dc95",
+        "pid": 61803,
+        "sessionId": "f1bec6e3-5b6f-457e-b713-5a850c64e319",
+        "tty": "/dev/ttys010",
+        "windowId": 27820
+      },
+      {
+        "label": "spare",
+        "tty": "/dev/ttys011",
+        "windowId": 27821
+      }
+    ],
+    "idleGate": {
+      "idleAtStart": 119.569719666,
+      "requiredSeconds": 10.0,
+      "satisfied": true,
+      "waitedMs": 24
+    },
+    "summary": {
+      "cases": [
+        {
+          "case": "baseline-exact",
+          "pass": true
+        },
+        {
+          "case": "reorder",
+          "pass": true
+        },
+        {
+          "case": "move",
+          "pass": true
+        },
+        {
+          "case": "minimize-then-return",
+          "pass": false
+        },
+        {
+          "case": "fullscreen-space-then-return",
+          "pass": true
+        },
+        {
+          "case": "foreground-process-mismatch",
+          "pass": true
+        },
+        {
+          "case": "selection-readback-race",
+          "pass": true
+        },
+        {
+          "case": "target-closed",
+          "pass": true
+        },
+        {
+          "case": "stale-tty-pathname",
+          "pass": true
+        },
+        {
+          "case": "target-closed-during-route",
+          "pass": true
+        },
+        {
+          "case": "terminal-restart",
+          "pass": false
+        }
+      ],
+      "disposableRoot": "/private/tmp/ts-m0c-route-ea41b581",
+      "gate": "G08",
+      "pass": false,
+      "terminalIncarnationUnchanged": true,
+      "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+      "wrongTargets": 0
+    }
+  },
+  {
+    "label": "m2-second-failure",
+    "directory": "evidence/M2/g08-terminal/20261009T044059Z-dev",
+    "harnessRevision": "66e53f0f190bdba08b16325919ad52072a1c4d8b",
+    "applicationSource": "f4ef5f156f7086962bafa92728cc4cace5a58c3c",
+    "nativeExecutionAttribution": "retained pre-remediation owner-Mac evidence; not executed in this review",
+    "sourceFilesSha256": {
+      "cases.jsonl": "3f0aed36cc697a8ee79e3f1086128c33e4aa2657f53db1c3ad8d9a2d719b21a9",
+      "sessions.json": "5b56cbdd628470800c6076af0929b5c374fd8827cdd915ef4f046e830268bbda",
+      "summary.json": "a07d5bd667191669562b1b00f884a888cc7732219567434c845f18c4e327b838",
+      "idle-gate.json": "2865fd9a2ba1b0753b8eef2ad72681d8a3c33731711607267f0e524d55ad9dd7",
+      "cleanup.jsonl": "0a7247478fcb46beccb8af8a2aaec527432d87050cdd1e17d025c475f36a7251"
+    },
+    "minimizedCaseLine": 4,
+    "minimizedCase": {
+      "case": "minimize-then-return",
+      "detail": {
+        "miniaturizedAfterReturn": false,
+        "minimizedByWindowId": true,
+        "route": {
+          "exact": false,
+          "expectedTty": "/dev/ttys001",
+          "focus": {
+            "elapsedMs": 0,
+            "error": "osascript failed (status None, timed out true): ",
+            "frontWindowId": null,
+            "frontmostApplication": null,
+            "outcome": "FAILED",
+            "readbackRdev": null,
+            "readbackTty": null,
+            "senderPid": null,
+            "startedMs": 1791520901461,
+            "targetTabIndex": null,
+            "targetTabSelected": null,
+            "targetWindowFrontmost": null,
+            "targetWindowId": null
+          },
+          "focusPerformed": true,
+          "harnessElapsedMs": 2004,
+          "independentFrontmost": "com.apple.Terminal",
+          "independentReadbackError": null,
+          "independentSelectedTty": "/dev/ttys011",
+          "inputReadiness": "UNKNOWN",
+          "latencyMs": 2003,
+          "reasonCode": "TIMEOUT",
+          "requestId": "a9243bdf-a290-431d-905d-4a910e1902f4",
+          "sessionVerification": "NATIVE_BOUND_LAST_KNOWN",
+          "surfaceResult": "UNAVAILABLE",
+          "unverifiedExact": false,
+          "wrongTarget": false
+        }
+      },
+      "pass": false
+    },
+    "sameRunBaseline": {
+      "case": "baseline-exact",
+      "detail": {
+        "exact": true,
+        "expectedTty": "/dev/ttys001",
+        "focus": {
+          "elapsedMs": 238,
+          "error": null,
+          "frontWindowId": 27889,
+          "frontmostApplication": {
+            "bundleIdentifier": "com.apple.Terminal",
+            "pid": 54375
+          },
+          "outcome": "FOCUSED",
+          "readbackRdev": 268435457,
+          "readbackTty": "/dev/ttys001",
+          "senderPid": 82581,
+          "startedMs": 1791520895094,
+          "targetTabIndex": 1,
+          "targetTabSelected": true,
+          "targetWindowFrontmost": true,
+          "targetWindowId": 27889
+        },
+        "focusPerformed": true,
+        "harnessElapsedMs": 786,
+        "independentFrontmost": "com.apple.Terminal",
+        "independentReadbackError": null,
+        "independentSelectedTty": "/dev/ttys001",
+        "inputReadiness": "FOREGROUND_COMPATIBLE",
+        "latencyMs": 785,
+        "reasonCode": "OK",
+        "requestId": "2354554f-4d29-4eb8-b73e-624dc90bc74c",
+        "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+        "surfaceResult": "EXACT_NATIVE_SURFACE",
+        "unverifiedExact": false,
+        "wrongTarget": false
+      },
+      "pass": true
+    },
+    "sessions": [
+      {
+        "label": "a",
+        "nativeSessionId": "53cf39c4-3b94-4380-8f29-9e7a0eaf70f4",
+        "pid": 81814,
+        "sessionId": "6e925fa3-f014-489b-b3f2-dd94925bbabe",
+        "tty": "/dev/ttys001",
+        "windowId": 27889
+      },
+      {
+        "label": "b",
+        "nativeSessionId": "c8fc19d7-eb88-4a0c-9058-af0781a855e9",
+        "pid": 82181,
+        "sessionId": "cb2ea1d2-d7c7-4cbd-b357-a95e15fd7664",
+        "tty": "/dev/ttys010",
+        "windowId": 27890
+      },
+      {
+        "label": "spare",
+        "tty": "/dev/ttys011",
+        "windowId": 27891
+      }
+    ],
+    "idleGate": {
+      "idleAtStart": 0.205444833,
+      "requiredSeconds": 10.0,
+      "satisfied": true,
+      "waitedMs": 23061
+    },
+    "summary": {
+      "cases": [
+        {
+          "case": "baseline-exact",
+          "pass": true
+        },
+        {
+          "case": "reorder",
+          "pass": true
+        },
+        {
+          "case": "move",
+          "pass": true
+        },
+        {
+          "case": "minimize-then-return",
+          "pass": false
+        },
+        {
+          "case": "fullscreen-space-then-return",
+          "pass": true
+        },
+        {
+          "case": "foreground-process-mismatch",
+          "pass": true
+        },
+        {
+          "case": "selection-readback-race",
+          "pass": true
+        },
+        {
+          "case": "target-closed",
+          "pass": true
+        },
+        {
+          "case": "stale-tty-pathname",
+          "pass": true
+        },
+        {
+          "case": "target-closed-during-route",
+          "pass": true
+        },
+        {
+          "case": "terminal-restart",
+          "pass": false
+        }
+      ],
+      "disposableRoot": "/private/tmp/ts-m0c-route-27457ae4",
+      "gate": "G08",
+      "pass": false,
+      "terminalIncarnationUnchanged": true,
+      "terminalRestart": "BLOCKED (quitting Terminal would end unrelated owner sessions)",
+      "wrongTargets": 0
+    }
+  }
+]

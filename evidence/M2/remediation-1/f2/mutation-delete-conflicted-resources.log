@@ -1,0 +1,22 @@
+   Compiling threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-f2-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_f2_portable-8d9a99313dc5c838)
+
+running 1 test
+test setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record ... FAILED
+
+failures:
+
+---- setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record stdout ----
+
+thread 'setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record' (899) panicked at src/setup/f2_tests.rs:88:9:
+assertion failed: !report.complete
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

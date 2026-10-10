@@ -1,0 +1,30 @@
+    Checking threadspace-contracts v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/contracts)
+    Checking threadspace-surfaces-macos v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/surfaces-macos)
+    Checking threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+    Checking threadspace-provider-claude v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/provider-claude)
+    Checking threadspace-relay v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/relay)
+    Checking threadspace-harness v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/tests/native/harness)
+error: this `if` statement can be collapsed
+   --> crates/relay/src/bin/threadspace-hook.rs:365:13
+    |
+365 | /             if let (Some(store), Some(boot), Some(stamp)) = (latency_store(args), context.boot_id.as_deref(), monotonic_ns()) {
+366 | |                 if let Some(annotated) = threadspace_relay::latency::annotate_receipt(&store, &receipt, boot, stamp) {
+367 | |                     return (Some(annotated), 0);
+368 | |                 }
+369 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+365 ~             if let (Some(store), Some(boot), Some(stamp)) = (latency_store(args), context.boot_id.as_deref(), monotonic_ns())
+366 ~                 && let Some(annotated) = threadspace_relay::latency::annotate_receipt(&store, &receipt, boot, stamp) {
+367 |                     return (Some(annotated), 0);
+368 ~                 }
+    |
+
+error: could not compile `threadspace-relay` (bin "threadspace-hook") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `threadspace-relay` (bin "threadspace-hook" test) due to 1 previous error

@@ -1,0 +1,71 @@
+   Compiling threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+   Compiling threadspace-surfaces-macos v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/surfaces-macos)
+error[E0425]: cannot find type `proc_bsdinfo` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:174:40
+    |
+174 |     let mut info = MaybeUninit::<libc::proc_bsdinfo>::zeroed();
+    |                                        ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find type `proc_bsdinfo` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:175:36
+    |
+175 |     let expected = size_of::<libc::proc_bsdinfo>() as i32;
+    |                                    ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `proc_pidinfo` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:179:15
+    |
+179 |         libc::proc_pidinfo(
+    |               ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find value `PROC_PIDTBSDINFO` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:181:19
+    |
+181 |             libc::PROC_PIDTBSDINFO,
+    |                   ^^^^^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find value `PROC_PIDPATHINFO_MAXSIZE` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:215:38
+    |
+215 |     let mut buffer = vec![0u8; libc::PROC_PIDPATHINFO_MAXSIZE as usize];
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `proc_pidpath` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:218:24
+    |
+218 |         unsafe { libc::proc_pidpath(pid, buffer.as_mut_ptr().cast(), buffer.len() as u32) };
+    |                        ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `proc_listallpids` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:232:35
+    |
+232 |     let estimate = unsafe { libc::proc_listallpids(std::ptr::null_mut(), 0) };
+    |                                   ^^^^^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `proc_listallpids` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:242:15
+    |
+242 |         libc::proc_listallpids(
+    |               ^^^^^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `sysctlbyname` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:306:15
+    |
+306 |         libc::sysctlbyname(
+    |               ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `sysctlbyname` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:333:15
+    |
+333 |         libc::sysctlbyname(
+    |               ^^^^^^^^^^^^ not found in `libc`
+
+error[E0425]: cannot find function `sysctlbyname` in crate `libc`
+   --> crates/surfaces-macos/src/process.rs:365:15
+    |
+365 |         libc::sysctlbyname(
+    |               ^^^^^^^^^^^^ not found in `libc`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `threadspace-surfaces-macos` (lib) due to 11 previous errors
+warning: build failed, waiting for other jobs to finish...

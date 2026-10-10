@@ -1,0 +1,13 @@
+{
+  "changedSinceCore": {
+    "evidence/M2/remediation-1/f1a/observer-witnesses.json": {
+      "after": "ea64a907ea469615fb0f356a8d63e88c6b4d0eef1f0f878550b906b61b06ff21",
+      "before": "f1561a3795b6e33ce9dc174fcfd51d2539a0be31814e0dd816380aa201c683fc"
+    }
+  },
+  "finalAdapterRecord": "final-f1a-adapter.json",
+  "nativeMacOSExecution": false,
+  "originalCoreRecord": "portable-core.json",
+  "reason": "F4 missing-watchdog-handle fix changes the producer runtime fingerprint; re-execute the consuming actual-F1A adapter chain only. Core Rust, migration and synthetic sources are unchanged.",
+  "unchangedCoreSources": 129
+}

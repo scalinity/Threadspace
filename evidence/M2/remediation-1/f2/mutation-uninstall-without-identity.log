@@ -1,0 +1,23 @@
+   Compiling threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-f2-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_f2_portable-8d9a99313dc5c838)
+
+running 1 test
+test setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged ... FAILED
+
+failures:
+
+---- setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged stdout ----
+
+thread 'setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged' (1118) panicked at src/setup/f2_tests.rs:336:9:
+assertion failed: matches!(uninstall(&scratch.target(Scope::Session)),
+    Err(SetupError::ScopeMismatch { installed: Scope::User }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

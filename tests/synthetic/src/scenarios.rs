@@ -1248,12 +1248,12 @@ pub fn observer_link_evidence() -> Scenario {
     })
 }
 
-/// Host-read-tier outcomes (D-0005 reload rule, D-0010): an outcome whose
-/// session attribution is a host read applies only once kernel/inventory
-/// evidence shows its provider process running that Session, whichever
-/// arrives first; one from another process never applies. A qualified
-/// host-read link with a corroborated process is restored; without that
-/// proof, or from an unqualified profile, it stays lower tier.
+/// Host-read-tier outcomes (D-0005 reload rule, D-0010/F1B): historical
+/// attachments never establish the observer's current ownership interval,
+/// including when the ProcessKey matches. Both same-process historical and
+/// wrong-process claims stay pending in every delivery order. The positive
+/// proof/seal/new-Turn sequence is exercised through production adapters in
+/// `journal/tests/observer_ownership.rs`.
 pub fn host_read_outcome() -> Scenario {
     let mut b = Builder::new("host-read-outcome", "evidence-sets");
     let corroborated = session(CLAUDE_LIKE, "sess-host-read-corroborated");
@@ -1303,8 +1303,8 @@ pub fn host_read_outcome() -> Scenario {
         let v = View::new(state);
         let turn = |s: &str| v.turn(s, None, "t1").map(|t| (t.state.clone(), t.pending_outcomes.len()));
         ensure!(
-            turn("sess-host-read-corroborated") == Some((TurnState::Completed, 1)),
-            "a corroborated host-read outcome applies: {:?}",
+            turn("sess-host-read-corroborated") == Some((TurnState::Working, 1)),
+            "a historical same-process attachment does not prove a new ownership interval: {:?}",
             turn("sess-host-read-corroborated")
         );
         ensure!(
@@ -1313,7 +1313,7 @@ pub fn host_read_outcome() -> Scenario {
             turn("sess-host-read-foreign")
         );
         let tier = |s: &str| v.session(s).and_then(|r| r.observer_tier);
-        ensure!(tier("sess-host-read-corroborated") == Some(ObserverTier::Restored), "corroborated host read is restored");
+        ensure!(tier("sess-host-read-corroborated") == Some(ObserverTier::LowerTier), "historical same-process host read stays lower tier");
         ensure!(tier("sess-host-read-foreign") == Some(ObserverTier::LowerTier), "uncorroborated host read stays lower tier");
         ensure!(tier("sess-host-read-unqualified") == Some(ObserverTier::LowerTier), "an unqualified profile stays lower tier");
         Ok(())

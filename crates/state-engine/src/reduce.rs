@@ -14,14 +14,15 @@ use std::collections::{BTreeMap, BTreeSet};
 use threadspace_contracts::canonical::causal::{CausalOrder, CausalPoint};
 use threadspace_contracts::canonical::fact::{
     ActorRole, AttachedPresence, Delivery, EvidenceClass, ExecutionMode, FactPayload, InputOrigin,
-    JournalEntry, ResolvedFact, TurnOutcome, WaitCategory, WaitSignal,
+    JournalEntry, ObserverOwnership, ResolvedFact, TurnOutcome, WaitCategory, WaitSignal,
 };
 use threadspace_contracts::canonical::keys::{NativeActorRef, NativeExecutionRef};
 use threadspace_contracts::canonical::records::{
     ActivityRecord, ActorRecord, ActorRelationRecord, AttachObservation, AttentionRecord,
     AttentionScope, CanonicalState, CommandEffect, ExactRequestRecord, ExecutionRecord,
     HumanFrontier, InputRecord, InputSubmission, InventoryObservation, LinkObservation,
-    NamespaceRecord, ObserverTier, OutboxRecord, OutboxState, OwnerActionKind, PendingOutcome,
+    NamespaceRecord, ObserverTier, OutboxRecord, OutboxState, OwnerActionKind, OwnershipProof,
+    OwnershipStart, PendingOutcome,
     ProcessImage, ProcessRecord, ResolutionCause, ResolutionKind, RouteRecord, SequenceRange, SessionRecord,
     SourceCoverage, SourceSurfaceRecord, SummaryAuthority, SurfaceBindingRecord,
     TurnIdentityKind, TurnRecord, WaitEpisode, WaitOwnerDecision, WaitScopeRecord,
@@ -85,6 +86,7 @@ pub(crate) fn apply(engine: &mut Engine, entry: &JournalEntry) -> ReduceOutput {
 pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, delivery: Delivery) -> ReduceOutput {
     let entry = JournalEntry {
         cursor,
+        payload_version: threadspace_contracts::canonical::JOURNAL_PAYLOAD_VERSION,
         endpoint_id: endpoint_id.to_owned(),
         observation_id: String::new(),
         source_id: "baseline".to_owned(),
@@ -187,9 +189,42 @@ pub fn record_evidence(state: &mut CanonicalState, fact: &ResolvedFact) -> bool 
                     qualified: *qualified,
                     version: version.clone(),
                     link: link.clone(),
+                    ownership: fact.native.observer_ownership.clone(),
                 });
                 true
             }),
+        FactPayload::ObserverOwnershipCorroborated {}
+            if fact.provenance == EvidenceClass::ProviderSnapshot => {
+                match (&refs.session_id, &refs.process_id, &fact.native.observer_ownership) {
+                    (Some(session), Some(process), Some(ownership)) => state.sessions.get_mut(session)
+                        .is_some_and(|session| {
+                            session.ownership_proofs.insert(OwnershipProof {
+                                observation_id,
+                                fact_index,
+                                process_id: process.clone(),
+                                ownership: ownership.clone(),
+                            });
+                            true
+                        }),
+                    _ => false,
+                }
+            }
+        FactPayload::TurnStarted {} => {
+            match (&refs.turn_id, &refs.process_id, &fact.native.observer_ownership, point) {
+                (Some(turn), Some(process), Some(ownership), Some(point)) => state.turns.get_mut(turn)
+                    .is_some_and(|turn| {
+                        turn.ownership_starts.insert(OwnershipStart {
+                            observation_id,
+                            fact_index,
+                            point,
+                            process_id: process.clone(),
+                            ownership: ownership.clone(),
+                        });
+                        true
+                    }),
+                _ => false,
+            }
+        }
         FactPayload::InputSubmitted { origin, submission } => refs
             .input_id
             .as_ref()
@@ -216,11 +251,58 @@ pub fn record_evidence(state: &mut CanonicalState, fact: &ResolvedFact) -> bool 
                     reason: reason.clone(),
                     point,
                     process_id: refs.process_id.clone(),
+                    ownership: fact.native.observer_ownership.clone(),
                 });
                 true
             }),
         _ => false,
     }
+}
+
+/// Explicit reducer-3 -> 4 transition, using retained canonical facts rather
+/// than a derived outcome Boolean. Direct native outcomes survive, including
+/// a direct witness that reports the same enum value as a pending claim.
+/// Historical owner-command/attention records stay available for rederive.
+pub(crate) fn requalify_ownership(state: &mut CanonicalState, facts: &[ResolvedFact]) -> Result<(), String> {
+    let affected: BTreeSet<String> = state.turns.iter()
+        .filter(|(_, turn)| !turn.pending_outcomes.is_empty())
+        .map(|(id, _)| id.clone()).collect();
+    for id in &affected {
+        let turn = &state.turns[id];
+        for pending in &turn.pending_outcomes {
+            let present = facts.iter().any(|fact| {
+                fact.observation_id == pending.observation_id
+                    && fact.fact_index == pending.fact_index
+                    && fact.refs.turn_id.as_ref() == Some(id)
+                    && fact.provenance == EvidenceClass::HostRead
+                    && matches!(fact.payload, FactPayload::TurnOutcomeObserved { .. })
+            });
+            if !present {
+                return Err(format!("reducer-4 ownership upgrade requires retained fact {}:{}", pending.observation_id, pending.fact_index));
+            }
+        }
+    }
+    for id in &affected {
+        if let Some(turn) = state.turns.get_mut(id) {
+            turn.outcomes.clear();
+            turn.outcome_reasons.clear();
+            turn.output_points.clear();
+        }
+    }
+    for fact in facts {
+        let Some(id) = fact.refs.turn_id.as_ref().filter(|id| affected.contains(*id)) else { continue };
+        let Some(turn) = state.turns.get_mut(id) else { continue };
+        match &fact.payload {
+            FactPayload::TurnOutcomeObserved { outcome, reason, .. } if fact.provenance != EvidenceClass::HostRead => {
+                turn.outcomes.insert(*outcome);
+                turn.outcome_reasons.extend(reason.clone());
+                turn.output_points.extend(fact.causal.clone());
+            }
+            FactPayload::OutputReady { .. } => turn.output_points.extend(fact.causal.clone()),
+            _ => {}
+        }
+    }
+    Ok(())
 }
 
 /// The items no other item's point causally follows; with unordered
@@ -271,6 +353,7 @@ fn link_rank(link: &ObservationState) -> u8 {
 
 const SUPPRESSED_BEFORE_SUBMISSION: &str = "ineligible before submission";
 const WAIT_SUPERSEDED: &str = "wait episode superseded by an earlier clear";
+const OWNERSHIP_UNQUALIFIED: &str = "native outcome lacks independent ownership corroboration";
 
 fn severity(outcome: TurnOutcome) -> u8 {
     match outcome {
@@ -554,6 +637,7 @@ impl Tx<'_> {
                     display_name: None,
                     start_sources: BTreeSet::new(),
                     links: BTreeSet::new(),
+                    ownership_proofs: BTreeSet::new(),
                     link: None,
                     inventory: None,
                     last_route: None,
@@ -716,6 +800,7 @@ impl Tx<'_> {
                     outcomes: BTreeSet::new(),
                     outcome_reasons: BTreeSet::new(),
                     pending_outcomes: BTreeSet::new(),
+                    ownership_starts: BTreeSet::new(),
                     output_ready: false,
                     output_points: BTreeSet::new(),
                     summary: None,
@@ -929,7 +1014,9 @@ impl Tx<'_> {
             }
             // The link, and an input's origin, submission point and active
             // turn, are derived from their reports.
-            FactPayload::ObservationLinkChanged { .. } | FactPayload::InputSubmitted { .. } => {
+            FactPayload::ObservationLinkChanged { .. }
+            | FactPayload::ObserverOwnershipCorroborated {}
+            | FactPayload::InputSubmitted { .. } => {
                 record_evidence(self.state, fact);
             }
             FactPayload::InputAccepted { proof } => {
@@ -943,6 +1030,7 @@ impl Tx<'_> {
                 }
             }
             FactPayload::TurnStarted {} => {
+                record_evidence(self.state, fact);
                 if let Some(turn_id) = &refs.turn_id {
                     if let Some(turn) = self.state.turns.get_mut(turn_id) {
                         turn.started = true;
@@ -1546,6 +1634,19 @@ impl Tx<'_> {
                 self.touch_turn(&turn);
             }
         }
+        // Independent proofs and observer seals can arrive after a pending
+        // outcome. Revisit only affected Sessions; causal identity, never
+        // admission order, decides whether the proof applies.
+        let ownership_sessions: Vec<String> = self.before.sessions.keys().cloned().collect();
+        for session in ownership_sessions {
+            let pending: Vec<String> = self.index.session_turns.get(&session)
+                .map(|ids| ids.iter().filter(|id| self.state.turns.get(*id)
+                    .is_some_and(|t| !t.pending_outcomes.is_empty())).cloned().collect())
+                .unwrap_or_default();
+            for id in pending {
+                self.touch_turn(&id);
+            }
+        }
         let turns: Vec<String> = self.before.turns.keys().cloned().collect();
         for id in &turns {
             self.derive_turn(id);
@@ -1716,10 +1817,10 @@ impl Tx<'_> {
         }
     }
 
-    /// True when kernel/inventory evidence shows `process_id` running one of
-    /// the session's executions: an execution of that process attached by
-    /// anything other than a host-read report.
-    fn corroborated(&self, session_id: &str, process_id: &str) -> bool {
+    /// The old reducer's rule, retained only to recover a pre-upgrade suffix
+    /// before its committed owner decisions are migrated. Never used for a
+    /// reducer-4 live admission or for its final authority derivation.
+    fn legacy_corroborated(&self, session_id: &str, process_id: &str) -> bool {
         self.index.session_executions.get(session_id).is_some_and(|ids| {
             ids.iter().filter_map(|id| self.state.executions.get(id)).any(|execution| {
                 execution.process_id.as_deref() == Some(process_id)
@@ -1728,6 +1829,50 @@ impl Tx<'_> {
                         .iter()
                         .any(|a| a.provenance != EvidenceClass::HostRead)
             })
+        })
+    }
+
+    /// A native-created token must name a separately admitted bracketed
+    /// inventory/kernel proof for this exact Session, ProcessKey and image.
+    /// Historical execution attachments are deliberately irrelevant.
+    fn ownership_proven(&self, session_id: &str, process_id: &str, ownership: &ObserverOwnership) -> bool {
+        self.state.sessions.get(session_id).is_some_and(|session| {
+            session.ownership_proofs.iter().any(|proof| {
+                proof.process_id == process_id && proof.ownership == *ownership
+            })
+        })
+    }
+
+    fn sealed(&self, session_id: &str, process_id: &str, ownership: &ObserverOwnership, before: Option<&CausalPoint>) -> bool {
+        if !self.ownership_proven(session_id, process_id, ownership) {
+            return false;
+        }
+        self.state.sessions.get(session_id).is_some_and(|session| session.links.iter().any(|link| {
+            link.qualified
+                && link.provenance == EvidenceClass::HostRead
+                && link.process_id.as_deref() == Some(process_id)
+                && link.ownership.as_ref() == Some(ownership)
+                && link.point.as_ref().is_some_and(|point| {
+                    point.source_epoch == ownership.source_epoch
+                        && point.sequence.is_some()
+                        && before.is_none_or(|start| compare(point, start) == CausalOrder::Before)
+                })
+        }))
+    }
+
+    fn outcome_corroborated(&self, turn: &TurnRecord, pending: &PendingOutcome) -> bool {
+        let Some(process) = pending.process_id.as_deref() else { return false };
+        if self.state.reducer_version < 4 {
+            return self.legacy_corroborated(&turn.session_id, process);
+        }
+        let (Some(ownership), Some(outcome)) = (&pending.ownership, &pending.point) else { return false };
+        turn.ownership_starts.iter().any(|start| {
+            start.process_id == process
+                && start.ownership == *ownership
+                && start.point.source_epoch == ownership.source_epoch
+                && outcome.source_epoch == ownership.source_epoch
+                && compare(&start.point, outcome) == CausalOrder::Before
+                && self.sealed(&turn.session_id, process, ownership, Some(&start.point))
         })
     }
 
@@ -1750,7 +1895,15 @@ impl Tx<'_> {
         let tier = if newest.iter().any(|l| l.qualified && l.provenance != EvidenceClass::HostRead) {
             ObserverTier::Native
         } else if newest.iter().any(|l| {
-            l.qualified && l.process_id.as_deref().is_some_and(|p| self.corroborated(id, p))
+            l.qualified && l.process_id.as_deref().is_some_and(|process| {
+                if self.state.reducer_version < 4 {
+                    self.legacy_corroborated(id, process)
+                } else {
+                    l.ownership.as_ref().is_some_and(|ownership| {
+                        self.sealed(id, process, ownership, None)
+                    })
+                }
+            })
         }) {
             ObserverTier::Restored
         } else {
@@ -1928,7 +2081,7 @@ impl Tx<'_> {
         let promoted: Vec<PendingOutcome> = turn
             .pending_outcomes
             .iter()
-            .filter(|p| p.process_id.as_deref().is_some_and(|process| self.corroborated(&turn.session_id, process)))
+            .filter(|pending| self.outcome_corroborated(turn, pending))
             .cloned()
             .collect();
         if let Some(turn) = self.state.turns.get_mut(id) {
@@ -1988,6 +2141,14 @@ impl Tx<'_> {
         }
         self.touch_session(&session_id);
         if !output {
+            // A versioned upgrade may withdraw an outcome that reducer 3
+            // accepted using a historical attachment. Preserve its durable
+            // owner-command history, but stop presenting it as actionable
+            // native output and suppress any still-unsent notification.
+            let key = keys::attention_scope(&session_id, "TURN_OUTPUT", id);
+            if let Some(attention) = self.state.attention_by_scope.get(&key).cloned() {
+                self.set_native_resolution(&attention, ResolutionKind::EvidenceUnavailable, true, OWNERSHIP_UNQUALIFIED);
+            }
             return;
         }
         let (category, priority) = if failed {
@@ -2008,6 +2169,7 @@ impl Tx<'_> {
             trigger,
             summary,
         );
+        self.set_native_resolution(&attention_id, ResolutionKind::EvidenceUnavailable, false, OWNERSHIP_UNQUALIFIED);
         // Only an eligible previous output resolves on follow-up; never an
         // error, approval, blocker or owner decision (SPEC §7.3 (5)).
         let followed = category == AttentionCategory::TurnComplete

@@ -198,6 +198,12 @@ pub fn projection(state: &CanonicalState) -> Value {
             "linkConflict": s.link_conflict,
             "observerTier": s.observer_tier,
             "observerVersion": s.observer_version,
+            "ownershipProofs": sorted(s.ownership_proofs.iter().map(|p| json!([
+                n.process(&p.process_id), p.ownership,
+            ])).collect()),
+            "ownershipSeals": sorted(s.links.iter().filter(|l| l.ownership.is_some()).map(|l| json!([
+                l.point, l.provenance, l.qualified, l.process_id.as_deref().map(|p| n.process(p)), l.ownership,
+            ])).collect()),
         })))),
         "actors": map(state.actors.values().map(|a| (n.actor(&a.id), json!({
             "role": a.role,
@@ -242,6 +248,10 @@ pub fn projection(state: &CanonicalState) -> Value {
                 p.reason,
                 p.point,
                 p.process_id.as_deref().map(|id| n.process(id)),
+                p.ownership,
+            ])).collect()),
+            "ownershipStarts": sorted(t.ownership_starts.iter().map(|s| json!([
+                s.point, n.process(&s.process_id), s.ownership,
             ])).collect()),
         })))),
         "inputs": map(state.inputs.values().map(|i| (n.input(&i.id), json!({

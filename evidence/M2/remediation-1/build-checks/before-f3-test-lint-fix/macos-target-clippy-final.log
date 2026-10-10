@@ -1,0 +1,20 @@
+    Checking threadspace-contracts v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/contracts)
+    Checking threadspace-surfaces-macos v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/surfaces-macos)
+    Checking threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+    Checking threadspace-provider-claude v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/provider-claude)
+    Checking threadspace-relay v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/relay)
+    Checking threadspace-harness v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/tests/native/harness)
+error: used `unwrap()` on an `Option` value
+   --> tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs:306:13
+    |
+306 | /             positive
+307 | |                 .as_object()
+308 | |                 .unwrap()
+    | |_________________________^
+    |
+    = note: if this value is `None`, it will panic
+    = help: consider using `expect()` to provide a better panic message
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unwrap_used
+    = note: requested on the command line with `-D clippy::unwrap-used`
+
+error: could not compile `threadspace-harness` (bin "threadspace-m0c" test) due to 1 previous error

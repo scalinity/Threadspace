@@ -1,0 +1,20 @@
+Read-only independent F1B portable audit after revision fix, Linux.
+Command: ['/workspace/scratch/c8272833f682/remediation-tools/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo', 'test', '--locked', '--offline', '--target', 'x86_64-unknown-linux-gnu', '-p', 'threadspace-journal', '--test', 'observer_ownership', 'f1b_', '--', '--nocapture']
+   Compiling threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.73s
+     Running tests/observer_ownership.rs (/workspace/scratch/c8272833f682/review-checks/f1b-independent-target/x86_64-unknown-linux-gnu/debug/deps/observer_ownership-facced9b4b9a46a8)
+
+running 9 tests
+test f1b_upgrade_refuses_missing_canonical_outcome_evidence ... ok
+test f1b_semantic_oracle_distinguishes_authority_bearing_evidence ... ok
+test f1b_a_token_in_an_intercepted_return_without_native_evidence_stays_pending ... ok
+test f1b_genuine_reducer3_upgrade_preserves_owner_receipts_and_converges_at_three_checkpoints ... ok
+test f1b_qualified_native_identity_does_not_borrow_host_read_authority ... ok
+test f1b_stale_a_p_attachment_cannot_restore_when_the_process_now_owns_b ... ok
+test f1b_a_b_a_fresh_interval_never_revives_preseal_or_original_generation_outcomes ... ok
+test f1b_wrong_incarnation_executable_epoch_generation_and_token_are_not_proofs ... ok
+test f1b_unchanged_id_new_turn_proof_seal_start_and_outcome_converge_in_every_delivery_order ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 2.22s
+

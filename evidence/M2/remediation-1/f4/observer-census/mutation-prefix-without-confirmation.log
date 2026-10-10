@@ -1,0 +1,19 @@
+   Compiling threadspace-observer-census-portable v0.0.0 (<disposable>/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.70s
+     Running unittests src/lib.rs (/workspace/scratch/c8272833f682/remediation-build-census-portable/x86_64-unknown-linux-gnu/debug/deps/threadspace_observer_census_portable-ddf56f0013509bee)
+
+running 1 test
+
+thread 'latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation' (577) panicked at src/latency_census_tests.rs:153:44:
+unconfirmed close: Object {"sealed": Bool(true)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation ... FAILED
+
+failures:
+
+failures:
+    latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

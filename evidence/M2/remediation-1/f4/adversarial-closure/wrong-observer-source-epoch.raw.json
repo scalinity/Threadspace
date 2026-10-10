@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 2,
+  "executionKind": "SYNTHETIC_UNIT_TEST",
+  "bootId": "qualification-boot",
+  "clockQualification": {
+    "nativeClock": "CLOCK_UPTIME_RAW",
+    "qualified": true,
+    "maximumRateErrorPpm": 0,
+    "precisionNs": 1000,
+    "evidence": "SYNTHETIC_FIXED_RATE_CLOCK_ORACLE"
+  },
+  "helperRecords": [
+    {
+      "kind": "hook-capture",
+      "observationId": "22222222-2222-4222-8222-222222222222",
+      "source": "claude.hook",
+      "sourceEpoch": "qualification-boot",
+      "capture": {
+        "clockQuality": "LOCAL_MONOTONIC",
+        "bootId": "qualification-boot",
+        "monotonicNs": "1010000000"
+      }
+    },
+    {
+      "kind": "helper-receipt",
+      "token": "55555555-5555-4555-8555-555555555555",
+      "clock": "CLOCK_UPTIME_RAW",
+      "bootId": "qualification-boot",
+      "monotonicNs": "1014000000",
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "33333333-3333-4333-8333-333333333333",
+            "status": "COMMITTED"
+          },
+          {
+            "observationId": "44444444-4444-4444-8444-444444444444",
+            "status": "COMMITTED"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "observer-clock-bracket",
+      "schemaVersion": 1,
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "clock": "performance.now",
+      "beginMs": 12,
+      "endMs": 16,
+      "nativeToken": "55555555-5555-4555-8555-555555555555",
+      "totalCaptured": 2,
+      "overflow": 0,
+      "failedExports": 0,
+      "records": [
+        {
+          "observationId": "33333333-3333-4333-8333-333333333333",
+          "capturedMs": 10,
+          "status": "COMMITTED"
+        },
+        {
+          "observationId": "44444444-4444-4444-8444-444444444444",
+          "capturedMs": 11,
+          "status": "COMMITTED"
+        }
+      ]
+    }
+  ],
+  "commitRecords": [
+    {
+      "event": "M2_COMMITTED_MEASUREMENT",
+      "observationId": "22222222-2222-4222-8222-222222222222",
+      "source": "claude.hook",
+      "bootId": "qualification-boot",
+      "cursor": "1",
+      "patchCursor": "1",
+      "status": "COMMITTED",
+      "capture": {
+        "clockQuality": "LOCAL_MONOTONIC",
+        "bootId": "qualification-boot",
+        "monotonicNs": "1010000000"
+      },
+      "storeGeneration": "store",
+      "sourceEpoch": "qualification-boot",
+      "commit": {
+        "boundary": "SQLITE_COMMIT_CALL",
+        "clock": "CLOCK_UPTIME_RAW",
+        "beginNs": "1012000000",
+        "endNs": "1013000000"
+      }
+    },
+    {
+      "event": "M2_COMMITTED_MEASUREMENT",
+      "observationId": "33333333-3333-4333-8333-333333333333",
+      "source": "claude.observer",
+      "bootId": "qualification-boot",
+      "cursor": "2",
+      "patchCursor": "2",
+      "status": "COMMITTED",
+      "capture": {
+        "clockQuality": "LOCAL_MONOTONIC",
+        "bootId": "qualification-boot",
+        "monotonicNs": "1010000000"
+      },
+      "storeGeneration": "store",
+      "sourceEpoch": "OTHER_RUNTIME",
+      "commit": {
+        "boundary": "SQLITE_COMMIT_CALL",
+        "clock": "CLOCK_UPTIME_RAW",
+        "beginNs": "1013000000",
+        "endNs": "1014000000"
+      }
+    },
+    {
+      "event": "M2_COMMITTED_MEASUREMENT",
+      "observationId": "44444444-4444-4444-8444-444444444444",
+      "source": "claude.observer",
+      "bootId": "qualification-boot",
+      "cursor": "3",
+      "patchCursor": null,
+      "status": "COMMITTED",
+      "capture": {
+        "clockQuality": "LOCAL_MONOTONIC",
+        "bootId": "qualification-boot",
+        "monotonicNs": "1010000000"
+      },
+      "storeGeneration": "store",
+      "sourceEpoch": "OTHER_RUNTIME",
+      "commit": {
+        "boundary": "SQLITE_COMMIT_CALL",
+        "clock": "CLOCK_UPTIME_RAW",
+        "beginNs": "1013000000",
+        "endNs": "1014000000"
+      }
+    }
+  ],
+  "domPages": [
+    {
+      "schemaVersion": 2,
+      "runtimeId": "view-runtime",
+      "clock": "performance.now",
+      "context": {
+        "phase": "live",
+        "viewEpoch": "view",
+        "coreGeneration": "core",
+        "storeGeneration": "store"
+      },
+      "totalApplied": 2,
+      "retainedMarks": 2,
+      "overflow": 0,
+      "invalid": 0,
+      "contextChanged": false,
+      "offset": 0,
+      "nextOffset": null,
+      "marks": [
+        {
+          "cursor": "1",
+          "domCursor": "1",
+          "appliedMonotonicMs": 15,
+          "domMonotonicMs": 20,
+          "hydratedVisible": true
+        },
+        {
+          "cursor": "2",
+          "domCursor": "2",
+          "appliedMonotonicMs": 24,
+          "domMonotonicMs": 30,
+          "hydratedVisible": true
+        }
+      ]
+    }
+  ],
+  "populationSeals": [
+    {
+      "source": "claude.hook",
+      "boundary": "CLOSED_CAPTURE_WINDOW",
+      "sealed": true,
+      "bootId": "qualification-boot",
+      "totalCaptured": 1,
+      "observationIdsSha256": "b454f82c5857ebabf342b7258e5cf7def78b7cd975814119462973de9a38df10",
+      "telemetryFailures": 0,
+      "runtimeIds": [],
+      "evidence": "SYNTHETIC_CENSUS"
+    },
+    {
+      "source": "claude.observer",
+      "boundary": "CLOSED_CAPTURE_WINDOW",
+      "sealed": true,
+      "bootId": "qualification-boot",
+      "totalCaptured": 2,
+      "observationIdsSha256": "f1c1c089aaeaf5330f5dc122fdb456921540f2a41b550b2f37c02d83529abd64",
+      "telemetryFailures": 0,
+      "runtimeIds": [
+        "11111111-1111-4111-8111-111111111111"
+      ],
+      "evidence": "SYNTHETIC_CENSUS"
+    }
+  ],
+  "uiCalibrations": [
+    {
+      "bootId": "qualification-boot",
+      "clock": "CLOCK_UPTIME_RAW",
+      "nativeBeforeNs": "1000000000",
+      "nativeAfterNs": "1000001000",
+      "reply": {
+        "runtimeId": "view-runtime",
+        "clock": "performance.now",
+        "monotonicMs": 0
+      }
+    },
+    {
+      "bootId": "qualification-boot",
+      "clock": "CLOCK_UPTIME_RAW",
+      "nativeBeforeNs": "1100000000",
+      "nativeAfterNs": "1100001000",
+      "reply": {
+        "runtimeId": "view-runtime",
+        "clock": "performance.now",
+        "monotonicMs": 100
+      }
+    }
+  ]
+}

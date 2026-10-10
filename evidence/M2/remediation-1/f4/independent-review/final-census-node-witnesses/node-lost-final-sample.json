@@ -1,0 +1,75 @@
+{
+  "executionKind": "NODE_FAULT_FIXTURE",
+  "nativeExecution": false,
+  "actualCaptureCalls": 2,
+  "persistedSamples": [
+    {
+      "kind": "observer-clock-bracket",
+      "schemaVersion": 1,
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "clock": "performance.now",
+      "beginMs": 244.076836,
+      "endMs": 244.0818,
+      "nativeToken": "44444444-4444-4444-8444-444444444444",
+      "totalCaptured": 1,
+      "overflow": 0,
+      "failedExports": 0,
+      "records": [
+        {
+          "observationId": "22222222-2222-4222-8222-000000000000",
+          "capturedMs": 244.070275,
+          "status": "COMMITTED"
+        }
+      ]
+    }
+  ],
+  "finalCensus": {
+    "kind": "observer-census-close",
+    "schemaVersion": 1,
+    "runtimeId": "11111111-1111-4111-8111-111111111111",
+    "censusId": "43ff62e0-b4c9-4467-9742-a4ca6af1a256",
+    "pageCount": 1,
+    "boundary": "SESSION_END",
+    "clock": "performance.now",
+    "openedMs": 244.070275,
+    "closedMs": 244.391017,
+    "totalCaptured": 2,
+    "overflow": 0,
+    "failedExports": 1,
+    "observationIdsSha256": "c4740ca196e027105fb30387a2b2321c85c2b367e8a4f491cd0ed8f2a74d0844",
+    "endDrainDeadline": {
+      "receiptToken": "44444444-4444-4444-8444-444444444444",
+      "remainingMs": 100
+    }
+  },
+  "censusPages": [
+    {
+      "kind": "observer-census-page",
+      "schemaVersion": 1,
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "censusId": "43ff62e0-b4c9-4467-9742-a4ca6af1a256",
+      "pageIndex": 0,
+      "pageCount": 1,
+      "records": [
+        {
+          "observationId": "22222222-2222-4222-8222-000000000000",
+          "capturedMs": 244.070275
+        },
+        {
+          "observationId": "22222222-2222-4222-8222-000000000001",
+          "capturedMs": 244.269643
+        }
+      ]
+    }
+  ],
+  "finalConfirmations": [
+    {
+      "kind": "observer-census-confirm",
+      "schemaVersion": 1,
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "censusId": "43ff62e0-b4c9-4467-9742-a4ca6af1a256",
+      "token": "44444444-4444-4444-8444-444444444444",
+      "observationIdsSha256": "c4740ca196e027105fb30387a2b2321c85c2b367e8a4f491cd0ed8f2a74d0844"
+    }
+  ]
+}

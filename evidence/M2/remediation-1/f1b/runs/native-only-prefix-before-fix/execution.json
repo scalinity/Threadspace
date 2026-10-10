@@ -1,0 +1,36 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "-p",
+    "threadspace-journal",
+    "--test",
+    "observer_ownership",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--locked",
+    "f1b_native_only_genuine",
+    "--",
+    "--nocapture"
+  ],
+  "endedUnixNs": 1791605287534517844,
+  "exitCode": 101,
+  "expectedReproduction": true,
+  "nativeMacOSExecution": false,
+  "purpose": "adversarial genuine reducer3 native-only prefix reproduction before version-trigger correction",
+  "sourceHashesAfter": {
+    "crates/journal/src/canonical.rs": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+    "crates/journal/tests/observer_ownership.rs": "25be7ca6b67b328313a14b6de9921b37312c282679a66af4411e8171ea7d83bd",
+    "crates/state-engine/src/engine.rs": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+    "crates/state-engine/src/reduce.rs": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6"
+  },
+  "sourceHashesBefore": {
+    "crates/journal/src/canonical.rs": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+    "crates/journal/tests/observer_ownership.rs": "25be7ca6b67b328313a14b6de9921b37312c282679a66af4411e8171ea7d83bd",
+    "crates/state-engine/src/engine.rs": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+    "crates/state-engine/src/reduce.rs": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6"
+  },
+  "sourceStable": true,
+  "startedUnixNs": 1791605285814302860
+}

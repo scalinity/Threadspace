@@ -1,0 +1,54 @@
+   Compiling threadspace-journal v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/journal)
+   Compiling threadspace-synthetic v0.1.0 (/tmp/threadspace-f1b-portable-en0nuu3y/tests/synthetic)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.15s
+     Running /workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/checkpoint_tail_upgrade.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/checkpoint_tail_upgrade-4b66313038b021de)
+
+running 5 tests
+test a_reducer_1_decision_reads_the_same_in_or_after_its_checkpoint ... ok
+test a_malformed_committed_resolution_time_refuses_the_upgrade ... ok
+test an_item_this_reducer_reopens_keeps_no_resolution_time ... ok
+test a_committed_resolution_time_is_kept_wherever_the_checkpoint_sits ... ok
+test checkpoint_placement_does_not_change_the_upgraded_store ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running /workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/reducer2_upgrade.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/reducer2_upgrade-7af0912a4f92fd1d)
+
+running 1 test
+test a_reducer_2_store_upgrades_to_one_result_wherever_its_checkpoint_sits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running /workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/reducer_upgrade.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/reducer_upgrade-79d81f4f5a2ef339)
+
+running 1 test
+test a_reducer_1_store_is_upgraded_not_reinterpreted ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running /workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/scenarios.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/scenarios-a827b10ae50aaab6)
+
+running 4 tests
+test allocated_ids_differ_but_semantics_do_not ... ok
+test every_scenario_meets_its_expectation_in_reference_order ... ok
+test semantic_equality_detects_missing_or_different_evidence ... ok
+test seeded_permutations_converge_semantically ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.11s
+
+     Running /workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/sqlite.rs (/workspace/scratch/c8272833f682/review-build-reducer-portable/x86_64-unknown-linux-gnu/debug/deps/sqlite-f9aa88ce7504326c)
+
+running 10 tests
+test an_observation_id_not_in_canonical_form_is_refused ... ok
+test sensitive_bodies_never_reach_the_store_files ... ok
+test a_committed_owner_command_retried_after_its_target_advanced_returns_the_original_result ... ok
+test a_live_batch_returns_only_the_intents_still_pending_after_it ... ok
+test a_command_that_changes_nothing_reports_the_items_unchanged_revision ... ok
+test ingest_cursor_gaps_raise_nothing_and_source_gaps_stay_scoped ... ok
+test ten_deliveries_of_each_observation_create_no_duplicate_sessions_or_facts ... ok
+test preserved_failing_seeds_now_keep_tables_equal_to_state_at_every_step ... ok
+test every_scenario_through_sqlite_matches_the_pure_path_and_replays_exactly ... ok
+test sqlite_permutations_converge_with_the_pure_reference ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.85s
+

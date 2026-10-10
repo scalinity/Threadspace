@@ -135,6 +135,7 @@ fn needs(kind: CanonicalFactKind) -> &'static [&'static str] {
         | K::WaitStateObserved => &["session"],
         K::ExecutionAttached | K::ExecutionEnded | K::SurfaceBindingUnproven => &["execution"],
         K::ProcessObserved | K::ProcessExitObserved => &["process"],
+        K::ObserverOwnershipCorroborated => &["session", "process"],
         K::InputSubmitted | K::InputAccepted | K::InputRejected => &["session", "input"],
         K::TurnStarted | K::TurnStepObserved | K::OutputReady | K::TurnOutcomeObserved => {
             &["session", "turn"]

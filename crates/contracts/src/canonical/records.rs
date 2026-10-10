@@ -19,7 +19,7 @@ use super::command::OwnerAction;
 use super::envelope::SequenceMeaning;
 use super::fact::{
     AcceptanceProof, ActivityResult, ActorRelationKind, ActorRole, AttachedPresence,
-    BindingMethod, EvidenceClass, ExecutionMode, InputOrigin, SessionRecordState,
+    BindingMethod, EvidenceClass, ExecutionMode, InputOrigin, ObserverOwnership, SessionRecordState,
     SnapshotInterval, SnapshotRow, TurnOutcome, WaitCategory,
 };
 use super::keys::{NativeActorRef, NativeSurfaceRef};
@@ -75,6 +75,9 @@ pub struct SessionRecord {
     /// Explicit observer link reports.
     #[serde(default)]
     pub links: BTreeSet<LinkObservation>,
+    /// Native proofs retained independently of observer-produced seals.
+    #[serde(default)]
+    pub ownership_proofs: BTreeSet<OwnershipProof>,
     /// Derived from `links`; with none, the link a baseline recorded.
     pub link: Option<ObservationState>,
     pub inventory: Option<InventoryObservation>,
@@ -187,6 +190,32 @@ pub struct LinkObservation {
     pub qualified: bool,
     pub version: Option<String>,
     pub link: ObservationState,
+    #[serde(default)]
+    pub ownership: Option<ObserverOwnership>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct OwnershipProof {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub process_id: String,
+    pub ownership: ObserverOwnership,
+}
+
+/// The original qualified core start, after the observer has sealed an
+/// independently corroborated ownership generation. Later callbacks must
+/// retain this scope; a new current Session cannot lend it authority.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct OwnershipStart {
+    pub observation_id: String,
+    pub fact_index: u32,
+    pub point: CausalPoint,
+    pub process_id: String,
+    pub ownership: ObserverOwnership,
 }
 
 /// One report of how an input was originally submitted (D-0010).
@@ -218,6 +247,8 @@ pub struct PendingOutcome {
     pub reason: Option<String>,
     pub point: Option<CausalPoint>,
     pub process_id: Option<String>,
+    #[serde(default)]
+    pub ownership: Option<ObserverOwnership>,
 }
 
 /// The evidence tier of a Session's current observer (D-0010).
@@ -304,6 +335,8 @@ pub struct TurnRecord {
     /// Host-read-tier outcomes; a corroborated one also enters `outcomes`.
     #[serde(default)]
     pub pending_outcomes: BTreeSet<PendingOutcome>,
+    #[serde(default)]
+    pub ownership_starts: BTreeSet<OwnershipStart>,
     pub output_ready: bool,
     pub output_points: BTreeSet<CausalPoint>,
     pub summary: Option<String>,
@@ -525,6 +558,9 @@ pub enum ResolutionKind {
     RequestResolved,
     /// Verified accepted human input causally after the output (SPEC §7.3).
     HumanFollowup,
+    /// An older reducer applied a lifecycle claim whose independent
+    /// ownership evidence is insufficient under the explicit upgrade.
+    EvidenceUnavailable,
 }
 
 #[derive(

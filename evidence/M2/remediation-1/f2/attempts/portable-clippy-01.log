@@ -1,0 +1,494 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.5
+    Checking serde_core v1.0.229
+    Checking libc v0.2.190
+    Checking const-oid v0.10.2
+    Checking zmij v1.0.23
+    Checking cpufeatures v0.3.1
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+    Checking hybrid-array v0.4.15
+    Checking getrandom v0.4.3
+    Checking crypto-common v0.2.2
+    Checking block-buffer v0.12.1
+    Checking digest v0.11.3
+    Checking sha2 v0.11.0
+    Checking serde v1.0.229
+    Checking uuid v1.27.0
+    Checking serde_json v1.0.151
+    Checking threadspace-f2-portable v0.0.0 (<disposable>/crates/provider-claude)
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:52:29
+    |
+ 52 |       pub fn create(&self) -> Result<(), SetupError> {
+    |                               ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+    = note: `-D clippy::result-large-err` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::result_large_err)]`
+
+error: the `Err`-variant returned from this closure is very large
+   --> src/setup/owned.rs:55:27
+    |
+ 55 |               .try_for_each(|dir| create_private_dir(dir))
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:60:42
+    |
+ 60 |   pub fn create_private_dir(dir: &Path) -> Result<(), SetupError> {
+    |                                            ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:84:38
+    |
+ 84 |   pub fn read_optional(path: &Path) -> Result<Option<Vec<u8>>, SetupError> {
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:112:62
+    |
+112 |   pub fn write_atomic(path: &Path, bytes: &[u8], mode: u32) -> Result<(), SetupError> {
+    |                                                                ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:150:6
+    |
+150 |   ) -> Result<(), SetupError> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:182:36
+    |
+182 |   pub fn read_record(path: &Path) -> Result<Option<InstallRecord>, SetupError> {
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this closure is very large
+   --> src/setup/owned.rs:184:14
+    |
+184 |           .map(|bytes| {
+    |  ______________^
+185 | |             serde_json::from_slice(&bytes).map_err(|error| SetupError::InvalidRecord {
+186 | |                 path: path.to_owned(),
+187 | |                 reason: error.to_string(),
+188 | |             })
+189 | |         })
+    | |_________^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:193:66
+    |
+193 |   pub fn write_json(path: &Path, value: &impl serde::Serialize) -> Result<(), SetupError> {
+    |                                                                    ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:203:37
+    |
+203 |   pub fn remove_owned(path: &Path) -> Result<bool, SetupError> {
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:214:50
+    |
+214 |   pub fn remove_others(dir: &Path, keep: &Path) -> Result<(), SetupError> {
+    |                                                    ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:238:60
+    |
+238 |       pub fn read(source: &Path, capture_argv: &[String]) -> Result<Self, SetupError> {
+    |                                                              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:278:43
+    |
+278 |       pub fn stage(&self, target: &Path) -> Result<(), SetupError> {
+    |                                             ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:307:37
+    |
+307 |   pub fn staged_sha256(dir: &Path) -> Result<Option<String>, SetupError> {
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/owned.rs:346:6
+    |
+346 |   ) -> Result<(), SetupError> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/setup/mod.rs:222:5
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:293:33
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+293 |   pub fn plan(target: &Target) -> Result<Plan, SetupError> {
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:358:36
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+358 |   pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:417:38
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+417 |   pub fn uninstall(target: &Target) -> Result<UninstallReport, SetupError> {
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: this `if` has identical blocks
+   --> src/setup/mod.rs:446:13
+    |
+446 | /             {
+447 | |                 report.removed = record.owned_entries.clone();
+448 | |             } else if settings.is_none() && env.is_none() {
+    | |_____________^
+    |
+note: same as this
+   --> src/setup/mod.rs:448:59
+    |
+448 |               } else if settings.is_none() && env.is_none() {
+    |  ___________________________________________________________^
+449 | |                 report.removed = record.owned_entries.clone();
+450 | |             } else {
+    | |_____________^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#if_same_then_else
+    = note: `-D clippy::if-same-then-else` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::if_same_then_else)]`
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:497:35
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+497 |   pub fn status(target: &Target) -> Result<IntegrationState, SetupError> {
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:571:32
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+571 |   fn prepare(target: &Target) -> Result<Prepared, SetupError> {
+    |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:719:6
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+719 |   ) -> Result<(), SetupError> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:776:6
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+776 |   ) -> Result<(), SetupError> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:818:6
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+818 |   ) -> Result<Option<Option<Vec<u8>>>, SetupError> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:840:33
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+840 |   fn validate(target: &Target) -> Result<(), SetupError> {
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:884:45
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+884 |   fn parse_root(path: &Path, bytes: &[u8]) -> Result<Map, SetupError> {
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: the `Err`-variant returned from this function is very large
+   --> src/setup/mod.rs:896:38
+    |
+222 | /     TargetMismatch {
+223 | |         installed: InstallIdentity,
+224 | |         requested: InstallIdentity,
+225 | |     },
+    | |_____- the largest variant contains at least 144 bytes
+...
+896 |   fn pretty(path: &Path, root: Map) -> Result<Vec<u8>, SetupError> {
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try reducing the size of `setup::SetupError`, for example by boxing large elements or replacing it with `Box<setup::SetupError>`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#result_large_err
+
+error: could not compile `threadspace-f2-portable` (lib) due to 27 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: unnecessary use of `clone` to create a slice from a reference
+  --> src/setup/f2_tests.rs:76:9
+   |
+76 |         assert_eq!(report.retained_mod_paths, [record.plugin_dir.clone()]);
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#cloned_ref_to_slice_refs
+   = note: `-D clippy::cloned-ref-to-slice-refs` implied by `-D clippy::all`
+   = help: to override `-D clippy::all` add `#[allow(clippy::cloned_ref_to_slice_refs)]`
+
+error: items after a test module
+   --> src/../../../harness/m2_ownership.rs:119:1
+    |
+119 | mod scratch_tests {
+    | ^^^^^^^^^^^^^^^^^
+...
+229 | pub fn disposable(label: &str) -> Result<PathBuf, String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D clippy::all`
+    = help: to override `-D clippy::all` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `threadspace-f2-portable` (lib test) due to 29 previous errors

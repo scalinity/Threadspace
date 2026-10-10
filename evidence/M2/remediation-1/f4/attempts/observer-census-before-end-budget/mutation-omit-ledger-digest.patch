@@ -1,0 +1,11 @@
+--- repaired/latency_census.rs
++++ mutant/latency_census.rs
+@@ -248,7 +248,7 @@
+             }
+         }
+     }
+-    (ids.len() as u64 == close.total_captured && digest(&ids) == close.observation_ids_sha256)
++    (ids.len() as u64 == close.total_captured )
+         .then_some((ids, missing_clocks))
+ }
+ 

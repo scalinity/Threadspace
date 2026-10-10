@@ -1,0 +1,20 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/observer_ownership.rs (/workspace/scratch/c8272833f682/review-build-reducer/x86_64-unknown-linux-gnu/debug/deps/observer_ownership-facced9b4b9a46a8)
+
+running 1 test
+
+thread 'f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary' (18) panicked at crates/journal/tests/observer_ownership.rs:609:17:
+assertion `left == right` failed: an older verified checkpoint plus v2 metadata suffix must retain the original transition
+  left: "cbda7df46aab37a2715dff236aba67e4f901e5a2b5841764182a852703ea2d69"
+ right: "bf8675d7467e58ecf12d8606631d899ea47694a3600d489f7f1a2e7b33953bbf"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary ... FAILED
+
+failures:
+
+failures:
+    f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p threadspace-journal --test observer_ownership`

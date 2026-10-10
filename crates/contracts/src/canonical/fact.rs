@@ -52,6 +52,7 @@ pub enum CanonicalFactKind {
     ProcessObserved,
     ProcessExitObserved,
     ObservationLinkChanged,
+    ObserverOwnershipCorroborated,
     InputSubmitted,
     InputAccepted,
     InputRejected,
@@ -285,6 +286,20 @@ pub struct SnapshotInterval {
     pub end_ms: i64,
 }
 
+/// A reload ownership witness, scoped to one observer load and immutable
+/// Session generation. The proof token is created by the native inventory
+/// probe, after its kernel bracket. A token reported by middleware alone
+/// has no authority; a separately admitted native proof must match it.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ObserverOwnership {
+    pub source_epoch: String,
+    pub session_generation: u64,
+    pub proof_token: String,
+    pub executable_identity: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(
     tag = "kind",
@@ -325,6 +340,10 @@ pub enum FactPayload {
         #[serde(default)]
         version: Option<String>,
     },
+    /// Independent native inventory/kernel corroboration. It establishes a
+    /// point inside the observer's challenge/seal bracket, not an open-ended
+    /// process attachment or authority for an earlier Turn.
+    ObserverOwnershipCorroborated {},
     InputSubmitted {
         origin: InputOrigin,
         /// The original submission point when it differs from the capture
@@ -446,6 +465,7 @@ impl FactPayload {
             Self::ProcessObserved { .. } => K::ProcessObserved,
             Self::ProcessExitObserved {} => K::ProcessExitObserved,
             Self::ObservationLinkChanged { .. } => K::ObservationLinkChanged,
+            Self::ObserverOwnershipCorroborated {} => K::ObserverOwnershipCorroborated,
             Self::InputSubmitted { .. } => K::InputSubmitted,
             Self::InputAccepted { .. } => K::InputAccepted,
             Self::InputRejected { .. } => K::InputRejected,
@@ -495,6 +515,10 @@ pub struct NativeRefs {
     pub request: Option<String>,
     pub surface: Option<NativeSurfaceRef>,
     pub attention: Option<String>,
+    /// Original immutable ownership scope and independent probe token.
+    /// Absent in reducer-3 captures; absence can never restore HOST_READ.
+    #[serde(default)]
+    pub observer_ownership: Option<ObserverOwnership>,
 }
 
 /// Canonical references of a resolved fact.
@@ -567,6 +591,10 @@ pub struct ResolvedFact {
 #[ts(export)]
 pub struct JournalEntry {
     pub cursor: i64,
+    /// The version written by admission, also for zero-fact observations.
+    /// It is independent of the provider envelope and each fact's version.
+    #[serde(default = "legacy_journal_payload_version")]
+    pub payload_version: u32,
     /// The endpoint that admitted the entry (the local endpoint for captures).
     pub endpoint_id: String,
     pub observation_id: String,
@@ -578,3 +606,5 @@ pub struct JournalEntry {
     pub delivery: Delivery,
     pub facts: Vec<ResolvedFact>,
 }
+
+fn legacy_journal_payload_version() -> u32 { 1 }

@@ -4,6 +4,7 @@ import type { InventoryObservation } from "./InventoryObservation";
 import type { LinkObservation } from "./LinkObservation";
 import type { ObservationState } from "./ObservationState";
 import type { ObserverTier } from "./ObserverTier";
+import type { OwnershipProof } from "./OwnershipProof";
 import type { RouteRecord } from "./RouteRecord";
 import type { SessionRecordState } from "./SessionRecordState";
 import type { TurnState } from "./TurnState";
@@ -17,6 +18,10 @@ export type SessionRecord = { id: string, namespaceId: string, nativeSessionId: 
  * Explicit observer link reports.
  */
 links: Array<LinkObservation>, 
+/**
+ * Native proofs retained independently of observer-produced seals.
+ */
+ownershipProofs: Array<OwnershipProof>, 
 /**
  * Derived from `links`; with none, the link a baseline recorded.
  */

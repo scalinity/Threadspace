@@ -1,0 +1,139 @@
+{
+  "reviewBase": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "reviewer": "independent observer sub-review",
+  "environment": "Linux x86_64; Rust 1.99.0; native macOS IO not executed",
+  "scope": "F1B current implementation source audit and focused portable exact-source adapter/reducer/SQLite checks",
+  "firstEnvironmentAttempt": {
+    "exitCode": 101,
+    "cause": "Repository default target aarch64-apple-darwin unavailable in Linux audit; rerun selected explicit Linux target",
+    "log": "environment-attempt.log"
+  },
+  "firstExecutableAttempt": {
+    "exitCode": 101,
+    "passed": 8,
+    "failed": 1,
+    "failure": "genuine reducer-3 checkpoint 11 migration state/genesis hash mismatch",
+    "genesisSha256": "7174a6f951c0f31fa24d99f5e07a12bbec984b161faa44162b16cbf187d2888c",
+    "openedStateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+    "log": "migration-mismatch.log",
+    "exactPreRepairSourceSnapshot": "NOT_CAPTURED: no retrospective whole-worktree hash or overwritten executable is claimed"
+  },
+  "repairedRun": {
+    "exitCode": 0,
+    "passed": 9,
+    "failed": 0,
+    "filtered": 24,
+    "sourceUnchangedDuringRun": true,
+    "sourceHashes": "repaired-context.json",
+    "log": "repaired-audit.log",
+    "sourceCopies": {
+      "crates/state-engine/src/engine.rs": {
+        "testedSha256": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+        "archivalSha256": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+        "matchesTestedSource": true
+      },
+      "crates/state-engine/src/reduce.rs": {
+        "testedSha256": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6",
+        "archivalSha256": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6",
+        "matchesTestedSource": true
+      },
+      "crates/journal/src/canonical.rs": {
+        "testedSha256": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+        "archivalSha256": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+        "matchesTestedSource": true
+      },
+      "crates/journal/tests/observer_ownership.rs": {
+        "testedSha256": "a9b9ccc96bb34bd903539b65fe34900d68cc9cb9c9613bf045988b9f34442e2a",
+        "archivalSha256": "a9b9ccc96bb34bd903539b65fe34900d68cc9cb9c9613bf045988b9f34442e2a",
+        "matchesTestedSource": true
+      },
+      "crates/provider-claude/src/observer.rs": {
+        "testedSha256": "4a8d4589932051c94a9f74bdb7ec45e94f6c9792d8491281b5af8e7f9a8eeef9",
+        "archivalSha256": "4a8d4589932051c94a9f74bdb7ec45e94f6c9792d8491281b5af8e7f9a8eeef9",
+        "matchesTestedSource": true
+      },
+      "crates/provider-claude/src/ownership_record.rs": {
+        "testedSha256": "483e6ff26d4593bbdbac78d2ecd06380e919c23d04505091394a5de1db9b8364",
+        "archivalSha256": "483e6ff26d4593bbdbac78d2ecd06380e919c23d04505091394a5de1db9b8364",
+        "matchesTestedSource": true
+      },
+      "crates/relay/src/modbatch.rs": {
+        "testedSha256": "70c0e4c12378b8f26c09fbe3b2046013a943b025d4cf03d06ab23bb56f0847ef",
+        "archivalSha256": "70c0e4c12378b8f26c09fbe3b2046013a943b025d4cf03d06ab23bb56f0847ef",
+        "matchesTestedSource": true
+      }
+    }
+  },
+  "f1aActualRecordsChain": {
+    "exitCode": 0,
+    "passed": 1,
+    "failed": 0,
+    "recordedCases": 14,
+    "log": "f1a-sqlite-chain.log",
+    "binary": "same compiled test binary as repaired run"
+  },
+  "macOSNativeOwnershipProbe": "NOT_RUN",
+  "qualificationClaim": "Portable F1B implementation passes after the documented migration revision correction; native process/inventory probe still requires macOS qualification",
+  "migration": [
+    {
+      "oldCheckpoint": 0,
+      "completeStateEqualsGenesis": true,
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "record": "repaired-records/migration-checkpoint-0.json"
+    },
+    {
+      "oldCheckpoint": 11,
+      "completeStateEqualsGenesis": true,
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "record": "repaired-records/migration-checkpoint-11.json"
+    },
+    {
+      "oldCheckpoint": 2,
+      "completeStateEqualsGenesis": true,
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "record": "repaired-records/migration-checkpoint-2.json"
+    }
+  ]
+}

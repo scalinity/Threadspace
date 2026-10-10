@@ -1,0 +1,13 @@
+--- a/crates/journal/src/canonical.rs
++++ b/crates/journal/src/canonical.rs
+@@ -980,9 +980,9 @@
+         )?;
+         #[cfg(feature = "qualification")]
+         let commit_begin = crate::latency::now_ns();
+-        tx.commit()?;
+         #[cfg(feature = "qualification")]
+         { outcome.commit_timing = crate::latency::finish(commit_begin); }
++        tx.commit()?;
+         self.index.apply(&all_assignments);
+         outcome.notifications = accumulated
+             .outbox

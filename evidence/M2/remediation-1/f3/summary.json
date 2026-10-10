@@ -1,0 +1,120 @@
+{
+  "finding": "F3 minimized-window positive Return",
+  "status": "M2_REMEDIATION_REQUIRED_NATIVE_QUALIFICATION_PENDING",
+  "blocking": true,
+  "nativeExecutionHere": "NOT_RUN (Linux; no owner Mac interaction)",
+  "routeProductChangesByThisTask": false,
+  "postRemediationPositiveRepetitions": 0,
+  "minimumRequiredPositiveRepetitions": 5,
+  "retainedM2MinimizedAttempts": 2,
+  "retainedM2MinimizedExactSuccesses": 0,
+  "retainedM0CMinimizedExactSuccesses": 1,
+  "deadlineMs": 2000,
+  "normalRouteP95Ms": 895,
+  "normalRouteP95TargetMs": 750,
+  "normalRouteP95Disposition": "Separate accepted M13 obligation; does not excuse this positive-case failure",
+  "rootCause": "NOT_ESTABLISHED",
+  "boundedFinding": "Both focus subprocesses timed out after the target was recorded minimized. Later readback showed target no longer miniaturized but the spare tab still selected. No exact current-session Return was established.",
+  "reportedButNotIndependentlyReconstructedPhases": {
+    "source": "Rejected candidate 2c4b5012f59189dcb38d61ced0b0b9fe96fb043e: evidence/M2/README.md and evidence/M2/manifest.json; exact snapshots at evidence/M2/remediation-1/historical/rejected-candidate-README.md and rejected-candidate-manifest.json",
+    "lookupMs": 394,
+    "focusAndReadbackMs": 1609,
+    "standaloneRestoreRangeMs": [
+      547,
+      926
+    ],
+    "limitation": "The committed G08 case rows omit the full route evidence/phases. The initialized focus.elapsedMs=0 on error is not a measured zero duration."
+  },
+  "missingFocusedEvidence": [
+    "Fresh exact ProcessKey and executable image plus claimed/current native Session per attempt",
+    "Controlling TTY character-device identity and unique target window/tab binding per attempt",
+    "Explicit minimized-state and other-foreground-window readbacks immediately before Return",
+    "Separate bounded timings for lookup, enumeration, unminimize/tab selection, raise, activate, readback and post-focus currentness",
+    "Independent selected TTY/frontmost readback and target restored within unchanged 2000 ms deadline",
+    "At least five successful repetitions on the repaired candidate, including prior failure conditions",
+    "Relevant conservative negative cases and exact new app/harness source/build identity"
+  ],
+  "fullTerminalRestart": "Preserved separate M15 BLOCKED limitation (D-0006); no Terminal restart performed",
+  "m2Build": {
+    "buildInfoFrom": "apps/agent-macos/build/dev/build-info.json, written by tests/native/build-app.sh dev; hashes re-read from the installed bundle",
+    "installedBundle": "~/Applications/Threadspace Dev.app (ai.scalinity.threadspace.dev)",
+    "channel": "dev",
+    "sourceCommit": "f4ef5f156f7086962bafa92728cc4cace5a58c3c",
+    "sourceTreeDirty": false,
+    "qualificationBuild": true,
+    "outerExecutableSha256": "f8bd554b01c0611334100316b050dec287a627ac93fa005312c679e96b93c991",
+    "companionSha256": "3b54b8369ecae00b6d53938c790fae69e44dc44bf0d08ad7295a208bbb18dfcc",
+    "helperSha256": "b714aca95e4ac7b262997bec5e4006ef0c4b556a98e090f3cd6d660a0f619c72",
+    "installedMatchesBuild": true,
+    "provider": {
+      "launcher": "~/.local/bin/claude",
+      "reportedVersion": "2.1.295 (Claude Code)",
+      "installedVersions": [
+        "2.1.292",
+        "2.1.293",
+        "2.1.294",
+        "2.1.295"
+      ]
+    }
+  },
+  "m0cG08Build": {
+    "channel": "prod",
+    "agentIdentifier": "ai.scalinity.threadspace.agent",
+    "version": "0.1.0",
+    "sourceCommit": "8c82212b7ac84abfb88ef2b2239f68de9aed49eb",
+    "sourceTreeDirty": false,
+    "executableSha256": "12d397871d32f7043e623fa378cf5c523c46505feb5aa325231193e4f3acab0d",
+    "qualificationBuild": true
+  },
+  "m0cOriginalManifest": "0c24b4fc785309e5a1d788bfcefdff02e05017cd:evidence/M0C/manifest.json",
+  "rawRecords": "primary-records.json",
+  "sourceComparison": "source-equivalence.json",
+  "qualificationHarnessChangesByThisTask": true,
+  "focusedRunner": {
+    "status": "PREPARED_UNEXECUTED",
+    "source": "tests/native/harness/src/bin/m0c/m2_minimized.rs",
+    "oracleSource": "tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs",
+    "command": "cargo +1.99.0 run --locked -p threadspace-harness --bin threadspace-m0c -- m2-minimized dev 5",
+    "channel": "dev only, explicitly required before Ctx initialization",
+    "acceptedRepetitionCounts": {
+      "minimum": 5,
+      "maximum": 100
+    },
+    "nativeOutputRoot": "evidence/M2/remediation-1/f3/native/",
+    "positiveAssertions": "Full original identity, minimized/other-foreground preconditions, complete native route proof, currentness, exact independent readback and <=2000 ms native/receipt budgets",
+    "conservativeNegative": "Independently absent canonical Session returns SESSION_NOT_FOUND and leaves foreground/selected tabs/minimized state unchanged",
+    "fullProductEvidencePreserved": true,
+    "productDeadlineMs": 2000,
+    "requestThroughReceiptBudgetMs": 2000,
+    "noSideEffectsClaimFromTimeout": false,
+    "perAppleEventDurations": "UNAVAILABLE in unchanged product; combined focus phase retained",
+    "nativePositiveRepetitionsExecutedHere": 0
+  },
+  "portableOracle": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "nativeQualification": false,
+    "execution": "portable/oracle-execution.json",
+    "output": "portable/oracle-tests.log",
+    "initialFailuresRetained": [
+      "portable/initial-compile-failure.json",
+      "portable/oracle-null-readback-failure.log",
+      "portable/oracle-null-readback-failure.json",
+      "portable/oracle-before-presence-repair.rs"
+    ],
+    "finalSyntaxOnlyRepair": "Test-only unwrap replaced with explanatory expect after root combined Clippy; same six portable oracle tests rerun and passed; no native execution or product semantics change."
+  },
+  "sourceHashes": {
+    "tests/native/harness/src/bin/m0c/m2_minimized.rs": "e8bb431beb581143912fbf60ca417360162fa0d75b89b4c9df8ed99fef549722",
+    "tests/native/harness/src/bin/m0c/m2_minimized_oracle.rs": "09a9eab066953802c23c2a250c07141470fde5fa787d197f4efa42f3bf59a6cc",
+    "tests/native/harness/src/bin/m0c/main.rs": "670cea5efe0c308df71b56ea07cfa2033dc107cd46df944cc2dec882a5f12ed8"
+  },
+  "macosTypecheck": {
+    "exitCode": 0,
+    "nativeExecution": false,
+    "output": "portable/macos-typecheck.log",
+    "context": "portable/macos-typecheck.json",
+    "scope": "Interim Linux cross-target type check; final combined checks belong to root after source freeze."
+  }
+}

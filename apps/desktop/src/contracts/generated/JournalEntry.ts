@@ -10,6 +10,11 @@ import type { SequenceMeaning } from "./SequenceMeaning";
  */
 export type JournalEntry = { cursor: number, 
 /**
+ * The version written by admission, also for zero-fact observations.
+ * It is independent of the provider envelope and each fact's version.
+ */
+payloadVersion: number, 
+/**
  * The endpoint that admitted the entry (the local endpoint for captures).
  */
 endpointId: string, observationId: string, sourceId: string, sourceEpoch: string, sourceSequence: string | null, sequenceMeaning: SequenceMeaning | null, capturedWallMs: number, delivery: Delivery, facts: Array<ResolvedFact>, };

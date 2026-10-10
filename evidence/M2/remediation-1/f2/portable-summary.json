@@ -1,0 +1,214 @@
+{
+  "status": "PORTABLE_PASS_NATIVE_PENDING",
+  "runtime": "Rust 1.99.0 / x86_64-unknown-linux-gnu",
+  "sourceHashes": {
+    "crates/provider-claude/src/setup/f2_tests.rs": "38a239ff2fa7708be85fa4bca26966dcd62c60e6d3a237ad5f95bf593e4cf521",
+    "crates/provider-claude/src/setup/mod.rs": "6b24b9beff1c9c2e0a04bfe11f984e29da0c57c72312c7c7c08378da1a03c405",
+    "crates/provider-claude/src/setup/ordered_json.rs": "ac09a1b295ee38cdea0c2815153a46d8a5ab363eb4c940322dbb0af63b59f797",
+    "crates/provider-claude/src/setup/owned.rs": "0ed79d6198fa7bc8316cc12dc116c87c5ac56c32782e63dcaf90f04ea5a8097f",
+    "crates/provider-claude/src/setup/settings.rs": "c2dd818f9295cea9adf5e37a9d4a989e6f255760c734cecf941ae398a8fd042b",
+    "tests/native/harness/src/bin/m0c/m2_ownership.rs": "9f53cae29cb3046daa2177954357fa2f6723e185e987742c9c5f7eeabb8a7205"
+  },
+  "workspaceCargoLockSha256": "a2dcac0024e3f6bc2f14df2b39468d6ee2ef6145f0818b3eabab12edf71cff88",
+  "providerModRuntimeSourceHashes": {
+    "packages/provider-mod/hooks/delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "packages/provider-mod/hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+    "packages/provider-mod/hooks/latency.ts": "9994519a5266532b29aab54d1ab0d7eee2d771002c045a9d3cb870e60326d68c",
+    "packages/provider-mod/hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+    "packages/provider-mod/hooks/register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29"
+  },
+  "byteInventoryHashes": {
+    "f2-09-wrong-scope.json": "88eb7fc17d7de9a1c640c6c2acda5ee66f47345e34c3cf67d08a35a392ece450",
+    "f2-10-failed-activation.json": "2bd8a06d605ac5dbaed6b743c594e259819e7d4750dd20fc7a6b46ce5a6e4822",
+    "f2-11-legacy-identity.json": "93c31f57fb92a319baf826374d6dfe47503e4b2135df8148ff9bdeaec00117bb",
+    "f2-11-wrong-config.json": "661d5fd51428e7b5c7f738db4aff8b688fa2f514dc78e3d0d3ea3b1641384310",
+    "f2-11-wrong-owned-root.json": "18f78d5d46edcae853fdafc9645c588d64c158bbd6b769b1dd5379e7a4212e5e"
+  },
+  "portableCargoLockSha256": "bbcb14740f49bcb67b563612a30fb7bdb8be9cc8592e11fa1b75880839a08f1a",
+  "focusedCasesPassed": 12,
+  "allPortableTestsPassed": 43,
+  "mutationsKilledByAssertions": 4,
+  "executions": [
+    {
+      "label": "portable-lock",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "generate-lockfile",
+        "--offline"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "fcc55e53aab075d9f3ee2dd6100e8f6e8a199fe55d9003c9fe8f2aa668194070"
+    },
+    {
+      "label": "portable-positive",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [
+        "setup::ordered_json::tests::empty_containers_print_inline",
+        "setup::ordered_json::tests::compact_input_prints_two_space_indent_with_trailing_newline",
+        "setup::ordered_json::tests::duplicate_keys_are_refused_at_any_depth",
+        "setup::ordered_json::tests::invalid_documents_are_refused",
+        "setup::ordered_json::tests::nested_objects_keep_document_order",
+        "setup::ordered_json::tests::map_edits_keep_order",
+        "setup::ordered_json::tests::numbers_keep_their_text",
+        "setup::ordered_json::tests::unicode_escapes_decode_and_reprint",
+        "setup::settings::tests::group_holding_a_foreign_hook_is_kept",
+        "setup::settings::tests::removal_reports_entries_no_longer_found",
+        "setup::settings::tests::plugin_dirs_append_once_preserving_existing_elements",
+        "setup::settings::tests::empty_plugin_dirs_value_is_restored_as_empty",
+        "setup::settings::tests::wrong_container_types_stop_the_edit",
+        "setup::tests::backups_are_owner_only_under_the_owned_dir",
+        "setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives",
+        "setup::tests::a_new_mod_replaces_the_old_copy_and_still_restores_the_original",
+        "setup::tests::f2::f2_04_changed_hook_type_is_a_conflict_and_survives",
+        "setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record",
+        "setup::tests::f2::f2_06_changed_plugin_reference_keeps_the_referenced_copy",
+        "setup::tests::f2::f2_07_foreign_siblings_and_their_order_survive_removal",
+        "setup::tests::f2::f2_03_changed_timeout_is_a_conflict_and_survives",
+        "ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install",
+        "setup::tests::f2::f2_08_repeated_partial_uninstall_has_no_double_removal_or_foreign_loss",
+        "setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged",
+        "setup::tests::hook_command_quotes_the_owned_path",
+        "setup::tests::invalid_targets_and_missing_sources_are_refused",
+        "setup::tests::install_into_complex_settings_keeps_foreign_configuration",
+        "setup::tests::install_twice_keeps_one_owned_set",
+        "setup::tests::install_into_empty_config_then_uninstall_removes_the_created_file",
+        "setup::tests::settings_changed_between_read_and_write_are_refused",
+        "setup::tests::session_scope_writes_only_owned_files",
+        "setup::tests::f2::f2_12_legitimately_resolved_conflict_finishes_on_retry",
+        "setup::tests::settings_that_cannot_be_merged_are_left_alone",
+        "setup::tests::f2::f2_11_wrong_config_or_copied_owned_root_refuses_without_mutation",
+        "setup::tests::status_reports_owned_entries_no_longer_installed",
+        "setup::tests::plan_writes_nothing_and_matches_the_install",
+        "setup::tests::the_real_observer_mod_copies_without_tests",
+        "setup::tests::symlinked_settings_are_written_through_to_their_target",
+        "setup::tests::worktree_hooks_are_never_installed",
+        "setup::tests::uninstall_keeps_owner_edit_as_conflict",
+        "setup::tests::uninstall_after_foreign_edit_removes_only_owned_entries",
+        "setup::tests::ten_cycles_restore_the_original_bytes_exactly",
+        "setup::tests::f2::f2_01_unchanged_install_reinstall_remove_is_byte_exact_for_ten_cycles"
+      ],
+      "failedTests": [],
+      "outputSha256": "eade828b91e0e9f54018a864251b0fbe232523e0518b3f906a8434f7a8fc2cea"
+    },
+    {
+      "label": "portable-clippy",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "clippy",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "expectedFailure": false,
+      "passedTests": [],
+      "failedTests": [],
+      "outputSha256": "e726c308b274c599d423cedeec505c660a4eefd8aaaf77bc0140cad451b2bf3d"
+    },
+    {
+      "label": "mutation-command-marker-only",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "f2_02_"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives"
+      ],
+      "outputSha256": "bb2ca0e5770fe88c0a072859c9af428367a9346fde430bd55aa9bdabe45b36f5"
+    },
+    {
+      "label": "mutation-delete-conflicted-resources",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "f2_05_"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record"
+      ],
+      "outputSha256": "f41659cffc426c4644ecce1d59fa17a28cc7151639c56d753184c60b68fb3664"
+    },
+    {
+      "label": "mutation-uninstall-without-identity",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "f2_09_"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged"
+      ],
+      "outputSha256": "98b447fe22bb6c40327c1b7e5684a0dc390685025d219d22040708bcaff6c103"
+    },
+    {
+      "label": "mutation-drop-without-acquisition",
+      "argv": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "f2_10_"
+      ],
+      "exitCode": 101,
+      "expectedFailure": true,
+      "passedTests": [],
+      "failedTests": [
+        "ownership::scratch_tests::f2_10_failed_session_activation_drop_cannot_uninstall_preexisting_user_install"
+      ],
+      "outputSha256": "f4210cba8f82631a149d956d5d693a2369f405b0441fa51854a0d0e33e99cfc0"
+    }
+  ],
+  "limitations": [
+    "The full workspace imports Darwin process APIs unavailable on Linux.",
+    "This standalone crate compiles copied byte-identical installer and pure Scratch sources; it is not a native application build.",
+    "Development-channel native integration smoke and native reversible cycles remain pending."
+  ]
+}

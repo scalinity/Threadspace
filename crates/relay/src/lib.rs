@@ -11,6 +11,8 @@ pub mod client;
 pub mod events;
 pub mod frame;
 pub mod locator;
+#[cfg(feature = "qualification")]
+pub mod latency;
 pub mod modbatch;
 pub mod paths;
 pub mod peer;

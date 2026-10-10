@@ -1,6 +1,6 @@
 # D-0009 — Claude Code 2.1.295 observer requalification
 
-**Status:** PROPOSED for M2 independent review.
+**Status:** PROPOSED — pending independent re-review.
 **Affects:** D-0005 (extends its contract to a second build), SPEC §5.2, §7.3, §11.4; `crates/provider-claude/src/profiles.rs`; `docs/compatibility/claude-observer-2.1.295.json`; MILESTONES M2 prerequisites.
 
 ## Context
@@ -26,8 +26,8 @@ D-0005 qualifies the observer mod's semantics on Claude Code **2.1.291** only. T
    - **Interrupt:** Ctrl+C during a running turn gives `INTERRUPTED`.
    - **Failure:** an unreachable API gives `FAILED` with an `ERROR` item.
    - **Blocked prompt:** a blocking `UserPromptSubmit` hook is recorded as a rejected input that starts no turn.
-   - **Reload:** saving the owned mod copy reloads the module. The session's tier goes from `NATIVE` to `RESTORED` 819 ms later, its native ID unchanged, and turns complete after the reload.
-   - **Forger:** a test-only plugin beside the observer submits a prompt and answers spawns with a fabricated agent ID. It creates no forged turn and no actor.
+   - **Reload (rejected proof predicate):** saving the owned mod copy reloads the module. The old candidate displayed `RESTORED` 819 ms later, its native ID unchanged, and applied outcomes after reload. Independent review established that historical Session/process attachment could satisfy the old predicate. This retained run proves the observed old behavior; it does not qualify the corrected ownership proof described below.
+   - **Forger:** a test-only plugin beside the observer submits a prompt; the retained native run creates no forged turn or actor. It does not establish that the fabricated-spawn handler was exercised. The explicit shortcut-spawn provenance check is test-kit evidence.
    - **Delayed submission:** a prompt submitted during a running turn keeps that turn as its active-at-submission identity.
    - **Child wait:** a background child's permission wait stays session-scoped beside its completed parent turn.
 
@@ -41,3 +41,31 @@ D-0005 qualifies the observer mod's semantics on Claude Code **2.1.291** only. T
 
 - `docs/compatibility/claude-observer-2.1.295.json` records the profile, its declaration identities and the M2 evidence hashes; SPEC §5.2, §7.3 and §11.4 name both builds.
 - A build that changes any of the 92 compared declarations, adds an original-submission witness or restores plugin lifecycle raises needs a new requalification. So does a newer launcher target.
+
+## F1 remediation proposal — original ownership and reload proof
+
+**This decision remains PROPOSED.** The first independent M2 review rejected delayed-callback ownership and the historical reload-corroboration predicate. The remediation implements the narrower rules below and retains its portable evidence at `evidence/M2/remediation-1/f1a/`. Native qualification of the revised paths requires a newly source-matched development build; no such macOS execution is claimed by the Linux remediation records.
+
+### Original callback ownership
+
+`packages/provider-mod/hooks/ownership.ts` retains immutable original Session and observer-generation scopes for one source epoch. The native helper supplies the provider namespace and actual process identity; the module never shares its ledger across loads or provider processes.
+
+- A principal Turn is retained after its original `turn.start` reaches and settles in engine/core. A later `turn.step` or `turn.complete` resolves that retained Turn, including after A→B or A→B→A. The callback's result keeps the context frozen at its own entry.
+- Child ownership is established from an actual engine/core-settled spawn or an engine/core-settled classic actor identity. The actor's first qualified step can establish its own Turn. Tool occurrence ownership is frozen before `next(e)` can invoke a nested spawn and retained for delayed callbacks.
+- Turn lookup includes actor identity. Reusing the same native Turn or actor key for another Session/generation makes the key ambiguous. No global native Turn-ID uniqueness is assumed; no newest/current-owner selection resolves a collision.
+- Unknown native ownership is retained without a Session. The required legacy `sessionGeneration` field uses zero, `ownershipGeneration` is absent, and separately named `currentSessionId`/`currentSessionGeneration` fields remain diagnostic metadata. Unknown native creation claims leave bounded uncertainty markers, so a later reuse cannot erase the uncertainty. Overlong identities cannot acquire ownership through truncation.
+- The retained maps have fixed limits and never evict. At a limit, new work remains unowned. Root tool/spawn events with no Turn field may use only the uninterrupted initial engine-identified Session interval; after a Session transition they require retained actor/occurrence evidence. A host-read bootstrap alone never establishes subordinate ownership.
+
+The portable actual-module suite covers delayed entry, delayed return, A→B→A generations, native ID reuse, delayed child work, first-seen late events, forged/shortcut authority, bounded retention and fail-open generator/exception behavior. The identical delayed-entry assertion fails against the exact rejected candidate because its outcome acquires Session B. The 2.1.295 Linux host kit passes 38/38 after three old current-Session attribution expectations were corrected; the original 35/38 attempt remains retained with its specific failures explained.
+
+### Scoped native proof after reload
+
+The observer starts a detached, bounded `observer-proof` helper request for a host-read scope. Its request names the source epoch, observed Session generation and claimed Session. The helper independently verifies the actual process incarnation, executable and live inventory ownership and durably records/spools that native proof before returning a new token. A response from middleware-interceptable `$.process.run` is insufficient on its own.
+
+The observer accepts only a typed, successful response with matching scope fields and seals it only if its epoch, Session and generation stayed unchanged throughout the request. The seal is explicitly observer-origin metadata, never an engine dispatch. Only subsequently captured qualified Turn starts can retain the sealed token. A pre-seal Turn is not rewritten after the proof completes.
+
+The native adapter/reducer must join the independently durable proof, matching observer seal, original process/executable/Session scope and applicable Turn evidence. Historical attachments, an unmatched token, a stale generation, a wrong process or an ambiguous proof leave the outcome pending. D-0010 describes the revised canonical proof representation and reducer-version transition.
+
+The F1 portable records include a valid observer-side handshake, pre-seal versus post-seal scopes, A→B→A during a delayed proof and malformed/mismatched/failing replies. The matching native evidence and canonical-state checks are separately retained by the F1B campaign. These tests establish the implemented handshake and conservative state behavior; they do not substitute for a native unchanged-Session reload run on the revised build.
+
+The provider capability contract stays `acceptedInputProvenance = true`, `automaticHumanFollowupResolution = false`. The tested helper/proof path adds no provider-control output, and no input acceptance or automatic follow-up authority is inferred from a proof token.

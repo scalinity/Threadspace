@@ -1,0 +1,80 @@
+{
+  "executionKind": "PORTABLE_SYNTHETIC_CLOCKS",
+  "helperRecords": [
+    {
+      "bootId": "fixture-boot",
+      "censusId": "22222222-2222-4222-8222-222222222222",
+      "clock": "CLOCK_UPTIME_RAW",
+      "kind": "observer-census-confirmed",
+      "monotonicNs": "40",
+      "observationIdsSha256": "b0455e6d6001688a5f01768f8026ce5306d9dbc0c6de61e2e5aca70cb546b352",
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "schemaVersion": 1,
+      "token": "8a1d4bc2-6a75-426d-87d9-4f489ab5cd35"
+    },
+    {
+      "bootId": "fixture-boot",
+      "censusId": "22222222-2222-4222-8222-222222222222",
+      "clock": "CLOCK_UPTIME_RAW",
+      "kind": "observer-census-page-record",
+      "monotonicNs": "20",
+      "page": {
+        "censusId": "22222222-2222-4222-8222-222222222222",
+        "kind": "observer-census-page",
+        "pageCount": 1,
+        "pageIndex": 0,
+        "records": [
+          {
+            "capturedMs": 1.0,
+            "observationId": "33333333-3333-4333-8333-000000000000"
+          },
+          {
+            "capturedMs": 1.0001220703125,
+            "observationId": "33333333-3333-4333-8333-000000000001"
+          }
+        ],
+        "runtimeId": "11111111-1111-4111-8111-111111111111",
+        "schemaVersion": 1
+      },
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "schemaVersion": 1
+    },
+    {
+      "bootId": "fixture-boot",
+      "censusId": "22222222-2222-4222-8222-222222222222",
+      "clock": "CLOCK_UPTIME_RAW",
+      "close": {
+        "boundary": "SESSION_END",
+        "censusId": "22222222-2222-4222-8222-222222222222",
+        "clock": "performance.now",
+        "closedMs": 10.0,
+        "failedExports": 0,
+        "kind": "observer-census-close",
+        "observationIdsSha256": "b0455e6d6001688a5f01768f8026ce5306d9dbc0c6de61e2e5aca70cb546b352",
+        "openedMs": 1.0,
+        "overflow": 0,
+        "pageCount": 1,
+        "runtimeId": "11111111-1111-4111-8111-111111111111",
+        "schemaVersion": 1,
+        "totalCaptured": 2
+      },
+      "kind": "observer-census-closed",
+      "monotonicNs": "30",
+      "runtimeId": "11111111-1111-4111-8111-111111111111",
+      "schemaVersion": 1,
+      "token": "8a1d4bc2-6a75-426d-87d9-4f489ab5cd35"
+    },
+    {
+      "bootId": "fixture-boot",
+      "kind": "helper-receipt",
+      "monotonicNs": "25",
+      "requestObservationIds": [
+        "99999999-9999-4999-8999-999999999999"
+      ],
+      "runtimeId": "11111111-1111-4111-8111-111111111111"
+    }
+  ],
+  "injectedCounterexample": "additional native submitted UUID missing from closed source ledger",
+  "nativeExecution": false,
+  "verifierError": "observer 11111111-1111-4111-8111-111111111111: native helper saw a UUID absent from final source census"
+}

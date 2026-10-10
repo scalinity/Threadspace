@@ -3,6 +3,7 @@ import type { NativeActorRef } from "./NativeActorRef";
 import type { NativeExecutionRef } from "./NativeExecutionRef";
 import type { NativeSessionRef } from "./NativeSessionRef";
 import type { NativeSurfaceRef } from "./NativeSurfaceRef";
+import type { ObserverOwnership } from "./ObserverOwnership";
 import type { ProcessKey } from "./ProcessKey";
 
 /**
@@ -13,4 +14,9 @@ export type NativeRefs = { session: NativeSessionRef | null, actor: NativeActorR
 /**
  * Endpoint may be empty for a local capture; admission fills it.
  */
-process: ProcessKey | null, execution: NativeExecutionRef | null, turn: string | null, input: string | null, activity: string | null, request: string | null, surface: NativeSurfaceRef | null, attention: string | null, };
+process: ProcessKey | null, execution: NativeExecutionRef | null, turn: string | null, input: string | null, activity: string | null, request: string | null, surface: NativeSurfaceRef | null, attention: string | null, 
+/**
+ * Original immutable ownership scope and independent probe token.
+ * Absent in reducer-3 captures; absence can never restore HOST_READ.
+ */
+observerOwnership: ObserverOwnership | null, };

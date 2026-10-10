@@ -101,6 +101,10 @@ pub struct Plan {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InstallRecord {
+    /// Scoped ownership was added in M2 remediation F2. Legacy records remain
+    /// readable, but cannot authorize mutation without this identity.
+    #[serde(default)]
+    pub identity: Option<InstallIdentity>,
     pub scope: Scope,
     /// The settings file holding the owned hooks.
     pub config_path: PathBuf,
@@ -116,6 +120,28 @@ pub struct InstallRecord {
     /// Containers the edit created, removed again once empty.
     pub created: Vec<String>,
     pub installed_at_ms: i64,
+    /// A partial uninstall retains only unresolved entries and the resources
+    /// they may still reference. It must never become an original-byte restore.
+    #[serde(default)]
+    pub partial_uninstall: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InstallIdentity {
+    pub config_dir: PathBuf,
+    pub owned_dir: PathBuf,
+    pub agent_identifier: String,
+}
+
+impl InstallIdentity {
+    fn for_target(target: &Target) -> Self {
+        Self {
+            config_dir: target.config_dir.clone(),
+            owned_dir: target.owned_dir.clone(),
+            agent_identifier: target.agent_identifier.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -131,6 +157,14 @@ pub struct UninstallReport {
     pub conflicts: Vec<OwnedEntry>,
     pub settings_sha256: Option<String>,
     pub removed_files: Vec<PathBuf>,
+    /// False while owner-modified configuration still needs resolution.
+    pub complete: bool,
+    pub retained_helper_paths: Vec<PathBuf>,
+    pub retained_mod_paths: Vec<PathBuf>,
+    pub retained_record: Option<PathBuf>,
+    /// JSON pointers or owned session filenames, never owner command values.
+    pub retained_references: Vec<String>,
+    pub attempted_at_ms: i64,
     pub uninstalled_at_ms: i64,
 }
 
@@ -185,6 +219,13 @@ pub enum SetupError {
     ScopeMismatch {
         installed: Scope,
     },
+    TargetMismatch {
+        installed: Box<InstallIdentity>,
+        requested: Box<InstallIdentity>,
+    },
+    UnresolvedConflicts {
+        entries: Vec<OwnedEntry>,
+    },
     Io {
         path: PathBuf,
         message: String,
@@ -236,6 +277,12 @@ impl fmt::Display for SetupError {
                     Scope::Session => "session",
                 }
             ),
+            Self::TargetMismatch { .. } => formatter.write_str(
+                "the requested configuration, owned directory or agent does not own this installation",
+            ),
+            Self::UnresolvedConflicts { .. } => formatter.write_str(
+                "resolve the retained integration conflicts before reinstalling",
+            ),
             Self::Io { path, message } => write!(formatter, "{}: {message}", path.display()),
         }
     }
@@ -285,7 +332,7 @@ pub fn plan(target: &Target) -> Result<Plan, SetupError> {
                 ),
             },
             "Otherwise it removes only the owned entries that still match exactly, and reports edited ones as conflicts without touching them.".into(),
-            format!("It then removes {owned_files} and record.json; backups/ is kept."),
+            format!("It removes {owned_files} and record.json only after every owned entry is resolved; conflicts retain those resources and the record for a safe retry. backups/ is kept."),
         ],
         Scope::Session => vec![
             format!(
@@ -348,6 +395,7 @@ pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
         }
     }
     let record = InstallRecord {
+        identity: Some(InstallIdentity::for_target(target)),
         scope: target.scope,
         config_path: prepared.settings_path,
         original_sha256: base.original_sha256.clone(),
@@ -358,6 +406,7 @@ pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
         owned_entries: prepared.entries,
         created,
         installed_at_ms: now_ms(),
+        partial_uninstall: false,
     };
     owned::write_json(&layout.record, &record)?;
     // Earlier mod copies are unreferenced once the settings are written.
@@ -368,7 +417,8 @@ pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
 pub fn uninstall(target: &Target) -> Result<UninstallReport, SetupError> {
     validate(target)?;
     let layout = Layout::new(&target.owned_dir);
-    let record = owned::read_record(&layout.record)?.ok_or(SetupError::NotInstalled)?;
+    let mut record = owned::read_record(&layout.record)?.ok_or(SetupError::NotInstalled)?;
+    verify_identity(target, &layout, &record)?;
     let mut report = UninstallReport {
         scope: record.scope,
         config_path: record.config_path.clone(),
@@ -377,13 +427,54 @@ pub fn uninstall(target: &Target) -> Result<UninstallReport, SetupError> {
         conflicts: Vec::new(),
         settings_sha256: None,
         removed_files: Vec::new(),
+        complete: false,
+        retained_helper_paths: Vec::new(),
+        retained_mod_paths: Vec::new(),
+        retained_record: None,
+        retained_references: Vec::new(),
+        attempted_at_ms: now_ms(),
         uninstalled_at_ms: 0,
     };
     match record.scope {
         Scope::User => restore_settings(&layout, &record, &mut report)?,
-        Scope::Session => report.removed = record.owned_entries.clone(),
+        Scope::Session => {
+            let settings = read_optional(&layout.session_settings)?;
+            let env = read_optional(&layout.session_env)?;
+            let unchanged = settings.as_deref().map(sha256_hex).as_deref()
+                == Some(record.applied_sha256.as_str())
+                && env.as_deref() == Some(activate_env(&path_text(&record.plugin_dir)).as_slice());
+            if unchanged || (settings.is_none() && env.is_none()) {
+                report.removed = record.owned_entries.clone();
+            } else {
+                // Session files are owned, but an owner may still edit them.
+                // Preserve the complete pair rather than erase unknown edits.
+                report.conflicts = record.owned_entries.clone();
+                report.retained_references = vec![
+                    "session/settings.json".into(),
+                    "session/activate.env".into(),
+                ];
+            }
+        }
     }
-    // Owned files go only once no settings reference them.
+    // A conflict can be an edited shell command or plugin path, whose complete
+    // reference semantics we cannot safely evaluate. Keep the helper, mod and
+    // ownership record as a conservative set until the recorded entry is
+    // resolved; never execute an owner command to guess whether it uses them.
+    if !report.conflicts.is_empty() || !report.retained_references.is_empty() {
+        record.owned_entries = report.conflicts.clone();
+        record.partial_uninstall = true;
+        owned::write_json(&layout.record, &record)?;
+        if layout.helper.exists() {
+            report.retained_helper_paths.push(layout.helper.clone());
+        }
+        if record.plugin_dir.exists() {
+            report.retained_mod_paths.push(record.plugin_dir.clone());
+        }
+        report.retained_record = Some(layout.record.clone());
+        owned::write_json(&layout.backups.join("uninstall-report.json"), &report)?;
+        return Ok(report);
+    }
+    // All recorded entries have been removed, so their resources can go.
     for path in [
         &layout.session,
         &layout.bin,
@@ -395,6 +486,7 @@ pub fn uninstall(target: &Target) -> Result<UninstallReport, SetupError> {
         }
     }
     report.uninstalled_at_ms = now_ms();
+    report.complete = true;
     owned::create_private_dir(&layout.backups)?;
     owned::write_json(&layout.backups.join("uninstall-report.json"), &report)?;
     Ok(report)
@@ -414,6 +506,7 @@ pub fn status(target: &Target) -> Result<IntegrationState, SetupError> {
             plugin_dir_present: false,
         });
     };
+    verify_identity(target, &layout, &record)?;
     let current = read_optional(&record.config_path)?;
     let (in_file, elsewhere): (Vec<OwnedEntry>, Vec<OwnedEntry>) = record
         .owned_entries
@@ -477,12 +570,13 @@ fn prepare(target: &Target) -> Result<Prepared, SetupError> {
     validate(target)?;
     let layout = Layout::new(&target.owned_dir);
     let previous = owned::read_record(&layout.record)?;
-    if let Some(record) = &previous
-        && record.scope != target.scope
-    {
-        return Err(SetupError::ScopeMismatch {
-            installed: record.scope,
-        });
+    if let Some(record) = &previous {
+        verify_identity(target, &layout, record)?;
+        if record.partial_uninstall {
+            return Err(SetupError::UnresolvedConflicts {
+                entries: record.owned_entries.clone(),
+            });
+        }
     }
     let helper =
         read_optional(&target.helper_source)?.ok_or_else(|| SetupError::MissingSource {
@@ -526,6 +620,19 @@ fn prepare(target: &Target) -> Result<Prepared, SetupError> {
         ),
     };
     let mut edited = root.clone();
+    if let Some(record) = &previous
+        && target.scope == Scope::User
+    {
+        let mut without_owned = root.clone();
+        let removal = settings::remove(&mut without_owned, &record.owned_entries, &[]);
+        if !removal.conflicts.is_empty()
+            || !resource_references(&without_owned, &layout, record).is_empty()
+        {
+            return Err(SetupError::UnresolvedConflicts {
+                entries: removal.conflicts,
+            });
+        }
+    }
     let in_file: Vec<OwnedEntry> = entries
         .iter()
         .filter(|entry| in_settings(target.scope, entry))
@@ -611,7 +718,8 @@ fn restore_settings(
     let path = &record.config_path;
     let current = read_optional(path)?;
     let current_sha256 = current.as_deref().map(sha256_hex);
-    if current_sha256.as_deref() == Some(record.applied_sha256.as_str())
+    if !record.partial_uninstall
+        && current_sha256.as_deref() == Some(record.applied_sha256.as_str())
         && let Some(original) = restorable_original(layout, record)?
     {
         owned::replace_checked(path, current_sha256.as_deref(), original.as_deref())?;
@@ -622,11 +730,12 @@ fn restore_settings(
     }
     let Some(bytes) = current else {
         // The file is gone, and every owned entry with it.
-        report.conflicts = record.owned_entries.clone();
+        report.removed = record.owned_entries.clone();
         return Ok(());
     };
     let mut root = parse_root(path, &bytes)?;
     let removal = settings::remove(&mut root, &record.owned_entries, &record.created);
+    report.retained_references = resource_references(&root, layout, record);
     let after = if removal.changed {
         let after = pretty(path, root)?;
         owned::replace_checked(path, current_sha256.as_deref(), Some(&after))?;
@@ -637,6 +746,63 @@ fn restore_settings(
     report.settings_sha256 = Some(sha256_hex(&after));
     report.removed = removal.removed;
     report.conflicts = removal.conflicts;
+    Ok(())
+}
+
+fn resource_references(root: &Map, layout: &Layout, record: &InstallRecord) -> Vec<String> {
+    settings::reference_locations(
+        root,
+        &[
+            path_text(&layout.root),
+            shell_quote(&path_text(&layout.helper)),
+            shell_quote(&path_text(&record.plugin_dir)),
+            // An owner may replace the absolute helper prefix with a variable.
+            // Treat that recognizable helper name conservatively as a reference.
+            "threadspace-hook".into(),
+        ],
+    )
+}
+
+/// Verify every independent part of the requested installation before reading
+/// provider settings or changing owned files. A copied record cannot confer
+/// ownership of another root, and session scope retains its acquisition's
+/// configuration identity even though it never reads that configuration.
+fn verify_identity(
+    target: &Target,
+    layout: &Layout,
+    record: &InstallRecord,
+) -> Result<(), SetupError> {
+    if record.scope != target.scope {
+        return Err(SetupError::ScopeMismatch {
+            installed: record.scope,
+        });
+    }
+    let Some(installed) = &record.identity else {
+        return Err(SetupError::InvalidRecord {
+            path: layout.record.clone(),
+            reason: "legacy record has no verified scope/configuration ownership identity; no files were changed".into(),
+        });
+    };
+    let requested = InstallIdentity::for_target(target);
+    if installed != &requested {
+        return Err(SetupError::TargetMismatch {
+            installed: Box::new(installed.clone()),
+            requested: Box::new(requested),
+        });
+    }
+    let settings_path = match target.scope {
+        Scope::User => target.config_dir.join("settings.json"),
+        Scope::Session => layout.session_settings.clone(),
+    };
+    if record.config_path != settings_path
+        || record.plugin_dir.parent() != Some(layout.observer.as_path())
+    {
+        return Err(SetupError::InvalidRecord {
+            path: layout.record.clone(),
+            reason: "recorded settings or observer path does not belong to the verified target"
+                .into(),
+        });
+    }
     Ok(())
 }
 
@@ -658,15 +824,23 @@ fn restorable_original(
         return Ok(None);
     }
     let clean = match Value::parse(&bytes) {
-        Ok(Value::Object(mut root)) => settings::remove(&mut root, &record.owned_entries, &[])
-            .removed
-            .is_empty(),
+        Ok(Value::Object(mut root)) => {
+            settings::remove(&mut root, &record.owned_entries, &[])
+                .removed
+                .is_empty()
+                && resource_references(&root, layout, record).is_empty()
+        }
         _ => false,
     };
     Ok(clean.then_some(Some(bytes)))
 }
 
 fn validate(target: &Target) -> Result<(), SetupError> {
+    if !target.config_dir.is_absolute() {
+        return Err(SetupError::InvalidTarget {
+            reason: "the configuration ownership identity must be an absolute path".into(),
+        });
+    }
     let identifier = &target.agent_identifier;
     if identifier.is_empty()
         || !identifier
@@ -1195,7 +1369,20 @@ mod tests {
             .collect();
         assert_eq!(events, ["SessionStart", "PreToolUse", "WorktreeCreate"]);
         assert_eq!(plugin_dirs(&root), Some("/opt/plugins/a:/opt/plugins/b"));
-        assert_eq!(listing(&target.owned_dir), ["backups"]);
+        assert!(!report.complete);
+        assert_eq!(
+            report.retained_helper_paths,
+            [target.owned_dir.join("bin/threadspace-hook")]
+        );
+        assert_eq!(report.retained_mod_paths, [record.plugin_dir]);
+        assert_eq!(
+            report.retained_record,
+            Some(target.owned_dir.join("record.json"))
+        );
+        assert_eq!(
+            listing(&target.owned_dir),
+            ["backups", "bin", "observer", "record.json"]
+        );
     }
 
     #[test]
@@ -1512,6 +1699,12 @@ mod tests {
             Err(SetupError::InvalidTarget { .. })
         ));
         let mut target = scratch.target(Scope::User);
+        target.config_dir = PathBuf::from("relative");
+        assert!(matches!(
+            uninstall(&target),
+            Err(SetupError::InvalidTarget { .. })
+        ));
+        let mut target = scratch.target(Scope::User);
         target.helper_source = scratch.root.join("absent");
         assert!(matches!(
             install(&target),
@@ -1544,7 +1737,14 @@ mod tests {
         fs::create_dir_all(target.parent().expect("parent")).expect("observer");
         copy.stage(&target).expect("stage");
         assert!(!target.join("tests").exists());
-        assert!(target.join("hooks/register.ts").is_file());
+        for module in ["register.ts", "delivery.ts", "ownership.ts", "latency.ts"] {
+            let relative = Path::new("hooks").join(module);
+            assert_eq!(
+                fs::read(target.join(&relative)).expect("runtime module staged"),
+                fs::read(source.join(&relative)).expect("runtime source module"),
+                "{module} must retain the exact runtime implementation"
+            );
+        }
         assert_eq!(
             fs::read(target.join("hooks/hooks.json")).expect("copy"),
             fs::read(source.join("hooks/hooks.json")).expect("source")
@@ -1575,4 +1775,6 @@ mod tests {
             Some(copy.sha256.clone())
         );
     }
+
+    include!("f2_tests.rs");
 }

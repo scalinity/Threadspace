@@ -200,6 +200,7 @@ impl Admit for PureRunner {
         self.cursor += 1;
         let entry = JournalEntry {
             cursor: self.cursor,
+            payload_version: threadspace_contracts::canonical::JOURNAL_PAYLOAD_VERSION,
             endpoint_id: self.endpoint.clone(),
             observation_id: envelope.observation_id.clone(),
             source_id: envelope.source_id.clone(),
@@ -256,6 +257,7 @@ impl Admit for PureRunner {
         );
         let entry = JournalEntry {
             cursor: self.cursor,
+            payload_version: threadspace_contracts::canonical::JOURNAL_PAYLOAD_VERSION,
             endpoint_id: self.endpoint.clone(),
             observation_id,
             source_id: command::OWNER_SOURCE.into(),

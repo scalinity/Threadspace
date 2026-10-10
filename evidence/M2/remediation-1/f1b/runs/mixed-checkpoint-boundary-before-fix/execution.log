@@ -1,0 +1,23 @@
+   Compiling threadspace-contracts v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/contracts)
+   Compiling threadspace-state-engine v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine)
+   Compiling threadspace-journal v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 41.17s
+     Running tests/observer_ownership.rs (/workspace/scratch/c8272833f682/review-build-reducer/x86_64-unknown-linux-gnu/debug/deps/observer_ownership-facced9b4b9a46a8)
+
+running 1 test
+
+thread 'f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary' (698) panicked at crates/journal/tests/observer_ownership.rs:608:17:
+assertion `left == right` failed: an older verified checkpoint plus v2 metadata suffix must retain the original transition
+  left: "80ef81fba6cb21b01d63a75157b2ad467d9469e0e75eac79a2dae4f7d64966a4"
+ right: "bf8675d7467e58ecf12d8606631d899ea47694a3600d489f7f1a2e7b33953bbf"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary ... FAILED
+
+failures:
+
+failures:
+    f1b_metadata_only_admissions_cannot_move_an_already_committed_upgrade_boundary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p threadspace-journal --test observer_ownership`

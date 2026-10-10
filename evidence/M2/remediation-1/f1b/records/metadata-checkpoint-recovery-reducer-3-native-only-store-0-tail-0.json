@@ -1,0 +1,1088 @@
+{
+  "expected": {
+    "activities": {},
+    "actors": {
+      "0f96f681-a08e-4816-826a-831dbd4f9c18": {
+        "agentTypes": [],
+        "createdCursor": 1,
+        "id": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "native": {
+          "kind": "PRINCIPAL"
+        },
+        "revision": 1,
+        "role": "PRINCIPAL",
+        "runsEnded": 0,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731"
+      }
+    },
+    "attention": {
+      "80372e1d-1c7f-8296-b700-1a8609fcf1b3": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000030,
+        "createdByFact": "42f28f83-1815-4368-a13b-1d256e0bcabf",
+        "createdByObservation": "00000000-0000-0000-0000-00000000001e",
+        "createdCursor": 4,
+        "id": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "notificationState": "NOT_REQUESTED",
+        "priority": 40,
+        "resolutionReason": "native owner decision survives version transition",
+        "resolutions": [
+          {
+            "detail": "native owner decision survives version transition",
+            "kind": "OWNER"
+          }
+        ],
+        "resolvedAtMs": 1791000000100,
+        "revision": 5,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+      },
+      "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000050,
+        "createdByFact": "7fab69ec-370a-4046-90f6-7d3083821b01",
+        "createdByObservation": "00000000-0000-0000-0000-000000000032",
+        "createdCursor": 7,
+        "id": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 7,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+      }
+    },
+    "attentionByScope": {
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"472bdf24-4162-4c0a-8fc8-924913e8c5fb\"]": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"60a44ac6-11de-4b6a-9324-141da9f5639e\"]": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc"
+    },
+    "bindings": {},
+    "commands": {
+      "00000000-0000-0000-0000-000000012fd1": {
+        "action": "RESOLVE",
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "commandId": "00000000-0000-0000-0000-000000012fd1",
+        "cursor": 5
+      }
+    },
+    "coverage": {
+      "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]": {
+        "gaps": [
+          {
+            "first": "11",
+            "last": "19"
+          },
+          {
+            "first": "21",
+            "last": "29"
+          },
+          {
+            "first": "31",
+            "last": "39"
+          },
+          {
+            "first": "41",
+            "last": "49"
+          },
+          {
+            "first": "51",
+            "last": "99"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 7,
+        "seen": [
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "20",
+            "last": "20"
+          },
+          {
+            "first": "30",
+            "last": "30"
+          },
+          {
+            "first": "40",
+            "last": "40"
+          },
+          {
+            "first": "50",
+            "last": "50"
+          },
+          {
+            "first": "100",
+            "last": "100"
+          }
+        ],
+        "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+        "sourceId": "claude.observer"
+      }
+    },
+    "executions": {
+      "3a041ecb-2088-4c0a-9725-e0338d79dfe5": {
+        "activation": 1,
+        "activationRef": "historical-A",
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "attached": "LIVE",
+        "attachmentConflict": false,
+        "attachments": [
+          {
+            "controllingDevice": 12,
+            "factIndex": 1,
+            "mode": "terminal_embedded",
+            "nativeRuntimeId": null,
+            "observationId": "00000000-0000-0000-0000-000000000064",
+            "point": null,
+            "presence": "LIVE",
+            "provenance": "PROVIDER_SNAPSHOT"
+          }
+        ],
+        "controllingDevice": 12,
+        "createdCursor": 1,
+        "endReasons": [],
+        "endedCursor": null,
+        "id": "3a041ecb-2088-4c0a-9725-e0338d79dfe5",
+        "mode": "terminal_embedded",
+        "nativeRuntimeId": null,
+        "presence": "LIVE",
+        "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "startedCursor": 1,
+        "surfaceStatus": null
+      }
+    },
+    "frontiers": {},
+    "inputs": {},
+    "namespaces": {
+      "46333fcc-87e0-4cf7-96ee-756d3e7ec443": {
+        "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+        "id": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      }
+    },
+    "outbox": {
+      "de3fa71b-acaf-813e-978b-2049d94f85e6": {
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "createdAtMs": 1791000000050,
+        "createdCursor": 7,
+        "detail": null,
+        "requestId": "de3fa71b-acaf-813e-978b-2049d94f85e6",
+        "revision": 7,
+        "state": "PENDING",
+        "updatedAtMs": 1791000000050
+      },
+      "ffe5da6f-8d3c-863b-b309-e04b3ce7e792": {
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "createdAtMs": 1791000000030,
+        "createdCursor": 4,
+        "detail": "ineligible before submission",
+        "requestId": "ffe5da6f-8d3c-863b-b309-e04b3ce7e792",
+        "revision": 5,
+        "state": "SUPPRESSED",
+        "updatedAtMs": 1791000000100
+      }
+    },
+    "processes": {
+      "4e827e73-4410-473e-b274-802bcd52fe09": {
+        "createdCursor": 1,
+        "currentExecutable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+        "exited": false,
+        "id": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "images": [
+          {
+            "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+            "point": null
+          }
+        ],
+        "key": {
+          "bootId": "f1b-boot",
+          "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+          "pid": 710,
+          "startMicroseconds": 7,
+          "startSeconds": "1700"
+        },
+        "revision": 7
+      }
+    },
+    "reducerVersion": 4,
+    "relations": [],
+    "requests": {},
+    "sessions": {
+      "964a1183-368e-40b9-9928-62e073835731": {
+        "createdCursor": 1,
+        "displayName": null,
+        "executionPresence": "LIVE",
+        "fixture": false,
+        "id": "964a1183-368e-40b9-9928-62e073835731",
+        "inventory": null,
+        "lastRoute": null,
+        "link": "CURRENT",
+        "linkConflict": false,
+        "links": [
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "00000000-0000-0000-0000-00000000000a",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "10",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+            "provenance": "PROVIDER_EVENT",
+            "qualified": true,
+            "version": "2.1.295"
+          }
+        ],
+        "namespaceId": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "nativeSessionId": "A",
+        "observation": "CURRENT",
+        "observerTier": "NATIVE",
+        "observerVersion": "2.1.295",
+        "ownershipProofs": [],
+        "recordState": "KNOWN",
+        "revision": 7,
+        "startSources": [],
+        "turnState": "COMPLETED"
+      }
+    },
+    "surfaces": {},
+    "throughCursor": 8,
+    "turns": {
+      "472bdf24-4162-4c0a-8fc8-924913e8c5fb": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 3,
+        "executionIds": [],
+        "id": "472bdf24-4162-4c0a-8fc8-924913e8c5fb",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-handled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "30",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 4,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      },
+      "60a44ac6-11de-4b6a-9324-141da9f5639e": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 6,
+        "executionIds": [],
+        "id": "60a44ac6-11de-4b6a-9324-141da9f5639e",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-unhandled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "50",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      }
+    },
+    "waits": {}
+  },
+  "genesis": {
+    "activities": {},
+    "actors": {
+      "0f96f681-a08e-4816-826a-831dbd4f9c18": {
+        "agentTypes": [],
+        "createdCursor": 1,
+        "id": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "native": {
+          "kind": "PRINCIPAL"
+        },
+        "revision": 1,
+        "role": "PRINCIPAL",
+        "runsEnded": 0,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731"
+      }
+    },
+    "attention": {
+      "80372e1d-1c7f-8296-b700-1a8609fcf1b3": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000030,
+        "createdByFact": "42f28f83-1815-4368-a13b-1d256e0bcabf",
+        "createdByObservation": "00000000-0000-0000-0000-00000000001e",
+        "createdCursor": 4,
+        "id": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "notificationState": "NOT_REQUESTED",
+        "priority": 40,
+        "resolutionReason": "native owner decision survives version transition",
+        "resolutions": [
+          {
+            "detail": "native owner decision survives version transition",
+            "kind": "OWNER"
+          }
+        ],
+        "resolvedAtMs": 1791000000100,
+        "revision": 5,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+      },
+      "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000050,
+        "createdByFact": "7fab69ec-370a-4046-90f6-7d3083821b01",
+        "createdByObservation": "00000000-0000-0000-0000-000000000032",
+        "createdCursor": 7,
+        "id": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 7,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+      }
+    },
+    "attentionByScope": {
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"472bdf24-4162-4c0a-8fc8-924913e8c5fb\"]": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"60a44ac6-11de-4b6a-9324-141da9f5639e\"]": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc"
+    },
+    "bindings": {},
+    "commands": {
+      "00000000-0000-0000-0000-000000012fd1": {
+        "action": "RESOLVE",
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "commandId": "00000000-0000-0000-0000-000000012fd1",
+        "cursor": 5
+      }
+    },
+    "coverage": {
+      "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]": {
+        "gaps": [
+          {
+            "first": "11",
+            "last": "19"
+          },
+          {
+            "first": "21",
+            "last": "29"
+          },
+          {
+            "first": "31",
+            "last": "39"
+          },
+          {
+            "first": "41",
+            "last": "49"
+          },
+          {
+            "first": "51",
+            "last": "99"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 7,
+        "seen": [
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "20",
+            "last": "20"
+          },
+          {
+            "first": "30",
+            "last": "30"
+          },
+          {
+            "first": "40",
+            "last": "40"
+          },
+          {
+            "first": "50",
+            "last": "50"
+          },
+          {
+            "first": "100",
+            "last": "100"
+          }
+        ],
+        "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+        "sourceId": "claude.observer"
+      }
+    },
+    "executions": {
+      "3a041ecb-2088-4c0a-9725-e0338d79dfe5": {
+        "activation": 1,
+        "activationRef": "historical-A",
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "attached": "LIVE",
+        "attachmentConflict": false,
+        "attachments": [
+          {
+            "controllingDevice": 12,
+            "factIndex": 1,
+            "mode": "terminal_embedded",
+            "nativeRuntimeId": null,
+            "observationId": "00000000-0000-0000-0000-000000000064",
+            "point": null,
+            "presence": "LIVE",
+            "provenance": "PROVIDER_SNAPSHOT"
+          }
+        ],
+        "controllingDevice": 12,
+        "createdCursor": 1,
+        "endReasons": [],
+        "endedCursor": null,
+        "id": "3a041ecb-2088-4c0a-9725-e0338d79dfe5",
+        "mode": "terminal_embedded",
+        "nativeRuntimeId": null,
+        "presence": "LIVE",
+        "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "startedCursor": 1,
+        "surfaceStatus": null
+      }
+    },
+    "frontiers": {},
+    "inputs": {},
+    "namespaces": {
+      "46333fcc-87e0-4cf7-96ee-756d3e7ec443": {
+        "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+        "id": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      }
+    },
+    "outbox": {
+      "de3fa71b-acaf-813e-978b-2049d94f85e6": {
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "createdAtMs": 1791000000050,
+        "createdCursor": 7,
+        "detail": null,
+        "requestId": "de3fa71b-acaf-813e-978b-2049d94f85e6",
+        "revision": 7,
+        "state": "PENDING",
+        "updatedAtMs": 1791000000050
+      },
+      "ffe5da6f-8d3c-863b-b309-e04b3ce7e792": {
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "createdAtMs": 1791000000030,
+        "createdCursor": 4,
+        "detail": "ineligible before submission",
+        "requestId": "ffe5da6f-8d3c-863b-b309-e04b3ce7e792",
+        "revision": 5,
+        "state": "SUPPRESSED",
+        "updatedAtMs": 1791000000100
+      }
+    },
+    "processes": {
+      "4e827e73-4410-473e-b274-802bcd52fe09": {
+        "createdCursor": 1,
+        "currentExecutable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+        "exited": false,
+        "id": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "images": [
+          {
+            "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+            "point": null
+          }
+        ],
+        "key": {
+          "bootId": "f1b-boot",
+          "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+          "pid": 710,
+          "startMicroseconds": 7,
+          "startSeconds": "1700"
+        },
+        "revision": 7
+      }
+    },
+    "reducerVersion": 4,
+    "relations": [],
+    "requests": {},
+    "sessions": {
+      "964a1183-368e-40b9-9928-62e073835731": {
+        "createdCursor": 1,
+        "displayName": null,
+        "executionPresence": "LIVE",
+        "fixture": false,
+        "id": "964a1183-368e-40b9-9928-62e073835731",
+        "inventory": null,
+        "lastRoute": null,
+        "link": "CURRENT",
+        "linkConflict": false,
+        "links": [
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "00000000-0000-0000-0000-00000000000a",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "10",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+            "provenance": "PROVIDER_EVENT",
+            "qualified": true,
+            "version": "2.1.295"
+          }
+        ],
+        "namespaceId": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "nativeSessionId": "A",
+        "observation": "CURRENT",
+        "observerTier": "NATIVE",
+        "observerVersion": "2.1.295",
+        "ownershipProofs": [],
+        "recordState": "KNOWN",
+        "revision": 7,
+        "startSources": [],
+        "turnState": "COMPLETED"
+      }
+    },
+    "surfaces": {},
+    "throughCursor": 8,
+    "turns": {
+      "472bdf24-4162-4c0a-8fc8-924913e8c5fb": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 3,
+        "executionIds": [],
+        "id": "472bdf24-4162-4c0a-8fc8-924913e8c5fb",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-handled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "30",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 4,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      },
+      "60a44ac6-11de-4b6a-9324-141da9f5639e": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 6,
+        "executionIds": [],
+        "id": "60a44ac6-11de-4b6a-9324-141da9f5639e",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-unhandled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "50",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      }
+    },
+    "waits": {}
+  },
+  "recovered": {
+    "activities": {},
+    "actors": {
+      "0f96f681-a08e-4816-826a-831dbd4f9c18": {
+        "agentTypes": [],
+        "createdCursor": 1,
+        "id": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "native": {
+          "kind": "PRINCIPAL"
+        },
+        "revision": 1,
+        "role": "PRINCIPAL",
+        "runsEnded": 0,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731"
+      }
+    },
+    "attention": {
+      "80372e1d-1c7f-8296-b700-1a8609fcf1b3": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000030,
+        "createdByFact": "42f28f83-1815-4368-a13b-1d256e0bcabf",
+        "createdByObservation": "00000000-0000-0000-0000-00000000001e",
+        "createdCursor": 4,
+        "id": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "notificationState": "NOT_REQUESTED",
+        "priority": 40,
+        "resolutionReason": "native owner decision survives version transition",
+        "resolutions": [
+          {
+            "detail": "native owner decision survives version transition",
+            "kind": "OWNER"
+          }
+        ],
+        "resolvedAtMs": 1791000000100,
+        "revision": 5,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "472bdf24-4162-4c0a-8fc8-924913e8c5fb"
+      },
+      "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000050,
+        "createdByFact": "7fab69ec-370a-4046-90f6-7d3083821b01",
+        "createdByObservation": "00000000-0000-0000-0000-000000000032",
+        "createdCursor": 7,
+        "id": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 7,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+        },
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "60a44ac6-11de-4b6a-9324-141da9f5639e"
+      }
+    },
+    "attentionByScope": {
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"472bdf24-4162-4c0a-8fc8-924913e8c5fb\"]": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+      "[\"attention\",\"964a1183-368e-40b9-9928-62e073835731\",\"TURN_OUTPUT\",\"60a44ac6-11de-4b6a-9324-141da9f5639e\"]": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc"
+    },
+    "bindings": {},
+    "commands": {
+      "00000000-0000-0000-0000-000000012fd1": {
+        "action": "RESOLVE",
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "commandId": "00000000-0000-0000-0000-000000012fd1",
+        "cursor": 5
+      }
+    },
+    "coverage": {
+      "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]": {
+        "gaps": [
+          {
+            "first": "11",
+            "last": "19"
+          },
+          {
+            "first": "21",
+            "last": "29"
+          },
+          {
+            "first": "31",
+            "last": "39"
+          },
+          {
+            "first": "41",
+            "last": "49"
+          },
+          {
+            "first": "51",
+            "last": "99"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 7,
+        "seen": [
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "20",
+            "last": "20"
+          },
+          {
+            "first": "30",
+            "last": "30"
+          },
+          {
+            "first": "40",
+            "last": "40"
+          },
+          {
+            "first": "50",
+            "last": "50"
+          },
+          {
+            "first": "100",
+            "last": "100"
+          }
+        ],
+        "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+        "sourceId": "claude.observer"
+      }
+    },
+    "executions": {
+      "3a041ecb-2088-4c0a-9725-e0338d79dfe5": {
+        "activation": 1,
+        "activationRef": "historical-A",
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "attached": "LIVE",
+        "attachmentConflict": false,
+        "attachments": [
+          {
+            "controllingDevice": 12,
+            "factIndex": 1,
+            "mode": "terminal_embedded",
+            "nativeRuntimeId": null,
+            "observationId": "00000000-0000-0000-0000-000000000064",
+            "point": null,
+            "presence": "LIVE",
+            "provenance": "PROVIDER_SNAPSHOT"
+          }
+        ],
+        "controllingDevice": 12,
+        "createdCursor": 1,
+        "endReasons": [],
+        "endedCursor": null,
+        "id": "3a041ecb-2088-4c0a-9725-e0338d79dfe5",
+        "mode": "terminal_embedded",
+        "nativeRuntimeId": null,
+        "presence": "LIVE",
+        "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "startedCursor": 1,
+        "surfaceStatus": null
+      }
+    },
+    "frontiers": {},
+    "inputs": {},
+    "namespaces": {
+      "46333fcc-87e0-4cf7-96ee-756d3e7ec443": {
+        "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+        "id": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      }
+    },
+    "outbox": {
+      "de3fa71b-acaf-813e-978b-2049d94f85e6": {
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "createdAtMs": 1791000000050,
+        "createdCursor": 7,
+        "detail": null,
+        "requestId": "de3fa71b-acaf-813e-978b-2049d94f85e6",
+        "revision": 7,
+        "state": "PENDING",
+        "updatedAtMs": 1791000000050
+      },
+      "ffe5da6f-8d3c-863b-b309-e04b3ce7e792": {
+        "attentionId": "80372e1d-1c7f-8296-b700-1a8609fcf1b3",
+        "createdAtMs": 1791000000030,
+        "createdCursor": 4,
+        "detail": "ineligible before submission",
+        "requestId": "ffe5da6f-8d3c-863b-b309-e04b3ce7e792",
+        "revision": 5,
+        "state": "SUPPRESSED",
+        "updatedAtMs": 1791000000100
+      }
+    },
+    "processes": {
+      "4e827e73-4410-473e-b274-802bcd52fe09": {
+        "createdCursor": 1,
+        "currentExecutable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+        "exited": false,
+        "id": "4e827e73-4410-473e-b274-802bcd52fe09",
+        "images": [
+          {
+            "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+            "point": null
+          }
+        ],
+        "key": {
+          "bootId": "f1b-boot",
+          "endpointId": "200e950c-027b-4341-aa1e-d3a134ca8e05",
+          "pid": 710,
+          "startMicroseconds": 7,
+          "startSeconds": "1700"
+        },
+        "revision": 7
+      }
+    },
+    "reducerVersion": 4,
+    "relations": [],
+    "requests": {},
+    "sessions": {
+      "964a1183-368e-40b9-9928-62e073835731": {
+        "createdCursor": 1,
+        "displayName": null,
+        "executionPresence": "LIVE",
+        "fixture": false,
+        "id": "964a1183-368e-40b9-9928-62e073835731",
+        "inventory": null,
+        "lastRoute": null,
+        "link": "CURRENT",
+        "linkConflict": false,
+        "links": [
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "00000000-0000-0000-0000-00000000000a",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "10",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "4e827e73-4410-473e-b274-802bcd52fe09",
+            "provenance": "PROVIDER_EVENT",
+            "qualified": true,
+            "version": "2.1.295"
+          }
+        ],
+        "namespaceId": "46333fcc-87e0-4cf7-96ee-756d3e7ec443",
+        "nativeSessionId": "A",
+        "observation": "CURRENT",
+        "observerTier": "NATIVE",
+        "observerVersion": "2.1.295",
+        "ownershipProofs": [],
+        "recordState": "KNOWN",
+        "revision": 7,
+        "startSources": [],
+        "turnState": "COMPLETED"
+      }
+    },
+    "surfaces": {},
+    "throughCursor": 8,
+    "turns": {
+      "472bdf24-4162-4c0a-8fc8-924913e8c5fb": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 3,
+        "executionIds": [],
+        "id": "472bdf24-4162-4c0a-8fc8-924913e8c5fb",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-handled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "30",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 4,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      },
+      "60a44ac6-11de-4b6a-9324-141da9f5639e": {
+        "activitySeen": false,
+        "actorId": "0f96f681-a08e-4816-826a-831dbd4f9c18",
+        "createdCursor": 6,
+        "executionIds": [],
+        "id": "60a44ac6-11de-4b6a-9324-141da9f5639e",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "native-unhandled",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "50",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 7,
+        "sessionId": "964a1183-368e-40b9-9928-62e073835731",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      }
+    },
+    "waits": {}
+  }
+}

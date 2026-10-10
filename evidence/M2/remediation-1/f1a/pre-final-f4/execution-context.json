@@ -1,0 +1,62 @@
+{
+  "baseCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "sourceStatus": "executed before the remediation commit; content hashes bind the qualified source copy",
+  "nodeVersion": "v26.11.1",
+  "claudeVersion": "2.1.295",
+  "platform": "linux",
+  "kitSourceCopy": "/workspace/scratch/c8272833f682/review-checks/f1a-kit-final-kvpcdk24/observer",
+  "sourceHashes": {
+    ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+    "hooks/delivery.ts": "31f005a90434d82dd887de69b4b24d9d35be14bbde2d1923848dbae1e8a2c224",
+    "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+    "hooks/latency.ts": "bc977098322dcf53d0ed44c3eba8d7ee6ee3fe5cb75a9953fe5c404838e4c189",
+    "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+    "hooks/register.ts": "cb96ba3ab6cd12cec69756a75073e1f816ff64b6d44266c5f2a6bb470ad9e8b5",
+    "tests/delivery.test.ts": "9615b87f4208b6c1e8d2cf7ac0c523cbd7b7f0c87f8887eda1c7b5adcd84087a",
+    "tests/kit.ts": "9cd76ea902aaaeb5fdad7c5ae012f353383af54ce65a4891c36d17fdb9f06969",
+    "tests/middleware.test.ts": "eca43eb50c7ae4aa3ae7567e2f2a4e5c1431694b3e70f5406ac47485f4f72b57",
+    "tests/ownership.node.mjs": "980aef2b5896bd433c00de35db6323c8eebe66fa06617d3b2b91638071883152",
+    "tests/provenance.test.ts": "112f488578dedc9dd69d2bda5217922e1370f0179edade8915fe47adcb6bbf85",
+    "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+  },
+  "claudeBinarySha256": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358",
+  "nativeMacOS": "NOT_RUN",
+  "positivePortableCases": 14,
+  "negativeControl": {
+    "source": "exact rejected candidate register.ts and delivery.ts",
+    "case": "F1A-1",
+    "expectedExitCode": 1,
+    "observedExitCode": 1,
+    "observedWrongSession": "Session-B",
+    "oldSourceHashes": {
+      "register.ts": "9ee0705cdf835d5d78f01fde131bbad241011386deaae65140603440dcab453d",
+      "ownership.ts": null,
+      "delivery.ts": "6ae1741b5e5a80cceb8a091f34d89f682fcdbec2bb37000d2006f91175df26dc",
+      "latency.ts": null,
+      "ownership.node.mjs": "980aef2b5896bd433c00de35db6323c8eebe66fa06617d3b2b91638071883152"
+    }
+  },
+  "kit": {
+    "testPassed": 38,
+    "testFailed": 0,
+    "testExitCode": 0,
+    "validateExitCode": 0,
+    "originalExpectationsAttempt": {
+      "passed": 35,
+      "failed": 3,
+      "exitCode": 1
+    }
+  },
+  "sourceMatchesWorktreeAtEvidenceFinalization": true,
+  "positivePortableExitCode": 0,
+  "outputHashes": {
+    "README.md": "1606826aa17ecdb4c7222a65b02b9f5299b5fee80aa3b11957d149b09eec812d",
+    "kit-original-expectations.txt": "174947f8ba25882b80cc3fe8d8886dcda1f5f54cc0a3600a6b1532181b527aa9",
+    "kit-repaired.txt": "928e2f14e4528ca5b2e2e857b7b860f8a62fca31e33a418012544f2bf1838f1d",
+    "kit-validate.txt": "6e4729da1d374b8f71c4d6d2e58ac90679ed1f75273173e588ea2682d8fdb84f",
+    "negative-control-old-candidate.json": "cbe5bdcf3a57fd60c76c57822295a32cd1f19adea2de1652075a17467583ae4d",
+    "negative-control-old-candidate.txt": "d16be4abc7ae2202dea1a6c68862bf52c3375a6dc232b5f490e75442c689290d",
+    "observer-witnesses.json": "3c51db342805922ad9515e6f590decefcdab046f326de39e92ce5f6d5a9e3297",
+    "portable-test-output.txt": "7fd8ab4373c0dd412e9480db0615a501b1edb51d0c875915f1bcb824996e00e5"
+  }
+}

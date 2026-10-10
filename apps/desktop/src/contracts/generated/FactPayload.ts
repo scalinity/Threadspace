@@ -34,7 +34,7 @@ qualified: boolean,
 /**
  * The observer's provider version, as the kernel read it.
  */
-version: string | null, } | { "kind": "INPUT_SUBMITTED", origin: InputOrigin, 
+version: string | null, } | { "kind": "OBSERVER_OWNERSHIP_CORROBORATED", } | { "kind": "INPUT_SUBMITTED", origin: InputOrigin, 
 /**
  * The original submission point when it differs from the capture
  * point (upstream-delayed submission).

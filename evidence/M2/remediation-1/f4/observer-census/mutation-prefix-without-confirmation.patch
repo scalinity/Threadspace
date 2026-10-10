@@ -1,0 +1,10 @@
+--- repaired/latency_census.rs
++++ mutant/latency_census.rs
+@@ -621,6 +621,7 @@
+             .iter()
+             .filter(|value| value["kind"] == "observer-census-confirmed")
+             .collect();
++        if confirms.is_empty() { return Ok(json!({"sealed": true})); }
+         if confirms.len() != 1 {
+             return Err(format!(
+                 "observer {runtime}: final positive close receipt was not confirmed"

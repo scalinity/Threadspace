@@ -158,7 +158,9 @@ describe('provenance and identity', () => {
     })
 
     await $.classic.SessionStart({ source: 'startup', session_id: 'S1' } as any)
-    const pending = $.tool.call(toolCallInput('tu-slow', { agentId: 'agent-7' }) as any)
+    // The uninterrupted initial principal interval has native Session proof.
+    // An arbitrary unspawned actor ID would intentionally have no owner.
+    const pending = $.tool.call(toolCallInput('tu-slow') as any)
     await clock.settle()
     await $.session.end({ reason: 'clear', sessionId: 'S1', resume: { id: 'S1' } } as any)
     await $.classic.SessionStart({ source: 'clear', session_id: 'S2' } as any)
@@ -173,9 +175,11 @@ describe('provenance and identity', () => {
     expect(slow.map(record => record.phase)).toEqual(['entry', 'result'])
     expect(slow.map(record => record.sessionId)).toEqual(['S1', 'S1'])
     expect(slow[1].sessionGeneration).toBe(slow[0].sessionGeneration)
-    expect(slow[1].actorNativeId).toBe('agent-7')
-    expect(after.sessionId).toBe('S2')
-    expect(after.sessionGeneration).toBeGreaterThan(slow[0].sessionGeneration)
+    expect(slow[1].actorNativeId).toBeUndefined()
+    expect(after.sessionId).toBeUndefined()
+    expect(after.ownershipStatus).toBe('UNKNOWN')
+    expect(after.currentSessionId).toBe('S2')
+    expect(after.currentSessionGeneration).toBeGreaterThan(slow[0].sessionGeneration)
     expect(Number(slow[1].callbackResultSequence)).toBeGreaterThan(Number(after.callbackEntrySequence))
   })
 
@@ -362,7 +366,12 @@ describe('provenance and identity', () => {
     const bootstrap = records.find(record => record.phase === 'bootstrap')
     expect(bootstrap.payload.hostSessionId).toBe('S-fabricated')
     const after = records.find(record => record.nativeOccurrenceId === 'tu-after-bootstrap' && record.phase === 'entry')
-    expect([after.sessionId, after.sessionIdSource]).toEqual(['S1', 'classic.SessionStart'])
+    expect([after.currentSessionId, after.currentSessionIdSource]).toEqual(['S1', 'classic.SessionStart'])
+    // This new tool occurrence has no original-ownership witness across the
+    // apparent identity transition. The fabricated read cannot own it, and
+    // the new current Session cannot acquire it merely by being current.
+    expect(after.sessionId).toBeUndefined()
+    expect(after.ownershipStatus).toBe('UNKNOWN')
   })
 
   test('first load records a null predecessor epoch and leaves its own in session state', OPTIONS, async ($, on) => {
@@ -473,15 +482,17 @@ describe('provenance and identity', () => {
     const calls = ['tu-1', 'tu-2', 'tu-3', 'tu-4', 'tu-5'].map(tu =>
       records.find(record => record.nativeOccurrenceId === tu && record.phase === 'entry'),
     )
-    expect(calls.map(record => record.sessionId)).toEqual(['S1', undefined, 'S2', 'S2', 'S3'])
-    expect(calls.map(record => record.sessionIdSource)).toEqual([
+    expect(calls.map(record => record.currentSessionId)).toEqual(['S1', undefined, 'S2', 'S2', 'S3'])
+    expect(calls.map(record => record.currentSessionIdSource)).toEqual([
       'classic.SessionStart',
       'session.end',
       'classic.SessionStart',
       'classic.SessionStart',
       'classic.SessionStart',
     ])
-    const generations = calls.map(record => record.sessionGeneration)
+    expect(calls.map(record => record.sessionId)).toEqual(['S1', undefined, undefined, undefined, undefined])
+    expect(calls.map(record => record.ownershipStatus)).toEqual(['KNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN'])
+    const generations = calls.map(record => record.currentSessionGeneration)
     expect(generations[1]).toBeGreaterThan(generations[0])
     expect(generations[2]).toBeGreaterThan(generations[1])
     expect(generations[3]).toBe(generations[2])

@@ -1,0 +1,88 @@
+(node:6) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/hooks/register.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/scratch/c8272833f682/Threadspace-review/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{
+  "execution": "Actual TypeScript, injected missing timer and deterministic helper receipts; NOT native execution",
+  "sourceHashes": {
+    "register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "latency.ts": "5ce7fb559ec77779c720d1a224b656a4ebe0c9e02f2b75d5e14f9d2d24fa81b0",
+    "ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275"
+  },
+  "cases": [
+    {
+      "delayed": false,
+      "timerCalls": 3,
+      "returnedTimer": null,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "elapsedMs": 14.277410000000003,
+      "confirmationsSent": 1,
+      "calls": [
+        {
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-census-page",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-census-close",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-census-confirm",
+          "timeoutMs": 100
+        }
+      ]
+    },
+    {
+      "delayed": true,
+      "timerCalls": 3,
+      "returnedTimer": null,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "elapsedMs": 135.078167,
+      "stillPendingPastOriginalDeadline": true,
+      "confirmationsSent": 0,
+      "calls": [
+        {
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-census-page",
+          "timeoutMs": 100
+        }
+      ]
+    }
+  ]
+}
+node:internal/modules/run_main:111
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: missing timer must leave census incomplete
+
+1 !== 0
+
+    at file:///workspace/scratch/c8272833f682/review-checks/f4-timer-review/missing-timer.mjs:38:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.11.1

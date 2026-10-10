@@ -1,0 +1,39 @@
+{
+  "command": [
+    "/workspace/scratch/c8272833f682/remediation-tools/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "-p",
+    "threadspace-journal",
+    "--test",
+    "observer_ownership",
+    "f1b_",
+    "--",
+    "--nocapture"
+  ],
+  "exitCode": 0,
+  "before": {
+    "crates/state-engine/src/engine.rs": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+    "crates/state-engine/src/reduce.rs": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6",
+    "crates/journal/src/canonical.rs": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+    "crates/journal/tests/observer_ownership.rs": "a9b9ccc96bb34bd903539b65fe34900d68cc9cb9c9613bf045988b9f34442e2a",
+    "crates/provider-claude/src/observer.rs": "4a8d4589932051c94a9f74bdb7ec45e94f6c9792d8491281b5af8e7f9a8eeef9",
+    "crates/provider-claude/src/ownership_record.rs": "483e6ff26d4593bbdbac78d2ecd06380e919c23d04505091394a5de1db9b8364",
+    "crates/relay/src/modbatch.rs": "70c0e4c12378b8f26c09fbe3b2046013a943b025d4cf03d06ab23bb56f0847ef"
+  },
+  "after": {
+    "crates/state-engine/src/engine.rs": "253361796faf7b207a82f7ce569bfba109b3bae04adf5c108ccd6fd251db2169",
+    "crates/state-engine/src/reduce.rs": "26d2f7c196dfc84b1de434581f673373e5d6a7fe3253eca3430a1d0aa9b158a6",
+    "crates/journal/src/canonical.rs": "35c3281096c79c74dc39f41cbb89334d9d8334da94a4b71938b83cf7a3392ab0",
+    "crates/journal/tests/observer_ownership.rs": "a9b9ccc96bb34bd903539b65fe34900d68cc9cb9c9613bf045988b9f34442e2a",
+    "crates/provider-claude/src/observer.rs": "4a8d4589932051c94a9f74bdb7ec45e94f6c9792d8491281b5af8e7f9a8eeef9",
+    "crates/provider-claude/src/ownership_record.rs": "483e6ff26d4593bbdbac78d2ecd06380e919c23d04505091394a5de1db9b8364",
+    "crates/relay/src/modbatch.rs": "70c0e4c12378b8f26c09fbe3b2046013a943b025d4cf03d06ab23bb56f0847ef"
+  },
+  "sourceUnchangedDuringRun": true,
+  "log": "/workspace/scratch/c8272833f682/review-checks/f1b-independent-audit-rerun.log",
+  "nativeMacOS": "NOT_RUN"
+}

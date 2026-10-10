@@ -1,0 +1,18 @@
+Validating plugin manifest: /workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/observer/.claude-plugin/plugin.json
+
+  ❯ types ./types/index.d.ts declares on $: nothing (no EngineInterface member)
+  ❯ types ./types/index.d.ts declares state: threadspace-observer.epoch
+
+Validating hooks: /workspace/scratch/c8272833f682/review-checks/f1a-kit-post-f4-owq4p4vh/observer/hooks/hooks.json
+
+  ❯ ./register.ts hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}, tool.check{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}, agent.spawn
+  ❯ ./register.ts gating hook without .catch: classic.SessionStart
+  ❯ ./register.ts gating hook without .catch: prompt.submit
+  ❯ ./register.ts gating hook without .catch: tool.call{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}
+  ❯ ./register.ts gating hook without .catch: tool.check{tool=/"^(?!(?:EnterWorktree|ExitWorktree)$)"/}
+  ❯ ./register.ts gating hook without .catch: agent.spawn
+  ❯ ./register.ts calls: $.clock.after, $.process.run, $.session.id, $.session.version, $.state.get, $.state.set
+  ❯ ./register.ts state writes: threadspace-observer.epoch
+  ❯ ./register.ts state reads: threadspace-observer.epoch
+
+✔ Validation passed

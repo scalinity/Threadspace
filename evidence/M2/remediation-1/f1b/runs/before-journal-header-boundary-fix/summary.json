@@ -1,0 +1,270 @@
+{
+  "actualF1aWitnessCases": 14,
+  "d0010Status": "PROPOSED",
+  "factPayloadVersion": 2,
+  "focusedPositiveDeliveryOrders": 24,
+  "genuineOldSource": {
+    "fixtures": {
+      "reducer-3-native-only-store": {
+        "checkpoints": [
+          [
+            0,
+            3,
+            "EMPTY",
+            "66a579917f25246621d2921c3567c94366e57c428de229d40d38b783d23aec2a"
+          ],
+          [
+            2,
+            3,
+            "F1B_NATIVE_BEFORE_OUTCOME",
+            "781f6265f582e855fc0787e4f7136ab7734add80cfb51f865826400289bbfea2"
+          ],
+          [
+            7,
+            3,
+            "F1B_NATIVE_FINAL",
+            "c592165f82f8d21d22cfc69ad7d4f3a0c5f040ba96aaa6a0323adcf095bdbcab"
+          ]
+        ],
+        "databaseSha256": "35fadca05ea258d0a50e7bb44078e0609d2c8550a8c9b4bcce57bfa181310a24",
+        "facts": 8,
+        "integrityCheck": "ok",
+        "observations": 7,
+        "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+        "witnessSha256": "d4824f6233c8f0b9138004ff86e962d72f4729e9754974597a0d70788bd9e1d3"
+      },
+      "reducer-3-store": {
+        "checkpoints": [
+          [
+            0,
+            3,
+            "EMPTY",
+            "66a579917f25246621d2921c3567c94366e57c428de229d40d38b783d23aec2a"
+          ],
+          [
+            2,
+            3,
+            "F1B_BEFORE_OUTCOMES",
+            "deb4967103f236b9382c2c279347003c7d481844d2cb21d9f817e6a3cfec6038"
+          ],
+          [
+            11,
+            3,
+            "F1B_REJECTED_FINAL",
+            "6848bcc1bf413c24ae150e26aee47fc2fc9c99847ccce4949d2a61e7565e1321"
+          ]
+        ],
+        "databaseSha256": "79e8f48dc358dec013ec1dde3ed18f4dd639f8f5d0ba60e614eef16a021cf559",
+        "facts": 11,
+        "integrityCheck": "ok",
+        "observations": 11,
+        "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+        "witnessSha256": "c8b7980e2c78f7f718c66ec208bb5aaa48945b79083ad094e70cd537cdb03d16"
+      }
+    },
+    "matchedFileCount": 229,
+    "sidecarNote": "No nonempty WAL. Empty transient WAL/SHM sidecars removed after immutable integrity checks; main database bytes unchanged.",
+    "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e"
+  },
+  "interimDiagnostic": "runs/interim-f4-edit/",
+  "migrationResults": [
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 0,
+      "path": "records/migration-checkpoint-0.json"
+    },
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 11,
+      "path": "records/migration-checkpoint-11.json"
+    },
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "f64055d54769a98c4cf8799e9572fb57291619b3c498d63d595085994194a870",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 2,
+      "path": "records/migration-checkpoint-2.json"
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "c5ce687a4c35d93efb21f6afec5191f78f05bcc736c3cd205442875efe53e04f",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 0,
+      "path": "records/native-migration-checkpoint-0.json"
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "c5ce687a4c35d93efb21f6afec5191f78f05bcc736c3cd205442875efe53e04f",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 2,
+      "path": "records/native-migration-checkpoint-2.json"
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "c5ce687a4c35d93efb21f6afec5191f78f05bcc736c3cd205442875efe53e04f",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 7,
+      "path": "records/native-migration-checkpoint-7.json"
+    }
+  ],
+  "nativeMacOSExecution": false,
+  "negativeControls": [
+    "old-code-negative-control.json",
+    "migration-negative-control.json",
+    "runs/native-only-prefix-before-fix/execution.json"
+  ],
+  "permutations": {
+    "evidenceSetFamily": 4000,
+    "failures": 0,
+    "primaryRecord": "permutations/summary.json",
+    "sqliteCrossChecks": 2440,
+    "total": 24400
+  },
+  "phases": [
+    {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "76dab02f9b27913b82529dab7a59fad09b2968f5e43fb3bc853b74ca0f97fc70",
+      "name": "portable-core",
+      "pass": true,
+      "sourceChangedDuringExecution": false,
+      "sourceHashCount": 101
+    },
+    {
+      "exitCode": 101,
+      "expectedFailure": true,
+      "logSha256": "361e55be459ac95ce46b52ecfdfcb2d9a65868f2b48242b2ff99e29ffc6f9919",
+      "name": "migration-negative-control",
+      "pass": true,
+      "sourceChangedDuringExecution": false,
+      "sourceHashCount": 101
+    },
+    {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "6af266f195a065f7f12e46a3c9ff33862a323dbba5f8bce7ee8a34c6e4e7b1d9",
+      "name": "retained-migration-and-scenarios",
+      "pass": true,
+      "sourceChangedDuringExecution": false,
+      "sourceHashCount": 101
+    },
+    {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "1afc96ccade51ecf0d7fad608deb95f0641402346913f2d08200e9552630d329",
+      "name": "permutation-campaign",
+      "pass": true,
+      "sourceChangedDuringExecution": false,
+      "sourceHashCount": 101
+    }
+  ],
+  "portableCore": {
+    "failed": 0,
+    "nonemptySuites": 13,
+    "ownershipSuite": {
+      "actualIncludedProviderRelayModuleTests": 23,
+      "focusedOwnershipTests": 11,
+      "total": 34
+    },
+    "passed": 288,
+    "primaryLog": "portable-core.log",
+    "qualification": "Includes generated export tests and then-current timing tests; final F4 all-imports timing qualification is separate"
+  },
+  "reducerVersion": 4,
+  "rejectedCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "remainingGate": "Source-matched macOS helper/kernel/native inventory producer; unchanged-ID reload; independently admitted proof; fresh post-seal genuine Turn and qualified completion. Old 819ms RESTORED readback is insufficient.",
+  "retainedExecutionStateRecords": 62,
+  "retainedMigrationAndScenarios": {
+    "failed": 0,
+    "passed": 21,
+    "primaryLog": "retained-migration-and-scenarios.log",
+    "suites": 5
+  },
+  "status": "PORTABLE_PASS_NATIVE_QUALIFICATION_INCOMPLETE",
+  "supersededAttempts": [
+    "runs/before-native-only-prefix-fix/",
+    "independent-review/migration-mismatch.log"
+  ]
+}

@@ -1,0 +1,11 @@
+--- repaired/latency.ts
++++ mutant/latency.ts
+@@ -186,7 +186,7 @@
+           // handle (including a throwing getter) cannot prove a watchdog was
+           // acquired, so it cannot authorize any additional census waiting.
+           const cancel = timer?.cancel
+-          if (typeof cancel !== 'function') throw new Error('unavailable end-drain watchdog')
++
+           cancelTimer = () => cancel.call(timer)
+         } catch {
+           // A failed optional timer gives no safe additional waiting budget.

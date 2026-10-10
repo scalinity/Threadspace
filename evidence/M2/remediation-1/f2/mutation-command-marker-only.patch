@@ -1,0 +1,22 @@
+--- repaired/settings
++++ mutant/settings
+@@ -159,18 +159,11 @@
+         let Some(group) = group.as_object_mut() else {
+             return true;
+         };
+-        // The installed group has only matcher/hooks. Foreign sibling hooks
+-        // may be added, but a changed matcher or group option is a conflict.
+-        if group.get("matcher").and_then(Value::as_str) != Some(matcher)
+-            || group.keys().any(|key| key != "matcher" && key != "hooks")
+-        {
+-            return true;
+-        }
+         let Some(list) = group.get_mut("hooks").and_then(Value::as_array_mut) else {
+             return true;
+         };
+         let before = list.len();
+-        list.retain(|hook| !unchanged_hook(hook, command));
++        list.retain(|hook| hook.get("command").and_then(Value::as_str) != Some(command));
+         if list.len() == before {
+             return true;
+         }

@@ -1,0 +1,52 @@
+[package]
+name = "threadspace-synthetic"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+autobins = false
+autotests = false
+
+[workspace]
+resolver = "3"
+
+[lib]
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/src/lib.rs"
+
+[dependencies]
+threadspace-contracts = { path = "/workspace/scratch/c8272833f682/Threadspace-review/crates/contracts" }
+threadspace-journal = { path = "/workspace/scratch/c8272833f682/Threadspace-review/crates/journal", features = ["qualification"] }
+threadspace-state-engine = { path = "/workspace/scratch/c8272833f682/Threadspace-review/crates/state-engine", features = ["synthetic"] }
+rusqlite = { version = "=0.40.2", features = ["bundled"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+sha2 = "=0.11.0"
+uuid = { version = "=1.27.0", features = ["v4", "serde"] }
+libc = "=0.2.190"
+
+[patch.crates-io]
+libsqlite3-sys = { path = "/workspace/scratch/c8272833f682/Threadspace-review/third_party/libsqlite3-sys" }
+
+[[test]]
+name = "scenarios"
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/scenarios.rs"
+
+[[test]]
+name = "sqlite"
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/sqlite.rs"
+
+[[test]]
+name = "reducer_upgrade"
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/reducer_upgrade.rs"
+
+[[test]]
+name = "reducer2_upgrade"
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/reducer2_upgrade.rs"
+
+[[test]]
+name = "checkpoint_tail_upgrade"
+path = "/workspace/scratch/c8272833f682/Threadspace-review/tests/synthetic/tests/checkpoint_tail_upgrade.rs"
+
+[[bin]]
+name = "f1b-permutations"
+path = "permutations-main.rs"

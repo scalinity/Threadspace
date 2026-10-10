@@ -1,0 +1,19 @@
+(node:6) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/scratch/c8272833f682/Threadspace-review/packages/provider-mod/hooks/ownership.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/scratch/c8272833f682/Threadspace-review/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS F1A-1: Delayed completion ENTRY after A→B resolves the retained A Turn
+PASS F1A-2: Delayed completion RETURN preserves the original immutable entry scope
+PASS F1A-3: A→B→A preserves original generations and actor-scoped repeated Turn IDs
+PASS F1A-4: Explicit native Turn-ID reuse across Sessions stays ambiguous
+PASS F1A-5: A child spawned under an original tool occurrence stays with A after parent/current change
+PASS F1A-6: First-seen late outcome is retained without Session and cannot be rebound later
+PASS F1A-7: Reused actual actor ID becomes ambiguous even when its old Turn remains retained
+PASS F1A-8: Plugin dispatch and a shortcut result cannot establish native ownership
+PASS F1A-9: Bounded retained maps never evict uncertainty or collide truncated identities
+PASS F1A-10: Provider values, exceptions, generator chunks and cancellation remain unchanged
+PASS F1A-11: Overlong native IDs cannot acquire a Session through capture truncation
+PASS F1B-bridge-1: Detached proof seals unchanged scope; only future captured Turn starts retain its token
+PASS F1B-bridge-2: A→B→A while native probe waits refuses a stale same-string seal
+PASS F1B-bridge-3: Malformed, mismatched and unsuccessful proof receipts never seal ownership
+14 passed; 0 failed (v26.11.1, linux)

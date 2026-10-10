@@ -1,0 +1,22 @@
+{
+  "source": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "-p",
+    "threadspace-journal",
+    "--test",
+    "f1b_fixture",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--locked",
+    "f1b_rejected_candidate",
+    "--",
+    "--nocapture"
+  ],
+  "exitCode": 101,
+  "expectedExitCode": 101,
+  "assertion": "stale host-read outcome must remain without authority",
+  "purpose": "Expect repaired invariant on actual rejected reducer: intentional failure discriminates historical same-ProcessKey authority bug"
+}

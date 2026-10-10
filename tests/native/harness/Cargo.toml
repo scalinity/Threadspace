@@ -17,7 +17,7 @@ path = "src/bin/m0c/main.rs"
 
 [dependencies]
 threadspace-contracts = { workspace = true, features = ["qualification"] }
-threadspace-relay.workspace = true
+threadspace-relay = { workspace = true, features = ["qualification"] }
 threadspace-surfaces-macos.workspace = true
 threadspace-provider-claude.workspace = true
 serde.workspace = true

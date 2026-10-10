@@ -1,0 +1,21 @@
+   Compiling threadspace-journal v0.1.0 (/workspace/scratch/c8272833f682/Threadspace-review/crates/journal)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.66s
+     Running tests/observer_ownership.rs (/workspace/scratch/c8272833f682/review-build-reducer/x86_64-unknown-linux-gnu/debug/deps/observer_ownership-facced9b4b9a46a8)
+
+running 1 test
+
+thread 'f1b_native_only_genuine_reducer3_prefix_still_records_the_version_transition' (213) panicked at crates/journal/tests/observer_ownership.rs:539:9:
+assertion `left == right` failed: native-only v1 prefix must still perform its explicit version transition
+  left: "9dd800f018c58dbc03bcb959f55c62b60374cca060f3a6a1dfd51218d0f95749"
+ right: "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f1b_native_only_genuine_reducer3_prefix_still_records_the_version_transition ... FAILED
+
+failures:
+
+failures:
+    f1b_native_only_genuine_reducer3_prefix_still_records_the_version_transition
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p threadspace-journal --test observer_ownership`

@@ -1,0 +1,27 @@
+{
+  "executionKind": "NODE_FAULT_FIXTURE",
+  "nativeExecution": false,
+  "originalDrainDelayMs": 40,
+  "censusPageDelayMs": 90,
+  "observationDelayMs": 110,
+  "elapsedMs": 41.385896,
+  "stillPendingAt110Ms": false,
+  "timerCalls": 3,
+  "returnedTimer": null,
+  "nextCalls": 1,
+  "originalResultPreserved": true,
+  "censusCalls": 0,
+  "confirmationsSent": 0,
+  "calls": [
+    {
+      "command": "mod-batch",
+      "kind": "mod-batch",
+      "timeoutMs": 100
+    },
+    {
+      "command": "latency-samples",
+      "kind": "observer-clock-bracket",
+      "timeoutMs": 100
+    }
+  ]
+}

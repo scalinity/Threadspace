@@ -1,0 +1,27 @@
+TAP version 13
+# Subtest: accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+not ok 1 - accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+  ---
+  duration_ms: 13.226504
+  type: 'test'
+  location: '<disposable>/provider-mod/tests/latency.node.mjs:82:1'
+  failureType: 'testCodeFailure'
+  error: 'all captured UUIDs must be retained before a native close can be accepted'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file://<disposable>/provider-mod/tests/latency.node.mjs:91:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 311.921601

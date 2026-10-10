@@ -1,0 +1,11 @@
+--- repaired/setup
++++ mutant/setup
+@@ -418,7 +418,7 @@
+     validate(target)?;
+     let layout = Layout::new(&target.owned_dir);
+     let mut record = owned::read_record(&layout.record)?.ok_or(SetupError::NotInstalled)?;
+-    verify_identity(target, &layout, &record)?;
++
+     let mut report = UninstallReport {
+         scope: record.scope,
+         config_path: record.config_path.clone(),

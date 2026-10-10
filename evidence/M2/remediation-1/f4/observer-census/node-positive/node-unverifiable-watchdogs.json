@@ -1,0 +1,139 @@
+{
+  "executionKind": "NODE_FAULT_FIXTURE",
+  "nativeExecution": false,
+  "cases": [
+    {
+      "variant": "undefined",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "null",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "missing cancel",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "undefined cancel",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "noncallable cancel",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "throwing cancel getter",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    },
+    {
+      "variant": "throwing after",
+      "watchdogAttempts": 1,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "calls": [
+        {
+          "command": "mod-batch",
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "command": "latency-samples",
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ],
+      "confirmations": 0
+    }
+  ]
+}

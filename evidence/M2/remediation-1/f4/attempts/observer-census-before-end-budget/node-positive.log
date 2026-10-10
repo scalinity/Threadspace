@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: qualification remains opt-in and validates the configured runtime/command
+ok 1 - qualification remains opt-in and validates the configured runtime/command
+  ---
+  duration_ms: 2.483221
+  type: 'test'
+  ...
+# Subtest: accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+ok 2 - accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger
+  ---
+  duration_ms: 12.097931
+  type: 'test'
+  ...
+# Subtest: stable UUID retries do not duplicate the closed capture population
+ok 3 - stable UUID retries do not duplicate the closed capture population
+  ---
+  duration_ms: 5.854894
+  type: 'test'
+  ...
+# Subtest: lost last sample cannot reuse an earlier zero-failure prefix as the final census
+ok 4 - lost last sample cannot reuse an earlier zero-failure prefix as the final census
+  ---
+  duration_ms: 1.79891
+  type: 'test'
+  ...
+# Subtest: failed final page, close or confirmation leaves no final native confirmation
+ok 5 - failed final page, close or confirmation leaves no final native confirmation
+  ---
+  duration_ms: 2.255195
+  type: 'test'
+  ...
+# Subtest: malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation
+ok 6 - malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation
+  ---
+  duration_ms: 4.217628
+  type: 'test'
+  ...
+# Subtest: fabricated positive close reply without native close state fails its challenge confirmation
+ok 7 - fabricated positive close reply without native close state fails its challenge confirmation
+  ---
+  duration_ms: 1.307413
+  type: 'test'
+  ...
+# Subtest: overlapping telemetry exports stay single-flight and retain all omitted-count failures
+ok 8 - overlapping telemetry exports stay single-flight and retain all omitted-count failures
+  ---
+  duration_ms: 0.965136
+  type: 'test'
+  ...
+# Subtest: an in-flight batch or a callback racing census pages invalidates final closure
+ok 9 - an in-flight batch or a callback racing census pages invalidates final closure
+  ---
+  duration_ms: 1.159815
+  type: 'test'
+  ...
+# Subtest: ledger and page bounds are explicit and overflow cannot seal as a smaller population
+ok 10 - ledger and page bounds are explicit and overflow cannot seal as a smaller population
+  ---
+  duration_ms: 13.218963
+  type: 'test'
+  ...
+# Subtest: the bounded close deadline aborts a slow export without provider rejection
+ok 11 - the bounded close deadline aborts a slow export without provider rejection
+  ---
+  duration_ms: 1.864769
+  type: 'test'
+  ...
+# Subtest: real delivery timeout retains the same UUID and measurement cannot manufacture acceptance
+ok 12 - real delivery timeout retains the same UUID and measurement cannot manufacture acceptance
+  ---
+  duration_ms: 2.982952
+  type: 'test'
+  ...
+# Subtest: optional measurement throwing leaves successful canonical delivery behavior unchanged
+ok 13 - optional measurement throwing leaves successful canonical delivery behavior unchanged
+  ---
+  duration_ms: 0.706714
+  type: 'test'
+  ...
+# Subtest: actual Session-end observer returns the original next result while final census is still pending
+ok 14 - actual Session-end observer returns the original next result while final census is still pending
+  ---
+  duration_ms: 4.640156
+  type: 'test'
+  ...
+# Subtest: plugin-origin Session end and clear do not close an authoritative source window
+ok 15 - plugin-origin Session end and clear do not close an authoritative source window
+  ---
+  duration_ms: 2.854469
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 292.641438

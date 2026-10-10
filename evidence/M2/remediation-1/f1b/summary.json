@@ -1,0 +1,1059 @@
+{
+  "actualF1aWitnessCases": 14,
+  "d0010Status": "PROPOSED",
+  "effectiveCurrentSourceCoverage": {
+    "coreSourceFiles": 130,
+    "laterChangedFiles": [
+      "evidence/M2/remediation-1/f1a/observer-witnesses.json"
+    ],
+    "note": "The raw four-phase summary was captured before the final F4-only TypeScript watchdog correction regenerated F1A captures. Its historical hashes remain unchanged. This cumulative record requires all original Rust and synthetic sources unchanged, and the sole changed fixture fully re-exercised through its actual production adapter test.",
+    "pass": true,
+    "rerunForOnlyChangedInput": "final-f1a-adapter.json",
+    "syntheticSourceFiles": 110,
+    "unchangedCoreFiles": 129,
+    "unmodifiedOriginalCampaignSummary": "portable-summary.json"
+  },
+  "factPayloadVersion": 2,
+  "finalF1aAdapter": {
+    "additionalDistinctOwnershipScenarios": 0,
+    "executionStateRecords": 15,
+    "fixtureSha256": "ea64a907ea469615fb0f356a8d63e88c6b4d0eef1f0f878550b906b61b06ff21",
+    "passedTests": 1,
+    "record": "final-f1a-adapter.json",
+    "sourceDeltaRecord": "final-f1a-source-delta.json",
+    "witnessCases": 14
+  },
+  "focusedPositiveDeliveryOrders": 24,
+  "genuineOldSource": {
+    "fixtures": {
+      "reducer-3-native-only-store": {
+        "checkpoints": [
+          [
+            0,
+            3,
+            "EMPTY",
+            "66a579917f25246621d2921c3567c94366e57c428de229d40d38b783d23aec2a"
+          ],
+          [
+            2,
+            3,
+            "F1B_NATIVE_BEFORE_OUTCOME",
+            "781f6265f582e855fc0787e4f7136ab7734add80cfb51f865826400289bbfea2"
+          ],
+          [
+            7,
+            3,
+            "F1B_NATIVE_FINAL",
+            "c592165f82f8d21d22cfc69ad7d4f3a0c5f040ba96aaa6a0323adcf095bdbcab"
+          ]
+        ],
+        "databaseSha256": "35fadca05ea258d0a50e7bb44078e0609d2c8550a8c9b4bcce57bfa181310a24",
+        "facts": 8,
+        "integrityCheck": "ok",
+        "observations": 7,
+        "requiredWal": false,
+        "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+        "storedJournalPayloadVersions": [
+          1
+        ],
+        "witnessSha256": "d4824f6233c8f0b9138004ff86e962d72f4729e9754974597a0d70788bd9e1d3"
+      },
+      "reducer-3-store": {
+        "checkpoints": [
+          [
+            0,
+            3,
+            "EMPTY",
+            "66a579917f25246621d2921c3567c94366e57c428de229d40d38b783d23aec2a"
+          ],
+          [
+            2,
+            3,
+            "F1B_BEFORE_OUTCOMES",
+            "deb4967103f236b9382c2c279347003c7d481844d2cb21d9f817e6a3cfec6038"
+          ],
+          [
+            11,
+            3,
+            "F1B_REJECTED_FINAL",
+            "6848bcc1bf413c24ae150e26aee47fc2fc9c99847ccce4949d2a61e7565e1321"
+          ]
+        ],
+        "databaseSha256": "79e8f48dc358dec013ec1dde3ed18f4dd639f8f5d0ba60e614eef16a021cf559",
+        "facts": 11,
+        "integrityCheck": "ok",
+        "observations": 11,
+        "requiredWal": false,
+        "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+        "storedJournalPayloadVersions": [
+          1
+        ],
+        "witnessSha256": "c8b7980e2c78f7f718c66ec208bb5aaa48945b79083ad094e70cd537cdb03d16"
+      }
+    },
+    "matchedFileCount": 229,
+    "sidecarNote": "Both main databases are self-contained and immutable integrity checks pass. Previously verified empty WAL and ephemeral SHM removed only after handles closed; no required WAL was discarded.",
+    "sourceCommit": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e"
+  },
+  "interimDiagnostic": "runs/interim-f4-edit/",
+  "journalPayloadVersion": 2,
+  "metadataOldCheckpointRecoveries": [
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-0-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-0-tail-1.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-2-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-2-tail-1.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-7-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-native-only-store-7-tail-1.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-0-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-0-tail-1.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-11-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-11-tail-1.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-2-tail-0.json"
+    },
+    {
+      "fullStateEqualsExpectedAndGenesis": true,
+      "path": "records/metadata-checkpoint-recovery-reducer-3-store-2-tail-1.json"
+    }
+  ],
+  "metadataOnlyTails": [
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 0,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-0-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 0,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-0-tail-1.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 2,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-2-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 2,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-2-tail-1.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 7,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-7-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-native-only-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 7,
+      "oldEndpoint": 7,
+      "path": "records/metadata-migration-reducer-3-native-only-store-checkpoint-7-tail-1.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 0,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-0-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 0,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-0-tail-1.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 11,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-11-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 11,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-11-tail-1.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 1,
+      "oldCheckpoint": 2,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-2-tail-0.json"
+    },
+    {
+      "allNewHeadersVersion2AndZeroFacts": true,
+      "fixture": "reducer-3-store",
+      "fullStateEqualsGenesis": true,
+      "newMetadataCount": 2,
+      "oldCheckpoint": 2,
+      "oldEndpoint": 11,
+      "path": "records/metadata-migration-reducer-3-store-checkpoint-2-tail-1.json"
+    }
+  ],
+  "migrationResults": [
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "a12f0e78ea47ba0e357560d650191cafa40be6c013787efbf4231c02b69d4abe",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 0,
+      "path": "records/migration-checkpoint-0.json",
+      "projectionEqualsMaterializedTables": true
+    },
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "a12f0e78ea47ba0e357560d650191cafa40be6c013787efbf4231c02b69d4abe",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 11,
+      "path": "records/migration-checkpoint-11.json",
+      "projectionEqualsMaterializedTables": true
+    },
+    {
+      "digest": {
+        "checkpointCursor": 11,
+        "checkpointSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "entries": 11,
+        "facts": 11,
+        "firstCursor": 1,
+        "journalSha256": "a12f0e78ea47ba0e357560d650191cafa40be6c013787efbf4231c02b69d4abe",
+        "lastCursor": 11,
+        "projectionSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d84dea3bcca7f53fddd01abb8429417924d2acf5d32550e5dc505ec5c46bc0ef",
+        "stateSha256": "5d1457917ddba0e7951b3e514b69eebf72250a7dd783ad0729cd17552978d37d",
+        "tablesSha256": "052d1b50915bfaafdaff8cd5b0a75c411402d4d096f6ad430b1bd593446be443"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 2,
+      "path": "records/migration-checkpoint-2.json",
+      "projectionEqualsMaterializedTables": true
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "875ba6fc78243ea7344ab7a310275463ca44936e3835622a65e96c8cb0bcb9c3",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 0,
+      "path": "records/native-migration-checkpoint-0.json",
+      "projectionEqualsMaterializedTables": true
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "875ba6fc78243ea7344ab7a310275463ca44936e3835622a65e96c8cb0bcb9c3",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 2,
+      "path": "records/native-migration-checkpoint-2.json",
+      "projectionEqualsMaterializedTables": true
+    },
+    {
+      "digest": {
+        "checkpointCursor": 7,
+        "checkpointSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "entries": 7,
+        "facts": 8,
+        "firstCursor": 1,
+        "journalSha256": "875ba6fc78243ea7344ab7a310275463ca44936e3835622a65e96c8cb0bcb9c3",
+        "lastCursor": 7,
+        "projectionSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e",
+        "reducerVersion": 4,
+        "schemaVersion": 3,
+        "semanticSha256": "d88494cc80ad90c41270e2d917ae4b615e57e8ff201cf0710b235b3be804cff3",
+        "stateSha256": "ef691f15947db3764930e683a25c795617209115986458fafb59198874fb0968",
+        "tablesSha256": "9df0a346e4a063d5022cd154c8488b6f09bbc03f11521a6b7a59034aeef9d17e"
+      },
+      "fullStateEqualsGenesis": true,
+      "oldCheckpoint": 7,
+      "path": "records/native-migration-checkpoint-7.json",
+      "projectionEqualsMaterializedTables": true
+    }
+  ],
+  "mixedSuffixOwnerNotificationRecoveries": [
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "commandId": "4c03acd6-a6f6-475b-aa4f-7d8f52279350",
+        "expectedRevision": "11"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-native-only-store-checkpoint-0.json",
+      "receipt": {
+        "commandId": "4c03acd6-a6f6-475b-aa4f-7d8f52279350",
+        "cursor": "12",
+        "status": "COMMITTED",
+        "targetRevision": "12"
+      }
+    },
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "commandId": "2f626946-4958-41ff-a7ed-0bbf1874e174",
+        "expectedRevision": "11"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-native-only-store-checkpoint-2.json",
+      "receipt": {
+        "commandId": "2f626946-4958-41ff-a7ed-0bbf1874e174",
+        "cursor": "12",
+        "status": "COMMITTED",
+        "targetRevision": "12"
+      }
+    },
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "8cd08df8-9c19-82fb-b8a4-c6fa2586bbdc",
+        "commandId": "45f973ad-e3c2-4167-9a00-03406dd632df",
+        "expectedRevision": "11"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-native-only-store-checkpoint-7.json",
+      "receipt": {
+        "commandId": "45f973ad-e3c2-4167-9a00-03406dd632df",
+        "cursor": "12",
+        "status": "COMMITTED",
+        "targetRevision": "12"
+      }
+    },
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "f44b8305-0ff2-8d0f-a499-380480c77825",
+        "commandId": "05f3c7ae-8569-4936-adc3-1fe29bf6890a",
+        "expectedRevision": "15"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-store-checkpoint-0.json",
+      "receipt": {
+        "commandId": "05f3c7ae-8569-4936-adc3-1fe29bf6890a",
+        "cursor": "16",
+        "status": "COMMITTED",
+        "targetRevision": "16"
+      }
+    },
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "f44b8305-0ff2-8d0f-a499-380480c77825",
+        "commandId": "eef8c03c-a399-4a8b-89fa-cdafc6e009f0",
+        "expectedRevision": "15"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-store-checkpoint-11.json",
+      "receipt": {
+        "commandId": "eef8c03c-a399-4a8b-89fa-cdafc6e009f0",
+        "cursor": "16",
+        "status": "COMMITTED",
+        "targetRevision": "16"
+      }
+    },
+    {
+      "currentHeaderFactCounts": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "fullStateEqualsExpectedAndGenesis": true,
+      "owner": {
+        "action": {
+          "kind": "RESOLVE",
+          "reason": "F1B post-upgrade owner decision"
+        },
+        "attentionId": "f44b8305-0ff2-8d0f-a499-380480c77825",
+        "commandId": "5959d382-4aed-4f18-bae3-9ec0a86ab5ec",
+        "expectedRevision": "15"
+      },
+      "path": "records/mixed-suffix-owner-notification-reducer-3-store-checkpoint-2.json",
+      "receipt": {
+        "commandId": "5959d382-4aed-4f18-bae3-9ec0a86ab5ec",
+        "cursor": "16",
+        "status": "COMMITTED",
+        "targetRevision": "16"
+      }
+    }
+  ],
+  "nativeMacOSExecution": false,
+  "negativeControls": [
+    {
+      "purpose": "Actual rejected source grants false RESTORED and completion from historical same-ProcessKey attachment.",
+      "record": "old-code-negative-control.json"
+    },
+    {
+      "purpose": "Relabeling genuine reducer-3 checkpoint without explicit retained-fact upgrade fails intended authority invariant.",
+      "record": "migration-negative-control.json"
+    }
+  ],
+  "permutations": {
+    "area": "permutations",
+    "durationMs": 217753,
+    "failures": 0,
+    "families": {
+      "activation-changes": {
+        "duplicateDeliveriesInjected": 2498,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "resume",
+          "pid-tty-reuse",
+          "executable-replaced",
+          "replaced-then-unordered-image",
+          "executable-requalified",
+          "routing-ambiguity",
+          "execution-end-retained"
+        ],
+        "seedRanges": [
+          {
+            "from": 9000000,
+            "scenario": "resume",
+            "to": 9000357
+          },
+          {
+            "from": 9100000,
+            "scenario": "pid-tty-reuse",
+            "to": 9100356
+          },
+          {
+            "from": 9200000,
+            "scenario": "executable-replaced",
+            "to": 9200356
+          },
+          {
+            "from": 9300000,
+            "scenario": "replaced-then-unordered-image",
+            "to": 9300356
+          },
+          {
+            "from": 9400000,
+            "scenario": "executable-requalified",
+            "to": 9400356
+          },
+          {
+            "from": 9500000,
+            "scenario": "routing-ambiguity",
+            "to": 9500356
+          },
+          {
+            "from": 9600000,
+            "scenario": "execution-end-retained",
+            "to": 9600356
+          }
+        ]
+      },
+      "actor-events": {
+        "duplicateDeliveriesInjected": 2541,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "child-actors",
+          "shared-native-turn-id"
+        ],
+        "seedRanges": [
+          {
+            "from": 1500000,
+            "scenario": "child-actors",
+            "to": 1501249
+          },
+          {
+            "from": 1600000,
+            "scenario": "shared-native-turn-id",
+            "to": 1601249
+          }
+        ]
+      },
+      "completion": {
+        "duplicateDeliveriesInjected": 2532,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "normal-session",
+          "parallel-tools",
+          "outcomes",
+          "latest-turn-outcome"
+        ],
+        "seedRanges": [
+          {
+            "from": 3000000,
+            "scenario": "normal-session",
+            "to": 3000624
+          },
+          {
+            "from": 3100000,
+            "scenario": "parallel-tools",
+            "to": 3100624
+          },
+          {
+            "from": 3200000,
+            "scenario": "outcomes",
+            "to": 3200624
+          },
+          {
+            "from": 3300000,
+            "scenario": "latest-turn-outcome",
+            "to": 3300624
+          }
+        ]
+      },
+      "delayed-callbacks": {
+        "duplicateDeliveriesInjected": 2560,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "a-b-a-delayed"
+        ],
+        "seedRanges": [
+          {
+            "from": 6700000,
+            "scenario": "a-b-a-delayed",
+            "to": 6702499
+          }
+        ]
+      },
+      "duplicates": {
+        "duplicateDeliveriesInjected": 209,
+        "failures": 0,
+        "permutations": 200,
+        "scenarios": [
+          "duplicate-deliveries"
+        ],
+        "seedRanges": [
+          {
+            "from": 8400000,
+            "scenario": "duplicate-deliveries",
+            "to": 8400199
+          }
+        ]
+      },
+      "evidence-sets": {
+        "duplicateDeliveriesInjected": 3974,
+        "failures": 0,
+        "permutations": 4000,
+        "scenarios": [
+          "attachment-evidence",
+          "followup-frontier-evidence",
+          "observer-link-evidence",
+          "host-read-outcome"
+        ],
+        "seedRanges": [
+          {
+            "from": 14000000,
+            "scenario": "attachment-evidence",
+            "to": 14000999
+          },
+          {
+            "from": 14100000,
+            "scenario": "followup-frontier-evidence",
+            "to": 14100999
+          },
+          {
+            "from": 14200000,
+            "scenario": "observer-link-evidence",
+            "to": 14200999
+          },
+          {
+            "from": 14300000,
+            "scenario": "host-read-outcome",
+            "to": 14300999
+          }
+        ]
+      },
+      "output-input": {
+        "duplicateDeliveriesInjected": 2430,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "followup-witnessed",
+          "followup-claude"
+        ],
+        "seedRanges": [
+          {
+            "from": 1700000,
+            "scenario": "followup-witnessed",
+            "to": 1701249
+          },
+          {
+            "from": 1800000,
+            "scenario": "followup-claude",
+            "to": 1801249
+          }
+        ]
+      },
+      "owner-commands": {
+        "duplicateDeliveriesInjected": 2457,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "owner-commands"
+        ],
+        "seedRanges": [
+          {
+            "from": 6900000,
+            "scenario": "owner-commands",
+            "to": 6902499
+          }
+        ]
+      },
+      "robustness": {
+        "duplicateDeliveriesInjected": 198,
+        "failures": 0,
+        "permutations": 200,
+        "scenarios": [
+          "unknown-and-malformed",
+          "sensitive-payload"
+        ],
+        "seedRanges": [
+          {
+            "from": 12000000,
+            "scenario": "unknown-and-malformed",
+            "to": 12000099
+          },
+          {
+            "from": 12100000,
+            "scenario": "sensitive-payload",
+            "to": 12100099
+          }
+        ]
+      },
+      "snapshot-live": {
+        "duplicateDeliveriesInjected": 2479,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "stale-snapshot",
+          "dropped-observation"
+        ],
+        "seedRanges": [
+          {
+            "from": 8800000,
+            "scenario": "stale-snapshot",
+            "to": 8801249
+          },
+          {
+            "from": 8900000,
+            "scenario": "dropped-observation",
+            "to": 8901249
+          }
+        ]
+      },
+      "wait-events": {
+        "duplicateDeliveriesInjected": 2479,
+        "failures": 0,
+        "permutations": 2500,
+        "scenarios": [
+          "waiting",
+          "delayed-positive-wait",
+          "delayed-clear-wait",
+          "wait-reappears",
+          "wait-uncertain-reopens",
+          "wait-owner-resolution-kept",
+          "wait-new-after-resolution",
+          "wait-turn-ownership",
+          "wait-session-scoped",
+          "wait-generations",
+          "wait-owner-partial-coverage",
+          "wait-owner-merge-keeps-coverage",
+          "wait-owner-covered-p",
+          "wait-owner-covered-q",
+          "wait-owner-covers-both",
+          "wait-owner-scopes",
+          "wait-owner-partial-actions",
+          "wait-owner-unordered-coverage",
+          "parent-completed-child-waiting",
+          "parent-completed-child-wait-cleared",
+          "parent-completed-child-wait-reordered"
+        ],
+        "seedRanges": [
+          {
+            "from": 2700000,
+            "scenario": "waiting",
+            "to": 2700119
+          },
+          {
+            "from": 2800000,
+            "scenario": "delayed-positive-wait",
+            "to": 2800118
+          },
+          {
+            "from": 2900000,
+            "scenario": "delayed-clear-wait",
+            "to": 2900118
+          },
+          {
+            "from": 3000000,
+            "scenario": "wait-reappears",
+            "to": 3000118
+          },
+          {
+            "from": 3100000,
+            "scenario": "wait-uncertain-reopens",
+            "to": 3100118
+          },
+          {
+            "from": 3200000,
+            "scenario": "wait-owner-resolution-kept",
+            "to": 3200118
+          },
+          {
+            "from": 3300000,
+            "scenario": "wait-new-after-resolution",
+            "to": 3300118
+          },
+          {
+            "from": 3400000,
+            "scenario": "wait-turn-ownership",
+            "to": 3400118
+          },
+          {
+            "from": 3500000,
+            "scenario": "wait-session-scoped",
+            "to": 3500118
+          },
+          {
+            "from": 3600000,
+            "scenario": "wait-generations",
+            "to": 3600118
+          },
+          {
+            "from": 5200000,
+            "scenario": "wait-owner-partial-coverage",
+            "to": 5200118
+          },
+          {
+            "from": 5300000,
+            "scenario": "wait-owner-merge-keeps-coverage",
+            "to": 5300118
+          },
+          {
+            "from": 5400000,
+            "scenario": "wait-owner-covered-p",
+            "to": 5400118
+          },
+          {
+            "from": 5500000,
+            "scenario": "wait-owner-covered-q",
+            "to": 5500118
+          },
+          {
+            "from": 5600000,
+            "scenario": "wait-owner-covers-both",
+            "to": 5600118
+          },
+          {
+            "from": 5700000,
+            "scenario": "wait-owner-scopes",
+            "to": 5700118
+          },
+          {
+            "from": 5800000,
+            "scenario": "wait-owner-partial-actions",
+            "to": 5800118
+          },
+          {
+            "from": 5900000,
+            "scenario": "wait-owner-unordered-coverage",
+            "to": 5900118
+          },
+          {
+            "from": 6400000,
+            "scenario": "parent-completed-child-waiting",
+            "to": 6400118
+          },
+          {
+            "from": 6500000,
+            "scenario": "parent-completed-child-wait-cleared",
+            "to": 6500118
+          },
+          {
+            "from": 6600000,
+            "scenario": "parent-completed-child-wait-reordered",
+            "to": 6600118
+          }
+        ]
+      }
+    },
+    "pass": true,
+    "requestedRequiredPermutations": 20000,
+    "requiredFamilyPermutations": 20000,
+    "seedScheme": "seed = familyIndex * 1000000 + scenarioIndex * 100000 + index; duplicates injected when Rng(seed ^ 0xD0D0D0D0) draws 1/2",
+    "sqliteCrossChecks": 2440,
+    "totalPermutations": 24400
+  },
+  "phases": {
+    "final-f1a-adapter": {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "0d87cfcc72cbfeb0c54a9a78022c9ddeaf8ca61da83fc41ffc1ca9463c427378",
+      "pass": true,
+      "record": "final-f1a-adapter.json",
+      "sourceFileCount": 130,
+      "sourceFingerprintScope": "core",
+      "sourceStable": true
+    },
+    "migration-negative-control": {
+      "exitCode": 101,
+      "expectedFailure": true,
+      "logSha256": "a8c391a73a8dc5d2392cb97a2ed7be2e2d14311d9b44abc44d57aee5af074d60",
+      "pass": true,
+      "record": "migration-negative-control.json",
+      "sourceFileCount": 130,
+      "sourceFingerprintScope": "core",
+      "sourceStable": true
+    },
+    "permutation-campaign": {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "8c2dc6e0df58245f158b48de81a3e5f39a954e169932e7aeb11f98fa644dce9f",
+      "pass": true,
+      "record": "permutation-campaign.json",
+      "sourceFileCount": 110,
+      "sourceFingerprintScope": "synthetic",
+      "sourceStable": true
+    },
+    "portable-core": {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "2acc2cb9420c0990c8d2e90c24cce846a096b26f8d297c6a76a13ce105cb472b",
+      "pass": true,
+      "record": "portable-core.json",
+      "sourceFileCount": 130,
+      "sourceFingerprintScope": "core",
+      "sourceStable": true
+    },
+    "retained-migration-and-scenarios": {
+      "exitCode": 0,
+      "expectedFailure": false,
+      "logSha256": "f1a5e7d7b1459ae52c285f1daa02b0ae3bfeb48bed7b901f25ebde4791c00513",
+      "pass": true,
+      "record": "retained-migration-and-scenarios.json",
+      "sourceFileCount": 110,
+      "sourceFingerprintScope": "synthetic",
+      "sourceStable": true
+    }
+  },
+  "portableCore": {
+    "focusedOwnershipTests": 13,
+    "includedProviderRelayModuleTests": 23,
+    "nonemptySuites": 13,
+    "note": "Includes generated contract export and qualification latency tests. Original exact F1A fixture fingerprint retained; the only later changed input was re-executed by final-f1a-adapter.",
+    "ownershipSuiteTotal": 36,
+    "passedTests": 306,
+    "record": "portable-core.json",
+    "suiteCounts": [
+      181,
+      3,
+      3,
+      3,
+      11,
+      18,
+      13,
+      8,
+      6,
+      36,
+      17,
+      5,
+      2,
+      0,
+      0,
+      0
+    ]
+  },
+  "preservedFailures": [
+    "independent-review/migration-mismatch.log",
+    "runs/native-only-prefix-before-fix/",
+    "runs/metadata-boundary-before-fix/",
+    "runs/mixed-checkpoint-boundary-before-fix/",
+    "runs/mixed-checkpoint-rebase-attempt/"
+  ],
+  "reducerVersion": 4,
+  "rejectedCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
+  "remainingGate": "Source-matched macOS helper proof producer and unchanged-ID observer reload with a newly started post-seal Turn; retained rejected-build RESTORED evidence does not qualify the new path.",
+  "retainedExecutionStateRecords": 92,
+  "retainedMigrationAndScenarios": {
+    "genuineReducer1And2Fixtures": true,
+    "nonemptySuites": 5,
+    "passedTests": 21,
+    "record": "retained-migration-and-scenarios.json",
+    "suiteCounts": [
+      5,
+      1,
+      1,
+      4,
+      10
+    ]
+  },
+  "status": "PASS \u2014 portable remediation qualification; native qualification INCOMPLETE",
+  "supersededAttempts": [
+    "runs/before-native-only-prefix-fix/",
+    "runs/before-journal-header-boundary-fix/"
+  ]
+}

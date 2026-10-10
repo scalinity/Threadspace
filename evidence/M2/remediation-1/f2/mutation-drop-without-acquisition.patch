@@ -1,0 +1,10 @@
+--- repaired/scratch
++++ mutant/scratch
+@@ -131,6 +131,7 @@
+ 
+ impl Drop for Scratch<'_> {
+     fn drop(&mut self) {
++        let _ = (self.integration)("uninstall", &self.dir.join("session-config"), "session");
+         if !self.owns_directory() {
+             eprintln!("scratch cleanup refused: directory ownership changed");
+             return;

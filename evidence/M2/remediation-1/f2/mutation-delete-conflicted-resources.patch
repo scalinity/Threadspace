@@ -1,0 +1,11 @@
+--- repaired/setup
++++ mutant/setup
+@@ -460,7 +460,7 @@
+     // reference semantics we cannot safely evaluate. Keep the helper, mod and
+     // ownership record as a conservative set until the recorded entry is
+     // resolved; never execute an owner command to guess whether it uses them.
+-    if !report.conflicts.is_empty() || !report.retained_references.is_empty() {
++    if false {
+         record.owned_entries = report.conflicts.clone();
+         record.partial_uninstall = true;
+         owned::write_json(&layout.record, &record)?;

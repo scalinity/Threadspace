@@ -1,0 +1,50 @@
+{
+  "execution": "Actual TypeScript, injected missing timer and deterministic helper receipts; NOT native execution",
+  "sourceHashes": {
+    "register.ts": "5e222632ea7af47051c37cc56379615afe706d0e97cb888c419e4a2871f05d29",
+    "delivery.ts": "c3a7845bd9fb5f5fc7057e0a247a207684a45e053856cb0882273a7e214f90a3",
+    "latency.ts": "9994519a5266532b29aab54d1ab0d7eee2d771002c045a9d3cb870e60326d68c",
+    "ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275"
+  },
+  "cases": [
+    {
+      "delayed": false,
+      "timerCalls": 3,
+      "returnedTimer": null,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "elapsedMs": 3.707492000000002,
+      "confirmationsSent": 0,
+      "calls": [
+        {
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ]
+    },
+    {
+      "delayed": true,
+      "timerCalls": 3,
+      "returnedTimer": null,
+      "nextCalls": 1,
+      "originalResultPreserved": true,
+      "elapsedMs": 110.81848599999998,
+      "stillPendingPastOriginalDeadline": false,
+      "confirmationsSent": 0,
+      "calls": [
+        {
+          "kind": "mod-batch",
+          "timeoutMs": 100
+        },
+        {
+          "kind": "observer-clock-bracket",
+          "timeoutMs": 100
+        }
+      ]
+    }
+  ]
+}
