@@ -45,12 +45,13 @@ end run"#;
 
 // Cleanup checks the recorded window/TTY and refuses a new tab in that
 // window. Values are argv. This never selects or types into any tab.
-const CLOSE_EMPTY_OWNED_WINDOW: &str = r#"on run argv
+const CLOSE_VERIFIED_OWNED_WINDOW: &str = r#"on run argv
 tell application "Terminal"
   repeat with w in windows
     if (id of w) is ((item 1 of argv) as integer) then
       if (count of tabs of w) is not 1 then return "REFUSED"
       if tty of tab 1 of w is not (item 2 of argv) then return "REFUSED"
+      if custom title of tab 1 of w is not (item 3 of argv) then return "REFUSED"
       close w
       return "CLOSED"
     end if
@@ -113,23 +114,56 @@ fn sample(incarnation: &process::Incarnation) -> Value {
 /// helper returns an empty vector on `ps` failure, which is not emptiness
 /// proof. A nonzero/failed read stays unknown and cannot authorize a close.
 fn cleanup_tty_pids(tab: &Tab) -> (Option<Vec<i32>>, Value) {
+    // A global successful listing distinguishes an empty TTY population from
+    // `ps -t`'s nonzero empty-selection exit. Keep every parse failure unknown.
+    let out = run("/bin/ps", &["-axo", "pid=,tty="], TERMINAL_READ_BUDGET);
+    let mut pids = Vec::new();
+    let mut parsed = true;
+    for line in out.stdout.lines().filter(|line| !line.trim().is_empty()) {
+        let fields: Vec<_> = line.split_whitespace().collect();
+        if fields.len() != 2 || fields[0].parse::<i32>().is_err() {
+            parsed = false;
+            break;
+        }
+        if fields[1] == tab.tty.trim_start_matches("/dev/")
+            && let Ok(pid) = fields[0].parse::<i32>()
+        {
+            pids.push(pid);
+        }
+    }
+    (
+        if out.ok && !out.timed_out && parsed {
+            Some(pids)
+        } else {
+            None
+        },
+        output(&out),
+    )
+}
+
+fn terminal_login_wrapper(pid: i32, terminal_pid: i32, tty: &str) -> Option<Value> {
+    if process::executable_path(pid).ok()?.to_str()? != "/usr/bin/login" {
+        return None;
+    }
     let out = run(
         "/bin/ps",
-        &["-t", tab.tty.trim_start_matches("/dev/"), "-o", "pid="],
+        &["-p", &pid.to_string(), "-o", "uid=,ppid=,tty="],
         TERMINAL_READ_BUDGET,
     );
-    let parsed = out
-        .stdout
-        .lines()
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| line.trim().parse::<i32>().ok().filter(|pid| *pid > 1))
-        .collect::<Option<Vec<_>>>();
-    let pids = if out.ok && !out.timed_out {
-        parsed
-    } else {
-        None
-    };
-    (pids, output(&out))
+    let fields: Vec<_> = out.stdout.split_whitespace().collect();
+    if !out.ok
+        || out.timed_out
+        || fields.len() != 3
+        || fields[0] != "0"
+        || fields[1].parse::<i32>().ok() != Some(terminal_pid)
+        || fields[2] != tty.trim_start_matches("/dev/")
+    {
+        return None;
+    }
+    Some(
+        json!({"pid":pid,"kernelExecutable":"/usr/bin/login","nativePs":output(&out),
+        "directSignalSent":false,"authority":"OS wrapper only; no borrowed PID cleanup authority"}),
+    )
 }
 
 fn cli() -> Result<ClaudeCli, String> {
@@ -246,106 +280,98 @@ impl OwnedTab {
             "terminalIncarnation": self.terminal, "device": self.device, "windowState": state, "helperOwnership": owned })
     }
 
-    /// No pattern signals, no borrowed PID authority, no broad Terminal close.
-    /// Each signal needs a fresh same-incarnation/image/device/cwd proof.
-    /// Unverifiable cleanup retains the scratch acquisition for diagnosis.
+    /// Close the acquired window through Terminal, without signalling any PID.
+    /// Every readable job still needs fresh image/device/cwd proof. The root
+    /// Terminal login wrapper is identified but never supplies signal authority.
     fn cleanup(&self, ctx: &Ctx) -> Value {
-        let guard = match ctx.gui("m2 minimized owned cleanup") {
+        let _guard = match ctx.gui("m2 minimized owned cleanup") {
             Ok(guard) => guard,
             Err(error) => return json!({ "closed": false, "refused": error }),
         };
-        let _guard = guard;
         let initial = self.ownership();
         if initial["owned"] != true {
-            // A previously closed window is already complete, but only while
-            // the same Terminal incarnation still exists.
             let gone = initial["checks"]["terminalIncarnation"] == true
                 && initial["checks"]["directoryIncarnation"] == true
                 && initial["windowState"]["missing"] == true;
             return json!({ "closed": gone, "ownership": initial, "refused": (!gone).then_some("ownership unproven") });
         }
         let directory = self.tab.dir.canonicalize().ok();
-        let mut captured = Vec::new();
         let (pids, pid_inventory) = cleanup_tty_pids(&self.tab);
         let Some(pids) = pids else {
-            return json!({ "closed": false, "refused": "TTY PID inventory failed; no signal or close sent",
-                "pidInventory": pid_inventory, "ownership": initial });
+            return json!({"closed":false,"refused":"TTY PID inventory failed; no close sent", "pidInventory":pid_inventory,"ownership":initial});
         };
+        let mut captured = Vec::new();
+        let mut wrappers = Vec::new();
         for pid in pids {
-            let Some(incarnation) = process::sample_incarnation(pid).ok() else {
-                return json!({ "closed": false, "refused": "process capture unavailable", "pid": pid, "ownership": initial });
+            let incarnation = match process::sample_incarnation(pid) {
+                Ok(value) => value,
+                Err(process::ProcessError::Vanished { .. }) => continue,
+                Err(error @ process::ProcessError::Denied { .. }) => {
+                    if let Some(wrapper) =
+                        terminal_login_wrapper(pid, self.terminal.pid, &self.tab.tty)
+                    {
+                        wrappers.push(wrapper);
+                        continue;
+                    }
+                    return json!({"closed":false,"refused":error.to_string(),"ownership":initial});
+                }
+                Err(error) => {
+                    return json!({"closed":false,"refused":error.to_string(),"ownership":initial});
+                }
             };
             let cwd = procs::cwd(pid).and_then(|path| PathBuf::from(path).canonicalize().ok());
             if directory.is_none()
                 || cwd != directory
                 || incarnation.sample.controlling_device != Some(self.device)
             {
-                return json!({ "closed": false, "refused": "a current TTY process is not proven to belong to this disposable directory", "pid": pid, "ownership": initial });
+                return json!({"closed":false,"refused":"current TTY job is not proven owned; no close sent","pid":pid,"ownership":initial});
             }
             captured.push(incarnation);
         }
-        let mut signals = Vec::new();
-        for before in captured {
-            let pid = before.sample.pid;
-            let now = match process::sample_incarnation(pid) {
-                Ok(now) => now,
-                Err(process::ProcessError::Vanished { .. }) => continue,
-                Err(error) => {
-                    return json!({ "closed": false, "refused": error.to_string(), "signals": signals, "ownership": initial });
-                }
-            };
-            let cwd = procs::cwd(pid).and_then(|path| PathBuf::from(path).canonicalize().ok());
-            if !before.same_process_and_image(&now)
-                || now.sample.controlling_device != Some(self.device)
-                || cwd != directory
-                || self.ownership()["owned"] != true
-            {
-                return json!({ "closed": false, "refused": "incarnation/image/TTY/directory changed before signal", "signals": signals, "ownership": initial });
-            }
-            // The ownership/cwd reads above can take time. Re-sample after
-            // them, immediately before signalling this exact incarnation.
-            let last = match process::sample_incarnation(pid) {
-                Ok(last)
-                    if before.same_process_and_image(&last)
-                        && last.sample.controlling_device == Some(self.device) =>
-                {
-                    last
-                }
-                Err(process::ProcessError::Vanished { .. }) => continue,
+        for before in &captured {
+            match process::sample_incarnation(before.sample.pid) {
+                Ok(now)
+                    if before.same_process_and_image(&now)
+                        && now.sample.controlling_device == Some(self.device)
+                        && procs::cwd(now.sample.pid)
+                            .and_then(|path| PathBuf::from(path).canonicalize().ok())
+                            == directory => {}
+                Err(process::ProcessError::Vanished { .. }) => {}
                 _ => {
-                    return json!({ "closed": false, "refused": "process changed at final signal boundary", "signals": signals, "ownership": initial });
+                    return json!({"closed":false,"refused":"job changed before owned-window close","ownership":initial});
                 }
-            };
-            let signalled = procs::signal(pid, libc::SIGHUP);
-            signals.push(json!({ "before": sample(&before), "verifiedBeforeSignal": sample(&last), "signal": "SIGHUP", "sent": signalled }));
-            if !signalled {
-                return json!({ "closed": false, "refused": "owned process signal failed", "signals": signals, "ownership": initial });
             }
         }
-        threadspace_harness::pause_ms(800);
-        let current = target_state(&self.tab);
-        if current["missing"] == true {
-            return json!({ "closed": true, "alreadyClosedAfterExit": true, "signals": signals, "ownership": initial, "after": current });
+        if self.ownership()["owned"] != true {
+            return json!({"closed":false,"refused":"ownership changed before close","ownership":initial});
         }
-        let (remaining, remaining_inventory) = cleanup_tty_pids(&self.tab);
-        if terminal::terminal_process().as_slice() != [self.terminal.clone()]
-            || !remaining.as_ref().is_some_and(Vec::is_empty)
-            || current["ok"] != true
-            || current["tabCount"] != 1
-            || current["matchingTtyCount"] != 1
-        {
-            return json!({ "closed": false, "refused": "window/process state changed, TTY still occupied or PID inventory unavailable; no close sent", "signals": signals, "ownership": initial,
-                "pidInventory": pid_inventory, "remainingPidInventory": remaining_inventory, "after": current });
-        }
+        // One dictionary operation rechecks sole-tab TTY and the acquired UUID
+        // marker immediately before closing this window. Never close by order.
         let closed = osascript(
-            CLOSE_EMPTY_OWNED_WINDOW,
-            &[&self.tab.window_id.to_string(), &self.tab.tty],
+            CLOSE_VERIFIED_OWNED_WINDOW,
+            &[
+                &self.tab.window_id.to_string(),
+                &self.tab.tty,
+                &self.tab.marker,
+            ],
             TERMINAL_READ_BUDGET,
         );
-        let after = target_state(&self.tab);
-        json!({ "closed": closed.ok && after["missing"] == true,
-            "signals": signals, "ownership": initial, "pidInventory": pid_inventory,
-            "remainingPidInventory": remaining_inventory, "close": output(&closed), "after": after })
+        let started = Instant::now();
+        let mut after = target_state(&self.tab);
+        let mut remaining = cleanup_tty_pids(&self.tab);
+        while started.elapsed() < Duration::from_secs(3)
+            && (after["missing"] != true || !remaining.0.as_ref().is_some_and(Vec::is_empty))
+        {
+            threadspace_harness::pause_ms(100);
+            after = target_state(&self.tab);
+            remaining = cleanup_tty_pids(&self.tab);
+        }
+        let stable = terminal::terminal_process().as_slice() == [self.terminal.clone()];
+        json!({"closed":closed.ok && closed.stdout.trim() == "CLOSED" && after["missing"] == true
+            && remaining.0.as_ref().is_some_and(Vec::is_empty) && stable,
+            "directPidSignals":[],"ownership":initial,"pidInventory":pid_inventory,
+            "verifiedJobs":captured.iter().map(sample).collect::<Vec<_>>(),"unsignalledTerminalWrappers":wrappers,
+            "close":output(&closed),"after":after,"remainingPidInventory":remaining.1,"stableTerminalIncarnation":stable})
     }
 }
 
@@ -402,6 +428,147 @@ fn source_identity(ctx: &Ctx) -> Value {
         "devBuildInfo": build_info, "installed": ctx.environment(),
         "helperSha256": ctx.id.companion_executable.parent().and_then(|path| sha256_file(&path.join("threadspace-hook"))),
         "sourceAttribution": "Build-info is retained as a claim; installed executable hashes must be matched to the reviewed build record before independent acceptance." })
+}
+
+/// Finish only the recorded absent-Session negative and cleanup of a retained
+/// F3 fixture. Original positive rows stay at their original source identity.
+pub fn finish_retained(ctx: &Ctx, retained: &std::path::Path) -> Result<Value, String> {
+    let retained = retained.canonicalize().map_err(|error| error.to_string())?;
+    let root = ctx
+        .repo
+        .join("evidence/M2/remediation-1/f3/native")
+        .canonicalize()
+        .map_err(|error| error.to_string())?;
+    if ctx.channel_name() != "dev" || retained.parent() != Some(root.as_path()) {
+        return Err("finish requires one recorded Dev F3 run in this repository".into());
+    }
+    let read = |name: &str| -> Result<Value, String> {
+        serde_json::from_slice(
+            &std::fs::read(retained.join(name)).map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())
+    };
+    let fixture = read("fixture.json")?;
+    let original = read("launch-ownership.json")?;
+    let acquired = read("integration-acquisition.json")?;
+    let config = std::path::Path::new(
+        acquired["detail"]["identity"]["configDir"]
+            .as_str()
+            .ok_or("no acquired configuration identity")?,
+    );
+    let scratch = std::path::Path::new(
+        fixture["target"]["dir"]
+            .as_str()
+            .ok_or("no acquired directory")?,
+    )
+    .parent()
+    .ok_or("no acquired scratch")?;
+    if acquired["ok"] != true
+        || acquired["appIdentifier"] != "ai.scalinity.threadspace.dev"
+        || acquired["scope"] != "session"
+        || config != scratch.join("session-config")
+    {
+        return Err("retained installation is not the recorded Dev session acquisition".into());
+    }
+    let installation_before = m2::integration(ctx, "status", config, "session")?;
+    if installation_before["ok"] != true
+        || scrub(installation_before["detail"]["record"].clone()) != acquired["detail"]
+    {
+        return Err("retained acquisition changed; no Return or cleanup issued".into());
+    }
+    let recorded_tab = |key: &str| -> Result<Tab, String> {
+        let value = &fixture[key];
+        let marker = value["marker"].as_str().ok_or("no acquired marker")?;
+        uuid::Uuid::parse_str(marker).map_err(|error| error.to_string())?;
+        let dir = PathBuf::from(value["dir"].as_str().ok_or("no acquired tab directory")?);
+        if dir != scratch.join(key) {
+            return Err("tab directory differs from the recorded scratch acquisition".into());
+        }
+        Ok(Tab {
+            marker: marker.into(),
+            dir,
+            tty: value["tty"].as_str().ok_or("no acquired TTY")?.into(),
+            window_id: value["windowId"]
+                .as_i64()
+                .filter(|id| *id > 0)
+                .ok_or("no acquired window")?,
+        })
+    };
+    let target = OwnedTab::acquire(recorded_tab("target")?)?;
+    let spare = OwnedTab::acquire(recorded_tab("spare")?)?;
+    let endpoint = fixture["expected"]["native"]["processKey"]["endpointId"]
+        .as_str()
+        .ok_or("no original endpoint")?;
+    let native_id = fixture["expected"]["native"]["nativeSessionId"]
+        .as_str()
+        .ok_or("no original native Session")?;
+    let current = native_witness(&target.tab, endpoint, Some(native_id));
+    if original["owned"] != true
+        || json!(target.terminal) != original["terminalIncarnation"]
+        || !oracle::same_identity(&fixture["expected"]["native"], &current)
+        || target.ownership()["owned"] != true
+        || spare.ownership()["owned"] != true
+    {
+        return Err(
+            "retained fixture currentness/ownership differs; no Return or cleanup issued".into(),
+        );
+    }
+    let run = Run::create(
+        &ctx.repo.join("evidence/M2/remediation-1/f3"),
+        "native",
+        &format!("dev-finish-{}", uuid::Uuid::new_v4()),
+    )
+    .map_err(|error| error.to_string())?;
+    write(&run, "source-identity.json", &source_identity(ctx))?;
+    write(
+        &run,
+        "retained-fixture.json",
+        &json!({"parentRun":retained,"fixture":fixture,"current":current,
+        "terminalIncarnationMatchesOriginal":true,"positiveEvidenceAttribution":"parent run only; no positive Return re-executed"}),
+    )?;
+    let negative = {
+        let _gui = ctx.gui("m2 retained absent-Session negative")?;
+        let absent = uuid::Uuid::new_v4().to_string();
+        let rows: Value = serde_json::from_str(&m2::journal_query(
+            ctx,
+            &format!("SELECT COUNT(*) AS n FROM sessions WHERE id = '{absent}'"),
+        )?)
+        .map_err(|error| error.to_string())?;
+        let absent_verified = rows[0]["n"].as_u64() == Some(0);
+        let mut case = json!({"case":"unknown-session-refusal","sessionId":absent,"sessionAbsent":absent_verified,
+            "explicitReturn":false,"before":readback(&target.tab),"journalCountRows":rows});
+        if absent_verified {
+            case["explicitReturn"] = json!(true);
+            case["route"] = crate::deadline::route_full(ctx, &absent);
+            case["after"] = readback(&target.tab);
+        }
+        let checks = oracle::negative_checks(&case);
+        case["pass"] = json!(oracle::all_true(&checks));
+        case["checks"] = checks;
+        case
+    };
+    write(&run, "negative.json", &negative)?;
+    let cleanup = vec![spare.cleanup(ctx), target.cleanup(ctx)];
+    let all_closed = cleanup.iter().all(|record| record["closed"] == true);
+    // The original lease remains retained here. Remove its exact installation
+    // through the original CLI identity only after every owned window/TTY retires.
+    let installation_after = m2::integration(ctx, "status", config, "session")?;
+    let same_acquisition = installation_after["ok"] == true
+        && scrub(installation_after["detail"]["record"].clone()) == acquired["detail"];
+    let integration = if all_closed && same_acquisition {
+        Some(m2::integration(ctx, "uninstall", config, "session")?)
+    } else {
+        None
+    };
+    let removed = integration
+        .as_ref()
+        .is_some_and(|value| value["ok"] == true && value["detail"]["complete"] == true);
+    let result = json!({"parentRun":retained,"runDirectory":run.dir,"negative":negative,"cleanup":cleanup,
+        "integrationRemoval":integration,"installationBefore":installation_before,"installationAfter":installation_after,
+        "sameAcquiredInstallationBeforeRemoval":same_acquisition,"retainedScratch":scratch,"scratchDeleted":false,
+        "pass":negative["pass"] == true && all_closed && removed});
+    write(&run, "summary.json", &result)?;
+    Ok(result)
 }
 
 /// Native-only entry point. An explicit `dev` is mandatory at dispatch too.
@@ -617,10 +784,10 @@ pub fn qualify(ctx: &Ctx, repetitions: u32) -> Result<Value, String> {
         let absent = uuid::Uuid::new_v4().to_string();
         let rows: Value = serde_json::from_str(&m2::journal_query(
             ctx,
-            &format!("SELECT id FROM sessions WHERE id = '{absent}'"),
+            &format!("SELECT COUNT(*) AS n FROM sessions WHERE id = '{absent}'"),
         )?)
         .map_err(|error| error.to_string())?;
-        let absent_verified = rows.as_array().is_some_and(Vec::is_empty);
+        let absent_verified = rows[0]["n"].as_u64() == Some(0);
         let before = readback(&target.tab);
         let mut negative = json!({ "case": "unknown-session-refusal", "sessionId": absent,
             "sessionAbsent": absent_verified, "explicitReturn": false, "before": before });

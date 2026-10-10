@@ -42,6 +42,18 @@ loop. `TERMINAL SCRIPTABILITY ENVIRONMENT BLOCKED` stops native fixture attempts
 `TERMINAL SCRIPTABILITY RESTORED` establishes only the scripting prerequisite.
 The product Return deadline remains two seconds.
 
+For an F3 run retained after its positive attempts, `threadspace-m0c
+m2-minimized-finish dev <recorded-run-directory>` executes only the corrected
+absent-Session negative and owned cleanup. It requires the recorded installation,
+original Terminal incarnation and original Claude Session/process/TTY to agree
+with fresh native proof before acting. Original positives remain attributed to
+their original run. Cleanup closes the acquired UUID-marked sole-tab window;
+it sends no direct PID signals. Every readable job must still belong to the
+fixture. A root Terminal login wrapper is identified through its native image,
+UID, parent and TTY and supplies no PID signal authority. Removal of the exact
+acquired integration requires window disappearance and an empty successful native
+TTY process census. Conflicts or missing proof retain resources.
+
 M2 qualification can select a retained provider executable with
 `THREADSPACE_CLAUDE_EXECUTABLE=/absolute/path/to/claude`. The override is confined
 to the unshipped harness; native witnesses still verify the running process image
