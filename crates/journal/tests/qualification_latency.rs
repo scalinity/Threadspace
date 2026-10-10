@@ -3,7 +3,9 @@
 //! native helper ancestry, a provider, or a UI.
 #![cfg(feature = "qualification")]
 
-#[allow(dead_code)]
+// The included helper also re-exports census APIs used by its production
+// binary; this COMMIT fixture deliberately does not call those APIs.
+#[allow(dead_code, unused_imports)]
 #[path = "../../relay/src/latency.rs"]
 mod helper_measurements;
 
