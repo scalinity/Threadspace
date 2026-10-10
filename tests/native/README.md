@@ -54,6 +54,13 @@ UID, parent and TTY and supplies no PID signal authority. Removal of the exact
 acquired integration requires window disappearance and an empty successful native
 TTY process census. Conflicts or missing proof retain resources.
 
+`threadspace-m0c m2-observer-native dev` records one owned real-Claude 2.1.295
+smoke and a separate unchanged-ID reload positive. It waits for independently
+admitted native ownership proof and observer seal before starting the post-seal
+Turn; it never waits for RESTORED before that Turn. It preserves raw journal
+rows and unsuccessful attempts. Its positive results alone do not close the
+remaining causal/replay and negative qualification requirements.
+
 M2 qualification can select a retained provider executable with
 `THREADSPACE_CLAUDE_EXECUTABLE=/absolute/path/to/claude`. The override is confined
 to the unshipped harness; native witnesses still verify the running process image

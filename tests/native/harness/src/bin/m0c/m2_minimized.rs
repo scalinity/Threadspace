@@ -181,7 +181,7 @@ fn cli() -> Result<ClaudeCli, String> {
 /// after stat proves a character device and production discovery has joined
 /// the full Session to a birth/image-stable process across two inventories.
 /// Cwd and titles never establish Session identity or authorize Return.
-fn native_witness(tab: &Tab, endpoint: &str, expected_session: Option<&str>) -> Value {
+pub(super) fn native_witness(tab: &Tab, endpoint: &str, expected_session: Option<&str>) -> Value {
     let started_ms = threadspace_harness::now_ms();
     let attempt = || -> Result<Value, String> {
         let device = tty::character_device(&tab.tty).map_err(|error| error.to_string())?;
@@ -237,15 +237,15 @@ fn native_witness(tab: &Tab, endpoint: &str, expected_session: Option<&str>) -> 
     record
 }
 
-struct OwnedTab {
-    tab: Tab,
+pub(super) struct OwnedTab {
+    pub(super) tab: Tab,
     directory: (u64, u64),
     terminal: procs::Incarnation,
     device: u32,
 }
 
 impl OwnedTab {
-    fn acquire(tab: Tab) -> Result<Self, String> {
+    pub(super) fn acquire(tab: Tab) -> Result<Self, String> {
         let metadata = std::fs::symlink_metadata(&tab.dir).map_err(|error| error.to_string())?;
         if !metadata.is_dir() {
             return Err("new fixture directory is not an owned directory".into());
@@ -263,7 +263,7 @@ impl OwnedTab {
         })
     }
 
-    fn ownership(&self) -> Value {
+    pub(super) fn ownership(&self) -> Value {
         let metadata_matches = std::fs::symlink_metadata(&self.tab.dir).is_ok_and(|metadata| {
             metadata.is_dir() && (metadata.dev(), metadata.ino()) == self.directory
         });
@@ -282,7 +282,7 @@ impl OwnedTab {
     /// Close the acquired window through Terminal, without signalling any PID.
     /// Every readable job still needs fresh image/device/cwd proof. The root
     /// Terminal login wrapper is identified but never supplies signal authority.
-    fn cleanup(&self, ctx: &Ctx) -> Value {
+    pub(super) fn cleanup(&self, ctx: &Ctx) -> Value {
         let _guard = match ctx.gui("m2 minimized owned cleanup") {
             Ok(guard) => guard,
             Err(error) => return json!({ "closed": false, "refused": error }),
