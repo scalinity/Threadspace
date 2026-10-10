@@ -43,6 +43,49 @@ use threadspace_surfaces_macos::{ancestry, process};
 const ANCESTRY_LINKS: usize = 24;
 const OWNERSHIP_PROOF_BUDGET_MS: u64 = 2_000;
 
+// Separate test feature: no filesystem sink, receipt annotation or live-agent
+// authority. Emit after the stdout flush attempt; a failed flush has no stamp.
+// No diagnostic survives a watchdog exit before emission.
+#[cfg(feature = "qualification-startup")]
+#[derive(Default, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct StartupTrace {
+    main_entry_ns: Option<u64>,
+    initialization_completed_ns: Option<u64>,
+    mod_batch_entry_ns: Option<u64>,
+    locator_read_ns: Option<u64>,
+    receipt_ready_ns: Option<u64>,
+    stdout_flush_completed_ns: Option<u64>,
+}
+
+#[cfg(feature = "qualification-startup")]
+impl StartupTrace {
+    fn emit(&self, args: &[String]) {
+        if arg(args, "--store-dir").is_none()
+            || std::env::var("THREADSPACE_QUALIFY_STARTUP").as_deref() != Ok("1") {
+            return;
+        }
+        let emission_started = monotonic_ns();
+        let boot = process::boot_session_id().ok();
+        let value = serde_json::json!({
+            "kind": "qualification-startup", "clock": "CLOCK_UPTIME_RAW",
+            "bootId": boot, "pid": std::process::id(), "stamps": self,
+            "diagnosticEmissionStartedNs": emission_started,
+            "finalProcessExitNs": null,
+        });
+        let mut stderr = std::io::stderr().lock();
+        if writeln!(stderr, "{value}").and_then(|()| stderr.flush()).is_ok() {
+            // This second line separates most diagnostic overhead from the
+            // residual answer-to-reap interval. It is not an exit timestamp.
+            let _ = writeln!(stderr, "{}", serde_json::json!({
+                "kind": "qualification-startup-emitted",
+                "clock": "CLOCK_UPTIME_RAW", "bootId": boot,
+                "diagnosticEmissionCompletedNs": monotonic_ns(),
+            }));
+        }
+    }
+}
+
 fn quiet_exit() -> ! {
     // SAFETY: `_exit` has no preconditions; it skips destructors and buffered
     // output on purpose, so nothing is printed on the way out.
@@ -314,7 +357,11 @@ fn latency_store(args: &[String]) -> Option<PathBuf> {
 }
 
 /// The answer and the exit status to leave with.
-fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
+fn mod_batch(args: &[String], started: Instant,
+    #[cfg(feature = "qualification-startup")] startup: &mut StartupTrace,
+) -> (Option<Vec<u8>>, i32) {
+    #[cfg(feature = "qualification-startup")]
+    { startup.mod_batch_entry_ns = monotonic_ns(); }
     // Dev-only phase evidence; ordinary capture and release artifacts do not
     // depend on these stamps or on optional measurement persistence.
     #[cfg(feature = "qualification")]
@@ -360,6 +407,8 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
         .and_then(|locator| locator.events_socket)
         .map(PathBuf::from);
     phase!("locatorReadNs");
+    #[cfg(feature = "qualification-startup")]
+    { startup.locator_read_ns = monotonic_ns(); }
     #[cfg(feature = "qualification")]
     let progress = |stamps: &serde_json::Map<String, serde_json::Value>, stage: &str| {
         if stamps.is_empty() { return; }
@@ -440,6 +489,8 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
 }
 
 fn main() {
+    #[cfg(feature = "qualification-startup")]
+    let main_entry = monotonic_ns();
     let started = Instant::now();
     std::panic::set_hook(Box::new(|_| {}));
     let args: Vec<String> = std::env::args().collect();
@@ -449,6 +500,12 @@ fn main() {
         WALL_BUDGET_MS
     };
     watchdog(Duration::from_millis(budget));
+    #[cfg(feature = "qualification-startup")]
+    let mut startup = StartupTrace {
+        main_entry_ns: main_entry,
+        initialization_completed_ns: monotonic_ns(),
+        ..StartupTrace::default()
+    };
     match args.get(1).map(String::as_str) {
         #[cfg(feature = "qualification")]
         Some("latency-census") => {
@@ -482,12 +539,24 @@ fn main() {
             }
         }
         Some("mod-batch") => {
+            #[cfg(not(feature = "qualification-startup"))]
             let (text, status) = std::panic::catch_unwind(|| mod_batch(&args, started)).unwrap_or((None, 0));
+            #[cfg(feature = "qualification-startup")]
+            let (text, status) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+                || mod_batch(&args, started, &mut startup),
+            )).unwrap_or((None, 0));
+            #[cfg(feature = "qualification-startup")]
+            { startup.receipt_ready_ns = text.as_ref().and_then(|_| monotonic_ns()); }
             if let Some(text) = text.filter(|text| text.len() <= RECEIPT_MAX_BYTES) {
                 // Flushed here: the exit below discards buffered output.
                 let mut stdout = std::io::stdout().lock();
-                let _ = stdout.write_all(&text).and_then(|()| stdout.flush());
+                let flushed = stdout.write_all(&text).and_then(|()| stdout.flush());
+                #[cfg(feature = "qualification-startup")]
+                if flushed.is_ok() { startup.stdout_flush_completed_ns = monotonic_ns(); }
+                let _ = flushed;
             }
+            #[cfg(feature = "qualification-startup")]
+            startup.emit(&args);
             if status != 0 {
                 // SAFETY: as in `quiet_exit`; only the qualification `exit1`
                 // fault leaves with a non-zero status.

@@ -13,21 +13,46 @@ use threadspace_contracts::canonical::capture::{ModBatchReceipt, RecordStatus};
 const EPOCH: &str = "6d1c7f0e-1111-4aaa-8bbb-000000000001";
 const ID: &str = "00000000-0000-4000-8000-000000000001";
 
+#[cfg(feature = "qualification-startup")]
+fn native_ns() -> u64 {
+    let mut now = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    // SAFETY: `now` is writable and CLOCK_UPTIME_RAW is supported on macOS.
+    assert_eq!(unsafe { libc::clock_gettime(libc::CLOCK_UPTIME_RAW, &mut now) }, 0);
+    now.tv_sec as u64 * 1_000_000_000 + now.tv_nsec as u64
+}
+
 fn run(stdin: &[u8], budget_ms: u64) -> (std::process::Output, u128) {
     let store = std::env::temp_dir().join(format!("ts-mod-batch-{}", uuid::Uuid::new_v4()));
     std::fs::create_dir_all(&store).expect("store");
+    #[cfg(feature = "qualification-startup")]
+    let boot = threadspace_surfaces_macos::process::boot_session_id().expect("boot");
     let started = Instant::now();
-    let mut child = Command::new(env!("CARGO_BIN_EXE_threadspace-hook"))
+    #[cfg(feature = "qualification-startup")]
+    let requested = native_ns();
+    let mut command = Command::new(env!("CARGO_BIN_EXE_threadspace-hook"));
+    command
         .args(["mod-batch", "--store-dir"])
         .arg(&store)
         .args(["--budget-ms", &budget_ms.to_string()])
         .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .expect("spawn");
+        .stdout(Stdio::piped());
+    #[cfg(feature = "qualification-startup")]
+    command.env("THREADSPACE_QUALIFY_STARTUP", "1").stderr(Stdio::piped());
+    let mut child = command.spawn().expect("spawn");
+    #[cfg(feature = "qualification-startup")]
+    let spawned = native_ns();
     child.stdin.take().expect("stdin").write_all(stdin).expect("write");
     let output = child.wait_with_output().expect("wait");
+    #[cfg(feature = "qualification-startup")]
+    let reaped = native_ns();
     let elapsed = started.elapsed().as_millis();
+    #[cfg(feature = "qualification-startup")]
+    eprintln!("{}", json!({
+        "kind": "qualification-startup-parent", "clock": "CLOCK_UPTIME_RAW", "bootId": boot,
+        "parentLaunchRequestNs": requested, "successfulSpawnReturnNs": spawned,
+        "parentReapNs": reaped, "assertionElapsedMs": elapsed,
+        "helperDiagnostics": String::from_utf8_lossy(&output.stderr),
+    }));
     let _ = std::fs::remove_dir_all(&store);
     (output, elapsed)
 }

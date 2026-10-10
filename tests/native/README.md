@@ -13,6 +13,26 @@ entry, answer and exact exit stamps remain explicitly missing. This control
 does not replace the COMMIT/DOM population or qualify a clock profile. Raw
 provider output and acquired resources remain in the supplied private directory.
 
+`cargo test --locked -p threadspace-relay --features qualification-startup
+--test mod_batch -- --nocapture --test-threads=1` adds native launch/spawn/reap
+stamps to the existing tests, retaining the original launch-inclusive `<250 ms`
+assertion. The separate feature emits helper main entry, main-side watchdog
+initialization completion, mod-batch entry, locator read, receipt ready and
+successful stdout flush on stderr when `THREADSPACE_QUALIFY_STARTUP=1` and
+`--store-dir` is supplied. It is excluded from the Dev/release packaging feature.
+The typed receipt, spool durability and configured watchdog are unchanged.
+Entry excludes the loader and Rust runtime prologue; initialization completion
+means watchdog spawn returned, not that its sleeping thread ran immediately.
+
+`tools/m2_f4_phases.py --helper <qualification-startup helper> --private-output
+<new private directory>` retains two acquired inodes and first/repeat executions
+against four owned absent-companion stores. It rejects mismatched clocks/boots,
+missing stamps and inverted intervals. Diagnostic emission follows the stdout
+flush attempt and remains inside launch-to-reap; its first-record emission
+interval is reported separately. Reap includes parent output collection and
+scheduling, and never becomes an exact exit timestamp. No provider, prewarming,
+cache eviction or complete F4 campaign runs in this control.
+
 `m2-latency-native dev` acquires its own Dev UI and Terminal fixture, refuses an
 existing Dev UI, enables observer measurement only in its acquired mod copy,
 and uses 20 independently recorded conventional-hook invocations. This hook

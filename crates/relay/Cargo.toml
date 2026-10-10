@@ -20,6 +20,8 @@ sha2.workspace = true
 [features]
 # Qualification-only mod-batch fault injection (tests/native M2 relay faults).
 qualification = []
+# Disposable-store startup tracing; deliberately excluded from Dev packaging.
+qualification-startup = ["qualification"]
 
 
 [lints]
