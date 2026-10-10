@@ -56,6 +56,7 @@ mod ownership;
 mod power;
 mod service_gates;
 mod supervision;
+mod terminal_diagnostic;
 mod terminal_gates;
 mod voiceover;
 mod window_gates;
@@ -73,8 +74,8 @@ fn main() -> ExitCode {
         return ExitCode::from(64);
     };
     // Refuse before Ctx initialization can inspect any production surface.
-    if command == "m2-minimized" && args.get(1).map(String::as_str) != Some("dev") {
-        eprintln!("m2-minimized requires the explicit dev channel");
+    if matches!(command, "m2-minimized" | "m2-terminal-preflight") && args.get(1).map(String::as_str) != Some("dev") {
+        eprintln!("{command} requires the explicit dev channel");
         return ExitCode::from(64);
     }
     if command == "m2-minimized"
@@ -114,6 +115,7 @@ fn main() -> ExitCode {
         "m2-vertical" => m2::vertical(&ctx, number(&args, 2, 10)),
         "m2-routes" => m2::routes(&ctx, number(&args, 2, 30)),
         "m2-minimized" => m2_minimized::qualify(&ctx, number(&args, 2, 5)),
+        "m2-terminal-preflight" => terminal_diagnostic::probe(),
         "m2-faults" => m2_faults::faults(&ctx, args.get(2).map_or("all", String::as_str)),
         "m2-latency-begin" => m2_latency::begin(&ctx),
         "m2-latency-end" => m2_latency::end(&ctx, std::path::Path::new(args.get(2).map_or("", String::as_str))),

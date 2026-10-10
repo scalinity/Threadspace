@@ -32,6 +32,16 @@ test/debug controls remains required; this is not a claim of JavaScript strippin
 
 ## Running
 
+Before an M2 Terminal fixture, run `threadspace-m0c m2-terminal-preflight dev`.
+This read-only diagnostic requires an already running Terminal, performs two
+passes under one kernel process incarnation, and records application, window,
+selected-tab and TTY queries. Each query has a three-second AppleEvent timeout
+and at most four seconds of worker time within a 55-second overall budget.
+It never launches or focuses Terminal and never invokes the ten-minute readiness
+loop. `TERMINAL SCRIPTABILITY ENVIRONMENT BLOCKED` stops native fixture attempts;
+`TERMINAL SCRIPTABILITY RESTORED` establishes only the scripting prerequisite.
+The product Return deadline remains two seconds.
+
 M2 qualification can select a retained provider executable with
 `THREADSPACE_CLAUDE_EXECUTABLE=/absolute/path/to/claude`. The override is confined
 to the unshipped harness; native witnesses still verify the running process image
