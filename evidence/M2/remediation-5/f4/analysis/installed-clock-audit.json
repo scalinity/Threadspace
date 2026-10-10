@@ -1,0 +1,73 @@
+{
+  "providerVersion": "2.1.295",
+  "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+  "embeddedBunVersion": "1.4.3",
+  "embeddedBunRevision": "eecfd55debb281c3fe3518098b1a49f76429637c",
+  "installedBinaryMarkerOffsets": {
+    "Bun v1\\.4\\.3 \\(eecfd55de\\)": [
+      60558496
+    ],
+    "eecfd55debb281c3fe3518098b1a49f76429637c": [
+      59270248,
+      59383304,
+      60305151,
+      60558553,
+      62679396
+    ],
+    "guarded\\(helpers.now\\)": [
+      80649565,
+      80669075,
+      189759851
+    ],
+    "now:\\(\\)=>performance.now\\(\\)": [
+      189846996,
+      221601240,
+      221619325,
+      223430661
+    ]
+  },
+  "pluginGlobals": {
+    "bun": null,
+    "process": null,
+    "performanceNowSource": "() => guarded(helpers.now)()"
+  },
+  "installedPluginClockFinding": "VM performance.now invokes guarded helpers.now; inspected helper table delegates now to host performance.now. This identifies the installed wrapper, not its native precision or maximum relative rate error.",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.2\nBuildVersion:\t\t26B5101f",
+  "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+  "WebKitBundleVersion": "22625.2.7.1",
+  "retainedMeasurementOsBuild": "26B5091g",
+  "retainedWebKitBundleVersion": "22625.2.5.11.1",
+  "retainedBootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+  "sqliteWriter": {
+    "nativeBuildSource": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+    "executableSha256": "fe0c1939913879c8abba16adae66a5a4553a50ae94b255c18cdcc309bbf9b439",
+    "retainedRuntimeVersion": "3.53.4",
+    "retainedRuntimeSourceId": "2026-07-24 19:02:57 bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+    "journalMode": "wal",
+    "synchronous": 2,
+    "timingSource": "crates/journal/src/latency.rs CLOCK_UPTIME_RAW around actual SQLITE_COMMIT_CALL",
+    "newWriterRuntimeLaunch": "NOT_RUN"
+  },
+  "crossRuntimeBound": {
+    "qualified": false,
+    "maximumRateErrorPpm": null,
+    "precisionNs": null
+  },
+  "sourceAvailability": [
+    {
+      "url": "https://github.com/oven-sh/bun/tree/eecfd55debb281c3fe3518098b1a49f76429637c",
+      "result": "unavailable via web; attempted native binding paths returned 404"
+    },
+    {
+      "url": "https://github.com/WebKit/WebKit/tree/webkit-626.2.7.1",
+      "result": "unavailable via web; does not cover retained WebKit 22625.2.5.11.1"
+    }
+  ],
+  "supportingUpstreamSources": [
+    "https://github.com/apple-oss-distributions/Libc/blob/main/gen/clock_gettime.c",
+    "https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time",
+    "https://github.com/WebKit/WebKit/blob/main/Source/WTF/wtf/CurrentTime.cpp",
+    "https://github.com/WebKit/WebKit/blob/main/Source/WebCore/page/Performance.cpp"
+  ],
+  "upstreamLimitation": "Upstream source explains Mach conversion and WebKit coarsening; it is not a match certificate for these installed binaries. The measured calibration only tests consistency; no finite maximum JS rate bound follows between sparse samples."
+}

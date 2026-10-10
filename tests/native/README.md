@@ -1,5 +1,18 @@
 # Native qualification harness
 
+`tools/m2_f4_startup.py --helper <exact retained helper> --provider <Claude
+2.1.295 executable> --private-output <new private directory>` performs the
+bounded F4 first/repeat comparison. It acquires two helper inodes for direct
+launch and two different inodes for real `$.process.run`, preserving first
+executions and isolated absent-companion spools. The Claude process receives
+only SDK initialization, with no inference prompt, external MCP configuration,
+installed integration or existing Terminal resource. Native parent launch,
+spawn-return and reap stamps are distinct from plugin-clock host spans.
+The current installed phase gate excludes disposable `--store-dir` invocations;
+entry, answer and exact exit stamps remain explicitly missing. This control
+does not replace the COMMIT/DOM population or qualify a clock profile. Raw
+provider output and acquired resources remain in the supplied private directory.
+
 `m2-latency-native dev` acquires its own Dev UI and Terminal fixture, refuses an
 existing Dev UI, enables observer measurement only in its acquired mod copy,
 and uses 20 independently recorded conventional-hook invocations. This hook

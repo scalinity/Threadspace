@@ -1,0 +1,66 @@
+{
+  "sourceCommit": "aee33d3779a413492136c437b3e552ce45962d0f",
+  "hashes": {
+    "outer": "a56ef09041f4b2de8e61ca120284fed7134ee9a5aa6ab4041f4ac759b735cf6b",
+    "companion": "fe0c1939913879c8abba16adae66a5a4553a50ae94b255c18cdcc309bbf9b439",
+    "helper": "f9ea720566710d6c7a05d5d82a433e2208915ed848eb5e10f9df4f35e14fb8fb",
+    "harness": "ceea9ffb23305437db4f25a0c606bee7688037fc2e6709cc9ef6723d1ea8cab3",
+    "testHelper": "39c437a0806e933db3a5803f45893636a928c3aafc1bd68bc3559d1f6a027541",
+    "testExecutable": "94fff811df4cd3115856c8a0949099f62d6a2d397fc0f2bf0060b59939452616"
+  },
+  "nativeBuildSource": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+  "calculatorSource": "bcb1d92b0150c019c8fdf5fc135601e3e4942aa7",
+  "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.2\nBuildVersion:\t\t26B5101f",
+  "sourceEqualitySinceBuild": "",
+  "runs": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "threadspace-relay",
+        "--features",
+        "qualification",
+        "--test",
+        "mod_batch",
+        "a_batch_without_a_companion_is_spooled_and_answered_within_its_budget",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exitCode": 101,
+      "log": "checks/original-modbatch-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "threadspace-relay",
+        "--features",
+        "qualification",
+        "--test",
+        "mod_batch",
+        "a_batch_without_a_companion_is_spooled_and_answered_within_its_budget",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exitCode": 0,
+      "log": "checks/original-modbatch-2.log"
+    }
+  ],
+  "afterHashes": {
+    "outer": "a56ef09041f4b2de8e61ca120284fed7134ee9a5aa6ab4041f4ac759b735cf6b",
+    "companion": "fe0c1939913879c8abba16adae66a5a4553a50ae94b255c18cdcc309bbf9b439",
+    "helper": "f9ea720566710d6c7a05d5d82a433e2208915ed848eb5e10f9df4f35e14fb8fb",
+    "harness": "ceea9ffb23305437db4f25a0c606bee7688037fc2e6709cc9ef6723d1ea8cab3",
+    "testHelper": "39c437a0806e933db3a5803f45893636a928c3aafc1bd68bc3559d1f6a027541",
+    "testExecutable": "94fff811df4cd3115856c8a0949099f62d6a2d397fc0f2bf0060b59939452616"
+  }
+}

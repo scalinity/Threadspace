@@ -1,0 +1,920 @@
+{
+  "rawSha256": "c1f4cb46ab095e0cce952f53976fd8c71b57273666a339bd15a3eca5ddc84a72",
+  "nativeBootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+  "method": "Program-order enclosures in native counter units. Observer capture follows source-window start and precedes its helper entry; DOM marks follow COMMIT and precede the acknowledged collector stop. No JS differences are translated.",
+  "nativeStartNs": "551093262444166",
+  "nativeStopAcknowledgedNs": "551126064941583",
+  "nativeObservationWindowMs": 32802.497417,
+  "nativeConversionRoundingStillApplies": "rounding endpoints outward increases every bound by at most 2 ns under retained native Mach conversion evidence; values below are integer raw endpoints, not a new qualified gate.",
+  "limitations": [
+    "These existing event enclosures are wide; failing upper bounds do not prove the actual latency is equally large.",
+    "No production-calculator profile or timestamp was changed.",
+    "Sparse calibration-only DOM bracket width remains 32453.169833 ms; COMMIT-to-stop ordering can tighten particular intervals but cannot establish a 100 ms bound."
+  ],
+  "bySource": {
+    "claude.hook": {
+      "captureToCommitMs": {
+        "n": 20,
+        "p50": 1.230167,
+        "p95": 1.755292,
+        "max": 4.936541
+      },
+      "commitToDomMs": {
+        "n": 20,
+        "p50": 6792.281417,
+        "p95": 7196.862958,
+        "max": 7245.075125
+      },
+      "eventToDomMs": {
+        "n": 20,
+        "p50": 6793.027917,
+        "p95": 7197.792625,
+        "max": 7246.172583
+      }
+    },
+    "claude.observer": {
+      "captureToCommitMs": {
+        "n": 21,
+        "p50": 23881.047917,
+        "p95": 26666.582459,
+        "max": 26666.582459
+      },
+      "commitToDomMs": {
+        "n": 21,
+        "p50": 8921.78975,
+        "p95": 26363.948375,
+        "max": 26398.6225
+      },
+      "eventToDomMs": {
+        "n": 21,
+        "p50": 32802.497417,
+        "p95": 32802.497417,
+        "max": 32802.497417
+      }
+    }
+  },
+  "rows": [
+    {
+      "observationId": "967f8cae-a8c0-4f2d-9248-5d04f137a1c4",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551099663660208"
+      ],
+      "commitIntervalNativeNs": [
+        "551099666319083",
+        "551099666708958"
+      ],
+      "domIntervalNativeNs": [
+        "551099666319083",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6404.264792,
+        "commitToDomMs": 26398.6225,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "c55e43d3-fb33-4c9c-9f8f-7c7c5d3574e8",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551099698407375"
+      ],
+      "commitIntervalNativeNs": [
+        "551099700993208",
+        "551099701233916"
+      ],
+      "domIntervalNativeNs": [
+        "551099700993208",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6438.78975,
+        "commitToDomMs": 26363.948375,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "d6a69f19-2810-4696-8f04-688449efd548",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551099698407375"
+      ],
+      "commitIntervalNativeNs": [
+        "551099700993208",
+        "551099701233916"
+      ],
+      "domIntervalNativeNs": [
+        "551099700993208",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6438.78975,
+        "commitToDomMs": 26363.948375,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "e44d7504-6652-4a6f-99d4-eb65a3e26cdb",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551099698407375"
+      ],
+      "commitIntervalNativeNs": [
+        "551099700993208",
+        "551099701233916"
+      ],
+      "domIntervalNativeNs": [
+        "551099700993208",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6438.78975,
+        "commitToDomMs": 26363.948375,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "01120700-3631-4fe7-8370-040e70be3461",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551099836880375"
+      ],
+      "commitIntervalNativeNs": [
+        "551099839068541",
+        "551099839328291"
+      ],
+      "domIntervalNativeNs": [
+        "551099839068541",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 6576.884125,
+        "commitToDomMs": 26225.873042,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "86c84a65-dc9b-469c-8982-75a3216bea86",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551115323261458"
+      ],
+      "commitIntervalNativeNs": [
+        "551115325681708",
+        "551115325967541"
+      ],
+      "domIntervalNativeNs": [
+        "551115325681708",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 22063.523375,
+        "commitToDomMs": 10739.259875,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "dc7c2515-a618-4f07-ad65-27e2754704f3",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551115479242625"
+      ],
+      "commitIntervalNativeNs": [
+        "551115481858250",
+        "551115482437291"
+      ],
+      "domIntervalNativeNs": [
+        "551115481858250",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 22219.993125,
+        "commitToDomMs": 10583.083333,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "e36848d8-b176-43be-9b61-c3ef5c16cf48",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551115479242625"
+      ],
+      "commitIntervalNativeNs": [
+        "551115481858250",
+        "551115482437291"
+      ],
+      "domIntervalNativeNs": [
+        "551115481858250",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 22219.993125,
+        "commitToDomMs": 10583.083333,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "eef4107b-11a3-436d-afc1-980b7218379a",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551115479242625"
+      ],
+      "commitIntervalNativeNs": [
+        "551115481858250",
+        "551115482437291"
+      ],
+      "domIntervalNativeNs": [
+        "551115481858250",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 22219.993125,
+        "commitToDomMs": 10583.083333,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "a089502e-ed66-4f85-a95b-05690d205a94",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551115479242625"
+      ],
+      "commitIntervalNativeNs": [
+        "551115481858250",
+        "551115482437291"
+      ],
+      "domIntervalNativeNs": [
+        "551115481858250",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 22219.993125,
+        "commitToDomMs": 10583.083333,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "eb6b2070-4bb1-4715-8d53-161b078b034b",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117139036875"
+      ],
+      "commitIntervalNativeNs": [
+        "551117143151833",
+        "551117143492083"
+      ],
+      "domIntervalNativeNs": [
+        "551117143151833",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 23881.047917,
+        "commitToDomMs": 8921.78975,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "487785fd-515d-4ef9-8c89-61dc71649377",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117139036875"
+      ],
+      "commitIntervalNativeNs": [
+        "551117143151833",
+        "551117143492083"
+      ],
+      "domIntervalNativeNs": [
+        "551117143151833",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 23881.047917,
+        "commitToDomMs": 8921.78975,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "8b8e6e0d-5d3d-4ef9-9f98-07c745ad8d6b",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117154997250"
+      ],
+      "commitIntervalNativeNs": [
+        "551117159424541",
+        "551117163625291"
+      ],
+      "domIntervalNativeNs": [
+        "551117159424541",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 23901.181125,
+        "commitToDomMs": 8905.517042,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "8560a957-2b49-4982-924c-92dcd69a491c",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117399001250"
+      ],
+      "commitIntervalNativeNs": [
+        "551117401276333",
+        "551117401783333"
+      ],
+      "domIntervalNativeNs": [
+        "551117401276333",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 24139.339167,
+        "commitToDomMs": 8663.66525,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "460ced90-cab6-41dd-b5d9-965b177dd13f",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117544908791"
+      ],
+      "commitIntervalNativeNs": [
+        "551117547761375",
+        "551117548270750"
+      ],
+      "domIntervalNativeNs": [
+        "551117547761375",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 24285.826584,
+        "commitToDomMs": 8517.180208,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "2e58c9eb-264d-4fc5-8ded-e45837d03cd2",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551117544908791"
+      ],
+      "commitIntervalNativeNs": [
+        "551117547761375",
+        "551117548270750"
+      ],
+      "domIntervalNativeNs": [
+        "551117547761375",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 24285.826584,
+        "commitToDomMs": 8517.180208,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "a3ef6a6e-c4c7-41ed-a028-d6e8e6b5d326",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551118277142291"
+      ],
+      "commitIntervalNativeNs": [
+        "551118280294666",
+        "551118280846833"
+      ],
+      "domIntervalNativeNs": [
+        "551118280294666",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 25018.402667,
+        "commitToDomMs": 7784.646917,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "3959dccb-dca9-4628-aafb-e504e8fb2f9f",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551118277142291"
+      ],
+      "commitIntervalNativeNs": [
+        "551118280294666",
+        "551118280846833"
+      ],
+      "domIntervalNativeNs": [
+        "551118280294666",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 25018.402667,
+        "commitToDomMs": 7784.646917,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "0c98b727-144b-4556-bfc9-ebadf20d6482",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551118277142291"
+      ],
+      "commitIntervalNativeNs": [
+        "551118280294666",
+        "551118280846833"
+      ],
+      "domIntervalNativeNs": [
+        "551118280294666",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 25018.402667,
+        "commitToDomMs": 7784.646917,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "6e8888c6-9055-470c-951d-61cda2d9dbef",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551118818769000",
+        "551118818769000"
+      ],
+      "commitIntervalNativeNs": [
+        "551118819866458",
+        "551118820411375"
+      ],
+      "domIntervalNativeNs": [
+        "551118819866458",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.642375,
+        "commitToDomMs": 7245.075125,
+        "eventToDomMs": 7246.172583
+      }
+    },
+    {
+      "observationId": "b6fafd2f-dc62-40f1-801f-6f819ff1d28c",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551118867148958",
+        "551118867148958"
+      ],
+      "commitIntervalNativeNs": [
+        "551118868078625",
+        "551118868619083"
+      ],
+      "domIntervalNativeNs": [
+        "551118868078625",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.470125,
+        "commitToDomMs": 7196.862958,
+        "eventToDomMs": 7197.792625
+      }
+    },
+    {
+      "observationId": "c582889b-3c6d-478d-8bc5-d8cfd696dd32",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551118914278583",
+        "551118914278583"
+      ],
+      "commitIntervalNativeNs": [
+        "551118915175833",
+        "551118915779916"
+      ],
+      "domIntervalNativeNs": [
+        "551118915175833",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.501333,
+        "commitToDomMs": 7149.76575,
+        "eventToDomMs": 7150.663
+      }
+    },
+    {
+      "observationId": "86f372e6-3038-4cbb-865e-41cf16ad40b8",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551118958025125",
+        "551118958025125"
+      ],
+      "commitIntervalNativeNs": [
+        "551118959001750",
+        "551118959516041"
+      ],
+      "domIntervalNativeNs": [
+        "551118959001750",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.490916,
+        "commitToDomMs": 7105.939833,
+        "eventToDomMs": 7106.916458
+      }
+    },
+    {
+      "observationId": "fd323724-8539-4a56-a447-ed5747e318ca",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551118998829500",
+        "551118998829500"
+      ],
+      "commitIntervalNativeNs": [
+        "551118999744958",
+        "551119000382875"
+      ],
+      "domIntervalNativeNs": [
+        "551118999744958",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.553375,
+        "commitToDomMs": 7065.196625,
+        "eventToDomMs": 7066.112083
+      }
+    },
+    {
+      "observationId": "903c53e3-6a95-4828-8c18-6740dcacb63d",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119042676083",
+        "551119042676083"
+      ],
+      "commitIntervalNativeNs": [
+        "551119043467708",
+        "551119043913458"
+      ],
+      "domIntervalNativeNs": [
+        "551119043467708",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.237375,
+        "commitToDomMs": 7021.473875,
+        "eventToDomMs": 7022.2655
+      }
+    },
+    {
+      "observationId": "1f4006bc-d266-45ec-a973-a4d2c2d459b7",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119082438708",
+        "551119082438708"
+      ],
+      "commitIntervalNativeNs": [
+        "551119083153041",
+        "551119083632375"
+      ],
+      "domIntervalNativeNs": [
+        "551119083153041",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.193667,
+        "commitToDomMs": 6981.788542,
+        "eventToDomMs": 6982.502875
+      }
+    },
+    {
+      "observationId": "627d6f4a-08e2-491a-a950-c3d1e6a4d4dc",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119130895208",
+        "551119130895208"
+      ],
+      "commitIntervalNativeNs": [
+        "551119131959291",
+        "551119132494708"
+      ],
+      "domIntervalNativeNs": [
+        "551119131959291",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.5995,
+        "commitToDomMs": 6932.982292,
+        "eventToDomMs": 6934.046375
+      }
+    },
+    {
+      "observationId": "2aae2797-c2a7-4bda-bd8e-e8d6cf93e9f4",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119174720125",
+        "551119174720125"
+      ],
+      "commitIntervalNativeNs": [
+        "551119175875208",
+        "551119176374291"
+      ],
+      "domIntervalNativeNs": [
+        "551119175875208",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.654166,
+        "commitToDomMs": 6889.066375,
+        "eventToDomMs": 6890.221458
+      }
+    },
+    {
+      "observationId": "26377020-a0f1-4e4f-bf28-27a1e9f437f6",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119225257041",
+        "551119225257041"
+      ],
+      "commitIntervalNativeNs": [
+        "551119226419958",
+        "551119227012333"
+      ],
+      "domIntervalNativeNs": [
+        "551119226419958",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.755292,
+        "commitToDomMs": 6838.521625,
+        "eventToDomMs": 6839.684542
+      }
+    },
+    {
+      "observationId": "b0cf04ef-f4f7-4f3c-a212-6ea72ccec7da",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119271913666",
+        "551119271913666"
+      ],
+      "commitIntervalNativeNs": [
+        "551119272660166",
+        "551119273114625"
+      ],
+      "domIntervalNativeNs": [
+        "551119272660166",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.200959,
+        "commitToDomMs": 6792.281417,
+        "eventToDomMs": 6793.027917
+      }
+    },
+    {
+      "observationId": "58f156d2-6eff-4844-8912-bf4197b6cf63",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119314496583",
+        "551119314496583"
+      ],
+      "commitIntervalNativeNs": [
+        "551119315104666",
+        "551119315380208"
+      ],
+      "domIntervalNativeNs": [
+        "551119315104666",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.883625,
+        "commitToDomMs": 6749.836917,
+        "eventToDomMs": 6750.445
+      }
+    },
+    {
+      "observationId": "e7b23369-9850-4636-bf99-422bbdcf24e5",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119356088000",
+        "551119356088000"
+      ],
+      "commitIntervalNativeNs": [
+        "551119356744083",
+        "551119357158416"
+      ],
+      "domIntervalNativeNs": [
+        "551119356744083",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.070416,
+        "commitToDomMs": 6708.1975,
+        "eventToDomMs": 6708.853583
+      }
+    },
+    {
+      "observationId": "70d4bc5c-60cf-48fd-88c6-628422549d09",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119398208083",
+        "551119398208083"
+      ],
+      "commitIntervalNativeNs": [
+        "551119399019166",
+        "551119399438250"
+      ],
+      "domIntervalNativeNs": [
+        "551119399019166",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.230167,
+        "commitToDomMs": 6665.922417,
+        "eventToDomMs": 6666.7335
+      }
+    },
+    {
+      "observationId": "a2cd010b-65e1-4d12-9fb9-43b423195de9",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119445873625",
+        "551119445873625"
+      ],
+      "commitIntervalNativeNs": [
+        "551119446403833",
+        "551119446595583"
+      ],
+      "domIntervalNativeNs": [
+        "551119446403833",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.721958,
+        "commitToDomMs": 6618.53775,
+        "eventToDomMs": 6619.067958
+      }
+    },
+    {
+      "observationId": "9f5fde96-f931-4011-87e0-7c4ce137a4d1",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119488257625",
+        "551119488257625"
+      ],
+      "commitIntervalNativeNs": [
+        "551119488746541",
+        "551119488975500"
+      ],
+      "domIntervalNativeNs": [
+        "551119488746541",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.717875,
+        "commitToDomMs": 6576.195042,
+        "eventToDomMs": 6576.683958
+      }
+    },
+    {
+      "observationId": "d093eef4-a1b8-478a-9bb6-b076e24d8c0e",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119531841791",
+        "551119531841791"
+      ],
+      "commitIntervalNativeNs": [
+        "551119532336750",
+        "551119532529500"
+      ],
+      "domIntervalNativeNs": [
+        "551119532336750",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.687709,
+        "commitToDomMs": 6532.604833,
+        "eventToDomMs": 6533.099792
+      }
+    },
+    {
+      "observationId": "71d5e2b6-fa96-4acf-a53c-02fda29eb7cb",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119572731875",
+        "551119572731875"
+      ],
+      "commitIntervalNativeNs": [
+        "551119573144041",
+        "551119577668416"
+      ],
+      "domIntervalNativeNs": [
+        "551119573144041",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 4.936541,
+        "commitToDomMs": 6491.797542,
+        "eventToDomMs": 6492.209708
+      }
+    },
+    {
+      "observationId": "4122b78d-bbde-4125-93e2-1dfe2d929d9e",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119623283208",
+        "551119623283208"
+      ],
+      "commitIntervalNativeNs": [
+        "551119623681541",
+        "551119623879125"
+      ],
+      "domIntervalNativeNs": [
+        "551119623681541",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.595917,
+        "commitToDomMs": 6441.260042,
+        "eventToDomMs": 6441.658375
+      }
+    },
+    {
+      "observationId": "67d2df01-43cd-44fa-be2a-dfc64f8c454c",
+      "source": "claude.hook",
+      "captureIntervalNativeNs": [
+        "551119672570000",
+        "551119672570000"
+      ],
+      "commitIntervalNativeNs": [
+        "551119672987375",
+        "551119673179708"
+      ],
+      "domIntervalNativeNs": [
+        "551119672987375",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.609708,
+        "commitToDomMs": 6391.954208,
+        "eventToDomMs": 6392.371583
+      }
+    },
+    {
+      "observationId": "f925cf3a-3bd3-4fd7-9d1f-9bc7d29b77e4",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551119926246291"
+      ],
+      "commitIntervalNativeNs": [
+        "551119928720166",
+        "551119929026625"
+      ],
+      "domIntervalNativeNs": [
+        "551119928720166",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 26666.582459,
+        "commitToDomMs": 6136.221417,
+        "eventToDomMs": 32802.497417
+      }
+    },
+    {
+      "observationId": "b67261b0-42d1-4e43-8ab3-013f66c3885d",
+      "source": "claude.observer",
+      "captureIntervalNativeNs": [
+        "551093262444166",
+        "551119926246291"
+      ],
+      "commitIntervalNativeNs": [
+        "551119928720166",
+        "551119929026625"
+      ],
+      "domIntervalNativeNs": [
+        "551119928720166",
+        "551126064941583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 26666.582459,
+        "commitToDomMs": 6136.221417,
+        "eventToDomMs": 32802.497417
+      }
+    }
+  ],
+  "F4Qualification": "INCOMPLETE; illustrative causal enclosures do not satisfy frozen precision and latency gates"
+}
