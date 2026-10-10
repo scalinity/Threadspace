@@ -1,5 +1,15 @@
 # Native qualification harness
 
+`m2-latency-native dev` acquires its own Dev UI and Terminal fixture, refuses an
+existing Dev UI, enables observer measurement only in its acquired mod copy,
+and uses 20 independently recorded conventional-hook invocations. This hook
+workload is deterministic; the observer runs in real Claude 2.1.295. Provider
+hooks are disabled only in this disposable measurement fixture to keep its
+declared hook population exact. The earlier real-Claude smoke covers that path.
+The exporter preserves raw clocks as unqualified and does not claim latency PASS.
+`tools/m2_hook_census.py --double-loss-index N` separately verifies that a known
+zero-output invocation remains missing from the independently issued denominator.
+
 `m2-native-replay dev` requires an existing absolute private directory in
 `THREADSPACE_M2_PRIVATE_EVIDENCE`. It opens the live Dev database read-only for
 SQLite backup, then uses the production Journal only on its exclusively created

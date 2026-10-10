@@ -47,12 +47,24 @@ fn write(run: &Run, name: &str, value: &Value) -> Result<(), String> {
 }
 
 pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
+    execute(ctx, false)
+}
+
+pub fn latency(ctx: &Ctx) -> Result<Value, String> {
+    execute(ctx, true)
+}
+
+fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
     if ctx.channel_name() != "dev" {
         return Err("observer native qualification is Dev-only".into());
     }
     let evidence = Run::create(
         &ctx.repo.join("evidence/M2/remediation-3"),
-        "observer-native",
+        if latency {
+            "latency-fixture"
+        } else {
+            "observer-native"
+        },
         "dev",
     )
     .map_err(|error| error.to_string())?;
@@ -87,7 +99,60 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     let mut reload_written = false;
     let mut smoke_pass = false;
     let mut reload_positive = false;
+    let manifest = std::path::Path::new(&activation.plugin_dir).join(".claude-plugin/plugin.json");
+    let manifest_original = std::fs::read(&manifest).map_err(|error| error.to_string())?;
+    let settings_original =
+        std::fs::read(&activation.settings).map_err(|error| error.to_string())?;
+    let mut latency_start = None;
+    let mut owned_ui = None;
     let operation = (|| -> Result<(), String> {
+        if latency {
+            // Never replace or terminate a UI acquired by another session.
+            if !ctx.app().processes().is_empty() {
+                return Err(
+                    "F4 needs an exclusively acquired Dev UI; existing UI left untouched".into(),
+                );
+            }
+            let mut cursor = ctx.companion().log();
+            let ui = ctx.app().launch_packaged(&[])?;
+            owned_ui = Some(ui.ui);
+            let hydrated = ctx
+                .app()
+                .wait_hydrated(&mut cursor, Duration::from_secs(30));
+            write(
+                &evidence,
+                "owned-ui.json",
+                &json!({"incarnation":owned_ui,"hydrated":hydrated}),
+            )?;
+            if hydrated.is_none() {
+                return Err("owned Dev UI did not hydrate".into());
+            }
+            let mut document: Value =
+                serde_json::from_slice(&manifest_original).map_err(|e| e.to_string())?;
+            document["userConfig"]["captureArgv"]["default"]
+                .as_array_mut()
+                .ok_or("missing owned capture argv")?
+                .push(json!("--qualification-latency"));
+            std::fs::write(
+                &manifest,
+                serde_json::to_vec_pretty(&document).map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+            // The hook denominator is an explicitly issued deterministic
+            // workload. Native Claude supplies the real observer population;
+            // ordinary provider hooks were separately exercised by the smoke.
+            let mut settings: Value =
+                serde_json::from_slice(&settings_original).map_err(|e| e.to_string())?;
+            settings["hooks"] = json!({});
+            std::fs::write(
+                &activation.settings,
+                serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+            let start = crate::m2_latency::begin(ctx)?;
+            write(&evidence, "latency-start.json", &start)?;
+            latency_start = start["runDirectory"].as_str().map(std::path::PathBuf::from);
+        }
         let idle = wait_for_idle(&ctx.native, 10.0, Duration::from_secs(180));
         write(&evidence, "idle-gate.json", &json!(idle))?;
         if !idle.satisfied {
@@ -215,6 +280,63 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
             "beforeNative":native,"afterNative":after,"sessionView":m2::session_view(ctx,native_id).ok()}),
         )?;
         smoke?;
+        if latency {
+            let output = evidence.dir.join("hook-issuance");
+            let helper = ctx
+                .id
+                .companion_executable
+                .parent()
+                .ok_or("no helper parent")?
+                .join("threadspace-hook");
+            let issued = run(
+                "/usr/bin/python3",
+                &[
+                    &ctx.repo
+                        .join("tests/native/tools/m2_hook_census.py")
+                        .display()
+                        .to_string(),
+                    "--helper",
+                    &helper.display().to_string(),
+                    "--out",
+                    &output.display().to_string(),
+                    "--journal",
+                    &ctx.id.agent.journal.display().to_string(),
+                    "--count",
+                    "20",
+                ],
+                Duration::from_secs(40),
+            );
+            write(
+                &evidence,
+                "hook-issuance-result.json",
+                &json!({"ok":issued.ok,"stdout":issued.stdout,"stderr":issued.stderr,"status":issued.status,"elapsedMs":issued.elapsed_ms}),
+            )?;
+            if !issued.ok {
+                return Err(
+                    "controlled independent hook issuance failed; raw evidence retained".into(),
+                );
+            }
+            {
+                let _gui = ctx.gui("m2 owned measured provider exit")?;
+                resource.tab.type_line("/exit");
+            }
+            let ended = m2::wait_view(ctx, native_id, Duration::from_secs(20), |view| {
+                format!("{:?}", view.execution_presence) == "Ended"
+            });
+            write(
+                &evidence,
+                "provider-close.json",
+                &json!({"observed":ended.as_ref().ok(),"error":ended.as_ref().err(),"journal":snapshot(ctx,&session)?}),
+            )?;
+            threadspace_harness::pause_ms(1000);
+            let dir = latency_start.as_ref().ok_or("no latency start")?;
+            write(
+                &evidence,
+                "latency-end.json",
+                &crate::m2_latency::end(ctx, dir)?,
+            )?;
+            return Ok(());
+        }
         let cursor: Value = serde_json::from_str(&m2::journal_query(
             ctx,
             "SELECT COALESCE(MAX(ingest_seq),0) AS n FROM observations",
@@ -297,6 +419,11 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     if reload_written {
         std::fs::write(&register, &original).map_err(|error| error.to_string())?;
     }
+    if latency {
+        std::fs::write(&manifest, &manifest_original).map_err(|error| error.to_string())?;
+        std::fs::write(&activation.settings, &settings_original)
+            .map_err(|error| error.to_string())?;
+    }
     let cleanup = owned.as_ref().map(|resource| resource.cleanup(ctx));
     let closed = !uncertain_open && cleanup.as_ref().is_none_or(|value| value["closed"] == true);
     let removal = if closed {
@@ -307,10 +434,11 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     let removed = removal
         .as_ref()
         .is_some_and(|result| result.as_ref().is_ok_and(|value| value["ok"] == true));
+    let ui_exit = owned_ui.as_ref().and_then(|ui| ctx.app().stop(ui, false));
     let summary = json!({"sourceCommit":git.stdout.trim(),"runDirectory":evidence.dir,"operationError":operation.err(),
         "nativeSmokePositive":smoke_pass,"reloadPositive":reload_positive,"cleanup":cleanup,
         "integrationRemoval":removal.map(|result|match result {Ok(value)=>value,Err(error)=>json!({"error":error})}),
-        "uncertainOpen":uncertain_open,"ownedResourcesClosed":closed&&removed,
+        "uncertainOpen":uncertain_open,"ownedResourcesClosed":closed&&removed,"ownedUiExitMs":ui_exit,"latencyRun":latency_start,
         "F1A":"INCOMPLETE until original ownership/control rows are independently assessed",
         "F1B":"INCOMPLETE until native causal/replay and negative rows are assessed"});
     if !closed {
