@@ -1,0 +1,210 @@
+{
+  "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+  "clock": "CLOCK_UPTIME_RAW",
+  "rows": [
+    {
+      "log": "instrumented-test-1.log",
+      "parent": {
+        "assertionElapsedMs": 161,
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "helperDiagnostics": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":19458305366875,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":41110,\"stamps\":{\"initializationCompletedNs\":19458249494791,\"locatorReadNs\":19458250777125,\"mainEntryNs\":19458249309333,\"modBatchEntryNs\":19458249503166,\"receiptReadyNs\":19458305339000,\"stdoutFlushCompletedNs\":19458305363583}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":19458305495458,\"kind\":\"qualification-startup-emitted\"}\n",
+        "kind": "qualification-startup-parent",
+        "parentLaunchRequestNs": 19458144171791,
+        "parentReapNs": 19458305971833,
+        "successfulSpawnReturnNs": 19458144506166
+      },
+      "assertionElapsedMs": 161,
+      "assertionPass": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 19458305366875,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 41110,
+        "stamps": {
+          "initializationCompletedNs": 19458249494791,
+          "locatorReadNs": 19458250777125,
+          "mainEntryNs": 19458249309333,
+          "modBatchEntryNs": 19458249503166,
+          "receiptReadyNs": 19458305339000,
+          "stdoutFlushCompletedNs": 19458305363583
+        }
+      },
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 19458305495458,
+        "kind": "qualification-startup-emitted"
+      },
+      "phaseMs": {
+        "launchToMain": 105.137542,
+        "spawnCall": 0.334375,
+        "mainToInitialized": 0.185458,
+        "initializedToModBatch": 0.008375,
+        "modBatchToLocator": 1.273959,
+        "locatorToReceiptReady": 54.561875,
+        "receiptReadyToFlush": 0.024583,
+        "flushToReap": 0.60825,
+        "diagnosticEmission": 0.128583,
+        "launchToReap": 161.800042
+      },
+      "finalProcessExitNs": null,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit."
+    },
+    {
+      "log": "instrumented-test-2.log",
+      "parent": {
+        "assertionElapsedMs": 12,
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "helperDiagnostics": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":19458324243666,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":41156,\"stamps\":{\"initializationCompletedNs\":19458314434708,\"locatorReadNs\":19458315443333,\"mainEntryNs\":19458314401666,\"modBatchEntryNs\":19458314436166,\"receiptReadyNs\":19458324229208,\"stdoutFlushCompletedNs\":19458324240958}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":19458324332666,\"kind\":\"qualification-startup-emitted\"}\n",
+        "kind": "qualification-startup-parent",
+        "parentLaunchRequestNs": 19458312667291,
+        "parentReapNs": 19458324684333,
+        "successfulSpawnReturnNs": 19458312867708
+      },
+      "assertionElapsedMs": 12,
+      "assertionPass": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 19458324243666,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 41156,
+        "stamps": {
+          "initializationCompletedNs": 19458314434708,
+          "locatorReadNs": 19458315443333,
+          "mainEntryNs": 19458314401666,
+          "modBatchEntryNs": 19458314436166,
+          "receiptReadyNs": 19458324229208,
+          "stdoutFlushCompletedNs": 19458324240958
+        }
+      },
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 19458324332666,
+        "kind": "qualification-startup-emitted"
+      },
+      "phaseMs": {
+        "launchToMain": 1.734375,
+        "spawnCall": 0.200417,
+        "mainToInitialized": 0.033042,
+        "initializedToModBatch": 0.001458,
+        "modBatchToLocator": 1.007167,
+        "locatorToReceiptReady": 8.785875,
+        "receiptReadyToFlush": 0.01175,
+        "flushToReap": 0.443375,
+        "diagnosticEmission": 0.089,
+        "launchToReap": 12.017042
+      },
+      "finalProcessExitNs": null,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit."
+    },
+    {
+      "log": "clean-instrumented-test.log",
+      "parent": {
+        "assertionElapsedMs": 289,
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "helperDiagnostics": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":19944937081916,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":41518,\"stamps\":{\"initializationCompletedNs\":19944928410000,\"locatorReadNs\":19944929965458,\"mainEntryNs\":19944928223833,\"modBatchEntryNs\":19944928420125,\"receiptReadyNs\":19944937058708,\"stdoutFlushCompletedNs\":19944937079166}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":19944937154375,\"kind\":\"qualification-startup-emitted\"}\n",
+        "kind": "qualification-startup-parent",
+        "parentLaunchRequestNs": 19944648278333,
+        "parentReapNs": 19944937489083,
+        "successfulSpawnReturnNs": 19944648515625
+      },
+      "assertionElapsedMs": 289,
+      "assertionPass": false,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 19944937081916,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 41518,
+        "stamps": {
+          "initializationCompletedNs": 19944928410000,
+          "locatorReadNs": 19944929965458,
+          "mainEntryNs": 19944928223833,
+          "modBatchEntryNs": 19944928420125,
+          "receiptReadyNs": 19944937058708,
+          "stdoutFlushCompletedNs": 19944937079166
+        }
+      },
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 19944937154375,
+        "kind": "qualification-startup-emitted"
+      },
+      "phaseMs": {
+        "launchToMain": 279.9455,
+        "spawnCall": 0.237292,
+        "mainToInitialized": 0.186167,
+        "initializedToModBatch": 0.010125,
+        "modBatchToLocator": 1.545333,
+        "locatorToReceiptReady": 7.09325,
+        "receiptReadyToFlush": 0.020458,
+        "flushToReap": 0.409917,
+        "diagnosticEmission": 0.072459,
+        "launchToReap": 289.21075
+      },
+      "finalProcessExitNs": null,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit."
+    },
+    {
+      "log": "clean-instrumented-repeat.log",
+      "parent": {
+        "assertionElapsedMs": 13,
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "helperDiagnostics": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":19969199279625,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":56124,\"stamps\":{\"initializationCompletedNs\":19969188648291,\"locatorReadNs\":19969189994291,\"mainEntryNs\":19969188610500,\"modBatchEntryNs\":19969188650458,\"receiptReadyNs\":19969199268750,\"stdoutFlushCompletedNs\":19969199277250}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":19969199354708,\"kind\":\"qualification-startup-emitted\"}\n",
+        "kind": "qualification-startup-parent",
+        "parentLaunchRequestNs": 19969186586166,
+        "parentReapNs": 19969199677916,
+        "successfulSpawnReturnNs": 19969186784208
+      },
+      "assertionElapsedMs": 13,
+      "assertionPass": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 19969199279625,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 56124,
+        "stamps": {
+          "initializationCompletedNs": 19969188648291,
+          "locatorReadNs": 19969189994291,
+          "mainEntryNs": 19969188610500,
+          "modBatchEntryNs": 19969188650458,
+          "receiptReadyNs": 19969199268750,
+          "stdoutFlushCompletedNs": 19969199277250
+        }
+      },
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 19969199354708,
+        "kind": "qualification-startup-emitted"
+      },
+      "phaseMs": {
+        "launchToMain": 2.024334,
+        "spawnCall": 0.198042,
+        "mainToInitialized": 0.037791,
+        "initializedToModBatch": 0.002167,
+        "modBatchToLocator": 1.343833,
+        "locatorToReceiptReady": 9.274459,
+        "receiptReadyToFlush": 0.0085,
+        "flushToReap": 0.400666,
+        "diagnosticEmission": 0.075083,
+        "launchToReap": 13.09175
+      },
+      "finalProcessExitNs": null,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit."
+    }
+  ]
+}

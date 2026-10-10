@@ -1,0 +1,55 @@
+{
+  "disposition": "CLOCK QUALIFICATION CAPABILITY BLOCKED",
+  "installedProviderVersion": "2.1.295",
+  "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+  "retainedInstalledRuntimeEvidence": "evidence/M2/remediation-5/f4/analysis/installed-clock-audit.json",
+  "embeddedRuntime": {
+    "name": "Bun",
+    "version": "1.4.3",
+    "revision": "eecfd55debb281c3fe3518098b1a49f76429637c"
+  },
+  "osBuild": "26B5101f",
+  "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+  "WebKitBundleVersion": "22625.2.7.1",
+  "installedDeclarationIdentity": {
+    "version": "2.1.295",
+    "sha256": "e2e13b2ceb80ff3cde49d8427ebe19c782a24caa817c7b20c56f91925a06f9cb",
+    "lines": 21463,
+    "retainedComparison": "evidence/M2/provider/claude/declarations.json",
+    "fullFileAvailableInBoundedLocalLookup": false
+  },
+  "publicDeclarationVersion": "2.1.277",
+  "sources": [
+    {
+      "url": "https://code.claude.com/docs/en/plugins/mods/api",
+      "finding": "Host APIs provide mediated process, filesystem and HTTP operations; process.run completes asynchronously at process termination."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/plugins/mods/reference",
+      "finding": "No boot-tagged native callback timestamp or counter mapping is documented in the supported API inventory."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/mods/types/claude-code.d.ts",
+      "finding": "Older public declarations: clock.now returns an asynchronous epoch-millisecond number; performance.now supplies a synchronous number without native mapping. Not the installed 2.1.295 declaration certificate."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/plugins/mods/create",
+      "finding": "Exact installed declarations govern over public documentation; no inference session or VM escape was used to recover missing local type files."
+    }
+  ],
+  "supportedSynchronousBootTaggedCallbackMarker": "NOT_ESTABLISHED",
+  "supportedFiniteNativeCausalEnclosure": true,
+  "causalLimitation": "Native marker acknowledged before a callback supplies a lower endpoint; native receipt after capture supplies an upper endpoint. A post-capture operation alone does not supply the required nearby lower endpoint for an early callback. Full intervals include scheduling, startup and queue waits.",
+  "closestRetainedNativeEnclosuresMs": {
+    "observerCaptureToCommitP95Upper": 26666.582459,
+    "commitToDomP95Upper": 26363.948375,
+    "source": "evidence/M2/remediation-5/f4/analysis/causal-enclosures.json"
+  },
+  "empiricalCalibrationIsMaximumRateProof": false,
+  "qualified": false,
+  "maximumRateErrorPpm": null,
+  "precisionNs": null,
+  "newHostOrWebKitRuntimeExperiment": "NOT_RUN",
+  "minimumCapability": "Provider-supported engine-origin native before-dispatch stamp or a vendor-supported finite native clock/rate/precision mapping for installed performance.now. Native DOM acknowledgement can provide the upper endpoint; helper entry cannot substitute for observer callback capture.",
+  "ownerDecision": "Retain callback-entry capture and require that native provider capability, or explicitly commission a separate measurement-contract amendment if it cannot be obtained. No endpoint shift or criterion waiver is applied."
+}

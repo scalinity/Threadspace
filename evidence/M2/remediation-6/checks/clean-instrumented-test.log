@@ -1,0 +1,16 @@
+
+running 1 test
+test a_batch_without_a_companion_is_spooled_and_answered_within_its_budget ... {"assertionElapsedMs":289,"bootId":"B25EE6BF-6973-4B99-9543-E37EF1A59C87","clock":"CLOCK_UPTIME_RAW","helperDiagnostics":"{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":19944937081916,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":41518,\"stamps\":{\"initializationCompletedNs\":19944928410000,\"locatorReadNs\":19944929965458,\"mainEntryNs\":19944928223833,\"modBatchEntryNs\":19944928420125,\"receiptReadyNs\":19944937058708,\"stdoutFlushCompletedNs\":19944937079166}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":19944937154375,\"kind\":\"qualification-startup-emitted\"}\n","kind":"qualification-startup-parent","parentLaunchRequestNs":19944648278333,"parentReapNs":19944937489083,"successfulSpawnReturnNs":19944648515625}
+
+thread 'a_batch_without_a_companion_is_spooled_and_answered_within_its_budget' (2862579) panicked at crates/relay/tests/mod_batch.rs:84:5:
+answered in 289 ms
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    a_batch_without_a_companion_is_spooled_and_answered_within_its_budget
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.29s
+

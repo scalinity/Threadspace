@@ -1,0 +1,37 @@
+{
+  "qualificationSource": "1176253fe7871d20b7b3c4c34a2962e2ae76d776",
+  "scanFileCount": 22,
+  "credentialAndPrivatePathHits": [],
+  "classification": {
+    "bootIdsAndPids": "real functional measurement identifiers",
+    "receiptAndSessionFixtureIds": "synthetic fixture identifiers",
+    "sourceAndExecutableHashes": "real functional provenance",
+    "codeAndSourcePaths": "repository-relative functional references",
+    "rawProviderContent": "not acquired in this unit",
+    "rawBinariesAndDisposableSpools": "retained outside Git"
+  },
+  "protectedComparisonSource": "2562d6226e623243dbe83ab208c808dba80ed1cf",
+  "protectedComparisonExit": 0,
+  "protectedPaths": [
+    "docs/SPEC.md",
+    "docs/MILESTONES.md",
+    "docs/decisions/D-0009-claude-2.1.295-observer-requalification.md",
+    "docs/decisions/D-0010-reducer-4-checkpoint-migration.md",
+    "evidence/M2/remediation-4",
+    "evidence/M2/remediation-5",
+    "packages/provider-mod",
+    "crates/relay/src/spool.rs",
+    "crates/relay/src/modbatch.rs",
+    "crates/journal",
+    "apps"
+  ],
+  "specAndMilestonesChanged": false,
+  "productRepairInstalled": false,
+  "new41RecordCampaign": false,
+  "orchestrationFileExists": false,
+  "sameInodeQualification": "Disposable acquired copies have before/after identity; clean-source test hash before/after, inode observed after repeat only.",
+  "wallBudgetVerdict": "FAIL_PRESERVED_CLEAN_SOURCE_289_MS",
+  "clockVerdict": "CLOCK QUALIFICATION CAPABILITY BLOCKED",
+  "checksAdded": "qualification-only feature exclusion and two-test suite",
+  "allDocsAndPriorEvidenceUnchanged": true
+}
