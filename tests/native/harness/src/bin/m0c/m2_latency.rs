@@ -59,8 +59,8 @@ pub fn begin(ctx: &Ctx) -> Result<Value, String> {
     let provenance = json!({
         "environment": ctx.environment(),
         "helperSha256": ctx.id.companion_executable.parent().and_then(|dir| sha256_file(&dir.join("threadspace-hook"))),
-        "head": threadspace_harness::run::run("git", &["rev-parse", "HEAD"], std::time::Duration::from_secs(5)).stdout.trim(),
-        "gitStatus": threadspace_harness::run::run("git", &["status", "--porcelain"], std::time::Duration::from_secs(5)).stdout,
+        "head": threadspace_harness::run::run("/usr/bin/git", &["rev-parse", "HEAD"], std::time::Duration::from_secs(5)).stdout.trim(),
+        "gitStatus": threadspace_harness::run::run("/usr/bin/git", &["status", "--porcelain"], std::time::Duration::from_secs(5)).stdout,
     });
     let value = json!({
         "kind": "M2_LATENCY_START", "schemaVersion": 2,

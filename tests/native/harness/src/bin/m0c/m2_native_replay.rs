@@ -47,7 +47,22 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     let mut journal = Journal::open(&db, "m2-native-copy-replay", threadspace_harness::now_ms())
         .map_err(|e| e.to_string())?;
     let recovered = state_hash(journal.canonical_state());
-    let genesis = state_hash(&journal.replay_from_genesis().map_err(|e| e.to_string())?);
+    let genesis_state = journal.replay_from_genesis().map_err(|e| e.to_string())?;
+    let genesis = state_hash(&genesis_state);
+    if recovered != genesis {
+        // Full state stays private. Keep the failed full-hash oracle intact
+        // while permitting exact diagnosis of legacy-baseline differences.
+        std::fs::write(
+            root.join("recovered-state.json"),
+            serde_json::to_vec_pretty(journal.canonical_state()).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+        std::fs::write(
+            root.join("genesis-state.json"),
+            serde_json::to_vec_pretty(&genesis_state).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+    }
     let digest = journal.replay_digest().map_err(|e| e.to_string())?;
     let differences = journal
         .projection_differences()
@@ -65,7 +80,7 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
         && recovered == digest.state_sha256
         && digest.projection_sha256 == digest.tables_sha256
         && differences.is_empty();
-    let value = json!({"sourceCommit":run("git", &["rev-parse","HEAD"], Duration::from_secs(3)).stdout.trim(),
+    let value = json!({"sourceCommit":run("/usr/bin/git", &["rev-parse","HEAD"], Duration::from_secs(3)).stdout.trim(),
         "harnessSha256":std::env::current_exe().ok().as_deref().and_then(sha256_file),
         "liveSourceOpenedReadOnly":true,"copy":root,"backupSha256":backup_hash,
         "backupIntegrity":"ok","recoveredStateSha256":recovered,"genesisStateSha256":genesis,

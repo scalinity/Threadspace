@@ -92,6 +92,31 @@ def verify(ledger, db):
             "complete": ledger["closed"] and ledger["allChildrenExited"] and len(joins) == ledger["expectedIssued"] and len(rows) == len(joins)}
 
 
+def attach(raw_path, ledger_path, census):
+    raw = json.loads(raw_path.read_text())
+    ids = sorted(r["observationId"] for r in census["joins"])
+    captured = sorted(r["observationId"] for r in raw["helperRecords"] if r.get("kind") == "hook-capture")
+    if not census["complete"] or captured != ids or len(ids) != len(set(ids)):
+        raise ValueError("independent issued population does not exactly cover native hook telemetry")
+    if any(r.get("source") == "claude.hook" for r in raw["populationSeals"]):
+        raise ValueError("raw already has a hook seal")
+    seal = {"source": "claude.hook", "bootId": raw["bootId"], "boundary": "CLOSED_CAPTURE_WINDOW",
+            "sourceBoundary": "ALL_INDEPENDENTLY_ISSUED_CHILDREN_EXITED", "sealed": True,
+            "totalCaptured": census["independentExpectedIssued"], "telemetryFailures": 0,
+            "observationIdsSha256": hashlib.sha256("\n".join(ids).encode()).hexdigest(),
+            "evidence": [{"issuanceLedger": str(ledger_path),
+                          "issuanceLedgerSha256": hashlib.sha256(ledger_path.read_bytes()).hexdigest(),
+                          "census": census}]}
+    raw["populationSeals"].append(seal)
+    raw["hookPopulationCensus"] = census
+    raw["derivedFrom"] = {"rawSha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),
+                          "change": "join independently issued hook census; clock remains unqualified"}
+    output = raw_path.with_name("raw-with-hook-census.json")
+    if output.exists():
+        raise ValueError("derived raw result already exists; preserve it")
+    write(output, raw)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--helper", type=Path, required=True)
@@ -99,17 +124,26 @@ def main():
     parser.add_argument("--journal", type=Path, required=True)
     parser.add_argument("--count", type=int, default=20)
     parser.add_argument("--double-loss-index", type=int)
+    parser.add_argument("--attach-raw", type=Path)
     args = parser.parse_args()
     if not args.helper.is_absolute() or not args.helper.is_file() or args.count < 1 or args.count > 100:
         raise SystemExit("absolute installed helper and count 1..100 required")
     if args.double_loss_index is not None and not 0 <= args.double_loss_index < args.count:
         raise SystemExit("invalid double-loss index")
-    args.out.mkdir(mode=0o700, parents=False, exist_ok=False)
-    ledger = issue(args.helper, args.out, args.count, args.double_loss_index)
+    if args.attach_raw:
+        ledger = json.loads((args.out / "issuance.json").read_text())
+        if ledger["helperSha256"] != hashlib.sha256(args.helper.read_bytes()).hexdigest():
+            raise SystemExit("helper changed since independently issued workload")
+    else:
+        args.out.mkdir(mode=0o700, parents=False, exist_ok=False)
+        ledger = issue(args.helper, args.out, args.count, args.double_loss_index)
     census = verify(ledger, args.journal)
     census.update({"fixtureKind": "controlled native conventional-hook issuance; not real inference",
                    "issuanceLedgerSha256": hashlib.sha256((args.out / "issuance.json").read_bytes()).hexdigest()})
-    write(args.out / "census.json", census)
+    if args.attach_raw:
+        attach(args.attach_raw, args.out / "issuance.json", census)
+    else:
+        write(args.out / "census.json", census)
     print(json.dumps({k: census[k] for k in ["independentExpectedIssued", "actualIssued", "joinedAccepted", "missingInvocations", "complete"]}))
     if args.double_loss_index is not None:
         assert len(census["missingInvocations"]) == 1 and census["missingInvocations"][0]["index"] == args.double_loss_index and not census["complete"]
