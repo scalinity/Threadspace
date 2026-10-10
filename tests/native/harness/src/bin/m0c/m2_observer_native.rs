@@ -46,6 +46,10 @@ fn write(run: &Run, name: &str, value: &Value) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
+fn integration_removed(value: &Value) -> bool {
+    value["ok"] == true && value["detail"]["complete"] == true
+}
+
 pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     execute(ctx, false)
 }
@@ -416,13 +420,17 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
         restored?;
         Ok(())
     })();
-    if reload_written {
-        std::fs::write(&register, &original).map_err(|error| error.to_string())?;
+    let mut restoration_errors = Vec::new();
+    if reload_written && let Err(error) = std::fs::write(&register, &original) {
+        restoration_errors.push(format!("owned register restoration: {error}"));
     }
     if latency {
-        std::fs::write(&manifest, &manifest_original).map_err(|error| error.to_string())?;
-        std::fs::write(&activation.settings, &settings_original)
-            .map_err(|error| error.to_string())?;
+        if let Err(error) = std::fs::write(&manifest, &manifest_original) {
+            restoration_errors.push(format!("owned manifest restoration: {error}"));
+        }
+        if let Err(error) = std::fs::write(&activation.settings, &settings_original) {
+            restoration_errors.push(format!("owned settings restoration: {error}"));
+        }
     }
     let cleanup = owned.as_ref().map(|resource| resource.cleanup(ctx));
     let closed = !uncertain_open && cleanup.as_ref().is_none_or(|value| value["closed"] == true);
@@ -433,12 +441,13 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
     };
     let removed = removal
         .as_ref()
-        .is_some_and(|result| result.as_ref().is_ok_and(|value| value["ok"] == true));
+        .is_some_and(|result| result.as_ref().is_ok_and(integration_removed));
     let ui_exit = owned_ui.as_ref().and_then(|ui| ctx.app().stop(ui, false));
     let summary = json!({"sourceCommit":git.stdout.trim(),"runDirectory":evidence.dir,"operationError":operation.err(),
         "nativeSmokePositive":smoke_pass,"reloadPositive":reload_positive,"cleanup":cleanup,
         "integrationRemoval":removal.map(|result|match result {Ok(value)=>value,Err(error)=>json!({"error":error})}),
-        "uncertainOpen":uncertain_open,"ownedResourcesClosed":closed&&removed,"ownedUiExitMs":ui_exit,"latencyRun":latency_start,
+        "uncertainOpen":uncertain_open,"ownedResourcesClosed":closed&&removed,
+        "restorationErrors":restoration_errors,"ownedUiExitMs":ui_exit,"latencyRun":latency_start,
         "F1A":"INCOMPLETE until original ownership/control rows are independently assessed",
         "F1B":"INCOMPLETE until native causal/replay and negative rows are assessed"});
     if !closed {
@@ -446,4 +455,26 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
     }
     write(&evidence, "summary.json", &summary)?;
     Ok(summary)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn partial_uninstall_never_reports_all_acquired_resources_closed() {
+        assert!(!integration_removed(
+            &json!({"ok":true,"detail":{"complete":false,"retainedRecord":"owned"}})
+        ));
+        assert!(!integration_removed(
+            &json!({"ok":false,"detail":{"complete":true}})
+        ));
+        assert!(!integration_removed(&json!({"ok":true,"detail":{}})));
+        assert!(integration_removed(
+            &json!({"ok":true,"detail":{"complete":true}})
+        ));
+        assert!(!integration_removed(
+            &json!({"ok":true,"detail":{"installed":false}})
+        ));
+    }
 }
