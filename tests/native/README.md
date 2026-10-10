@@ -19,6 +19,9 @@ or pass the latency gate. These are comparison runs, not a telemetry-free
 measurement of certified product latency. The flags are confined to the Dev
 qualification helper and acquired mod copy. New F4 collector/fixture runs go
 under `evidence/M2/remediation-4/f4/`; previous evidence is left intact.
+Phase mode also retains bounded host rejection metadata and best-effort native
+progress files before delivery and after receipt. Progress files are unsynced
+diagnostics; they establish neither durable acceptance nor a census seal.
 
 `m2-native-replay dev` requires an existing absolute private directory in
 `THREADSPACE_M2_PRIVATE_EVIDENCE`. It opens the live Dev database read-only for

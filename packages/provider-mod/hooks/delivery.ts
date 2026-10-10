@@ -172,8 +172,14 @@ export function createDelivery(argv: readonly string[] | undefined, sourceEpoch:
         }
         isDelivered = accepted.size === batch.length
       }
-    } catch {
+    } catch (error) {
       // A rejected run (timeout, no such executable) is not acceptance.
+      if (measured && argv.includes('--qualification-phases')) {
+        try {
+          measured.failure = { name: error instanceof Error ? error.name.slice(0, 64) : 'non-Error rejection',
+            message: error instanceof Error ? error.message.slice(0, 256) : String(error).slice(0, 256) }
+        } catch { /* optional diagnostic never changes provider behavior */ }
+      }
       if (measurement && measured && !measurementFinished) {
         // Keep failed subprocess attempts in the same measurement ledger;
         // this metadata has no effect on the unchanged UUID retry queue.

@@ -13,7 +13,7 @@ export const MEASUREMENT_LIMITS = {
   receiptBytes: 4096,
 } as const
 
-export type BatchMeasurement = { beginMs: number; ids: readonly string[] }
+export type BatchMeasurement = { beginMs: number; ids: readonly string[]; failure?: { name: string; message: string } }
 export type DeliveryMeasurement = {
   capture: (id: string) => void
   begin: (ids: readonly string[]) => BatchMeasurement
@@ -147,7 +147,11 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
             status: statuses?.get(observationId) ?? 'UNKNOWN' })),
           ...(argv.includes('--qualification-phases') && result ? {
             helperPhases: (JSON.parse(result.stdout) as { qualificationPhases?: unknown }).qualificationPhases ?? null,
+            processResult: { exitCode: result.exitCode, isStdoutTruncated: result.isStdoutTruncated,
+              isStderrTruncated: result.isStderrTruncated, stdoutBytes: new TextEncoder().encode(result.stdout).length,
+              stderrBytes: new TextEncoder().encode(result.stderr).length },
           } : {}),
+          ...(argv.includes('--qualification-phases') && batch.failure ? { processFailure: batch.failure } : {}),
         }
         if (exporting || closed) { failedExports += 1; return }
         ownExport = (async () => {

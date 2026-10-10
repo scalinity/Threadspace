@@ -360,6 +360,25 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
         .and_then(|locator| locator.events_socket)
         .map(PathBuf::from);
     phase!("locatorReadNs");
+    #[cfg(feature = "qualification")]
+    let progress = |stamps: &serde_json::Map<String, serde_json::Value>, stage: &str| {
+        if stamps.is_empty() { return; }
+        let Some(boot) = context.boot_id.as_deref() else { return; };
+        let Some(at) = monotonic_ns() else { return; };
+        let Ok(request) = serde_json::from_slice::<modbatch::ModBatchRequest>(&stdin) else { return; };
+        // An independent, best-effort diagnostic file survives a lost host
+        // response. It has no admission or census authority and is not synced.
+        let ids: Vec<_> = request.records.iter().take(64)
+            .filter_map(|record| record["observationId"].as_str()).collect();
+        let _ = threadspace_relay::latency::save_phase_probe(&store, &serde_json::json!({
+            "kind": "helper-phase-probe", "schemaVersion": 1, "clock": "CLOCK_UPTIME_RAW",
+            "bootId": boot, "monotonicNs": at.to_string(), "runtimeId": request.source_epoch,
+            "helperPid": std::process::id(), "stage": stage, "observationIds": ids,
+            "helperPhaseStamps": stamps, "helperElapsedMs": started.elapsed().as_secs_f64() * 1000.0,
+        }));
+    };
+    #[cfg(feature = "qualification")]
+    progress(&phases, "initialized");
     let mut sink = LiveSink {
         socket,
         spool: Spool::at(&store),
@@ -381,6 +400,8 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
     }
     let receipt: ModBatchReceipt = modbatch::answer(&stdin, &context, &mut sink, delivery, deadline);
     phase!("receiptReceivedNs");
+    #[cfg(feature = "qualification")]
+    progress(&phases, "receipt-received");
     match fault.as_deref() {
         Some("malformed") => (Some(br#"{"receiptVersion":1,"results":"malformed"}"#.to_vec()), 0),
         Some("exit1") => (serde_json::to_vec(&receipt).ok(), 1),

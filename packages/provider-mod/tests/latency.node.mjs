@@ -244,10 +244,12 @@ test('the bounded close deadline aborts a slow export without provider rejection
 });
 
 test('real delivery timeout retains the same UUID and measurement cannot manufacture acceptance', async () => {
+  for (const diagnostic of [false, true]) {
+  const configured = diagnostic ? [...argv, '--qualification-phases'] : argv;
   let tries = 0;
   const fixture = backend(async call => { if (call.argv[1] === 'mod-batch' && tries++ === 0) throw new Error('actual helper timed out'); });
-  const measurement = collector();
-  const delivery = createDelivery(argv, runtime, measurement);
+  const measurement = createLatencyMeasurement(configured, runtime);
+  const delivery = createDelivery(configured, runtime, measurement);
   delivery.bind(fixture.io);
   measurement.capture(id(0));
   delivery.enqueue(id(0), { observationId: id(0) }, false);
@@ -259,10 +261,13 @@ test('real delivery timeout retains the same UUID and measurement cannot manufac
   assert.equal(batches.length, 2);
   assert.equal(batches[0].body.records[0].observationId, batches[1].body.records[0].observationId);
   assert.equal(fixture.saved.filter(body => body.kind === 'observer-clock-bracket')[0].records[0].status, 'UNKNOWN');
+  const failure = fixture.saved.filter(body => body.kind === 'observer-clock-bracket')[0].processFailure;
+  assert.deepEqual(failure, diagnostic ? { name: 'Error', message: 'actual helper timed out' } : undefined);
   await delivery.drainOnEnd();
   assert.equal(fixture.calls.filter(call => call.argv[1] === 'mod-batch').length, 2, 'only actual COMMITTED removed the queued record');
   await measurement.finalize(fixture.io);
   assert.equal(fixture.saved.find(body => body.kind === 'observer-census-close').totalCaptured, 1);
+  }
 });
 
 test('optional measurement throwing leaves successful canonical delivery behavior unchanged', async () => {

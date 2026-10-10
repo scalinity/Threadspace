@@ -211,6 +211,9 @@ pub fn end(ctx: &Ctx, directory: &Path) -> Result<Value, String> {
             Some("helper-receipt") => value["token"]
                 .as_str()
                 .is_some_and(|token| tokens.contains(token)),
+            // Diagnostic progress never establishes a runtime population or
+            // an observer seal. Include only native points in this run window.
+            Some("helper-phase-probe") => value["bootId"] == boot && in_window(&value["monotonicNs"]),
             Some("observer-clock-bracket") => value["runtimeId"]
                 .as_str()
                 .is_some_and(|epoch| epochs.contains(epoch)),

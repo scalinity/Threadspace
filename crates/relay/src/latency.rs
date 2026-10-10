@@ -42,6 +42,10 @@ struct ObserverBracket {
     records: Vec<Record>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     helper_phases: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    process_result: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    process_failure: Option<serde_json::Value>,
 }
 
 fn uuid(value: &str) -> bool {
@@ -127,6 +131,21 @@ fn measurement_dir(store: &Path) -> io::Result<PathBuf> {
     let dir = root.join("m2-latency");
     private_dir(&dir)?;
     Ok(dir)
+}
+
+/// Best-effort Dev diagnostic progress, deliberately without fsync. It is
+/// never a receipt, durable admission or positive population close witness.
+pub fn save_phase_probe(store: &Path, value: &serde_json::Value) -> bool {
+    let save = || -> io::Result<()> {
+        let bytes = serde_json::to_vec(value)?;
+        if bytes.len() > MAX_BYTES { return Err(io::Error::other("phase probe too large")); }
+        let dir = measurement_dir(store)?;
+        if fs::read_dir(&dir)?.take(MAX_FILES).count() >= MAX_FILES { return Err(io::Error::other("phase collector full")); }
+        let mut file = OpenOptions::new().write(true).create_new(true).mode(0o600)
+            .custom_flags(libc::O_NOFOLLOW).open(dir.join(format!("phase-{}.json", uuid::Uuid::new_v4())))?;
+        file.write_all(&bytes)
+    };
+    save().is_ok()
 }
 
 fn save_named(store: &Path, name: &str, bytes: &[u8]) -> io::Result<()> {
