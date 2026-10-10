@@ -315,6 +315,25 @@ fn latency_store(args: &[String]) -> Option<PathBuf> {
 
 /// The answer and the exit status to leave with.
 fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
+    // Dev-only phase evidence; ordinary capture and release artifacts do not
+    // depend on these stamps or on optional measurement persistence.
+    #[cfg(feature = "qualification")]
+    let mut phases = serde_json::Map::new();
+    #[cfg(feature = "qualification")]
+    macro_rules! phase {
+        ($name:literal) => {
+            if arg(args, "--agent").as_deref() == Some("ai.scalinity.threadspace.dev.agent")
+                && arg(args, "--store-dir").is_none()
+                && args.iter().any(|arg| arg == "--qualification-phases") {
+                if let Some(ns) = monotonic_ns() {
+                    phases.insert($name.into(), serde_json::json!(ns.to_string()));
+                }
+            }
+        };
+    }
+    #[cfg(not(feature = "qualification"))]
+    macro_rules! phase { ($name:literal) => {}; }
+    phase!("modBatchEntryNs");
     let budget = arg(args, "--budget-ms")
         .and_then(|ms| ms.parse::<u64>().ok())
         .map_or(WALL_BUDGET_MS, |ms| ms.min(WALL_BUDGET_MS));
@@ -324,7 +343,9 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
         late();
     }
     let Some(store) = store_dir(args) else { return (None, 0) };
+    phase!("storeResolvedNs");
     let Some(stdin) = read_stdin(2 * FRAME_MAX_BYTES) else { return (None, 0) };
+    phase!("stdinReadNs");
     let home = arg(args, "--home").map(PathBuf::from).or_else(home_dir);
     let Some(home) = home else { return (None, 0) };
     let boot = process::boot_session_id().ok();
@@ -333,10 +354,12 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
         evidence: provider_evidence(boot.as_deref().unwrap_or_default()),
         boot_id: boot,
     };
+    phase!("providerContextNs");
     let socket = locator::read(&store.join("runtime-locator.json"))
         .ok()
         .and_then(|locator| locator.events_socket)
         .map(PathBuf::from);
+    phase!("locatorReadNs");
     let mut sink = LiveSink {
         socket,
         spool: Spool::at(&store),
@@ -357,16 +380,40 @@ fn mod_batch(args: &[String], started: Instant) -> (Option<Vec<u8>>, i32) {
         return (None, 0);
     }
     let receipt: ModBatchReceipt = modbatch::answer(&stdin, &context, &mut sink, delivery, deadline);
+    phase!("receiptReceivedNs");
     match fault.as_deref() {
         Some("malformed") => (Some(br#"{"receiptVersion":1,"results":"malformed"}"#.to_vec()), 0),
         Some("exit1") => (serde_json::to_vec(&receipt).ok(), 1),
         _ => {
             #[cfg(feature = "qualification")]
-            if let (Some(store), Some(boot), Some(stamp)) = (latency_store(args), context.boot_id.as_deref(), monotonic_ns())
-                && let Some(annotated) = threadspace_relay::latency::annotate_receipt(&store, &receipt, &stdin, boot, stamp) {
-                return (Some(annotated), 0);
+            let mut response = serde_json::to_vec(&receipt).ok();
+            #[cfg(not(feature = "qualification"))]
+            let response = serde_json::to_vec(&receipt).ok();
+            phase!("measurementBeginNs");
+            #[cfg(feature = "qualification")]
+            if !args.iter().any(|arg| arg == "--qualification-without-receipt-telemetry")
+                && let (Some(store), Some(boot), Some(stamp)) = (latency_store(args), context.boot_id.as_deref(), monotonic_ns())
+                && let Some(annotated) = threadspace_relay::latency::annotate_receipt_with_phases(
+                    &store, &receipt, &stdin, boot, stamp,
+                    (!phases.is_empty()).then_some(&phases),
+                ) {
+                response = Some(annotated);
             }
-            (serde_json::to_vec(&receipt).ok(), 0)
+            phase!("measurementFinishedNs");
+            #[cfg(feature = "qualification")]
+            if !phases.is_empty() && let Some(bytes) = &response
+                && let Ok(mut value) = serde_json::from_slice::<serde_json::Value>(bytes) {
+                phase!("answerReadyNs");
+                value["qualificationPhases"] = serde_json::json!({
+                    "clock": "CLOCK_UPTIME_RAW", "bootId": context.boot_id,
+                    "helperPid": std::process::id(), "stamps": phases,
+                    "helperElapsedMsAtAnswer": started.elapsed().as_secs_f64() * 1000.0,
+                    "measurementEnabled": latency_store(args).is_some()
+                        && !args.iter().any(|arg| arg == "--qualification-without-receipt-telemetry"),
+                });
+                response = serde_json::to_vec(&value).ok();
+            }
+            (response, 0)
         }
     }
 }

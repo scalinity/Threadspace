@@ -145,6 +145,9 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
           records: batch.ids.map(observationId => ({ observationId,
             capturedMs: captures.get(observationId)?.capturedMs ?? null,
             status: statuses?.get(observationId) ?? 'UNKNOWN' })),
+          ...(argv.includes('--qualification-phases') && result ? {
+            helperPhases: (JSON.parse(result.stdout) as { qualificationPhases?: unknown }).qualificationPhases ?? null,
+          } : {}),
         }
         if (exporting || closed) { failedExports += 1; return }
         ownExport = (async () => {

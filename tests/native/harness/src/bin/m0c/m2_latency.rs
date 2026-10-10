@@ -15,7 +15,7 @@ fn root(ctx: &Ctx) -> Result<PathBuf, String> {
     if ctx.id.app_identifier != "ai.scalinity.threadspace.dev" {
         return Err("F4 collector requires the development identity".into());
     }
-    Ok(ctx.repo.join("evidence/M2/remediation-1/f4/native"))
+    Ok(ctx.repo.join("evidence/M2/remediation-4/f4/native"))
 }
 
 fn monotonic_ns() -> Result<u64, String> {

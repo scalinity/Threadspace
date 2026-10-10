@@ -40,6 +40,8 @@ struct ObserverBracket {
     overflow: u64,
     failed_exports: u64,
     records: Vec<Record>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    helper_phases: Option<serde_json::Value>,
 }
 
 fn uuid(value: &str) -> bool {
@@ -233,6 +235,19 @@ pub fn annotate_receipt(
     boot: &str,
     native_ns: u64,
 ) -> Option<Vec<u8>> {
+    annotate_receipt_with_phases(store, receipt, request, boot, native_ns, None)
+}
+
+/// Optional helper phase stamps are retained beside the independent native
+/// receipt token. They cannot replace capture, COMMIT or DOM clock evidence.
+pub fn annotate_receipt_with_phases(
+    store: &Path,
+    receipt: &ModBatchReceipt,
+    request: &[u8],
+    boot: &str,
+    native_ns: u64,
+    phases: Option<&serde_json::Map<String, serde_json::Value>>,
+) -> Option<Vec<u8>> {
     // Independent metadata about the real submitted batch. Do not recover
     // the runtime population only from successful optional sample files.
     let request: serde_json::Value = serde_json::from_slice(request).ok()?;
@@ -252,6 +267,7 @@ pub fn annotate_receipt(
         "runtimeId": runtime, "requestObservationIds": ids,
         "clock": "CLOCK_UPTIME_RAW", "monotonicNs": native_ns.to_string(),
         "bootId": boot, "receipt": receipt,
+        "helperPhaseStamps": phases,
     });
     save_named(
         store,

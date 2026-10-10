@@ -10,6 +10,16 @@ The exporter preserves raw clocks as unqualified and does not claim latency PASS
 `tools/m2_hook_census.py --double-loss-index N` separately verifies that a known
 zero-output invocation remains missing from the independently issued denominator.
 
+F4 phase diagnostics use the same owned fixture with
+`THREADSPACE_M2_PHASE_DIAGNOSTIC=with-receipt-telemetry` or
+`without-receipt-telemetry`. Both retain callback/host-call brackets and helper
+initialization/receipt/answer stamps; the latter disables only native receipt
+measurement persistence. It therefore cannot seal an observer latency population
+or pass the latency gate. These are comparison runs, not a telemetry-free
+measurement of certified product latency. The flags are confined to the Dev
+qualification helper and acquired mod copy. New F4 collector/fixture runs go
+under `evidence/M2/remediation-4/f4/`; previous evidence is left intact.
+
 `m2-native-replay dev` requires an existing absolute private directory in
 `THREADSPACE_M2_PRIVATE_EVIDENCE`. It opens the live Dev database read-only for
 SQLite backup, then uses the production Journal only on its exclusively created

@@ -63,7 +63,11 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
         return Err("observer native qualification is Dev-only".into());
     }
     let evidence = Run::create(
-        &ctx.repo.join("evidence/M2/remediation-3"),
+        &ctx.repo.join(if latency {
+            "evidence/M2/remediation-4/f4"
+        } else {
+            "evidence/M2/remediation-3"
+        }),
         if latency {
             "latency-fixture"
         } else {
@@ -137,6 +141,14 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
                 .as_array_mut()
                 .ok_or("missing owned capture argv")?
                 .push(json!("--qualification-latency"));
+            if std::env::var("THREADSPACE_M2_PHASE_DIAGNOSTIC").is_ok() {
+                let argv = document["userConfig"]["captureArgv"]["default"].as_array_mut()
+                    .ok_or("missing owned diagnostic capture argv")?;
+                argv.push(json!("--qualification-phases"));
+                if std::env::var("THREADSPACE_M2_PHASE_DIAGNOSTIC").as_deref() == Ok("without-receipt-telemetry") {
+                    argv.push(json!("--qualification-without-receipt-telemetry"));
+                }
+            }
             std::fs::write(
                 &manifest,
                 serde_json::to_vec_pretty(&document).map_err(|e| e.to_string())?,
