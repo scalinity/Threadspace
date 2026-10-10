@@ -28,7 +28,7 @@ pub fn qualify(ctx: &Ctx) -> Result<Value, String> {
     // Python opens only the source read-only. The destination directory was
     // exclusively created above; SQLite's backup API includes the live WAL.
     let backup = run(
-        "python3",
+        "/usr/bin/python3",
         &[
             "-c",
             "import sqlite3,sys,pathlib; s=sqlite3.connect(pathlib.Path(sys.argv[1]).as_uri()+'?mode=ro',uri=True,timeout=2); d=sqlite3.connect(sys.argv[2]); s.backup(d); assert d.execute('PRAGMA integrity_check').fetchone()[0]=='ok'; d.close(); s.close()",
