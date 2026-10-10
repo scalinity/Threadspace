@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<repo>/tests/native/tools/m2_integration_native.py", line 180, in <module>
+    main()
+    ~~~~^^
+  File "<repo>/tests/native/tools/m2_integration_native.py", line 102, in main
+    assert inventory([owned, config]) == before, "Reinstall changed owned bytes"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Reinstall changed owned bytes

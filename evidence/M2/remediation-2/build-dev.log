@@ -1,0 +1,84 @@
+==> Rust core and capture helper (release, qualification)
+   Compiling threadspace-contracts v0.1.0 (<repo>/crates/contracts)
+   Compiling threadspace-state-engine v0.1.0 (<repo>/crates/state-engine)
+   Compiling threadspace-surfaces-macos v0.1.0 (<repo>/crates/surfaces-macos)
+   Compiling threadspace-provider-claude v0.1.0 (<repo>/crates/provider-claude)
+   Compiling threadspace-journal v0.1.0 (<repo>/crates/journal)
+   Compiling threadspace-surfaces v0.1.0 (<repo>/crates/surfaces)
+   Compiling threadspace-relay v0.1.0 (<repo>/crates/relay)
+   Compiling threadspace-agent v0.1.0 (<repo>/apps/agent-macos/core)
+    Finished `release` profile [optimized] target(s) in 15.79s
+   Compiling threadspace-contracts v0.1.0 (<repo>/crates/contracts)
+   Compiling threadspace-surfaces-macos v0.1.0 (<repo>/crates/surfaces-macos)
+   Compiling threadspace-state-engine v0.1.0 (<repo>/crates/state-engine)
+   Compiling threadspace-provider-claude v0.1.0 (<repo>/crates/provider-claude)
+   Compiling threadspace-relay v0.1.0 (<repo>/crates/relay)
+    Finished `release` profile [optimized] target(s) in 11.36s
+==> Swift AppKit shell
+==> Bundle
+==> Sign (nested helper, then hardened runtime with companion entitlements)
+<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook: replacing existing signature
+<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app: replacing existing signature
+--prepared:<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+--validated:<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app: valid on disk
+<repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app: satisfies its Designated Requirement
+==> <repo>/apps/agent-macos/build/dev/ThreadspaceAgent.app
+==> Threadspace (dev) Tauri bundle
+npm notice run npx
+npm notice run 'tauri' build --config src-tauri/tauri.dev.conf.json --target aarch64-apple-darwin --bundles app --features qualification
+        Info `tauri-build` dependency has workspace inheritance enabled. The features array won't be automatically rewritten. Expected features: []
+        Info `tauri` dependency has workspace inheritance enabled. The features array won't be automatically rewritten. Expected features: []
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build`
+npm notice run @threadspace/desktop@0.1.0 build
+npm notice run tsc --noEmit -p . && vite build
+vite v8.3.3 building client environment for production...
+transforming...
+✓ 53 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                           0.39 kB │ gzip:   0.26 kB
+dist/assets/floor-grain-CV_VrcFB.png      0.81 kB
+dist/assets/index-Biz855sz.css            6.54 kB │ gzip:   2.10 kB
+dist/assets/index-D0ti1RuI.js         1,215.78 kB │ gzip: 342.21 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0m../../node_modules/@tauri-apps/api/core.js is dynamically imported by src/qualification/commands.ts but also statically imported by src/bridge/client.ts, src/bridge/ipc.ts, src/qualification/aclProbe.ts, dynamic import will not move module into another chunk.
+
+✓ built in 218ms
+   Compiling threadspace-contracts v0.1.0 (<repo>/crates/contracts)
+   Compiling threadspace-desktop v0.1.0 (<repo>/apps/desktop/src-tauri)
+   Compiling threadspace-state-engine v0.1.0 (<repo>/crates/state-engine)
+   Compiling threadspace-surfaces-macos v0.1.0 (<repo>/crates/surfaces-macos)
+   Compiling threadspace-provider-claude v0.1.0 (<repo>/crates/provider-claude)
+   Compiling threadspace-relay v0.1.0 (<repo>/crates/relay)
+    Finished `release` profile [optimized] target(s) in 16.79s
+       Built application at: <repo>/target/aarch64-apple-darwin/release/Threadspace
+    Bundling Threadspace Dev.app (<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app)
+     Signing with identity "BF0C3BD87875380E053876EA170575E50AACE8DD"
+Signing with identity "BF0C3BD87875380E053876EA170575E50AACE8DD"
+Signing <repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/MacOS/Threadspace
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/MacOS/Threadspace: replacing existing signature
+Signing with identity "BF0C3BD87875380E053876EA170575E50AACE8DD"
+Signing <repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app: replacing existing signature
+        Warn skipping app notarization, no APPLE_ID & APPLE_PASSWORD & APPLE_TEAM_ID or APPLE_API_KEY & APPLE_API_ISSUER & APPLE_API_KEY_PATH environment variables found
+    Finished 1 bundle at:
+        <repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app (32.71 MiB)
+
+==> Verify nested companion, then outer application
+--prepared:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+--validated:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app: valid on disk
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app: satisfies its Designated Requirement
+--prepared:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+--validated:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app: valid on disk
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app: satisfies its Designated Requirement
+--prepared:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+--prepared:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+--validated:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app/Contents/MacOS/threadspace-hook
+--validated:<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app/Contents/Library/LoginItems/ThreadspaceAgent.app
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app: valid on disk
+<repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app: satisfies its Designated Requirement
+==> <repo>/target/aarch64-apple-darwin/release/bundle/macos/Threadspace Dev.app

@@ -1,0 +1,74 @@
+{
+  "installed": {
+    "companionBuildInfo": {
+      "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+      "channel": "dev",
+      "executableSha256": "43d59886d6a8b7cd5c04734b8e738e4883970cbbabe5cd812a8516b039d50f1b",
+      "helperSha256": "554ce67cb42f9443cb23a2f7eae13a878c35502a04275e5230e1ef56e120c60f",
+      "qualificationBuild": true,
+      "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
+      "sourceTreeDirty": false,
+      "version": "0.1.0"
+    },
+    "companionSha256": "43d59886d6a8b7cd5c04734b8e738e4883970cbbabe5cd812a8516b039d50f1b",
+    "executableSha256": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6"
+  },
+  "newCompanion": {
+    "incarnation": {
+      "pid": 91177,
+      "ppid": 1,
+      "startMicroseconds": 708375,
+      "startSeconds": 1791610069
+    },
+    "waitedMs": 105
+  },
+  "pass": true,
+  "service": "ENABLED",
+  "steps": [
+    {
+      "result": {
+        "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": null,
+          "operation": "unregister",
+          "statusAfter": "NOT_REGISTERED",
+          "statusBefore": "ENABLED"
+        },
+        "elapsedMs": 281,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "unregister",
+        "statusAfter": "NOT_REGISTERED"
+      },
+      "step": "unregister-old"
+    },
+    {
+      "step": "old-companion-exit",
+      "waitedMs": 0
+    },
+    {
+      "ok": true,
+      "step": "move-old-bundle",
+      "to": "~/Library/Application Support/threadspace-qualification/rollback/ai.scalinity.threadspace.dev-20261010T052749Z"
+    },
+    {
+      "result": {
+        "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": null,
+          "operation": "register",
+          "statusAfter": "ENABLED",
+          "statusBefore": "NOT_REGISTERED"
+        },
+        "elapsedMs": 668,
+        "exitStatus": 0,
+        "ok": true,
+        "operation": "register",
+        "statusAfter": "ENABLED"
+      },
+      "step": "register-new"
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
+  "installedOuterSha256": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6",
+  "nativeExecution": true,
+  "rows": [
+    {
+      "operation": "status",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 15.987,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "status",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "install",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 9.077,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "uninstall",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 8.822,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "status",
+      "scope": "session",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 9.707,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "status",
+        "scope": "session"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "install",
+      "scope": "session",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 8.712,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "session"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "uninstall",
+      "scope": "session",
+      "configuration": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+      "exitCode": 1,
+      "elapsedMs": 8.976,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "uninstall",
+        "scope": "session"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "status",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+      "exitCode": 1,
+      "elapsedMs": 10.904,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "status",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "install",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+      "exitCode": 1,
+      "elapsedMs": 8.88,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    },
+    {
+      "operation": "uninstall",
+      "scope": "user",
+      "configuration": "<scratch-root>/ts-m2-f3-minimized-7d6a0c30-251c-4691-a6ef-01d2d4a0afba/session-config",
+      "exitCode": 1,
+      "elapsedMs": 9.332,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with session scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "session"
+          }
+        },
+        "ok": false,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "byteAndModeEquality": true,
+      "pass": true
+    }
+  ],
+  "allPass": true,
+  "fixtureRetained": "<scratch-root>/ts-m2-native-refusal-dcwzvj6x"
+}

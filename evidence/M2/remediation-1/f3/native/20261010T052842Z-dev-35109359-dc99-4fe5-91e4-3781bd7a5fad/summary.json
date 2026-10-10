@@ -1,0 +1,161 @@
+{
+  "additionalExistingNegativeCommand": "THREADSPACE_EVIDENCE_MILESTONE=M2 threadspace-m0c g08-terminal dev",
+  "cases": 0,
+  "cleanup": {
+    "allOwnedResourcesClosed": true,
+    "integrationRemoval": {
+      "appIdentifier": "ai.scalinity.threadspace.dev",
+      "detail": {
+        "attemptedAtMs": 1791610738488,
+        "complete": true,
+        "configPath": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session/settings.json",
+        "conflicts": [],
+        "removed": [
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "SessionStart",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "UserPromptSubmit",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "Stop",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "SubagentStop",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "SubagentStart",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PreToolUse",
+            "kind": "hook",
+            "matcher": "*"
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PostToolUse",
+            "kind": "hook",
+            "matcher": "*"
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PostToolUseFailure",
+            "kind": "hook",
+            "matcher": "*"
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PermissionRequest",
+            "kind": "hook",
+            "matcher": "*"
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "SessionEnd",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "Notification",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "StopFailure",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PermissionDenied",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PreCompact",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "event": "PostCompact",
+            "kind": "hook",
+            "matcher": ""
+          },
+          {
+            "kind": "pluginDir",
+            "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          }
+        ],
+        "removedFiles": [
+          "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session",
+          "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+          "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+          "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+        ],
+        "restoredOriginal": false,
+        "retainedHelperPaths": [],
+        "retainedModPaths": [],
+        "retainedRecord": null,
+        "retainedReferences": [],
+        "scope": "session",
+        "settingsSha256": null,
+        "uninstalledAtMs": 1791610738489
+      },
+      "ok": true,
+      "operation": "uninstall",
+      "scope": "session"
+    },
+    "retainedScratch": null,
+    "uncertainOpen": false,
+    "windows": []
+  },
+  "finding": "F3",
+  "fullTerminalRestart": "Not executed; retained separate M15 limitation",
+  "minimumRequiredPositiveRepetitions": 5,
+  "operationError": "Terminal refused element queries for 600s: ",
+  "pass": false,
+  "requestThroughReceiptBudgetMs": 2000,
+  "requestedPositiveRepetitions": 5,
+  "routeDeadlineMs": 2000,
+  "routeOutcomeAccounting": {
+    "exactClaimsWithDifferentOrUnknownIndependentSurface": 0,
+    "interpretation": "A non-target final readback after TIMEOUT is a failed positive, not automatically a wrong-target route claim or proof that no side effect occurred.",
+    "nonTargetFinalReadbacksIncludingHonestTimeouts": 0,
+    "positiveCasesWithReturnIssued": 0,
+    "unknownFinalReadbacks": 0
+  },
+  "routeProductCodeChanged": false,
+  "runDirectory": "<repo>/evidence/M2/remediation-1/f3/native/20261010T052842Z-dev-35109359-dc99-4fe5-91e4-3781bd7a5fad",
+  "status": "F3_STILL_BLOCKING",
+  "successfulPositiveRepetitions": 0,
+  "terminalRefusalCounters": [
+    0,
+    0
+  ],
+  "timingCoverage": {
+    "finerAppleEventDurations": "UNAVAILABLE in unchanged product: tab selection/restoration/raise/activation/readback share the focus phase",
+    "fullProductPhasesRetained": true,
+    "independentReadback": "read-only after returned result, timed separately; cannot extend or repair the route attempt",
+    "rootCause": "NOT_INFERRED_BY_RUNNER"
+  }
+}

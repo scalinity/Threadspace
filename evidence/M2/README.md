@@ -6,28 +6,32 @@ The independent review of `2c4b5012f59189dcb38d61ced0b0b9fe96fb043e`
 rejected four bounded areas: observer ownership/reload authority (F1), integration
 ownership/cleanup (F2), the minimized-window positive Return case (F3), and the
 normal-path latency measurement (F4). The focused implementation and execution
-records are under [`remediation-1/`](remediation-1/README.md). The current
+portable records are under [`remediation-1/`](remediation-1/README.md). The
+source-matched Mac build, native F2 qualification and blocked F3 attempts are
+under [`remediation-2/`](remediation-2/README.md). The current
 [`manifest.json`](manifest.json) is the status and provenance index; it does not
 inherit the rejected candidate's PASS labels.
 
 The accepted main/M1 endpoint remains
-`af9b285da529890bc441ea00f1a92e73e39902a8`. This remediation does not merge,
-deploy, migrate an owner store, change owner Claude configuration, or implement
-M3. D-0009 and D-0010 remain **PROPOSED — pending independent re-review**.
+`af9b285da529890bc441ea00f1a92e73e39902a8`. The production application/store
+and owner Claude settings remain untouched. The existing Dev store was backed
+up before installing the reducer-4 Dev candidate. No merge or M3 occurred.
+D-0009 and D-0010 remain **PROPOSED — pending independent re-review**.
 
 ## Current qualification
 
 | Finding | Implemented or established | Remaining mandatory evidence |
 | --- | --- | --- |
-| F1A: delayed callback ownership | An immutable native Turn/actor ownership ledger preserves the original Session, observer epoch and generation. Ambiguous reused IDs and first-seen late events stay nonauthoritative. Actual TypeScript captures are tested through the production adapter and SQLite. | A new source-matched Dev application and focused real-Claude ownership/native-origin smoke. |
+| F1A: delayed callback ownership | An immutable native Turn/actor ownership ledger preserves the original Session, observer epoch and generation. Ambiguous reused IDs and first-seen late events stay nonauthoritative. Actual TypeScript captures are tested through the production adapter and SQLite. The new signed Dev application is installed with matching hashes. | Focused real-Claude ownership/native-origin smoke; no owned native Session was established during the Mac attempt. |
 | F1B: reload authority | Independent helper-created proof, scope seal and a later qualified Turn start replace permanent authority from historical attachments. The proposed reducer is now version 4, with an explicit retained-fact upgrade for reducer-3 development stores. | Native execution of the new inventory/kernel proof producer and unchanged-ID reload/new-Turn smoke. The old 819 ms RESTORED result does not qualify this predicate. |
-| F2: integration ownership | Structural edits become conflicts; still-referenced resources and ownership records survive partial uninstall. Wrong installation identity refuses, and failed acquisition gives the harness no cleanup authority. | Focused Dev native integration smoke using disposable settings/resources. Portable positive and mutation-control results are retained. |
-| F3: minimized Return | Both original failed attempts and the inherited M0C source history have been examined. Route product code remains unchanged; the cause is not established. | **BLOCKING:** at least five independently verified minimized-window successes, relevant negatives and complete phase evidence under the unchanged 2,000 ms deadline. No new native repetitions were executed here. |
-| F4: latency | Actual SQLite COMMIT brackets, qualified monotonic/cross-runtime bounds, DOM-application marks and explicit population checks replace the old calculation. Incomplete clock, source-census, identity or tail evidence refuses PASS. | Complete independently closed source populations, positive native clock qualification and a focused source-matched native capture → COMMIT → DOM sample for both sources. No native p95 has been established by this remediation. |
+| F2: integration ownership | Structural conflicts, retained resources, strict installation identity and acquired-resource cleanup passed the new focused native CLI/asset campaign: 13 cases/31 calls plus 9 refusal checks, 42 native installer tests and one native Scratch test. | Independent review of the new native records; historical portable controls remain source-scoped. |
+| F3: minimized Return | Original failures remain preserved. Two new native attempts stopped before a Return: Terminal absent, then window/tab queries unavailable throughout the existing 600-second readiness wait. Acquired integration cleanup succeeded. | **BLOCKING:** 0 of 5 required minimized-window successes; relevant negatives and phase evidence under the unchanged 2,000 ms deadline remain required. No native route was issued in the Mac attempt. |
+| F4: latency | Actual SQLite COMMIT brackets, a monotonic/cross-runtime interval model, DOM-application marks and explicit population checks replace the old calculation. Incomplete clock, source-census, identity or tail evidence refuses PASS. | Complete independently closed source populations, positive native clock qualification and native capture → COMMIT → DOM samples for both sources. Exporter/calculator were not run in the Mac attempt; no native p95 is established. |
 
-The execution environment is Linux. Portable tests and macOS-target Rust type
-checks are reported separately from retained macOS execution. A successful
-cross-target compilation is not a native application build or native test run.
+The portable remediation ran on Linux. The subsequent Mac attempt built and
+installed source `4aef4a96f0e21844b35271246a151629a77bceb2`, qualified F2,
+and preserved the Terminal scripting blocker. No new F1 or F4 native execution
+is inferred from the build or F2 results.
 
 ## Preserved historical qualification
 

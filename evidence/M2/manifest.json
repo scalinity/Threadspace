@@ -1,19 +1,28 @@
 {
   "schemaVersion": 2,
-  "title": "M2 focused F1–F4 remediation status and evidence index",
+  "title": "M2 focused F1\u2013F4 remediation status and evidence index",
   "milestone": "M2",
   "branch": "m2",
   "verdict": "M2 REMEDIATION INCOMPLETE",
   "baseCommit": "af9b285da529890bc441ea00f1a92e73e39902a8",
   "rejectedCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
   "sourceCommit": "9799b84b8cd8c2db1f033a172e9a8276ddbd1901",
-  "sourceIdentityNote": "This source/harness commit contains the tested implementation and evidence. The final provenance-only commit changes only this manifest and remediation-1/provenance.json; native build remains unexecuted.",
+  "sourceIdentityNote": "Native product and Rust harness sources are bound to clean build 4aef4a96f0e21844b35271246a151629a77bceb2. The later unshipped Python native CLI runner is bound by its execution file hash. No product/reducer/observer/native route source changed after the build. Publication records preserve the separate source, native artifact and evidence identities.",
   "currentNativeBuild": {
-    "status": "NOT_BUILT_OR_EXECUTED_HERE",
-    "sourceCommit": null,
+    "status": "BUILT_SIGNED_INSTALLED_HASH_MATCHED",
+    "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
     "bundleId": "ai.scalinity.threadspace.dev",
-    "executableHashes": null,
-    "environmentLimitation": "Linux; no owner Mac access or native application execution."
+    "executableHashes": {
+      "outer": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6",
+      "companion": "43d59886d6a8b7cd5c04734b8e738e4883970cbbabe5cd812a8516b039d50f1b",
+      "helper": "554ce67cb42f9443cb23a2f7eae13a878c35502a04275e5230e1ef56e120c60f"
+    },
+    "harnessExecutableSha256": "0874be1567b8f6573aa15634f84f50e56583c85e2ddbd231f0300cab9d7aeb73",
+    "qualificationBuild": true,
+    "sourceTreeCleanAtBuild": true,
+    "evidence": "evidence/M2/remediation-2/",
+    "devStoreBackupVerified": true,
+    "productionApplicationOrStoreModified": false
   },
   "historicalNativeBuild": {
     "buildInfoFrom": "apps/agent-macos/build/dev/build-info.json, written by tests/native/build-app.sh dev; hashes re-read from the installed bundle",
@@ -44,8 +53,8 @@
     "readme": "evidence/M2/remediation-1/historical/rejected-candidate-README.md"
   },
   "decisions": {
-    "D-0009": "PROPOSED — pending independent re-review",
-    "D-0010": "PROPOSED — pending independent re-review"
+    "D-0009": "PROPOSED \u2014 pending independent re-review",
+    "D-0010": "PROPOSED \u2014 pending independent re-review"
   },
   "reducer": {
     "version": 4,
@@ -70,15 +79,26 @@
   "areas": {
     "F1A": {
       "status": "PORTABLE_IMPLEMENTATION_WITH_NATIVE_GATE_OPEN",
-      "evidence": "evidence/M2/remediation-1/f1a/"
+      "evidence": "evidence/M2/remediation-1/f1a/",
+      "nativeGate": "INCOMPLETE",
+      "macAttemptEvidence": "evidence/M2/remediation-2/README.md"
     },
     "F1B": {
       "status": "PORTABLE_IMPLEMENTATION_WITH_NATIVE_GATE_OPEN",
-      "evidence": "evidence/M2/remediation-1/f1b/"
+      "evidence": "evidence/M2/remediation-1/f1b/",
+      "nativeGate": "INCOMPLETE",
+      "macAttemptEvidence": "evidence/M2/remediation-2/README.md"
     },
     "F2": {
-      "status": "PORTABLE_IMPLEMENTATION_WITH_NATIVE_GATE_OPEN",
-      "evidence": "evidence/M2/remediation-1/f2/"
+      "status": "FOCUSED_NATIVE_PASS_PENDING_INDEPENDENT_REVIEW",
+      "evidence": "evidence/M2/remediation-1/f2/",
+      "nativeGate": "PASS",
+      "nativeEvidence": "evidence/M2/remediation-2/f2-native-cli-final/summary.json",
+      "nativeCliCases": 13,
+      "nativeCliCalls": 31,
+      "additionalNativeRefusalChecks": 9,
+      "nativeInstallerTests": 42,
+      "nativeScratchFailedActivationTests": 1
     },
     "F3": {
       "status": "BLOCKING",
@@ -86,7 +106,12 @@
       "newNativePositiveRepetitions": 0,
       "requiredNativePositiveRepetitions": 5,
       "deadlineMs": 2000,
-      "evidence": "evidence/M2/remediation-1/f3/"
+      "evidence": "evidence/M2/remediation-1/f3/",
+      "nativeGate": "INCOMPLETE",
+      "newNativeReturnsIssued": 0,
+      "latestAttempt": "evidence/M2/remediation-1/f3/native/20261010T052842Z-dev-35109359-dc99-4fe5-91e4-3781bd7a5fad/summary.json",
+      "nativeBlocker": "Terminal window-element queries unavailable throughout the existing 600-second readiness wait; no owned Claude fixture or route acquired.",
+      "setupWaitMs": 615244
     },
     "F4": {
       "status": "INCOMPLETE",
@@ -98,7 +123,9 @@
         "Independent closed hook capture population",
         "Positive native clock rate/resolution qualification",
         "Focused source-matched native capture/COMMIT/applied-DOM run for both sources"
-      ]
+      ],
+      "nativeGate": "INCOMPLETE",
+      "macAttemptEvidence": "evidence/M2/remediation-2/README.md"
     }
   },
   "preservedDispositions": {
@@ -120,15 +147,15 @@
     "ownershipIncident": "Known unsafe pattern command; affected PIDs/effects unknown. See f2/harness-ownership-incident.md."
   },
   "remainingActions": [
-    "New source-matched Dev build and executable provenance",
-    "Focused real-Claude ownership/native-origin/reload smoke",
-    "Focused disposable native integration smoke",
-    "Diagnose and close minimized-window Return with at least five positive repetitions and relevant negatives",
-    "Complete and qualify F4 source census, clocks and native end-to-end latency measurements",
-    "Independent M2 re-review; no merge, M3 or production deployment"
+    "Establish a safely verifiable owned Terminal fixture after the recorded scripting blocker clears",
+    "Focused real-Claude original ownership smoke",
+    "Explicit independent proof/seal/post-seal completion and reload negatives; legacy reload runner ordering does not establish the revised contract",
+    "At least five independently verified minimized Returns and relevant negatives within the unchanged deadline",
+    "Independent hook issuance/loss census, closed observer population, qualified native/runtime clocks and complete capture/COMMIT/applied-DOM samples",
+    "Independent M2 acceptance re-review only after every mandatory gate passes; no merge, M3 or production deployment"
   ],
-  "remediationIndex": "evidence/M2/remediation-1/README.md",
-  "provenance": "evidence/M2/remediation-1/provenance.json",
+  "remediationIndex": "evidence/M2/remediation-2/README.md",
+  "provenance": "evidence/M2/remediation-2/provenance.json",
   "evidenceHashes": {
     "evidence/M2/faults/20261009T041720Z-dev/cases.jsonl": "9a7ea76b12ecadd2b84e4e2db91ba30948987edaec811a6ba6a0cfa70a70f94b",
     "evidence/M2/faults/20261009T041720Z-dev/summary.json": "204308c50a8171ee0bc64004aced80d54f48186d154c645f75cc1e48398056d8",
@@ -779,5 +806,19 @@
     "evidence/M2/vertical/attempts/README.md": "3d5b984681bc34e43e8e678b351973a9677d8f42105906a85c2a6180ed4d7b82"
   },
   "harnessCommit": "9799b84b8cd8c2db1f033a172e9a8276ddbd1901",
-  "publicationMethod": "Authenticated GitHub Git Data API; source-tree identity and CLI credential limitation recorded in remediation-1/provenance.json."
+  "publicationMethod": "Git commits and authenticated git push to origin/m2; accepted main remains unchanged.",
+  "previousRemediationIndex": "evidence/M2/remediation-1/README.md",
+  "previousProvenance": "evidence/M2/remediation-1/provenance.json",
+  "macAttempt": {
+    "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
+    "nativeBuildInstall": "PASS",
+    "F1A": "INCOMPLETE",
+    "F1B": "INCOMPLETE",
+    "F2": "PASS",
+    "F3": "INCOMPLETE",
+    "F4": "INCOMPLETE",
+    "status": "M2 NATIVE REMEDIATION INCOMPLETE",
+    "rootCauseOfHistoricalMinimizedTimeouts": "NOT_ESTABLISHED",
+    "orchestration": "No ORCHESTRATION.html exists; none created."
+  }
 }

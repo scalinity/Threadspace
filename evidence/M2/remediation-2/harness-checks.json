@@ -1,0 +1,32 @@
+[
+  {
+    "name": "harness-check",
+    "argv": [
+      "cargo",
+      "+1.99.0",
+      "check",
+      "--locked",
+      "-p",
+      "threadspace-harness",
+      "--bin",
+      "threadspace-m0c"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 10.05
+  },
+  {
+    "name": "harness-build",
+    "argv": [
+      "cargo",
+      "+1.99.0",
+      "build",
+      "--locked",
+      "-p",
+      "threadspace-harness",
+      "--bin",
+      "threadspace-m0c"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 12.953
+  }
+]

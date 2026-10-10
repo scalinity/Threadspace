@@ -1,0 +1,2833 @@
+{
+  "nativeExecution": true,
+  "bundleIdentifier": "ai.scalinity.threadspace.dev",
+  "outerSha256": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6",
+  "runnerSha256": "eeefd21c5bd6efa1c9820f0478010b1ffbdd5c87e09a89f318c7933226bfa919",
+  "scratch": "<scratch-root>/ts-m2-f2-native-6vz2gcj6",
+  "calls": [
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 74.898,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611761385,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 25.777,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611761422,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 25.13,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761447,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": true,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "uninstalledAtMs": 1791611761456
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 64.735,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611761528,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 30.626,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761553,
+          "complete": false,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook"
+          ],
+          "retainedModPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          ],
+          "retainedRecord": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json",
+          "retainedReferences": [
+            "/hooks/SessionStart/1/hooks/0/command"
+          ],
+          "scope": "user",
+          "settingsSha256": "b1e40dd44646c6bfb37f99907e7fd083ec31bd42abf594584ac4df1fc85e969e",
+          "uninstalledAtMs": 0
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.727,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "resolve the retained integration conflicts before reinstalling",
+          "setupError": {
+            "code": "UNRESOLVED_CONFLICTS",
+            "entries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              }
+            ]
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 26.016,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761611,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "0284f850fcdb7607e5b61c3b50ac60abcb6bc53a940cfd183ecf46e471491632",
+          "uninstalledAtMs": 1791611761620
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 60.218,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611761688,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 32.75,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761716,
+          "complete": false,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook"
+          ],
+          "retainedModPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          ],
+          "retainedRecord": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json",
+          "retainedReferences": [
+            "/hooks/SessionStart/1/hooks/0/command"
+          ],
+          "scope": "user",
+          "settingsSha256": "79588856871fe543d224dff05d6c99674da45d47c0ef3f4366bd54922a849ce4",
+          "uninstalledAtMs": 0
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.717,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "resolve the retained integration conflicts before reinstalling",
+          "setupError": {
+            "code": "UNRESOLVED_CONFLICTS",
+            "entries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              }
+            ]
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 25.103,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761774,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "0284f850fcdb7607e5b61c3b50ac60abcb6bc53a940cfd183ecf46e471491632",
+          "uninstalledAtMs": 1791611761783
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 64.879,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611761857,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 27.869,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761883,
+          "complete": false,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook"
+          ],
+          "retainedModPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          ],
+          "retainedRecord": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json",
+          "retainedReferences": [
+            "/hooks/SessionStart/1/hooks/0/command"
+          ],
+          "scope": "user",
+          "settingsSha256": "196daebbf9846afb053d61c499e1bf1b22ad43c084b8a3d2b2323680453c9764",
+          "uninstalledAtMs": 0
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 7.617,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "resolve the retained integration conflicts before reinstalling",
+          "setupError": {
+            "code": "UNRESOLVED_CONFLICTS",
+            "entries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              }
+            ]
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 25.321,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611761938,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "0284f850fcdb7607e5b61c3b50ac60abcb6bc53a940cfd183ecf46e471491632",
+          "uninstalledAtMs": 1791611761945
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 66.312,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611762022,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 30.909,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611762047,
+          "complete": false,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook"
+          ],
+          "retainedModPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          ],
+          "retainedRecord": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json",
+          "retainedReferences": [
+            "/hooks/SessionStart/1/hooks/0/command"
+          ],
+          "scope": "user",
+          "settingsSha256": "dfe84b7b6bf8d3b811b97af6a0a2586eac4f3a5dabe057b62e5bb2e35e29e15c",
+          "uninstalledAtMs": 0
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.017,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "resolve the retained integration conflicts before reinstalling",
+          "setupError": {
+            "code": "UNRESOLVED_CONFLICTS",
+            "entries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              }
+            ]
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 25.084,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611762101,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "0284f850fcdb7607e5b61c3b50ac60abcb6bc53a940cfd183ecf46e471491632",
+          "uninstalledAtMs": 1791611762110
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 63.844,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611762182,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 32.324,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611762207,
+          "complete": false,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            }
+          ],
+          "removedFiles": [],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook"
+          ],
+          "retainedModPaths": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+          ],
+          "retainedRecord": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json",
+          "retainedReferences": [
+            "/env/CLAUDE_CODE_PLUGIN_DIRS"
+          ],
+          "scope": "user",
+          "settingsSha256": "9a793fe5b77d2f55dbc097ab36ac2ec5d5130ba9048bf8c73a17f92f6bf11837",
+          "uninstalledAtMs": 0
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.568,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "resolve the retained integration conflicts before reinstalling",
+          "setupError": {
+            "code": "UNRESOLVED_CONFLICTS",
+            "entries": [
+              {
+                "kind": "pluginDir",
+                "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+              }
+            ]
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 24.748,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611762265,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": false,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "0284f850fcdb7607e5b61c3b50ac60abcb6bc53a940cfd183ecf46e471491632",
+          "uninstalledAtMs": 1791611762274
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 68.412,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "appliedSha256": "a771237a08aae23b11cb0ec5f3c8d4300af19d0c52682a68c8e0e89b332a1357",
+          "backup": "settings.8de28cb56b5282c9.json",
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "created": [
+            "/hooks/UserPromptSubmit",
+            "/hooks/Stop",
+            "/hooks/SubagentStop",
+            "/hooks/SubagentStart",
+            "/hooks/PreToolUse",
+            "/hooks/PostToolUse",
+            "/hooks/PostToolUseFailure",
+            "/hooks/PermissionRequest",
+            "/hooks/SessionEnd",
+            "/hooks/Notification",
+            "/hooks/StopFailure",
+            "/hooks/PermissionDenied",
+            "/hooks/PreCompact",
+            "/hooks/PostCompact"
+          ],
+          "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+          "identity": {
+            "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+            "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+            "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+          },
+          "installedAtMs": 1791611762351,
+          "originalSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "ownedEntries": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "partialUninstall": false,
+          "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+          "scope": "user"
+        },
+        "ok": true,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "status",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "session"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.059,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with user scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "user"
+          }
+        },
+        "ok": false,
+        "operation": "status",
+        "scope": "session"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "session"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.894,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with user scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "user"
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "session"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "session"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.765,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the Claude integration is installed with user scope; uninstall it first",
+          "setupError": {
+            "code": "SCOPE_MISMATCH",
+            "installed": "user"
+          }
+        },
+        "ok": false,
+        "operation": "uninstall",
+        "scope": "session"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "status",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.315,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "status",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "install",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.41,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "install",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 1,
+      "elapsedMs": 8.239,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "error": "the requested configuration, owned directory or agent does not own this installation",
+          "setupError": {
+            "code": "TARGET_MISMATCH",
+            "installed": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "requested": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/other",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            }
+          }
+        },
+        "ok": false,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "~/Applications/Threadspace Dev.app/Contents/MacOS/Threadspace",
+        "--integration",
+        "uninstall",
+        "--config-dir",
+        "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config",
+        "--scope",
+        "user"
+      ],
+      "exitCode": 0,
+      "elapsedMs": 26.283,
+      "result": {
+        "appIdentifier": "ai.scalinity.threadspace.dev",
+        "detail": {
+          "attemptedAtMs": 1791611763262,
+          "complete": true,
+          "configPath": "<scratch-root>/ts-m2-f2-native-6vz2gcj6/config/settings.json",
+          "conflicts": [],
+          "removed": [
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "UserPromptSubmit",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Stop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStop",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SubagentStart",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUse",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostToolUseFailure",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionRequest",
+              "kind": "hook",
+              "matcher": "*"
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "SessionEnd",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "Notification",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "StopFailure",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PermissionDenied",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PreCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+              "event": "PostCompact",
+              "kind": "hook",
+              "matcher": ""
+            },
+            {
+              "kind": "pluginDir",
+              "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+            }
+          ],
+          "removedFiles": [
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer",
+            "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/record.json"
+          ],
+          "restoredOriginal": true,
+          "retainedHelperPaths": [],
+          "retainedModPaths": [],
+          "retainedRecord": null,
+          "retainedReferences": [],
+          "scope": "user",
+          "settingsSha256": "8de28cb56b5282c929a81bdfe1aaf79488b91cb6648a117990437766ebce65b8",
+          "uninstalledAtMs": 1791611763271
+        },
+        "ok": true,
+        "operation": "uninstall",
+        "scope": "user"
+      },
+      "stderr": ""
+    }
+  ],
+  "cases": [
+    {
+      "case": "unchanged-install-reinstall-remove",
+      "pass": true,
+      "byteIdenticalRestore": true
+    },
+    {
+      "case": "matcher",
+      "pass": true,
+      "partialComplete": false,
+      "resourcesRetained": true,
+      "conflictResolved": true
+    },
+    {
+      "case": "timeout",
+      "pass": true,
+      "partialComplete": false,
+      "resourcesRetained": true,
+      "conflictResolved": true
+    },
+    {
+      "case": "command",
+      "pass": true,
+      "partialComplete": false,
+      "resourcesRetained": true,
+      "conflictResolved": true
+    },
+    {
+      "case": "type",
+      "pass": true,
+      "partialComplete": false,
+      "resourcesRetained": true,
+      "conflictResolved": true
+    },
+    {
+      "case": "plugin-directory",
+      "pass": true,
+      "partialComplete": false,
+      "resourcesRetained": true,
+      "conflictResolved": true
+    },
+    {
+      "case": "refuse-status-session-same-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "refuse-install-session-same-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "refuse-uninstall-session-same-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "refuse-status-user-different-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "refuse-install-user-different-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "refuse-uninstall-user-different-config",
+      "pass": true,
+      "byteAndModeEquality": true
+    },
+    {
+      "case": "staged-native-assets",
+      "pass": true,
+      "providerVersion": "2.1.295 (Claude Code)",
+      "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "pluginValidateStdout": "Validating plugin manifest: ~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef/.claude-plugin/plugin.json\n\n  \u276f types ./types/index.d.ts declares on $: nothing (no EngineInterface member)\n  \u276f types ./types/index.d.ts declares state: threadspace-observer.epoch\n\nValidating hooks: ~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef/hooks/hooks.json\n\n  \u276f ./register.ts hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, agent.spawn\n  \u276f ./register.ts gating hook without .catch: classic.SessionStart\n  \u276f ./register.ts gating hook without .catch: prompt.submit\n  \u276f ./register.ts gating hook without .catch: tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}\n  \u276f ./register.ts gating hook without .catch: tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}\n  \u276f ./register.ts gating hook without .catch: agent.spawn\n  \u276f ./register.ts calls: $.clock.after, $.process.run, $.session.id, $.session.version, $.state.get, $.state.set\n  \u276f ./register.ts state writes: threadspace-observer.epoch\n  \u276f ./register.ts state reads: threadspace-observer.epoch\n\n\u2714 Validation passed\n",
+      "pluginValidateStderr": "",
+      "helperExitCode": 0,
+      "helperSilent": true,
+      "assetHashesStable": true,
+      "isolatedHookStore": true,
+      "fixtureHasNoClaudeParent": true,
+      "sessionAuthorityClaimed": false
+    }
+  ],
+  "pass": true,
+  "scope": "Native CLI integration only; observer execution and atomic-write fault controls are separate evidence.",
+  "integrationRemoved": true,
+  "fixtureRetained": true
+}

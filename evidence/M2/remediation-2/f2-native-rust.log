@@ -1,0 +1,53 @@
+   Compiling threadspace-contracts v0.1.0 (<repo>/crates/contracts)
+   Compiling threadspace-surfaces-macos v0.1.0 (<repo>/crates/surfaces-macos)
+   Compiling threadspace-state-engine v0.1.0 (<repo>/crates/state-engine)
+   Compiling threadspace-provider-claude v0.1.0 (<repo>/crates/provider-claude)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.44s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_provider_claude-d7589cf4d3f3c1bf)
+
+running 42 tests
+test setup::ordered_json::tests::map_edits_keep_order ... ok
+test setup::settings::tests::plugin_dirs_append_once_preserving_existing_elements ... ok
+test setup::ordered_json::tests::invalid_documents_are_refused ... ok
+test setup::settings::tests::group_holding_a_foreign_hook_is_kept ... ok
+test setup::ordered_json::tests::empty_containers_print_inline ... ok
+test setup::settings::tests::wrong_container_types_stop_the_edit ... ok
+test setup::settings::tests::empty_plugin_dirs_value_is_restored_as_empty ... ok
+test setup::ordered_json::tests::unicode_escapes_decode_and_reprint ... ok
+test setup::ordered_json::tests::compact_input_prints_two_space_indent_with_trailing_newline ... ok
+test setup::settings::tests::removal_reports_entries_no_longer_found ... ok
+test setup::ordered_json::tests::nested_objects_keep_document_order ... ok
+test setup::ordered_json::tests::numbers_keep_their_text ... ok
+test setup::ordered_json::tests::duplicate_keys_are_refused_at_any_depth ... ok
+test setup::tests::invalid_targets_and_missing_sources_are_refused ... ok
+test setup::tests::hook_command_quotes_the_owned_path ... ok
+test setup::tests::backups_are_owner_only_under_the_owned_dir ... ok
+test setup::tests::install_into_empty_config_then_uninstall_removes_the_created_file ... ok
+test setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged ... ok
+test setup::tests::f2::f2_11_wrong_config_or_copied_owned_root_refuses_without_mutation ... ok
+test setup::tests::f2::f2_04_changed_hook_type_is_a_conflict_and_survives ... ok
+test setup::tests::f2::f2_03_changed_timeout_is_a_conflict_and_survives ... ok
+test setup::tests::install_into_complex_settings_keeps_foreign_configuration ... ok
+test setup::tests::f2::f2_06_changed_plugin_reference_keeps_the_referenced_copy ... ok
+test setup::tests::f2::f2_07_foreign_siblings_and_their_order_survive_removal ... ok
+test setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record ... ok
+test setup::tests::install_twice_keeps_one_owned_set ... ok
+test setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives ... ok
+test setup::tests::f2::f2_08_repeated_partial_uninstall_has_no_double_removal_or_foreign_loss ... ok
+test setup::tests::plan_writes_nothing_and_matches_the_install ... ok
+test setup::tests::f2::f2_12_legitimately_resolved_conflict_finishes_on_retry ... ok
+test setup::tests::a_new_mod_replaces_the_old_copy_and_still_restores_the_original ... ok
+test setup::tests::settings_changed_between_read_and_write_are_refused ... ok
+test setup::tests::status_reports_owned_entries_no_longer_installed ... ok
+test setup::tests::session_scope_writes_only_owned_files ... ok
+test setup::tests::the_real_observer_mod_copies_without_tests ... ok
+test setup::tests::symlinked_settings_are_written_through_to_their_target ... ok
+test setup::tests::uninstall_after_foreign_edit_removes_only_owned_entries ... ok
+test setup::tests::uninstall_keeps_owner_edit_as_conflict ... ok
+test setup::tests::settings_that_cannot_be_merged_are_left_alone ... ok
+test setup::tests::worktree_hooks_are_never_installed ... ok
+test setup::tests::f2::f2_01_unchanged_install_reinstall_remove_is_byte_exact_for_ten_cycles ... ok
+test setup::tests::ten_cycles_restore_the_original_bytes_exactly ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 41 filtered out; finished in 3.59s
+
