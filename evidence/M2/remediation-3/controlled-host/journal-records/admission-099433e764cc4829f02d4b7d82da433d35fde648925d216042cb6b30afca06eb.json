@@ -1,0 +1,912 @@
+{
+  "captures": [
+    {
+      "activationRef": null,
+      "actorNativeId": null,
+      "adapterId": "threadspace-observer-ownership",
+      "adapterVersion": "1",
+      "callbackEntrySequence": null,
+      "callbackResultSequence": null,
+      "capturedAt": {
+        "bootId": "f1b-boot",
+        "clockQuality": "LOCAL_MONOTONIC",
+        "endpointId": null,
+        "monotonicNs": "1000000000",
+        "wallTimeMs": 1791000000000
+      },
+      "evidence": [
+        {
+          "controllingDevice": 12,
+          "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+          "key": {
+            "bootId": "f1b-boot",
+            "endpointId": "",
+            "pid": 710,
+            "startMicroseconds": 7,
+            "startSeconds": "1700"
+          },
+          "parentPid": 100,
+          "role": "PROVIDER"
+        }
+      ],
+      "nativeEvent": "ownership.proven",
+      "nativeOccurrenceId": null,
+      "nativePromptId": null,
+      "nativeTurnId": null,
+      "observationId": "00000000-0000-0000-0000-0000000003eb",
+      "payload": {
+        "inventoryEndMs": 11,
+        "inventoryStartMs": 10,
+        "proofToken": "33333333-3333-4333-8333-333333333333",
+        "sessionGeneration": 3,
+        "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+      },
+      "providerVersion": "2.1.295",
+      "schemaVersion": 1,
+      "sequenceMeaning": null,
+      "sessionKey": {
+        "nativeSessionId": "A",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      },
+      "sourceEpoch": "33333333-3333-4333-8333-333333333333",
+      "sourceId": "claude.observer.ownership",
+      "sourceSequence": null
+    },
+    {
+      "activationRef": null,
+      "actorNativeId": null,
+      "adapterId": "threadspace-observer",
+      "adapterVersion": "1",
+      "callbackEntrySequence": "9",
+      "callbackResultSequence": "10",
+      "capturedAt": {
+        "bootId": "f1b-boot",
+        "clockQuality": "REMOTE_REPORTED",
+        "endpointId": null,
+        "monotonicNs": null,
+        "wallTimeMs": 1791000000010
+      },
+      "evidence": [
+        {
+          "controllingDevice": 12,
+          "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+          "key": {
+            "bootId": "f1b-boot",
+            "endpointId": "",
+            "pid": 710,
+            "startMicroseconds": 7,
+            "startSeconds": "1700"
+          },
+          "parentPid": 100,
+          "role": "PROVIDER"
+        }
+      ],
+      "nativeEvent": "ownership.seal",
+      "nativeOccurrenceId": null,
+      "nativePromptId": null,
+      "nativeTurnId": null,
+      "observationId": "00000000-0000-0000-0000-00000000000a",
+      "payload": {
+        "detail": {
+          "core": {
+            "coreSettled": true
+          },
+          "reason": "answer"
+        },
+        "dispatchPlugin": "engine",
+        "dispatchTier": "core",
+        "engineDispatch": true,
+        "ownershipEpoch": "22222222-2222-4222-8222-222222222222",
+        "ownershipGeneration": 3,
+        "ownershipProofToken": "33333333-3333-4333-8333-333333333333",
+        "ownershipStatus": "HOST_READ",
+        "phase": "result",
+        "sessionGeneration": 3,
+        "sessionIdSource": "session.id"
+      },
+      "providerVersion": null,
+      "schemaVersion": 1,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sessionKey": {
+        "nativeSessionId": "A",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      },
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "10"
+    },
+    {
+      "activationRef": null,
+      "actorNativeId": null,
+      "adapterId": "threadspace-observer",
+      "adapterVersion": "1",
+      "callbackEntrySequence": "19",
+      "callbackResultSequence": "20",
+      "capturedAt": {
+        "bootId": "f1b-boot",
+        "clockQuality": "REMOTE_REPORTED",
+        "endpointId": null,
+        "monotonicNs": null,
+        "wallTimeMs": 1791000000020
+      },
+      "evidence": [
+        {
+          "controllingDevice": 12,
+          "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+          "key": {
+            "bootId": "f1b-boot",
+            "endpointId": "",
+            "pid": 710,
+            "startMicroseconds": 7,
+            "startSeconds": "1700"
+          },
+          "parentPid": 100,
+          "role": "PROVIDER"
+        }
+      ],
+      "nativeEvent": "turn.start",
+      "nativeOccurrenceId": null,
+      "nativePromptId": null,
+      "nativeTurnId": "new-turn",
+      "observationId": "00000000-0000-0000-0000-000000000014",
+      "payload": {
+        "detail": {
+          "core": {
+            "coreSettled": true
+          },
+          "reason": "answer"
+        },
+        "dispatchPlugin": "engine",
+        "dispatchTier": "core",
+        "engineDispatch": true,
+        "ownershipEpoch": "22222222-2222-4222-8222-222222222222",
+        "ownershipGeneration": 3,
+        "ownershipProofToken": "33333333-3333-4333-8333-333333333333",
+        "ownershipStatus": "HOST_READ",
+        "phase": "result",
+        "sessionGeneration": 3,
+        "sessionIdSource": "session.id"
+      },
+      "providerVersion": null,
+      "schemaVersion": 1,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sessionKey": {
+        "nativeSessionId": "A",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      },
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "20"
+    },
+    {
+      "activationRef": null,
+      "actorNativeId": null,
+      "adapterId": "threadspace-observer",
+      "adapterVersion": "1",
+      "callbackEntrySequence": "29",
+      "callbackResultSequence": "30",
+      "capturedAt": {
+        "bootId": "f1b-boot",
+        "clockQuality": "REMOTE_REPORTED",
+        "endpointId": null,
+        "monotonicNs": null,
+        "wallTimeMs": 1791000000030
+      },
+      "evidence": [
+        {
+          "controllingDevice": 12,
+          "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+          "key": {
+            "bootId": "f1b-boot",
+            "endpointId": "",
+            "pid": 710,
+            "startMicroseconds": 7,
+            "startSeconds": "1700"
+          },
+          "parentPid": 100,
+          "role": "PROVIDER"
+        }
+      ],
+      "nativeEvent": "turn.complete",
+      "nativeOccurrenceId": null,
+      "nativePromptId": null,
+      "nativeTurnId": "new-turn",
+      "observationId": "00000000-0000-0000-0000-00000000001e",
+      "payload": {
+        "detail": {
+          "core": {
+            "coreSettled": true
+          },
+          "reason": "answer"
+        },
+        "dispatchPlugin": "engine",
+        "dispatchTier": "core",
+        "engineDispatch": true,
+        "ownershipEpoch": "22222222-2222-4222-8222-222222222222",
+        "ownershipGeneration": 3,
+        "ownershipProofToken": "33333333-3333-4333-8333-333333333333",
+        "ownershipStatus": "HOST_READ",
+        "phase": "result",
+        "sessionGeneration": 3,
+        "sessionIdSource": "session.id"
+      },
+      "providerVersion": null,
+      "schemaVersion": 1,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sessionKey": {
+        "nativeSessionId": "A",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      },
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "30"
+    }
+  ],
+  "deliveryOrder": [
+    0,
+    2,
+    1,
+    3,
+    3
+  ],
+  "digest": {
+    "checkpointCursor": 4,
+    "checkpointSha256": "099433e764cc4829f02d4b7d82da433d35fde648925d216042cb6b30afca06eb",
+    "entries": 4,
+    "facts": 5,
+    "firstCursor": 1,
+    "journalSha256": "48e157cb4ceb91c5d290845814834224ddd2a812b332ac9041517551771492ee",
+    "lastCursor": 4,
+    "projectionSha256": "6e49c240ca18c499ed5023d0c732776d5ffd3bcef04f73d9ee9a4b14eb4f2be1",
+    "reducerVersion": 4,
+    "schemaVersion": 3,
+    "semanticSha256": "7bf6c1f4791bafdd3a16094cc28604c83cea2c842d9f0578024371861a16c40d",
+    "stateSha256": "099433e764cc4829f02d4b7d82da433d35fde648925d216042cb6b30afca06eb",
+    "tablesSha256": "6e49c240ca18c499ed5023d0c732776d5ffd3bcef04f73d9ee9a4b14eb4f2be1"
+  },
+  "entries": [
+    {
+      "capturedWallMs": 1791000000000,
+      "cursor": 1,
+      "delivery": "LIVE",
+      "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+      "facts": [
+        {
+          "causal": null,
+          "factId": "1a7d074d-81b1-435d-ad06-245c2b4b43d0",
+          "factIndex": 0,
+          "native": {
+            "activity": null,
+            "actor": null,
+            "attention": null,
+            "execution": null,
+            "input": null,
+            "observerOwnership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "process": {
+              "bootId": "f1b-boot",
+              "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+              "pid": 710,
+              "startMicroseconds": 7,
+              "startSeconds": "1700"
+            },
+            "relatedActor": null,
+            "request": null,
+            "session": {
+              "nativeSessionId": "A",
+              "profileRef": "claude-cli:/f1b/.claude",
+              "provider": "claude"
+            },
+            "surface": null,
+            "turn": null
+          },
+          "observationId": "00000000-0000-0000-0000-0000000003eb",
+          "payload": {
+            "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+            "kind": "PROCESS_OBSERVED"
+          },
+          "payloadVersion": 2,
+          "provenance": "KERNEL",
+          "refs": {
+            "activityId": null,
+            "actorId": null,
+            "attentionId": null,
+            "bindingId": null,
+            "executionId": null,
+            "inputId": null,
+            "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "relatedActorId": null,
+            "request": null,
+            "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+            "surfaceId": null,
+            "turnId": null
+          }
+        },
+        {
+          "causal": null,
+          "factId": "277b4945-c24d-41ae-b027-5194e3db4c69",
+          "factIndex": 1,
+          "native": {
+            "activity": null,
+            "actor": null,
+            "attention": null,
+            "execution": null,
+            "input": null,
+            "observerOwnership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "process": {
+              "bootId": "f1b-boot",
+              "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+              "pid": 710,
+              "startMicroseconds": 7,
+              "startSeconds": "1700"
+            },
+            "relatedActor": null,
+            "request": null,
+            "session": {
+              "nativeSessionId": "A",
+              "profileRef": "claude-cli:/f1b/.claude",
+              "provider": "claude"
+            },
+            "surface": null,
+            "turn": null
+          },
+          "observationId": "00000000-0000-0000-0000-0000000003eb",
+          "payload": {
+            "kind": "OBSERVER_OWNERSHIP_CORROBORATED"
+          },
+          "payloadVersion": 2,
+          "provenance": "PROVIDER_SNAPSHOT",
+          "refs": {
+            "activityId": null,
+            "actorId": null,
+            "attentionId": null,
+            "bindingId": null,
+            "executionId": null,
+            "inputId": null,
+            "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "relatedActorId": null,
+            "request": null,
+            "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+            "surfaceId": null,
+            "turnId": null
+          }
+        }
+      ],
+      "observationId": "00000000-0000-0000-0000-0000000003eb",
+      "payloadVersion": 2,
+      "sequenceMeaning": null,
+      "sourceEpoch": "33333333-3333-4333-8333-333333333333",
+      "sourceId": "claude.observer.ownership",
+      "sourceSequence": null
+    },
+    {
+      "capturedWallMs": 1791000000020,
+      "cursor": 2,
+      "delivery": "LIVE",
+      "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+      "facts": [
+        {
+          "causal": {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "20",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          },
+          "factId": "89607443-fbaf-48e7-ae0e-a8c6fccc849c",
+          "factIndex": 0,
+          "native": {
+            "activity": null,
+            "actor": null,
+            "attention": null,
+            "execution": null,
+            "input": null,
+            "observerOwnership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "process": {
+              "bootId": "f1b-boot",
+              "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+              "pid": 710,
+              "startMicroseconds": 7,
+              "startSeconds": "1700"
+            },
+            "relatedActor": null,
+            "request": null,
+            "session": {
+              "nativeSessionId": "A",
+              "profileRef": "claude-cli:/f1b/.claude",
+              "provider": "claude"
+            },
+            "surface": null,
+            "turn": "new-turn"
+          },
+          "observationId": "00000000-0000-0000-0000-000000000014",
+          "payload": {
+            "kind": "TURN_STARTED"
+          },
+          "payloadVersion": 2,
+          "provenance": "HOST_READ",
+          "refs": {
+            "activityId": null,
+            "actorId": "d32184a6-f5c0-4354-b865-aede32eb11ff",
+            "attentionId": null,
+            "bindingId": null,
+            "executionId": null,
+            "inputId": null,
+            "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "relatedActorId": null,
+            "request": null,
+            "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+            "surfaceId": null,
+            "turnId": "84faedc8-18ff-47b1-8a27-dba3db26b26c"
+          }
+        }
+      ],
+      "observationId": "00000000-0000-0000-0000-000000000014",
+      "payloadVersion": 2,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "20"
+    },
+    {
+      "capturedWallMs": 1791000000010,
+      "cursor": 3,
+      "delivery": "LIVE",
+      "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+      "facts": [
+        {
+          "causal": {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "10",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          },
+          "factId": "4b8a7a62-a93f-4a43-8b43-a54c9c12208e",
+          "factIndex": 0,
+          "native": {
+            "activity": null,
+            "actor": null,
+            "attention": null,
+            "execution": null,
+            "input": null,
+            "observerOwnership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "process": {
+              "bootId": "f1b-boot",
+              "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+              "pid": 710,
+              "startMicroseconds": 7,
+              "startSeconds": "1700"
+            },
+            "relatedActor": null,
+            "request": null,
+            "session": {
+              "nativeSessionId": "A",
+              "profileRef": "claude-cli:/f1b/.claude",
+              "provider": "claude"
+            },
+            "surface": null,
+            "turn": null
+          },
+          "observationId": "00000000-0000-0000-0000-00000000000a",
+          "payload": {
+            "kind": "OBSERVATION_LINK_CHANGED",
+            "link": "CURRENT",
+            "qualified": true,
+            "version": "2.1.295"
+          },
+          "payloadVersion": 2,
+          "provenance": "HOST_READ",
+          "refs": {
+            "activityId": null,
+            "actorId": null,
+            "attentionId": null,
+            "bindingId": null,
+            "executionId": null,
+            "inputId": null,
+            "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "relatedActorId": null,
+            "request": null,
+            "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+            "surfaceId": null,
+            "turnId": null
+          }
+        }
+      ],
+      "observationId": "00000000-0000-0000-0000-00000000000a",
+      "payloadVersion": 2,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "10"
+    },
+    {
+      "capturedWallMs": 1791000000030,
+      "cursor": 4,
+      "delivery": "LIVE",
+      "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+      "facts": [
+        {
+          "causal": {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "30",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          },
+          "factId": "d7ba4f6c-2754-4bdd-8a71-1837f60f3765",
+          "factIndex": 0,
+          "native": {
+            "activity": null,
+            "actor": null,
+            "attention": null,
+            "execution": null,
+            "input": null,
+            "observerOwnership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "process": {
+              "bootId": "f1b-boot",
+              "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+              "pid": 710,
+              "startMicroseconds": 7,
+              "startSeconds": "1700"
+            },
+            "relatedActor": null,
+            "request": null,
+            "session": {
+              "nativeSessionId": "A",
+              "profileRef": "claude-cli:/f1b/.claude",
+              "provider": "claude"
+            },
+            "surface": null,
+            "turn": "new-turn"
+          },
+          "observationId": "00000000-0000-0000-0000-00000000001e",
+          "payload": {
+            "kind": "TURN_OUTCOME_OBSERVED",
+            "outcome": "COMPLETED",
+            "reason": "answer",
+            "summary": null
+          },
+          "payloadVersion": 2,
+          "provenance": "HOST_READ",
+          "refs": {
+            "activityId": null,
+            "actorId": "d32184a6-f5c0-4354-b865-aede32eb11ff",
+            "attentionId": null,
+            "bindingId": null,
+            "executionId": null,
+            "inputId": null,
+            "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "relatedActorId": null,
+            "request": null,
+            "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+            "surfaceId": null,
+            "turnId": "84faedc8-18ff-47b1-8a27-dba3db26b26c"
+          }
+        }
+      ],
+      "observationId": "00000000-0000-0000-0000-00000000001e",
+      "payloadVersion": 2,
+      "sequenceMeaning": "OBSERVER_CAPTURE",
+      "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+      "sourceId": "claude.observer",
+      "sourceSequence": "30"
+    }
+  ],
+  "execution": "controlled host fixture: actual observer/mod-batch adapters, SQLite and pure reducer",
+  "platform": "macos",
+  "state": {
+    "activities": {},
+    "actors": {
+      "d32184a6-f5c0-4354-b865-aede32eb11ff": {
+        "agentTypes": [],
+        "createdCursor": 2,
+        "id": "d32184a6-f5c0-4354-b865-aede32eb11ff",
+        "native": {
+          "kind": "PRINCIPAL"
+        },
+        "revision": 2,
+        "role": "PRINCIPAL",
+        "runsEnded": 0,
+        "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793"
+      }
+    },
+    "attention": {
+      "0e81959e-4331-8897-ae67-0fd4eb23f80f": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "d32184a6-f5c0-4354-b865-aede32eb11ff",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791000000030,
+        "createdByFact": "d7ba4f6c-2754-4bdd-8a71-1837f60f3765",
+        "createdByObservation": "00000000-0000-0000-0000-00000000001e",
+        "createdCursor": 4,
+        "id": "0e81959e-4331-8897-ae67-0fd4eb23f80f",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 4,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "84faedc8-18ff-47b1-8a27-dba3db26b26c"
+        },
+        "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "84faedc8-18ff-47b1-8a27-dba3db26b26c"
+      }
+    },
+    "attentionByScope": {
+      "[\"attention\",\"dcaf059b-de47-4285-bb8a-35844f588793\",\"TURN_OUTPUT\",\"84faedc8-18ff-47b1-8a27-dba3db26b26c\"]": "0e81959e-4331-8897-ae67-0fd4eb23f80f"
+    },
+    "bindings": {},
+    "commands": {},
+    "coverage": {
+      "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]": {
+        "gaps": [
+          {
+            "first": "11",
+            "last": "19"
+          },
+          {
+            "first": "21",
+            "last": "29"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"22222222-2222-4222-8222-222222222222\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 4,
+        "seen": [
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "20",
+            "last": "20"
+          },
+          {
+            "first": "30",
+            "last": "30"
+          }
+        ],
+        "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+        "sourceId": "claude.observer"
+      }
+    },
+    "executions": {},
+    "frontiers": {},
+    "inputs": {},
+    "namespaces": {
+      "c184c9d2-9436-4d5c-9be5-b3a1d6a75564": {
+        "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+        "id": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+        "profileRef": "claude-cli:/f1b/.claude",
+        "provider": "claude"
+      }
+    },
+    "outbox": {
+      "9291b2d3-5e32-84bc-b757-09f439ce1cb4": {
+        "attentionId": "0e81959e-4331-8897-ae67-0fd4eb23f80f",
+        "createdAtMs": 1791000000030,
+        "createdCursor": 4,
+        "detail": null,
+        "requestId": "9291b2d3-5e32-84bc-b757-09f439ce1cb4",
+        "revision": 4,
+        "state": "PENDING",
+        "updatedAtMs": 1791000000030
+      }
+    },
+    "processes": {
+      "a0523895-e9c6-49c1-988f-18e877bc3a4b": {
+        "createdCursor": 1,
+        "currentExecutable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+        "exited": false,
+        "id": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+        "images": [
+          {
+            "executable": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+            "point": null
+          }
+        ],
+        "key": {
+          "bootId": "f1b-boot",
+          "endpointId": "f4ac3cc4-290e-4ed6-82e6-3285b70b4773",
+          "pid": 710,
+          "startMicroseconds": 7,
+          "startSeconds": "1700"
+        },
+        "revision": 1
+      }
+    },
+    "reducerVersion": 4,
+    "relations": [],
+    "requests": {},
+    "sessions": {
+      "dcaf059b-de47-4285-bb8a-35844f588793": {
+        "createdCursor": 1,
+        "displayName": null,
+        "executionPresence": "UNKNOWN",
+        "fixture": false,
+        "id": "dcaf059b-de47-4285-bb8a-35844f588793",
+        "inventory": null,
+        "lastRoute": null,
+        "link": "CURRENT",
+        "linkConflict": false,
+        "links": [
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "00000000-0000-0000-0000-00000000000a",
+            "ownership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "10",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "provenance": "HOST_READ",
+            "qualified": true,
+            "version": "2.1.295"
+          }
+        ],
+        "namespaceId": "c184c9d2-9436-4d5c-9be5-b3a1d6a75564",
+        "nativeSessionId": "A",
+        "observation": "CURRENT",
+        "observerTier": "RESTORED",
+        "observerVersion": "2.1.295",
+        "ownershipProofs": [
+          {
+            "factIndex": 1,
+            "observationId": "00000000-0000-0000-0000-0000000003eb",
+            "ownership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b"
+          }
+        ],
+        "recordState": "KNOWN",
+        "revision": 4,
+        "startSources": [],
+        "turnState": "COMPLETED"
+      }
+    },
+    "surfaces": {},
+    "throughCursor": 4,
+    "turns": {
+      "84faedc8-18ff-47b1-8a27-dba3db26b26c": {
+        "activitySeen": false,
+        "actorId": "d32184a6-f5c0-4354-b865-aede32eb11ff",
+        "createdCursor": 2,
+        "executionIds": [],
+        "id": "84faedc8-18ff-47b1-8a27-dba3db26b26c",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "new-turn",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "30",
+            "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [
+          {
+            "factIndex": 0,
+            "observationId": "00000000-0000-0000-0000-000000000014",
+            "ownership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "20",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b"
+          }
+        ],
+        "pendingOutcomes": [
+          {
+            "factIndex": 0,
+            "observationId": "00000000-0000-0000-0000-00000000001e",
+            "outcome": "COMPLETED",
+            "ownership": {
+              "executableIdentity": "/f1b/.local/share/claude/versions/2.1.295#1:2",
+              "proofToken": "33333333-3333-4333-8333-333333333333",
+              "sessionGeneration": 3,
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:22222222-2222-4222-8222-222222222222",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "30",
+              "sourceEpoch": "22222222-2222-4222-8222-222222222222",
+              "sourceId": "claude.observer"
+            },
+            "processId": "a0523895-e9c6-49c1-988f-18e877bc3a4b",
+            "reason": "answer"
+          }
+        ],
+        "queuedInputs": [],
+        "revision": 4,
+        "sessionId": "dcaf059b-de47-4285-bb8a-35844f588793",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": false,
+        "summary": null
+      }
+    },
+    "waits": {}
+  },
+  "stepwiseSqlite": false
+}

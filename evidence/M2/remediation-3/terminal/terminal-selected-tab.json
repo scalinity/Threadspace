@@ -1,0 +1,14 @@
+{
+  "name": "terminal-selected-tab",
+  "argv": [
+    "/usr/bin/osascript",
+    "-e",
+    "with timeout of 3 seconds\n tell application id \"com.apple.Terminal\"\n return properties of selected tab of front window\n end tell\nend timeout"
+  ],
+  "pid": 56049,
+  "exitStatus": 0,
+  "timedOut": false,
+  "elapsedMs": 136.071833,
+  "stdout": "font:SFMonoTerminal-Regular, title displays device name:false, cursor color:35700, 35700, 35700, current settings:current settings of tab 1 of window id 35046, title displays shell path:false, tty:/dev/ttys002, normal text color:57514, 57514, 57514, title displays window size:false, title displays custom title:false, contents:\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n, number of rows:38, processes:login, -zsh, clean commands:, font antialiasing:false, background color:6447, 7462, 10000, custom title:, class:tab, title displays file name:false, history:\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n, selected:true, size:14, bold text color:60853, 60853, 60853, busy:true, number of columns:127\n",
+  "stderr": ""
+}

@@ -1,0 +1,14 @@
+{
+  "name": "terminal-window-ids",
+  "argv": [
+    "/usr/bin/osascript",
+    "-e",
+    "with timeout of 3 seconds\n tell application id \"com.apple.Terminal\"\n return id of every window\n end tell\nend timeout"
+  ],
+  "pid": 56002,
+  "exitStatus": 0,
+  "timedOut": false,
+  "elapsedMs": 141.337542,
+  "stdout": "35046\n",
+  "stderr": ""
+}

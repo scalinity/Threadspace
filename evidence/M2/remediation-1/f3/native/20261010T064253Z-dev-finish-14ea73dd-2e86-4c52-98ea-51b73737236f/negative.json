@@ -1,0 +1,135 @@
+{
+  "after": {
+    "endedMs": 1791614574762,
+    "frontmostBundle": "com.mitchellh.ghostty",
+    "note": "Independent read-only witness after the completed attempt; no retry can repair the product result or deadline.",
+    "selection": {
+      "atMs": 1791614574626,
+      "error": null,
+      "front": 35063,
+      "selected": {
+        "35046": "/dev/ttys002",
+        "35063": "/dev/ttys003",
+        "35065": "/dev/ttys004"
+      }
+    },
+    "startedMs": 1791614574478,
+    "targetState": {
+      "endedMs": 1791614574762,
+      "matchingTtyCount": 1,
+      "miniaturized": false,
+      "ok": true,
+      "raw": {
+        "elapsedMs": 122,
+        "ok": true,
+        "senderPid": 83644,
+        "status": 0,
+        "stderr": "",
+        "stdout": "FOUND\tfalse\t1\t1\n",
+        "timedOut": false
+      },
+      "startedMs": 1791614574639,
+      "tabCount": 1
+    }
+  },
+  "before": {
+    "endedMs": 1791614574313,
+    "frontmostBundle": "com.mitchellh.ghostty",
+    "note": "Independent read-only witness after the completed attempt; no retry can repair the product result or deadline.",
+    "selection": {
+      "atMs": 1791614574156,
+      "error": null,
+      "front": 35063,
+      "selected": {
+        "35046": "/dev/ttys002",
+        "35063": "/dev/ttys003",
+        "35065": "/dev/ttys004"
+      }
+    },
+    "startedMs": 1791614574003,
+    "targetState": {
+      "endedMs": 1791614574313,
+      "matchingTtyCount": 1,
+      "miniaturized": false,
+      "ok": true,
+      "raw": {
+        "elapsedMs": 138,
+        "ok": true,
+        "senderPid": 83610,
+        "status": 0,
+        "stderr": "",
+        "stdout": "FOUND\tfalse\t1\t1\n",
+        "timedOut": false
+      },
+      "startedMs": 1791614574174,
+      "tabCount": 1
+    }
+  },
+  "case": "unknown-session-refusal",
+  "checks": {
+    "boundedRequest": true,
+    "explicitReturnIssued": true,
+    "honestUnavailable": true,
+    "independentFrontmostUnchanged": true,
+    "independentWindowAndSelectionsUnchanged": true,
+    "noFocusAppleEventReported": true,
+    "targetMinimizedStateUnchanged": true,
+    "unknownSessionVerifiedAbsent": true
+  },
+  "explicitReturn": true,
+  "journalCountRows": [
+    {
+      "n": 0
+    }
+  ],
+  "pass": true,
+  "route": {
+    "harnessElapsedMs": 1,
+    "requestId": "a637ba92-3a2a-42d7-bd7c-1c0fb74e6335",
+    "result": {
+      "bindingId": null,
+      "choices": [],
+      "evidence": {
+        "bindingId": null,
+        "bindingRevisionAfterFocus": null,
+        "bindingRevisionBeforeFocus": null,
+        "bindingRevisionLoaded": null,
+        "boundDevice": null,
+        "boundExecutable": null,
+        "focus": null,
+        "lookup": null,
+        "nativeSessionId": null,
+        "phases": [],
+        "postFocusLookup": null,
+        "postFocusSample": null,
+        "postLookupSample": null,
+        "preLookupSample": null,
+        "processKey": null,
+        "terminal": null
+      },
+      "focusPerformed": false,
+      "inputReadiness": "UNKNOWN",
+      "latencyMs": 0,
+      "reasonCode": "SESSION_NOT_FOUND",
+      "requestId": "a637ba92-3a2a-42d7-bd7c-1c0fb74e6335",
+      "sessionId": "4978f017-0261-43b8-a0f8-cd7a44a65ac7",
+      "sessionVerification": "UNBOUND",
+      "startedAtMs": 1791614574313,
+      "surfaceResult": "UNAVAILABLE",
+      "validatedBindingRevision": null
+    },
+    "selectionAfter": {
+      "atMs": 1791614574478,
+      "error": null,
+      "front": 35063,
+      "selected": {
+        "35046": "/dev/ttys002",
+        "35063": "/dev/ttys003",
+        "35065": "/dev/ttys004"
+      }
+    },
+    "sentMs": 1791614574313
+  },
+  "sessionAbsent": true,
+  "sessionId": "4978f017-0261-43b8-a0f8-cd7a44a65ac7"
+}

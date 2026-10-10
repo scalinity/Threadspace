@@ -1,0 +1,25 @@
+    Checking threadspace-contracts v0.1.0 (~/Documents/Tools/Threadspace/crates/contracts)
+   Compiling threadspace-desktop v0.1.0 (~/Documents/Tools/Threadspace/apps/desktop/src-tauri)
+    Checking threadspace-state-engine v0.1.0 (~/Documents/Tools/Threadspace/crates/state-engine)
+    Checking threadspace-surfaces-macos v0.1.0 (~/Documents/Tools/Threadspace/crates/surfaces-macos)
+    Checking threadspace-hook-probe v0.1.0 (~/Documents/Tools/Threadspace/tests/native/hook-probe)
+    Checking threadspace-codex-probe v0.1.0 (~/Documents/Tools/Threadspace/tests/native/codex-probe)
+    Checking threadspace-provider-claude v0.1.0 (~/Documents/Tools/Threadspace/crates/provider-claude)
+    Checking threadspace-journal v0.1.0 (~/Documents/Tools/Threadspace/crates/journal)
+    Checking threadspace-relay v0.1.0 (~/Documents/Tools/Threadspace/crates/relay)
+    Checking threadspace-surfaces v0.1.0 (~/Documents/Tools/Threadspace/crates/surfaces)
+    Checking threadspace-journal-crash v0.1.0 (~/Documents/Tools/Threadspace/tests/native/journal-crash)
+error: unused imports: `answer_census` and `observer_population_seal`
+  --> crates/journal/tests/../../relay/src/latency.rs:19:18
+   |
+19 | pub use census::{answer_census, observer_population_seal};
+   |                  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+    Checking threadspace-agent v0.1.0 (~/Documents/Tools/Threadspace/apps/agent-macos/core)
+    Checking threadspace-harness v0.1.0 (~/Documents/Tools/Threadspace/tests/native/harness)
+    Checking threadspace-qualify v0.1.0 (~/Documents/Tools/Threadspace/tests/native/qualify)
+error: could not compile `threadspace-journal` (test "qualification_latency") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

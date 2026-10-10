@@ -1,0 +1,14 @@
+{
+  "name": "terminal-selected-tty",
+  "argv": [
+    "/usr/bin/osascript",
+    "-e",
+    "with timeout of 3 seconds\n tell application id \"com.apple.Terminal\"\n return tty of selected tab of front window\n end tell\nend timeout"
+  ],
+  "pid": 56058,
+  "exitStatus": 0,
+  "timedOut": false,
+  "elapsedMs": 129.2705,
+  "stdout": "/dev/ttys002\n",
+  "stderr": ""
+}

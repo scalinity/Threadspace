@@ -1,0 +1,14 @@
+{
+  "name": "terminal-front-window",
+  "argv": [
+    "/usr/bin/osascript",
+    "-e",
+    "with timeout of 3 seconds\n tell application id \"com.apple.Terminal\"\n return id of front window\n end tell\nend timeout"
+  ],
+  "pid": 56034,
+  "exitStatus": 0,
+  "timedOut": false,
+  "elapsedMs": 143.922958,
+  "stdout": "35046\n",
+  "stderr": ""
+}

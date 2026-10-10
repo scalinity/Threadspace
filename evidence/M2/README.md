@@ -8,7 +8,9 @@ ownership/cleanup (F2), the minimized-window positive Return case (F3), and the
 normal-path latency measurement (F4). The focused implementation and execution
 portable records are under [`remediation-1/`](remediation-1/README.md). The
 source-matched Mac build, native F2 qualification and blocked F3 attempts are
-under [`remediation-2/`](remediation-2/README.md). The current
+under [`remediation-2/`](remediation-2/README.md). Bounded Terminal recovery,
+five minimized positives, native ownership/reload and the incomplete latency
+measurement are under [`remediation-3/`](remediation-3/README.md). The current
 [`manifest.json`](manifest.json) is the status and provenance index; it does not
 inherit the rejected candidate's PASS labels.
 
@@ -22,16 +24,17 @@ D-0009 and D-0010 remain **PROPOSED — pending independent re-review**.
 
 | Finding | Implemented or established | Remaining mandatory evidence |
 | --- | --- | --- |
-| F1A: delayed callback ownership | An immutable native Turn/actor ownership ledger preserves the original Session, observer epoch and generation. Ambiguous reused IDs and first-seen late events stay nonauthoritative. Actual TypeScript captures are tested through the production adapter and SQLite. The new signed Dev application is installed with matching hashes. | Focused real-Claude ownership/native-origin smoke; no owned native Session was established during the Mac attempt. |
-| F1B: reload authority | Independent helper-created proof, scope seal and a later qualified Turn start replace permanent authority from historical attachments. The proposed reducer is now version 4, with an explicit retained-fact upgrade for reducer-3 development stores. | Native execution of the new inventory/kernel proof producer and unchanged-ID reload/new-Turn smoke. The old 819 ms RESTORED result does not qualify this predicate. |
+| F1A: delayed callback ownership | PASS in the focused real-Claude 2.1.295 native-origin smoke plus 14 separately labelled controlled ownership/fail-open cases, through adapter/SQLite/restart. | Independent review of source-bound native and controlled records. |
+| F1B: reload authority | PASS in fresh independent native proof, matching reload seal, post-seal Turn and RESTORED outcome; 19 retained native envelopes pass the unchanged complete isolated replay oracle. Causal negatives and genuine reducer-3 migrations pass separately. | Independent review. The long-lived Dev store's empty-genesis full hash still fails on legacy baseline history; that diagnostic is preserved and is not represented as a passing full-store check. |
 | F2: integration ownership | Structural conflicts, retained resources, strict installation identity and acquired-resource cleanup passed the new focused native CLI/asset campaign: 13 cases/31 calls plus 9 refusal checks, 42 native installer tests and one native Scratch test. | Independent review of the new native records; historical portable controls remain source-scoped. |
-| F3: minimized Return | Original failures remain preserved. Two new native attempts stopped before a Return: Terminal absent, then window/tab queries unavailable throughout the existing 600-second readiness wait. Acquired integration cleanup succeeded. | **BLOCKING:** 0 of 5 required minimized-window successes; relevant negatives and phase evidence under the unchanged 2,000 ms deadline remain required. No native route was issued in the Mac attempt. |
-| F4: latency | Actual SQLite COMMIT brackets, a monotonic/cross-runtime interval model, DOM-application marks and explicit population checks replace the old calculation. Incomplete clock, source-census, identity or tail evidence refuses PASS. | Complete independently closed source populations, positive native clock qualification and native capture → COMMIT → DOM samples for both sources. Exporter/calculator were not run in the Mac attempt; no native p95 is established. |
+| F3: minimized Return | PASS: five exact verified minimized Returns in 1,206–1,260 ms, absent-Session refusal without focus mutation and verified acquired cleanup. Previous failures remain preserved. | Independent review of the original positives and separate source-bound finish; immutable deadline is 2,000 ms. |
+| F4: latency | 20 independently issued hook captures and 21 independently closed real observer captures join true COMMIT and applied-DOM records. The double-loss census control retains the missing invocation. | **INCOMPLETE:** cross-runtime maximum rate/precision qualification and conservative source-specific performance proof. Unqualified observer capture→COMMIT diagnostic p95 is 216.025 ms; no valid native latency PASS is established. |
 
 The portable remediation ran on Linux. The subsequent Mac attempt built and
 installed source `4aef4a96f0e21844b35271246a151629a77bceb2`, qualified F2,
-and preserved the Terminal scripting blocker. No new F1 or F4 native execution
-is inferred from the build or F2 results.
+and preserved the Terminal scripting blocker. The separate remediation-3
+attempt records actual new native execution after two bounded element-query
+passes. None of its evidence is inferred from a successful build or F2 result.
 
 ## Preserved historical qualification
 
@@ -59,11 +62,12 @@ not identify a build of the remediation source.
 
 ## Corrected dispositions
 
-- **Minimized-window Return is an M2 blocker.** The two TIMEOUT results at
+- **The original minimized-window Return failures were M2 blockers.** The two TIMEOUT results at
   2,007 and 2,003 ms were not successful exact Returns. Readback still selected
   the harness spare TTY after the target was no longer minimized. The old
   conditional `wrongTarget:false` field does not establish absence of focus
-  side effects. This positive gate is not deferred to M13.
+  side effects. The five source-matched remediation-3 positives close that
+  focused native gate pending review; it was not deferred to M13.
 - **Normal-route p95 remains unmet:** 895 ms versus the 750 ms target, with
   maximum 968 ms. Its accepted M0B/M13 deferral is separate from the minimized
   positive-case blocker. The hard per-attempt budget remains 2,000 ms.

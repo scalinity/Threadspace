@@ -1,0 +1,25 @@
+{
+  "sourceCommit": "89f85da7f4dfd93f9142e49865505ce5c97fa8da",
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "--locked",
+    "-p",
+    "threadspace-journal",
+    "--features",
+    "qualification",
+    "--test",
+    "observer_ownership",
+    "f1_native_captured_observer_and_proof_have_exact_isolated_replay",
+    "--",
+    "--ignored"
+  ],
+  "host": "darwin",
+  "exitCode": 0,
+  "elapsedMs": 1923.950917,
+  "nativeInputSha256": "cb255d10164960031748d7b43ed5dcc0d30265534a623c81596e847b7b5eb3ba",
+  "testExecutableSha256": "ddf3b135412d597f12144c6b16bdab75b928315f8a7e65238d2a38aadaa042d3",
+  "liveNativeSource": "295cac9577a020e21ad2d477c21562bf5c9debb7",
+  "evidenceType": "19 unchanged retained real-native envelopes through production adapters and a fresh isolated journal; not a repeated inference"
+}

@@ -1,0 +1,609 @@
+{
+  "envelopes": 19,
+  "evidenceType": "retained real-native envelopes re-admitted through production adapters to a new isolated journal",
+  "fullStateHash": "f8eda726d5b00645ac426d520cae9b1e9b1c61a850714d755e2f4ca33dd8f6ab",
+  "nativeSessionId": "9a666124-4134-4e09-82b5-616374c1a14d",
+  "state": {
+    "activities": {
+      "5fed2ace-2a8e-4d4f-807a-44e7920b02c1": {
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "createdCursor": 7,
+        "finished": [
+          "SUCCESS"
+        ],
+        "id": "5fed2ace-2a8e-4d4f-807a-44e7920b02c1",
+        "nativeOccurrenceId": "toolu_017NpYaUoB7bWPpJiAsppkLC",
+        "permissionChecked": true,
+        "proposed": false,
+        "revision": 10,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "started": true,
+        "toolCategories": [
+          "Bash"
+        ],
+        "turnId": null
+      }
+    },
+    "actors": {
+      "d1024a5f-ad64-4717-8466-a7d0954b76a3": {
+        "agentTypes": [],
+        "createdCursor": 4,
+        "id": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "native": {
+          "kind": "PRINCIPAL"
+        },
+        "revision": 4,
+        "role": "PRINCIPAL",
+        "runsEnded": 0,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3"
+      }
+    },
+    "attention": {
+      "16c2d218-ad70-8c07-b306-dc606d597dbf": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791616158477,
+        "createdByFact": "1a7dfeb1-2a71-45fb-ad68-a194f20b2caf",
+        "createdByObservation": "9a34f99f-2696-42db-97b6-cbe58bb4a3ed",
+        "createdCursor": 19,
+        "id": "16c2d218-ad70-8c07-b306-dc606d597dbf",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 19,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "df8ef55e-f835-46d8-960f-182fd057f638"
+        },
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "df8ef55e-f835-46d8-960f-182fd057f638"
+      },
+      "73837ad8-b3e9-8adb-9f87-fb06c7aef10f": {
+        "acknowledgedAtMs": null,
+        "acknowledgements": [],
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "category": "TURN_COMPLETE",
+        "createdAtMs": 1791616155367,
+        "createdByFact": "bba2aa66-f998-4193-888d-acb220274c43",
+        "createdByObservation": "027f270a-ab14-464a-96b2-3251658ad7d2",
+        "createdCursor": 12,
+        "id": "73837ad8-b3e9-8adb-9f87-fb06c7aef10f",
+        "notificationState": "PENDING",
+        "priority": 40,
+        "resolutionReason": null,
+        "resolutions": [],
+        "resolvedAtMs": null,
+        "revision": 12,
+        "scope": {
+          "kind": "TURN_OUTPUT",
+          "turnId": "11402f24-3028-4f2c-989b-810659c5a8bc"
+        },
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "snoozedUntilMs": null,
+        "summary": null,
+        "summaryAuthority": "NONE",
+        "turnId": "11402f24-3028-4f2c-989b-810659c5a8bc"
+      }
+    },
+    "attentionByScope": {
+      "[\"attention\",\"abbfa924-7d3d-4543-ba3c-ecbc70ee19c3\",\"TURN_OUTPUT\",\"11402f24-3028-4f2c-989b-810659c5a8bc\"]": "73837ad8-b3e9-8adb-9f87-fb06c7aef10f",
+      "[\"attention\",\"abbfa924-7d3d-4543-ba3c-ecbc70ee19c3\",\"TURN_OUTPUT\",\"df8ef55e-f835-46d8-960f-182fd057f638\"]": "16c2d218-ad70-8c07-b306-dc606d597dbf"
+    },
+    "bindings": {},
+    "commands": {},
+    "coverage": {
+      "[\"coverage\",\"claude.observer\",\"293cfc6a-831c-4779-8962-0b1efac4f8fb\"]": {
+        "gaps": [
+          {
+            "first": "2",
+            "last": "3"
+          },
+          {
+            "first": "7",
+            "last": "7"
+          },
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "13",
+            "last": "13"
+          },
+          {
+            "first": "16",
+            "last": "16"
+          },
+          {
+            "first": "18",
+            "last": "18"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"293cfc6a-831c-4779-8962-0b1efac4f8fb\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 12,
+        "seen": [
+          {
+            "first": "1",
+            "last": "1"
+          },
+          {
+            "first": "4",
+            "last": "6"
+          },
+          {
+            "first": "8",
+            "last": "9"
+          },
+          {
+            "first": "11",
+            "last": "12"
+          },
+          {
+            "first": "14",
+            "last": "15"
+          },
+          {
+            "first": "17",
+            "last": "17"
+          },
+          {
+            "first": "19",
+            "last": "19"
+          }
+        ],
+        "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+        "sourceId": "claude.observer"
+      },
+      "[\"coverage\",\"claude.observer\",\"e642a93b-22bb-4185-802e-ea310eaaf2bf\"]": {
+        "gaps": [
+          {
+            "first": "4",
+            "last": "4"
+          },
+          {
+            "first": "7",
+            "last": "8"
+          },
+          {
+            "first": "10",
+            "last": "10"
+          },
+          {
+            "first": "12",
+            "last": "12"
+          }
+        ],
+        "key": "[\"coverage\",\"claude.observer\",\"e642a93b-22bb-4185-802e-ea310eaaf2bf\"]",
+        "meaning": "OBSERVER_CAPTURE",
+        "reportedGaps": [],
+        "revision": 19,
+        "seen": [
+          {
+            "first": "3",
+            "last": "3"
+          },
+          {
+            "first": "5",
+            "last": "6"
+          },
+          {
+            "first": "9",
+            "last": "9"
+          },
+          {
+            "first": "11",
+            "last": "11"
+          },
+          {
+            "first": "13",
+            "last": "13"
+          }
+        ],
+        "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+        "sourceId": "claude.observer"
+      }
+    },
+    "executions": {},
+    "frontiers": {
+      "[\"frontier\",\"abbfa924-7d3d-4543-ba3c-ecbc70ee19c3\",\"d1024a5f-ad64-4717-8466-a7d0954b76a3\",\"claude.observer\",\"293cfc6a-831c-4779-8962-0b1efac4f8fb\",\"observer-capture\"]": {
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "key": "[\"frontier\",\"abbfa924-7d3d-4543-ba3c-ecbc70ee19c3\",\"d1024a5f-ad64-4717-8466-a7d0954b76a3\",\"claude.observer\",\"293cfc6a-831c-4779-8962-0b1efac4f8fb\",\"observer-capture\"]",
+        "maxSequence": "6",
+        "orderDomain": "observer-capture",
+        "predecessorKeys": [],
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+        "sourceId": "claude.observer"
+      }
+    },
+    "inputs": {
+      "230275d7-91e4-42cc-b593-ede49c8a6d72": {
+        "acceptances": [],
+        "activeTurnId": null,
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "createdCursor": 16,
+        "id": "230275d7-91e4-42cc-b593-ede49c8a6d72",
+        "nativeKey": "observer:e642a93b-22bb-4185-802e-ea310eaaf2bf:6",
+        "origin": "HUMAN_COMPOSER",
+        "rejections": [],
+        "revision": 16,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "startedTurns": [],
+        "submission": {
+          "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+          "nativePredecessorKeys": [],
+          "orderDomain": "observer-capture",
+          "sequence": "6",
+          "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+          "sourceId": "claude.observer"
+        },
+        "submissions": [
+          {
+            "activeTurnId": null,
+            "factIndex": 0,
+            "observationId": "1d621f54-9e7f-40f2-bb4a-0c5d3aa8cff7",
+            "origin": "HUMAN_COMPOSER",
+            "point": {
+              "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "6",
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "sourceId": "claude.observer"
+            }
+          }
+        ]
+      },
+      "44c666b6-b3e8-4a5a-8df8-fb6da7904e2f": {
+        "acceptances": [
+          {
+            "coreSettled": true,
+            "dropped": false,
+            "engineDispatch": true,
+            "originalOriginProtected": true
+          }
+        ],
+        "activeTurnId": null,
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "createdCursor": 4,
+        "id": "44c666b6-b3e8-4a5a-8df8-fb6da7904e2f",
+        "nativeKey": "observer:293cfc6a-831c-4779-8962-0b1efac4f8fb:6",
+        "origin": "HUMAN_COMPOSER",
+        "rejections": [],
+        "revision": 5,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "startedTurns": [],
+        "submission": {
+          "nativeKey": "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb",
+          "nativePredecessorKeys": [],
+          "orderDomain": "observer-capture",
+          "sequence": "6",
+          "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+          "sourceId": "claude.observer"
+        },
+        "submissions": [
+          {
+            "activeTurnId": null,
+            "factIndex": 0,
+            "observationId": "57f735e9-1100-427c-9d3f-0ee777f58a7f",
+            "origin": "HUMAN_COMPOSER",
+            "point": {
+              "nativeKey": "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "6",
+              "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "sourceId": "claude.observer"
+            }
+          }
+        ]
+      }
+    },
+    "namespaces": {
+      "2b88fba3-86c0-48f4-bc12-faf53d0fe673": {
+        "endpointId": "d5b2d034-f041-42fb-9a31-9a9cb9672cd7",
+        "id": "2b88fba3-86c0-48f4-bc12-faf53d0fe673",
+        "profileRef": "claude-cli:~/.claude",
+        "provider": "claude"
+      }
+    },
+    "outbox": {
+      "b790f9d8-7eb8-8c7a-84d0-d25bb04d4c8d": {
+        "attentionId": "16c2d218-ad70-8c07-b306-dc606d597dbf",
+        "createdAtMs": 1791616158477,
+        "createdCursor": 19,
+        "detail": null,
+        "requestId": "b790f9d8-7eb8-8c7a-84d0-d25bb04d4c8d",
+        "revision": 19,
+        "state": "PENDING",
+        "updatedAtMs": 1791616158477
+      },
+      "e00790e3-556f-8b14-bac1-359a6d312602": {
+        "attentionId": "73837ad8-b3e9-8adb-9f87-fb06c7aef10f",
+        "createdAtMs": 1791616155367,
+        "createdCursor": 12,
+        "detail": null,
+        "requestId": "e00790e3-556f-8b14-bac1-359a6d312602",
+        "revision": 12,
+        "state": "PENDING",
+        "updatedAtMs": 1791616155367
+      }
+    },
+    "processes": {
+      "85c95dc6-d74d-483e-8d5b-f86280de1314": {
+        "createdCursor": 1,
+        "currentExecutable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+        "exited": false,
+        "id": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+        "images": [
+          {
+            "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+            "point": null
+          }
+        ],
+        "key": {
+          "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+          "endpointId": "d5b2d034-f041-42fb-9a31-9a9cb9672cd7",
+          "pid": 13284,
+          "startMicroseconds": 927233,
+          "startSeconds": "1791616130"
+        },
+        "revision": 14
+      }
+    },
+    "reducerVersion": 4,
+    "relations": [],
+    "requests": {},
+    "sessions": {
+      "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3": {
+        "createdCursor": 1,
+        "displayName": null,
+        "executionPresence": "UNKNOWN",
+        "fixture": false,
+        "id": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "inventory": null,
+        "lastRoute": null,
+        "link": "CURRENT",
+        "linkConflict": false,
+        "links": [
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "0731512f-eb76-40d0-8bb5-e2a223a3aba5",
+            "ownership": {
+              "executableIdentity": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "proofToken": "97b26edf-f2db-44f0-9d85-aa6da433b194",
+              "sessionGeneration": 1,
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "5",
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+            "provenance": "HOST_READ",
+            "qualified": true,
+            "version": "2.1.295"
+          },
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "b82e37e2-c61f-4f3f-a01a-927ff9b53532",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "2",
+              "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+            "provenance": "PROVIDER_EVENT",
+            "qualified": true,
+            "version": "2.1.295"
+          },
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "e11c1284-7846-401b-99be-c5ebed261e74",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "5",
+              "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+            "provenance": "PROVIDER_EVENT",
+            "qualified": true,
+            "version": "2.1.295"
+          },
+          {
+            "factIndex": 0,
+            "link": "CURRENT",
+            "observationId": "f55a64c5-6168-4b53-8757-171ecdc04fc9",
+            "ownership": null,
+            "point": {
+              "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "nativePredecessorKeys": [
+                "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb"
+              ],
+              "orderDomain": "observer-capture",
+              "sequence": "1",
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+            "provenance": "HOST_READ",
+            "qualified": true,
+            "version": "2.1.295"
+          }
+        ],
+        "namespaceId": "2b88fba3-86c0-48f4-bc12-faf53d0fe673",
+        "nativeSessionId": "9a666124-4134-4e09-82b5-616374c1a14d",
+        "observation": "CURRENT",
+        "observerTier": "RESTORED",
+        "observerVersion": "2.1.295",
+        "ownershipProofs": [
+          {
+            "factIndex": 1,
+            "observationId": "e67c6430-cc6f-4ff4-b76b-c845edb9a16b",
+            "ownership": {
+              "executableIdentity": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "proofToken": "97b26edf-f2db-44f0-9d85-aa6da433b194",
+              "sessionGeneration": 1,
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314"
+          }
+        ],
+        "recordState": "KNOWN",
+        "revision": 19,
+        "startSources": [
+          "startup"
+        ],
+        "turnState": "COMPLETED"
+      }
+    },
+    "surfaces": {},
+    "throughCursor": 19,
+    "turns": {
+      "11402f24-3028-4f2c-989b-810659c5a8bc": {
+        "activitySeen": false,
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "createdCursor": 6,
+        "executionIds": [],
+        "id": "11402f24-3028-4f2c-989b-810659c5a8bc",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "07bf39db-d6c5-41f4-af14-34d697bc8a4b",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:293cfc6a-831c-4779-8962-0b1efac4f8fb",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "19",
+            "sourceEpoch": "293cfc6a-831c-4779-8962-0b1efac4f8fb",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [],
+        "pendingOutcomes": [],
+        "queuedInputs": [],
+        "revision": 12,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": true,
+        "summary": null
+      },
+      "df8ef55e-f835-46d8-960f-182fd057f638": {
+        "activitySeen": false,
+        "actorId": "d1024a5f-ad64-4717-8466-a7d0954b76a3",
+        "createdCursor": 17,
+        "executionIds": [],
+        "id": "df8ef55e-f835-46d8-960f-182fd057f638",
+        "identityKind": "NATIVE",
+        "nativeTurnId": "65c36ae7-fe50-42cf-9c89-76891519363f",
+        "outcomeConflict": false,
+        "outcomeReasons": [
+          "answer"
+        ],
+        "outcomes": [
+          "COMPLETED"
+        ],
+        "outputPoints": [
+          {
+            "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+            "nativePredecessorKeys": [],
+            "orderDomain": "observer-capture",
+            "sequence": "13",
+            "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+            "sourceId": "claude.observer"
+          }
+        ],
+        "outputReady": false,
+        "ownerFacing": true,
+        "ownershipStarts": [
+          {
+            "factIndex": 0,
+            "observationId": "eadc8582-9ec8-4d65-a93c-53d8a95dbc34",
+            "ownership": {
+              "executableIdentity": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "proofToken": "97b26edf-f2db-44f0-9d85-aa6da433b194",
+              "sessionGeneration": 1,
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "9",
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314"
+          }
+        ],
+        "pendingOutcomes": [
+          {
+            "factIndex": 0,
+            "observationId": "9a34f99f-2696-42db-97b6-cbe58bb4a3ed",
+            "outcome": "COMPLETED",
+            "ownership": {
+              "executableIdentity": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "proofToken": "97b26edf-f2db-44f0-9d85-aa6da433b194",
+              "sessionGeneration": 1,
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf"
+            },
+            "point": {
+              "nativeKey": "observer-epoch:e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "nativePredecessorKeys": [],
+              "orderDomain": "observer-capture",
+              "sequence": "13",
+              "sourceEpoch": "e642a93b-22bb-4185-802e-ea310eaaf2bf",
+              "sourceId": "claude.observer"
+            },
+            "processId": "85c95dc6-d74d-483e-8d5b-f86280de1314",
+            "reason": "answer"
+          }
+        ],
+        "queuedInputs": [],
+        "revision": 19,
+        "sessionId": "abbfa924-7d3d-4543-ba3c-ecbc70ee19c3",
+        "started": true,
+        "startedByInputs": [],
+        "state": "COMPLETED",
+        "stepped": true,
+        "summary": null
+      }
+    },
+    "waits": {}
+  },
+  "stepwiseSqliteCheckpointRestartAndGenesis": "PASS"
+}

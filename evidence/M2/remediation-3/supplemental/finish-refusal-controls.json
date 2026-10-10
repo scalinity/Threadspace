@@ -1,0 +1,1233 @@
+{
+  "harnessSha256": "c1b58733394d3d1ac3bd163ed546c9fbe014402f564bc49666bbd91812dabcfa",
+  "cases": [
+    {
+      "kind": "wrong-scope",
+      "syntheticFixture": true,
+      "exitStatus": 1,
+      "stdout": "",
+      "stderr": "retained installation is not the recorded Dev session acquisition\n",
+      "inputRecords": {
+        "fixture.json": {
+          "expected": {
+            "native": {
+              "after": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "before": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "confirmingInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425224,
+                "requestStartedMs": 1791613425076,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "endedMs": 1791613425225,
+              "evidenceSource": "production discover + KernelSampler + character_device; independent of route result",
+              "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "firstInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425076,
+                "requestStartedMs": 1791613424920,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "lookupBinary": "~/.local/share/claude/versions/2.1.295",
+              "nativeSessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+              "processKey": {
+                "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+                "endpointId": "1c56b203-c064-421c-8bc6-ad2df4be8afb",
+                "pid": 63528,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418"
+              },
+              "qualified": true,
+              "rdev": 268435459,
+              "runningVersion": "2.1.295",
+              "startedMs": 1791613424920,
+              "tty": "/dev/ttys003"
+            },
+            "otherTty": "/dev/ttys004",
+            "otherWindowId": 35065,
+            "sessionId": "ceda5120-f230-4076-8032-3eb3911472cf",
+            "windowId": 35063
+          },
+          "launch": "independently started in a new ordinary Terminal window; no Threadspace provider-launch command",
+          "modelTurnsRequested": 0,
+          "spare": {
+            "dir": "<owned-m2-temp-1>/spare",
+            "marker": "f5a10130-a296-4078-952c-a933dcd1d56a",
+            "tty": "/dev/ttys004",
+            "windowId": 35065
+          },
+          "target": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          }
+        },
+        "launch-ownership.json": {
+          "checks": {
+            "characterDevice": true,
+            "directoryIncarnation": true,
+            "ownedWorkingDirectoryProcess": true,
+            "recordedWindowAndSoleTab": true,
+            "terminalIncarnation": true
+          },
+          "device": 268435459,
+          "helperOwnership": {
+            "owned": true,
+            "processesInDir": [
+              63528
+            ],
+            "windowHasTty": true
+          },
+          "owned": true,
+          "tab": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          },
+          "terminalIncarnation": {
+            "pid": 55965,
+            "ppid": 1,
+            "startMicroseconds": 586317,
+            "startSeconds": 1791612993
+          },
+          "windowState": {
+            "endedMs": 1791613423336,
+            "matchingTtyCount": 1,
+            "miniaturized": false,
+            "ok": true,
+            "raw": {
+              "elapsedMs": 159,
+              "ok": true,
+              "senderPid": 63741,
+              "status": 0,
+              "stderr": "",
+              "stdout": "FOUND\tfalse\t1\t1\n",
+              "timedOut": false
+            },
+            "startedMs": 1791613423177,
+            "tabCount": 1
+          }
+        },
+        "integration-acquisition.json": {
+          "appIdentifier": "ai.scalinity.threadspace.dev",
+          "detail": {
+            "appliedSha256": "1d105690ebdb305fabacb8ac512640e7e446dc33aac0b5f805052e3b3317a6bc",
+            "backup": null,
+            "configPath": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session/settings.json",
+            "created": [
+              "/hooks",
+              "/hooks/SessionStart",
+              "/hooks/UserPromptSubmit",
+              "/hooks/Stop",
+              "/hooks/SubagentStop",
+              "/hooks/SubagentStart",
+              "/hooks/PreToolUse",
+              "/hooks/PostToolUse",
+              "/hooks/PostToolUseFailure",
+              "/hooks/PermissionRequest",
+              "/hooks/SessionEnd",
+              "/hooks/Notification",
+              "/hooks/StopFailure",
+              "/hooks/PermissionDenied",
+              "/hooks/PreCompact",
+              "/hooks/PostCompact"
+            ],
+            "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "identity": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<owned-m2-temp-1>/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "installedAtMs": 1791613343467,
+            "originalSha256": null,
+            "ownedEntries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "UserPromptSubmit",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Stop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUseFailure",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionRequest",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionEnd",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Notification",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "StopFailure",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionDenied",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "kind": "pluginDir",
+                "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+              }
+            ],
+            "partialUninstall": false,
+            "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+            "scope": "session"
+          },
+          "ok": true,
+          "operation": "install",
+          "scope": "user"
+        }
+      }
+    },
+    {
+      "kind": "wrong-config",
+      "syntheticFixture": true,
+      "exitStatus": 1,
+      "stdout": "",
+      "stderr": "retained installation is not the recorded Dev session acquisition\n",
+      "inputRecords": {
+        "fixture.json": {
+          "expected": {
+            "native": {
+              "after": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "before": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "confirmingInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425224,
+                "requestStartedMs": 1791613425076,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "endedMs": 1791613425225,
+              "evidenceSource": "production discover + KernelSampler + character_device; independent of route result",
+              "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "firstInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425076,
+                "requestStartedMs": 1791613424920,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "lookupBinary": "~/.local/share/claude/versions/2.1.295",
+              "nativeSessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+              "processKey": {
+                "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+                "endpointId": "1c56b203-c064-421c-8bc6-ad2df4be8afb",
+                "pid": 63528,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418"
+              },
+              "qualified": true,
+              "rdev": 268435459,
+              "runningVersion": "2.1.295",
+              "startedMs": 1791613424920,
+              "tty": "/dev/ttys003"
+            },
+            "otherTty": "/dev/ttys004",
+            "otherWindowId": 35065,
+            "sessionId": "ceda5120-f230-4076-8032-3eb3911472cf",
+            "windowId": 35063
+          },
+          "launch": "independently started in a new ordinary Terminal window; no Threadspace provider-launch command",
+          "modelTurnsRequested": 0,
+          "spare": {
+            "dir": "<owned-m2-temp-1>/spare",
+            "marker": "f5a10130-a296-4078-952c-a933dcd1d56a",
+            "tty": "/dev/ttys004",
+            "windowId": 35065
+          },
+          "target": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          }
+        },
+        "launch-ownership.json": {
+          "checks": {
+            "characterDevice": true,
+            "directoryIncarnation": true,
+            "ownedWorkingDirectoryProcess": true,
+            "recordedWindowAndSoleTab": true,
+            "terminalIncarnation": true
+          },
+          "device": 268435459,
+          "helperOwnership": {
+            "owned": true,
+            "processesInDir": [
+              63528
+            ],
+            "windowHasTty": true
+          },
+          "owned": true,
+          "tab": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          },
+          "terminalIncarnation": {
+            "pid": 55965,
+            "ppid": 1,
+            "startMicroseconds": 586317,
+            "startSeconds": 1791612993
+          },
+          "windowState": {
+            "endedMs": 1791613423336,
+            "matchingTtyCount": 1,
+            "miniaturized": false,
+            "ok": true,
+            "raw": {
+              "elapsedMs": 159,
+              "ok": true,
+              "senderPid": 63741,
+              "status": 0,
+              "stderr": "",
+              "stdout": "FOUND\tfalse\t1\t1\n",
+              "timedOut": false
+            },
+            "startedMs": 1791613423177,
+            "tabCount": 1
+          }
+        },
+        "integration-acquisition.json": {
+          "appIdentifier": "ai.scalinity.threadspace.dev",
+          "detail": {
+            "appliedSha256": "1d105690ebdb305fabacb8ac512640e7e446dc33aac0b5f805052e3b3317a6bc",
+            "backup": null,
+            "configPath": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session/settings.json",
+            "created": [
+              "/hooks",
+              "/hooks/SessionStart",
+              "/hooks/UserPromptSubmit",
+              "/hooks/Stop",
+              "/hooks/SubagentStop",
+              "/hooks/SubagentStart",
+              "/hooks/PreToolUse",
+              "/hooks/PostToolUse",
+              "/hooks/PostToolUseFailure",
+              "/hooks/PermissionRequest",
+              "/hooks/SessionEnd",
+              "/hooks/Notification",
+              "/hooks/StopFailure",
+              "/hooks/PermissionDenied",
+              "/hooks/PreCompact",
+              "/hooks/PostCompact"
+            ],
+            "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "identity": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "~/.codex/private-evidence/threadspace-m2/20261010T061633Z-terminal-recovery/not-acquired",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "installedAtMs": 1791613343467,
+            "originalSha256": null,
+            "ownedEntries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "UserPromptSubmit",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Stop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUseFailure",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionRequest",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionEnd",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Notification",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "StopFailure",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionDenied",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "kind": "pluginDir",
+                "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+              }
+            ],
+            "partialUninstall": false,
+            "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+            "scope": "session"
+          },
+          "ok": true,
+          "operation": "install",
+          "scope": "session"
+        }
+      }
+    },
+    {
+      "kind": "wrong-Terminal-incarnation",
+      "syntheticFixture": true,
+      "exitStatus": 1,
+      "stdout": "",
+      "stderr": "retained acquisition changed; no Return or cleanup issued\n",
+      "inputRecords": {
+        "fixture.json": {
+          "expected": {
+            "native": {
+              "after": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "before": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "confirmingInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425224,
+                "requestStartedMs": 1791613425076,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "endedMs": 1791613425225,
+              "evidenceSource": "production discover + KernelSampler + character_device; independent of route result",
+              "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "firstInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425076,
+                "requestStartedMs": 1791613424920,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "lookupBinary": "~/.local/share/claude/versions/2.1.295",
+              "nativeSessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+              "processKey": {
+                "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+                "endpointId": "1c56b203-c064-421c-8bc6-ad2df4be8afb",
+                "pid": 63528,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418"
+              },
+              "qualified": true,
+              "rdev": 268435459,
+              "runningVersion": "2.1.295",
+              "startedMs": 1791613424920,
+              "tty": "/dev/ttys003"
+            },
+            "otherTty": "/dev/ttys004",
+            "otherWindowId": 35065,
+            "sessionId": "ceda5120-f230-4076-8032-3eb3911472cf",
+            "windowId": 35063
+          },
+          "launch": "independently started in a new ordinary Terminal window; no Threadspace provider-launch command",
+          "modelTurnsRequested": 0,
+          "spare": {
+            "dir": "<owned-m2-temp-1>/spare",
+            "marker": "f5a10130-a296-4078-952c-a933dcd1d56a",
+            "tty": "/dev/ttys004",
+            "windowId": 35065
+          },
+          "target": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          }
+        },
+        "launch-ownership.json": {
+          "checks": {
+            "characterDevice": true,
+            "directoryIncarnation": true,
+            "ownedWorkingDirectoryProcess": true,
+            "recordedWindowAndSoleTab": true,
+            "terminalIncarnation": true
+          },
+          "device": 268435459,
+          "helperOwnership": {
+            "owned": true,
+            "processesInDir": [
+              63528
+            ],
+            "windowHasTty": true
+          },
+          "owned": true,
+          "tab": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          },
+          "terminalIncarnation": {
+            "pid": 55965,
+            "ppid": 1,
+            "startMicroseconds": 586318,
+            "startSeconds": 1791612993
+          },
+          "windowState": {
+            "endedMs": 1791613423336,
+            "matchingTtyCount": 1,
+            "miniaturized": false,
+            "ok": true,
+            "raw": {
+              "elapsedMs": 159,
+              "ok": true,
+              "senderPid": 63741,
+              "status": 0,
+              "stderr": "",
+              "stdout": "FOUND\tfalse\t1\t1\n",
+              "timedOut": false
+            },
+            "startedMs": 1791613423177,
+            "tabCount": 1
+          }
+        },
+        "integration-acquisition.json": {
+          "appIdentifier": "ai.scalinity.threadspace.dev",
+          "detail": {
+            "appliedSha256": "1d105690ebdb305fabacb8ac512640e7e446dc33aac0b5f805052e3b3317a6bc",
+            "backup": null,
+            "configPath": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session/settings.json",
+            "created": [
+              "/hooks",
+              "/hooks/SessionStart",
+              "/hooks/UserPromptSubmit",
+              "/hooks/Stop",
+              "/hooks/SubagentStop",
+              "/hooks/SubagentStart",
+              "/hooks/PreToolUse",
+              "/hooks/PostToolUse",
+              "/hooks/PostToolUseFailure",
+              "/hooks/PermissionRequest",
+              "/hooks/SessionEnd",
+              "/hooks/Notification",
+              "/hooks/StopFailure",
+              "/hooks/PermissionDenied",
+              "/hooks/PreCompact",
+              "/hooks/PostCompact"
+            ],
+            "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "identity": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<owned-m2-temp-1>/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "installedAtMs": 1791613343467,
+            "originalSha256": null,
+            "ownedEntries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "UserPromptSubmit",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Stop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUseFailure",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionRequest",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionEnd",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Notification",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "StopFailure",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionDenied",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "kind": "pluginDir",
+                "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+              }
+            ],
+            "partialUninstall": false,
+            "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+            "scope": "session"
+          },
+          "ok": true,
+          "operation": "install",
+          "scope": "session"
+        }
+      }
+    },
+    {
+      "kind": "wrong-provider-incarnation",
+      "syntheticFixture": true,
+      "exitStatus": 1,
+      "stdout": "",
+      "stderr": "retained acquisition changed; no Return or cleanup issued\n",
+      "inputRecords": {
+        "fixture.json": {
+          "expected": {
+            "native": {
+              "after": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "before": {
+                "comm": "2.1.295",
+                "controllingDevice": 268435459,
+                "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+                "pgid": 63527,
+                "pid": 63528,
+                "ppid": 63527,
+                "startMicroseconds": 645529,
+                "startSeconds": "1791613418",
+                "status": 2,
+                "tpgid": 63527
+              },
+              "confirmingInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425224,
+                "requestStartedMs": 1791613425076,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "endedMs": 1791613425225,
+              "evidenceSource": "production discover + KernelSampler + character_device; independent of route result",
+              "executable": "~/.local/share/claude/versions/2.1.295#16777234:152193867",
+              "firstInventory": {
+                "binary": "~/.local/share/claude/versions/2.1.295",
+                "error": null,
+                "pidRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ],
+                "requestEndedMs": 1791613425076,
+                "requestStartedMs": 1791613424920,
+                "rowCount": 5,
+                "sessionRows": [
+                  {
+                    "kind": "interactive",
+                    "pid": 63528,
+                    "sessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+                    "status": "idle",
+                    "waitingFor": null
+                  }
+                ]
+              },
+              "lookupBinary": "~/.local/share/claude/versions/2.1.295",
+              "nativeSessionId": "03d3937d-c60c-4f6b-add4-853250cb84fc",
+              "processKey": {
+                "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+                "endpointId": "1c56b203-c064-421c-8bc6-ad2df4be8afb",
+                "pid": 63528,
+                "startMicroseconds": 645530,
+                "startSeconds": "1791613418"
+              },
+              "qualified": true,
+              "rdev": 268435459,
+              "runningVersion": "2.1.295",
+              "startedMs": 1791613424920,
+              "tty": "/dev/ttys003"
+            },
+            "otherTty": "/dev/ttys004",
+            "otherWindowId": 35065,
+            "sessionId": "ceda5120-f230-4076-8032-3eb3911472cf",
+            "windowId": 35063
+          },
+          "launch": "independently started in a new ordinary Terminal window; no Threadspace provider-launch command",
+          "modelTurnsRequested": 0,
+          "spare": {
+            "dir": "<owned-m2-temp-1>/spare",
+            "marker": "f5a10130-a296-4078-952c-a933dcd1d56a",
+            "tty": "/dev/ttys004",
+            "windowId": 35065
+          },
+          "target": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          }
+        },
+        "launch-ownership.json": {
+          "checks": {
+            "characterDevice": true,
+            "directoryIncarnation": true,
+            "ownedWorkingDirectoryProcess": true,
+            "recordedWindowAndSoleTab": true,
+            "terminalIncarnation": true
+          },
+          "device": 268435459,
+          "helperOwnership": {
+            "owned": true,
+            "processesInDir": [
+              63528
+            ],
+            "windowHasTty": true
+          },
+          "owned": true,
+          "tab": {
+            "dir": "<owned-m2-temp-1>/target",
+            "marker": "93a541eb-9288-43fb-85d5-cfb56e803f6c",
+            "tty": "/dev/ttys003",
+            "windowId": 35063
+          },
+          "terminalIncarnation": {
+            "pid": 55965,
+            "ppid": 1,
+            "startMicroseconds": 586317,
+            "startSeconds": 1791612993
+          },
+          "windowState": {
+            "endedMs": 1791613423336,
+            "matchingTtyCount": 1,
+            "miniaturized": false,
+            "ok": true,
+            "raw": {
+              "elapsedMs": 159,
+              "ok": true,
+              "senderPid": 63741,
+              "status": 0,
+              "stderr": "",
+              "stdout": "FOUND\tfalse\t1\t1\n",
+              "timedOut": false
+            },
+            "startedMs": 1791613423177,
+            "tabCount": 1
+          }
+        },
+        "integration-acquisition.json": {
+          "appIdentifier": "ai.scalinity.threadspace.dev",
+          "detail": {
+            "appliedSha256": "1d105690ebdb305fabacb8ac512640e7e446dc33aac0b5f805052e3b3317a6bc",
+            "backup": null,
+            "configPath": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/session/settings.json",
+            "created": [
+              "/hooks",
+              "/hooks/SessionStart",
+              "/hooks/UserPromptSubmit",
+              "/hooks/Stop",
+              "/hooks/SubagentStop",
+              "/hooks/SubagentStart",
+              "/hooks/PreToolUse",
+              "/hooks/PostToolUse",
+              "/hooks/PostToolUseFailure",
+              "/hooks/PermissionRequest",
+              "/hooks/SessionEnd",
+              "/hooks/Notification",
+              "/hooks/StopFailure",
+              "/hooks/PermissionDenied",
+              "/hooks/PreCompact",
+              "/hooks/PostCompact"
+            ],
+            "hookCommand": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+            "identity": {
+              "agentIdentifier": "ai.scalinity.threadspace.dev.agent",
+              "configDir": "<owned-m2-temp-1>/session-config",
+              "ownedDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude"
+            },
+            "installedAtMs": 1791613343467,
+            "originalSha256": null,
+            "ownedEntries": [
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "UserPromptSubmit",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Stop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStop",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SubagentStart",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUse",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostToolUseFailure",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionRequest",
+                "kind": "hook",
+                "matcher": "*"
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "SessionEnd",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "Notification",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "StopFailure",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PermissionDenied",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PreCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "command": "'~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/bin/threadspace-hook' hook --agent ai.scalinity.threadspace.dev.agent",
+                "event": "PostCompact",
+                "kind": "hook",
+                "matcher": ""
+              },
+              {
+                "kind": "pluginDir",
+                "path": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef"
+              }
+            ],
+            "partialUninstall": false,
+            "pluginDir": "~/Library/Application Support/ai.scalinity.threadspace.dev/integrations/claude/observer/c0dbf251589737ef",
+            "scope": "session"
+          },
+          "ok": true,
+          "operation": "install",
+          "scope": "session"
+        }
+      }
+    }
+  ]
+}
