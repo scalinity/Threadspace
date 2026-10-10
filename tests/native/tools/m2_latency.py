@@ -59,6 +59,7 @@ def analyze(raw):
         errors.append("clock profile is not positively qualified on the recorded native boot")
     if "maximumRateErrorPpm" not in profile or profile["maximumRateErrorPpm"] is None or not 0 <= rate < 1 or precision <= 0 or not profile.get("evidence"):
         errors.append("missing/invalid rate, resolution or clock qualification evidence")
+    clock_profile_qualified = not errors
     errors.extend(str(error) for error in raw.get("collectorErrors", []))
     if raw.get("schemaVersion") != 2:
         errors.append("wrong raw measurement schema")
@@ -291,9 +292,15 @@ def analyze(raw):
             errors.append(f"incomplete sample {observation_id}: {error}")
     by_source = {source: {**{metric: percentiles(values) for metric, values in samples[source].items()}, "population": counts[source]} for source in SOURCES}
     thresholds = all(by_source[source][metric]["n"] > 0 and by_source[source][metric]["p95"] <= target for source in SOURCES for metric, target in TARGETS.items())
+    measurement_qualified = clock_profile_qualified and not errors
     if not thresholds:
         errors.append("one or more mandatory source/metric populations is empty or exceeds its p95 target")
-    return {"schemaVersion": 2, "calculation": "nearest-rank p95 of conservative upper bounds in milliseconds", "targets": TARGETS,
+    return {"schemaVersion": 2,
+            "calculation": "nearest-rank p95 of conservative upper bounds in milliseconds" if measurement_qualified else "UNQUALIFIED diagnostic percentiles; not certified conservative upper bounds",
+            "metricsQualified": measurement_qualified,
+            "qualifiedSampleCounts": {source: {metric: len(values) if measurement_qualified else 0 for metric, values in samples[source].items()} for source in SOURCES},
+            "diagnosticClockFallback": None if clock_profile_qualified else {"maximumRateErrorPpm": rate * 1_000_000, "precisionNs": precision, "certified": False},
+            "targets": TARGETS,
             "bySource": by_source, "joinedSamples": joined, "exclusions": exclusions, "errors": errors,
             "normalPathPass": thresholds and not errors,
             "nativeExecution": raw.get("executionKind") == "NATIVE",

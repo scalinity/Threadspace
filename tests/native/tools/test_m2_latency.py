@@ -110,6 +110,24 @@ class LatencyAcceptanceTests(unittest.TestCase):
             else: raw["clockQualification"]["nativeClock"] = "Date.now"
             self.assert_incomplete(raw)
 
+    def test_unqualified_diagnostics_never_report_qualified_sample_counts(self):
+        raw = fixture()
+        raw["clockQualification"].update(qualified=False, maximumRateErrorPpm=None, precisionNs=None)
+        result = analyze(raw)
+        self.assertFalse(result["metricsQualified"])
+        self.assertIn("UNQUALIFIED", result["calculation"])
+        self.assertEqual(result["diagnosticClockFallback"], {"maximumRateErrorPpm": 0, "precisionNs": 0, "certified": False})
+        self.assertTrue(all(count == 0 for metrics in result["qualifiedSampleCounts"].values() for count in metrics.values()))
+        self.assertEqual(result["bySource"]["claude.hook"]["captureToCommitMs"]["n"], 1, "retain every diagnostic sample")
+
+    def test_valid_slow_measurement_is_qualified_even_when_target_fails(self):
+        raw = fixture()
+        raw["commitRecords"][0]["commit"]["endNs"] = str(BASE + 120_000_000)
+        result = analyze(raw)
+        self.assertTrue(result["metricsQualified"], result["errors"])
+        self.assertFalse(result["normalPathPass"])
+        self.assertEqual(result["qualifiedSampleCounts"]["claude.hook"]["captureToCommitMs"], 1)
+
     def test_incompatible_clock_rates_and_unbracketed_dom_fail(self):
         for mutation in ("jump", "outside"):
             raw = fixture()
