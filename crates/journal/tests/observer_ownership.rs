@@ -669,3 +669,39 @@ fn f1b_unrecognized_journal_header_versions_refuse_recovery() {
         assert!(matches!(result, Err(threadspace_journal::JournalError::Invalid { detail }) if detail.contains("unsupported journal payload version")));
     }
 }
+
+/// Re-admit the immutable envelopes captured by the owned native run into
+/// a new disposable journal. The full-state oracle is unchanged. This avoids
+/// treating a legacy M0 checkpoint baseline as an empty canonical genesis.
+#[test]
+#[ignore = "requires retained owned native observer/proof envelopes"]
+fn f1_native_captured_observer_and_proof_have_exact_isolated_replay() {
+    let path = std::env::var_os("THREADSPACE_F1_NATIVE_ENVELOPES")
+        .map(PathBuf::from).expect("explicit native envelope input");
+    let envelopes: Vec<ObservationEnvelope> = serde_json::from_slice(
+        &std::fs::read(path).expect("retained native envelopes")
+    ).expect("native envelope JSON");
+    assert!(!envelopes.is_empty());
+    let native = envelopes[0].session_key.as_ref().expect("original Session").native_session_id.clone();
+    let captures: Vec<Capture> = envelopes.into_iter().map(|envelope| {
+        assert_eq!(envelope.session_key.as_ref().expect("Session ownership").native_session_id, native);
+        assert!(envelope.evidence.iter().any(|sample| sample.executable.as_ref().is_some_and(|image| image.contains("/versions/2.1.295#"))), "actual retained provider image");
+        let normalized = match envelope.source_id.as_str() {
+            "claude.observer" => observer::normalize(&envelope),
+            "claude.observer.ownership" => ownership::normalize(&envelope),
+            source => panic!("unexpected native source: {source}"),
+        };
+        Capture { envelope, normalized }
+    }).collect();
+    let state = run(&captures, &(0..captures.len()).collect::<Vec<_>>(), true);
+    assert_eq!(session(&state, &native).observer_tier, Some(ObserverTier::Restored));
+    let owner = &session(&state, &native).id;
+    let turns: Vec<_> = state.turns.values().filter(|turn| &turn.session_id == owner).collect();
+    assert_eq!(turns.len(), 2, "original and post-seal native Turns");
+    assert!(turns.iter().all(|turn| turn.state == TurnState::Completed));
+    write_evidence("native-captured-full-replay", &json!({
+        "evidenceType":"retained real-native envelopes re-admitted through production adapters to a new isolated journal",
+        "nativeSessionId":native,"envelopes":captures.len(),"state":state,
+        "fullStateHash":state_hash(&state),"stepwiseSqliteCheckpointRestartAndGenesis":"PASS",
+    }));
+}
