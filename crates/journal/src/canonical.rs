@@ -1384,6 +1384,48 @@ pub(crate) fn initial_checkpoint(
 mod tests {
     use super::{Sql, materialize, nullable_integer};
 
+    /// Read-only adjudication of a preserved legacy backup. The alternate
+    /// checkpoint selection exists only in an acquired in-memory copy.
+    #[test]
+    #[ignore = "requires an explicit privately preserved legacy Dev backup"]
+    fn retained_legacy_checkpoint_suffix_matches_full_state_without_genesis() {
+        use rusqlite::{Connection, OpenFlags};
+        use threadspace_state_engine::hash::state_hash;
+        let path = std::env::var("THREADSPACE_M2_LEGACY_BACKUP").expect("explicit backup path");
+        let before = std::fs::read(&path).expect("preserved backup bytes");
+        let source = Connection::open_with_flags(&path, OpenFlags::SQLITE_OPEN_READ_ONLY).expect("read-only backup");
+        let integrity: String = source.query_row("PRAGMA integrity_check", [], |r| r.get(0)).expect("integrity");
+        assert_eq!(integrity, "ok");
+        let endpoint: String = source.query_row("SELECT value FROM store_meta WHERE key='endpoint_id'", [], |r| r.get(0)).expect("endpoint");
+        let expected = super::load_engine(&source, &endpoint).expect("current retained recovery").0.state;
+        let first: i64 = source.query_row("SELECT MIN(ingest_seq) FROM observations WHERE canonical=1", [], |r| r.get(0)).expect("canonical coverage");
+        let prefix_facts: i64 = source.query_row("SELECT COUNT(*) FROM facts WHERE ingest_seq<?1", [first], |r| r.get(0)).expect("prefix");
+        assert_eq!(prefix_facts, 0);
+        let mut copy = Connection::open_in_memory().expect("owned in-memory copy");
+        rusqlite::backup::Backup::new(&source, &mut copy).expect("copy").run_to_completion(256, std::time::Duration::ZERO, None).expect("consistent copy");
+        let anchor: (i64, i64, String) = copy.query_row("SELECT id,through_cursor,state_sha256 FROM projection_checkpoints WHERE reducer_version=4 AND through_cursor<?1 ORDER BY id LIMIT 1", [expected.through_cursor], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?))).expect("nontrivial current-reducer anchor");
+        copy.execute("DELETE FROM projection_checkpoints WHERE id>?1", [anchor.0]).expect("select anchor in memory only");
+        let entries = super::entries_after(&copy, anchor.1, &endpoint).expect("complete suffix");
+        assert!(!entries.is_empty());
+        assert_eq!(entries.len() as i64, expected.through_cursor - anchor.1);
+        for (index, entry) in entries.iter().enumerate() { assert_eq!(entry.cursor, anchor.1+index as i64+1); }
+        let recovered = super::load_engine(&copy, &endpoint).expect("verified anchor and suffix").0.state;
+        assert_eq!(state_hash(&recovered), state_hash(&expected));
+        assert_eq!(materialize::hash_state(&recovered), materialize::hash_tables(&source).expect("all materialized tables"));
+        assert_eq!(super::load_engine(&copy, &endpoint).expect("exact read-only restart").0.state, recovered);
+        let report = serde_json::json!({"verdict":"LEGACY DEV-STORE COMPARISON NOT APPLICABLE TO EMPTY GENESIS — qualified anchor/suffix PASS",
+            "backupSha256":super::sha256_hex(&before),"firstCanonicalCursor":first,"preCanonicalFactCount":prefix_facts,
+            "anchorId":anchor.0,"anchorCursor":anchor.1,"anchorSha256":anchor.2,"suffixEntries":entries.len(),
+            "throughCursor":recovered.through_cursor,"stateSha256":state_hash(&recovered),
+            "projectionSha256":materialize::hash_state(&recovered),"commands":recovered.commands.len(),
+            "attention":recovered.attention.len(),"outbox":recovered.outbox.len(),"sessions":recovered.sessions.len(),"turns":recovered.turns.len(),
+            "fullStateDifferences":0,"sourceOpenedReadOnly":true,"checkpointSelectionOnlyInMemory":true});
+        copy.execute("UPDATE projection_checkpoints SET state_sha256='invalid' WHERE id=?1", [anchor.0]).expect("owned corruption control");
+        assert!(super::load_engine(&copy, &endpoint).is_err());
+        assert_eq!(std::fs::read(&path).expect("original backup unchanged"), before);
+        if let Ok(output) = std::env::var("THREADSPACE_M2_LEGACY_REPORT") { std::fs::write(output, serde_json::to_vec_pretty(&report).expect("report")).expect("private report"); }
+    }
+
     /// NULL is a committed absence, an integer its value; any other type,
     /// or no such column, is not a committed value at all.
     #[test]
