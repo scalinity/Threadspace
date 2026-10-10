@@ -505,7 +505,7 @@ pub fn finish_retained(ctx: &Ctx, retained: &std::path::Path) -> Result<Value, S
     let current = native_witness(&target.tab, endpoint, Some(native_id));
     if original["owned"] != true
         || json!(target.terminal) != original["terminalIncarnation"]
-        || !oracle::same_identity(&fixture["expected"]["native"], &current)
+        || !oracle::same_identity(&fixture["expected"]["native"], &scrub(current.clone()))
         || target.ownership()["owned"] != true
         || spare.ownership()["owned"] != true
     {
