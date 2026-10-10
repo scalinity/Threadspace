@@ -104,6 +104,13 @@ pub fn claude_command(dir: &Path, activation: &Activation, binary: &Path, extra:
 }
 
 pub fn launcher() -> Result<PathBuf, String> {
+    if let Some(executable) = std::env::var_os("THREADSPACE_CLAUDE_EXECUTABLE") {
+        let executable = PathBuf::from(executable);
+        if !executable.is_absolute() || !executable.is_file() {
+            return Err("THREADSPACE_CLAUDE_EXECUTABLE must name an existing absolute executable path".into());
+        }
+        return executable.canonicalize().map_err(|error| error.to_string());
+    }
     Ok(threadspace_relay::paths::home_dir().ok_or("no home")?.join(".local/bin/claude"))
 }
 

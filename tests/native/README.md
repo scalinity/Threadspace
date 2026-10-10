@@ -32,6 +32,11 @@ test/debug controls remains required; this is not a claim of JavaScript strippin
 
 ## Running
 
+M2 qualification can select a retained provider executable with
+`THREADSPACE_CLAUDE_EXECUTABLE=/absolute/path/to/claude`. The override is confined
+to the unshipped harness; native witnesses still verify the running process image
+and qualified version. It does not change the default Claude launcher.
+
 Build once: `cargo build -p threadspace-harness` (the runner builds `ts-native`
 itself when its source changes). Install the bundles under test:
 
