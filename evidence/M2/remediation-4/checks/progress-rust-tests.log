@@ -1,0 +1,43 @@
+   Compiling threadspace-provider-claude v0.1.0 (~/Documents/Tools/Threadspace/crates/provider-claude)
+   Compiling threadspace-relay v0.1.0 (~/Documents/Tools/Threadspace/crates/relay)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.89s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_relay-29ff35e34acff81b)
+
+running 16 tests
+test latency::tests::metadata_validation_refuses_wall_clocks_bad_ids_future_capture_and_provider_content ... ok
+test latency::census::tests::protocol_is_bounded_and_metadata_only ... ok
+test latency::census::tests::actual_typed_capture_receipt_is_unchanged_and_native_batch_ids_are_metadata_only ... ok
+test latency::census::tests::missing_final_page_close_or_confirmation_cannot_be_replaced_by_prefix ... ok
+test latency::census::tests::native_deadline_rejects_missing_anchor_and_late_durable_confirmation ... ok
+test latency::census::tests::native_submitted_uuid_absent_from_source_census_is_an_explicit_missing_tail ... ok
+test latency::census::tests::stable_retries_are_idempotent_and_conflicting_page_never_overwrites ... ok
+test latency::census::tests::boot_time_and_postclose_identity_tampering_refuse_reexport ... ok
+test latency::census::tests::removing_or_duplicating_native_file_after_ack_never_preserves_qualification ... ok
+test latency::census::tests::completion_witness_requires_the_exact_durable_echo_and_deadline_anchor ... ok
+test latency::census::tests::historical_export_failures_and_missing_capture_clocks_remain_in_final_seal ... ok
+test latency::census::tests::fabricated_close_token_wrong_runtime_wrong_boot_or_wrong_store_cannot_confirm ... ok
+test latency::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation ... ok
+test latency::census::tests::every_seen_runtime_must_close_and_reused_uuid_between_runtimes_is_refused ... ok
+test latency::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close ... ok
+test latency::census::tests::maximum_bounded_ledger_closes_with_all_4096_uuid_entries ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.49s
+
+     Running unittests src/bin/threadspace-hook.rs (target/aarch64-apple-darwin/debug/deps/threadspace_hook-2b7918e8448094db)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mod_batch.rs (target/aarch64-apple-darwin/debug/deps/mod_batch-7d51c44575027cb9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/spool_capacity.rs (target/aarch64-apple-darwin/debug/deps/spool_capacity-c4c8a123c99c0907)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+

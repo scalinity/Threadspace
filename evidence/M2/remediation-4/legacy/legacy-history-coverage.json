@@ -1,0 +1,234 @@
+[
+  {
+    "name": "backup-3528-1791512864466.sqlite3",
+    "sha256": "6af055284c2db4e8b177b44b29e392a30b1b346011c0400384487011ac5e7b5e",
+    "integrity": "ok",
+    "migrations": [
+      [
+        1,
+        "m0-fixture-schema",
+        "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8",
+        1791263393566
+      ],
+      [
+        2,
+        "m0b-identity-and-routes",
+        "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2",
+        1791281961414
+      ]
+    ],
+    "lastObservation": 3528,
+    "counts": {
+      "sessions": 120,
+      "process_incarnations": 103,
+      "executions": 105,
+      "turns": 48,
+      "attention_items": 48,
+      "attention_commands": 7,
+      "notification_outbox": 47
+    },
+    "bytesUnchanged": true
+  },
+  {
+    "name": "backup-5521-1791520162238.sqlite3",
+    "sha256": "b079ee4bf50dab1bdc4f97e9f8e6dd5c746beafa9a42422ec24069db60ea7a18",
+    "integrity": "ok",
+    "migrations": [
+      [
+        1,
+        "m0-fixture-schema",
+        "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8",
+        1791263393566
+      ],
+      [
+        2,
+        "m0b-identity-and-routes",
+        "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2",
+        1791281961414
+      ],
+      [
+        3,
+        "m1-canonical-journal",
+        "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e",
+        1791512936281
+      ]
+    ],
+    "lastObservation": 5521,
+    "counts": {
+      "sessions": 187,
+      "process_incarnations": 135,
+      "executions": 137,
+      "turns": 140,
+      "attention_items": 149,
+      "attention_commands": 49,
+      "notification_outbox": 148
+    },
+    "checkpoints": [
+      [
+        2,
+        3,
+        4043,
+        "PERIODIC",
+        "e01923da97f4169a68a74f742efedfb63e33157c1d1ffae67e2b28c3b0886e72"
+      ],
+      [
+        3,
+        3,
+        4556,
+        "PERIODIC",
+        "122c70a07c8800d476b78ca9f77801c5b93afd436a59273305149f0a7cb03e7d"
+      ],
+      [
+        4,
+        3,
+        5068,
+        "PERIODIC",
+        "00bcbece242f59c417a99d91cb4ef4c942ee1650991398bf787da67bccdb8f47"
+      ]
+    ],
+    "baselineAssignments": [
+      [
+        3529,
+        "actor",
+        120
+      ],
+      [
+        3529,
+        "binding",
+        1
+      ],
+      [
+        3529,
+        "execution",
+        105
+      ],
+      [
+        3529,
+        "namespace",
+        3
+      ],
+      [
+        3529,
+        "process",
+        103
+      ],
+      [
+        3529,
+        "session",
+        120
+      ],
+      [
+        3529,
+        "surface",
+        1
+      ],
+      [
+        3529,
+        "turn",
+        48
+      ]
+    ],
+    "bytesUnchanged": true
+  },
+  {
+    "name": "journal.sqlite3",
+    "sha256": "59a8b69df91eb8509ab526b3b974cd65bf75307206d2e01ee91d4c71694a4a76",
+    "integrity": "ok",
+    "migrations": [
+      [
+        1,
+        "m0-fixture-schema",
+        "44a25b947ea4d81bc43d26bf38a1ada46b06b9fdd004ed6a447ea1b7f5b384c8",
+        1791263393566
+      ],
+      [
+        2,
+        "m0b-identity-and-routes",
+        "76f9eeaea464d9e8cd09bd5ecacab034c58a6f3c76a34a8eef520feb54620ab2",
+        1791281961414
+      ],
+      [
+        3,
+        "m1-canonical-journal",
+        "299dd431f203025f28008b723057f4c8a95ea9294b0b5230cc7270b2286bc60e",
+        1791512936281
+      ]
+    ],
+    "lastObservation": 5871,
+    "counts": {
+      "sessions": 258,
+      "process_incarnations": 149,
+      "executions": 151,
+      "turns": 146,
+      "attention_items": 169,
+      "attention_commands": 49,
+      "notification_outbox": 168
+    },
+    "checkpoints": [
+      [
+        3,
+        3,
+        4556,
+        "PERIODIC",
+        "122c70a07c8800d476b78ca9f77801c5b93afd436a59273305149f0a7cb03e7d"
+      ],
+      [
+        4,
+        3,
+        5068,
+        "PERIODIC",
+        "00bcbece242f59c417a99d91cb4ef4c942ee1650991398bf787da67bccdb8f47"
+      ],
+      [
+        5,
+        3,
+        5585,
+        "PERIODIC",
+        "942daef1c26f575794dce8ca0151bd9bf339df4b7b042829248d4c8e5bc9fc2d"
+      ]
+    ],
+    "baselineAssignments": [
+      [
+        3529,
+        "actor",
+        120
+      ],
+      [
+        3529,
+        "binding",
+        1
+      ],
+      [
+        3529,
+        "execution",
+        105
+      ],
+      [
+        3529,
+        "namespace",
+        3
+      ],
+      [
+        3529,
+        "process",
+        103
+      ],
+      [
+        3529,
+        "session",
+        120
+      ],
+      [
+        3529,
+        "surface",
+        1
+      ],
+      [
+        3529,
+        "turn",
+        48
+      ]
+    ],
+    "bytesUnchanged": true
+  }
+]

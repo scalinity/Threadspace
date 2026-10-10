@@ -1,0 +1,25 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.34s
+     Running tests/mod_batch.rs (target/aarch64-apple-darwin/debug/deps/mod_batch-7d51c44575027cb9)
+
+running 2 tests
+test a_batch_without_a_companion_is_spooled_and_answered_within_its_budget ... FAILED
+test input_that_is_not_a_mod_batch_claims_nothing ... ok
+
+failures:
+
+---- a_batch_without_a_companion_is_spooled_and_answered_within_its_budget stdout ----
+
+thread 'a_batch_without_a_companion_is_spooled_and_answered_within_its_budget' (90673597) panicked at crates/relay/tests/mod_batch.rs:59:5:
+answered in 308 ms
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    a_batch_without_a_companion_is_spooled_and_answered_within_its_budget
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+error: test failed, to rerun pass `-p threadspace-relay --test mod_batch`

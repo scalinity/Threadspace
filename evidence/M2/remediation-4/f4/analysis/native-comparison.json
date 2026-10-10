@@ -1,0 +1,268 @@
+{
+  "qualified": false,
+  "noColdEventsExcluded": true,
+  "runs": [
+    {
+      "captureRun": "20261010T092414Z-dev",
+      "fixtureRun": "20261010T092412Z-dev",
+      "sourceCommit": "ac7d1c92b81c775a964e9dbc81d35a8c1a7a87ee",
+      "rawOriginalSha256": "e2a11b62248559465c810921562b7fd64f8ca5f107e179f2c0839dd9b4d03099",
+      "observerRuntime": "d61e2b02-a92c-4dba-a795-781b9f6fd589",
+      "firstHostCall": {
+        "beginMs": 303.156125,
+        "endMs": 576.281834,
+        "spanMs": 273.12570900000003,
+        "records": [
+          {
+            "capturedMs": 266.145875,
+            "observationId": "37f36b08-4972-4a73-86e6-f3e5c619ce99",
+            "status": "UNKNOWN"
+          }
+        ],
+        "helperPhases": null
+      },
+      "nextHostCallBeginMs": 829.296667,
+      "postFirstReturnToNextDrainMs": 253.01483299999995,
+      "nextQueueWaitMs": [
+        {
+          "observationId": "37f36b08-4972-4a73-86e6-f3e5c619ce99",
+          "waitMs": 563.1507919999999
+        },
+        {
+          "observationId": "534cb997-eb47-41a6-a495-4469e6a9925e",
+          "waitMs": 461.26458299999996
+        },
+        {
+          "observationId": "109e4337-36cd-4935-8b38-3e30af35ad1e",
+          "waitMs": 442.85691699999995
+        },
+        {
+          "observationId": "592adcd0-b0ae-4985-a8b0-64b51e726366",
+          "waitMs": 416.246
+        },
+        {
+          "observationId": "fb9a09de-d336-432e-b45b-b65485733435",
+          "waitMs": 225.36483299999998
+        }
+      ],
+      "observerDeliveryAttemptRecords": 22,
+      "observerRetryRecordAttempts": 1,
+      "observerReceiptAttemptStatuses": {
+        "UNKNOWN": 1,
+        "COMMITTED": 21
+      },
+      "qualifiedSampleCounts": {
+        "claude.hook": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        },
+        "claude.observer": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        }
+      },
+      "diagnosticPercentiles": {
+        "claude.hook": {
+          "captureToCommitMs": {
+            "n": 20,
+            "p50": 1.013042,
+            "p95": 1.425125,
+            "max": 1.718584
+          },
+          "commitToDomMs": {
+            "n": 20,
+            "p50": 27.0245,
+            "p95": 28.616959,
+            "max": 30.732625
+          },
+          "eventToDomMs": {
+            "n": 20,
+            "p50": 27.692209,
+            "p95": 29.42075,
+            "max": 31.732834
+          },
+          "population": {
+            "totalCaptured": 20,
+            "durablyAccepted": 20,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 20,
+            "noProjectionChange": 0,
+            "matchedDom": 20,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        },
+        "claude.observer": {
+          "captureToCommitMs": {
+            "n": 21,
+            "p50": 34.174584,
+            "p95": 476.518124,
+            "max": 578.404333
+          },
+          "commitToDomMs": {
+            "n": 21,
+            "p50": 29.373,
+            "p95": 30.414375,
+            "max": 30.414375
+          },
+          "eventToDomMs": {
+            "n": 21,
+            "p50": 60.857167,
+            "p95": 506.169958,
+            "max": 608.056167
+          },
+          "population": {
+            "totalCaptured": 21,
+            "durablyAccepted": 21,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 21,
+            "noProjectionChange": 0,
+            "matchedDom": 21,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        }
+      },
+      "operationError": null
+    },
+    {
+      "captureRun": "20261010T093850Z-dev",
+      "fixtureRun": "20261010T093848Z-dev",
+      "sourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+      "rawOriginalSha256": "23aa531e446336939a7aa57dca4337fc9d9e4080dc52194f887ec99a1ae32467",
+      "observerRuntime": "f479475b-67b8-4023-9990-61634aebccde",
+      "firstHostCall": {
+        "beginMs": 291.304375,
+        "endMs": 458.017583,
+        "spanMs": 166.713208,
+        "records": [
+          {
+            "capturedMs": 257.906042,
+            "observationId": "967f8cae-a8c0-4f2d-9248-5d04f137a1c4",
+            "status": "COMMITTED"
+          }
+        ],
+        "helperPhases": {
+          "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+          "clock": "CLOCK_UPTIME_RAW",
+          "helperElapsedMsAtAnswer": 15.400875,
+          "helperPid": 81753,
+          "measurementEnabled": true,
+          "stamps": {
+            "answerReadyNs": "551099678996375",
+            "locatorReadNs": "551099665335916",
+            "measurementBeginNs": "551099667291666",
+            "measurementFinishedNs": "551099678992000",
+            "modBatchEntryNs": "551099663660208",
+            "providerContextNs": "551099665236166",
+            "receiptReceivedNs": "551099667038750",
+            "stdinReadNs": "551099665112000",
+            "storeResolvedNs": "551099665070750"
+          }
+        }
+      },
+      "nextHostCallBeginMs": 472.137625,
+      "postFirstReturnToNextDrainMs": 14.120042000000012,
+      "nextQueueWaitMs": [
+        {
+          "observationId": "c55e43d3-fb33-4c9c-9f8f-7c7c5d3574e8",
+          "waitMs": 103.608
+        },
+        {
+          "observationId": "d6a69f19-2810-4696-8f04-688449efd548",
+          "waitMs": 86.43762500000003
+        },
+        {
+          "observationId": "e44d7504-6652-4a6f-99d4-eb65a3e26cdb",
+          "waitMs": 73.38654200000002
+        }
+      ],
+      "observerDeliveryAttemptRecords": 21,
+      "observerRetryRecordAttempts": 0,
+      "observerReceiptAttemptStatuses": {
+        "COMMITTED": 21
+      },
+      "qualifiedSampleCounts": {
+        "claude.hook": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        },
+        "claude.observer": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        }
+      },
+      "diagnosticPercentiles": {
+        "claude.hook": {
+          "captureToCommitMs": {
+            "n": 20,
+            "p50": 1.230167,
+            "p95": 1.755292,
+            "max": 4.936541
+          },
+          "commitToDomMs": {
+            "n": 20,
+            "p50": 24.792,
+            "p95": 29.06975,
+            "max": 30.884833
+          },
+          "eventToDomMs": {
+            "n": 20,
+            "p50": 25.602333,
+            "p95": 29.468083,
+            "max": 31.982291
+          },
+          "population": {
+            "totalCaptured": 20,
+            "durablyAccepted": 20,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 20,
+            "noProjectionChange": 0,
+            "matchedDom": 20,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        },
+        "claude.observer": {
+          "captureToCommitMs": {
+            "n": 21,
+            "p50": 22.650125,
+            "p95": 119.213624,
+            "max": 199.522416
+          },
+          "commitToDomMs": {
+            "n": 21,
+            "p50": 28.893041,
+            "p95": 30.069583,
+            "max": 30.474958
+          },
+          "eventToDomMs": {
+            "n": 21,
+            "p50": 51.554583,
+            "p95": 142.730999,
+            "max": 227.564749
+          },
+          "population": {
+            "totalCaptured": 21,
+            "durablyAccepted": 21,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 21,
+            "noProjectionChange": 0,
+            "matchedDom": 21,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        }
+      },
+      "operationError": null
+    }
+  ]
+}

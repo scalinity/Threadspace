@@ -1,0 +1,65 @@
+{
+  "clockQualification": "INCOMPLETE",
+  "runs": [
+    {
+      "run": "20261010T092414Z-dev",
+      "rawSha256": "e2a11b62248559465c810921562b7fd64f8ca5f107e179f2c0839dd9b4d03099",
+      "uiRuntime": "bb2e4bf7-f320-4522-be75-755e169acc15",
+      "uiCalibrationCount": 10,
+      "calibrationNativeSpanMs": 32390.7765,
+      "constantAffineAssumptionOnly": true,
+      "empiricalAffineRateEnclosurePpm": [
+        -758.5218181248576,
+        758.3810614266717
+      ],
+      "maximumRateErrorQualified": false,
+      "orderOnlyDomBracketCount": 31,
+      "orderOnlyUnbracketedDom": 0,
+      "orderOnlyDomBracketWidthMs": {
+        "min": 31928.084916,
+        "max": 31928.084916
+      },
+      "orderOnlyConclusion": "Existing sparse start/end UI calibration cannot certify 100 ms intervals without an independently supported rate model; precision/coarsening and runtime correspondence remain unqualified.",
+      "observedRepresentation": {
+        "maxJsTimestampDoubleUlpMs": 7.275957614183426e-12,
+        "maxNativeAsDoubleUlpNs": 0.0625,
+        "endpointCalculation": "integer native timestamps; affine arithmetic with floor/ceil endpoint rounding",
+        "qualification": "These representation steps are observed; installed timer coarsening and complete translation uncertainty remain unqualified."
+      }
+    },
+    {
+      "run": "20261010T093850Z-dev",
+      "rawSha256": "23aa531e446336939a7aa57dca4337fc9d9e4080dc52194f887ec99a1ae32467",
+      "uiRuntime": "c10a5437-c8be-4717-ba08-972f0cf91808",
+      "uiCalibrationCount": 10,
+      "calibrationNativeSpanMs": 33135.602292,
+      "constantAffineAssumptionOnly": true,
+      "empiricalAffineRateEnclosurePpm": [
+        -762.3261704939877,
+        713.8455096826757
+      ],
+      "maximumRateErrorQualified": false,
+      "orderOnlyDomBracketCount": 33,
+      "orderOnlyUnbracketedDom": 0,
+      "orderOnlyDomBracketWidthMs": {
+        "min": 32453.169833,
+        "max": 32453.169833
+      },
+      "orderOnlyConclusion": "Existing sparse start/end UI calibration cannot certify 100 ms intervals without an independently supported rate model; precision/coarsening and runtime correspondence remain unqualified.",
+      "observedRepresentation": {
+        "maxJsTimestampDoubleUlpMs": 7.275957614183426e-12,
+        "maxNativeAsDoubleUlpNs": 0.0625,
+        "endpointCalculation": "integer native timestamps; affine arithmetic with floor/ceil endpoint rounding",
+        "qualification": "These representation steps are observed; installed timer coarsening and complete translation uncertainty remain unqualified."
+      }
+    }
+  ],
+  "primarySources": [
+    "https://developer.apple.com/documentation/kernel/1462446-mach_absolute_time",
+    "https://www.w3.org/TR/hr-time-3/",
+    "https://github.com/WebKit/WebKit/blob/main/Source/WebCore/page/Performance.cpp",
+    "https://github.com/WebKit/WebKit/blob/main/Source/WTF/wtf/CurrentTime.cpp",
+    "https://bun.sh/docs/project/benchmarking"
+  ],
+  "adjudication": "Upstream WebKit Darwin MonotonicTime uses Mach absolute time with reduced-resolution Performance timestamps. These upstream sources do not identify the installed Claude 2.1.295 mod runtime or certify its clock rate/precision; observed affine consistency is not a maximum-rate contract. Native CLOCK_UPTIME_RAW and converted Mach timestamps agree, but the full cross-runtime profile remains false."
+}

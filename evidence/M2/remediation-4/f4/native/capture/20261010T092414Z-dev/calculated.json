@@ -1,0 +1,863 @@
+{
+  "schemaVersion": 2,
+  "calculation": "nearest-rank p95 of conservative upper bounds in milliseconds",
+  "targets": {
+    "captureToCommitMs": 100,
+    "commitToDomMs": 100,
+    "eventToDomMs": 250
+  },
+  "bySource": {
+    "claude.hook": {
+      "captureToCommitMs": {
+        "n": 20,
+        "p50": 1.013042,
+        "p95": 1.425125,
+        "max": 1.718584
+      },
+      "commitToDomMs": {
+        "n": 20,
+        "p50": 27.0245,
+        "p95": 28.616959,
+        "max": 30.732625
+      },
+      "eventToDomMs": {
+        "n": 20,
+        "p50": 27.692209,
+        "p95": 29.42075,
+        "max": 31.732834
+      },
+      "population": {
+        "totalCaptured": 20,
+        "durablyAccepted": 20,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 20,
+        "noProjectionChange": 0,
+        "matchedDom": 20,
+        "unmatchedDom": 0,
+        "missingTelemetry": 0
+      }
+    },
+    "claude.observer": {
+      "captureToCommitMs": {
+        "n": 21,
+        "p50": 34.174584,
+        "p95": 476.518124,
+        "max": 578.404333
+      },
+      "commitToDomMs": {
+        "n": 21,
+        "p50": 29.373,
+        "p95": 30.414375,
+        "max": 30.414375
+      },
+      "eventToDomMs": {
+        "n": 21,
+        "p50": 60.857167,
+        "p95": 506.169958,
+        "max": 608.056167
+      },
+      "population": {
+        "totalCaptured": 21,
+        "durablyAccepted": 21,
+        "deduplicatedAttempts": 0,
+        "rejected": 0,
+        "projectionChange": 21,
+        "noProjectionChange": 0,
+        "matchedDom": 21,
+        "unmatchedDom": 0,
+        "missingTelemetry": 0
+      }
+    }
+  },
+  "joinedSamples": [
+    {
+      "observationId": "05d5997d-37b9-44ce-a1ab-1d6d9b303718",
+      "source": "claude.hook",
+      "cursor": "6082",
+      "patchCursor": "6082",
+      "captureIntervalNs": [
+        "550242589330250",
+        "550242589330250"
+      ],
+      "commitIntervalNs": [
+        "550242590134041",
+        "550242590625125"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.294875,
+        "commitToDomMs": 28.616959,
+        "eventToDomMs": 29.42075
+      }
+    },
+    {
+      "observationId": "109e4337-36cd-4935-8b38-3e30af35ad1e",
+      "source": "claude.observer",
+      "cursor": "6060",
+      "patchCursor": "6062",
+      "captureIntervalNs": [
+        "550223746988708",
+        "550223762766416"
+      ],
+      "commitIntervalNs": [
+        "550224204336625",
+        "550224205099166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 458.110458,
+        "commitToDomMs": 30.414375,
+        "eventToDomMs": 487.762292
+      }
+    },
+    {
+      "observationId": "129795c3-45ec-4bce-bc31-69630ca310ba",
+      "source": "claude.observer",
+      "cursor": "6098",
+      "patchCursor": "6099",
+      "captureIntervalNs": [
+        "550243521594708",
+        "550243533992250"
+      ],
+      "commitIntervalNs": [
+        "550243536637708",
+        "550243536820250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 15.225542,
+        "commitToDomMs": 28.113292,
+        "eventToDomMs": 43.156292
+      }
+    },
+    {
+      "observationId": "138b17d6-f7de-481a-b05c-355cffe30f33",
+      "source": "claude.hook",
+      "cursor": "6097",
+      "patchCursor": "6097",
+      "captureIntervalNs": [
+        "550243272891750",
+        "550243272891750"
+      ],
+      "commitIntervalNs": [
+        "550243273568208",
+        "550243273780125"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.888375,
+        "commitToDomMs": 25.182792,
+        "eventToDomMs": 25.85925
+      }
+    },
+    {
+      "observationId": "1a205c0d-7f85-44c4-aef3-7c3c62b8655e",
+      "source": "claude.hook",
+      "cursor": "6095",
+      "patchCursor": "6095",
+      "captureIntervalNs": [
+        "550243175181875",
+        "550243175181875"
+      ],
+      "commitIntervalNs": [
+        "550243175849083",
+        "550243176117791"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.935916,
+        "commitToDomMs": 27.901917,
+        "eventToDomMs": 28.569125
+      }
+    },
+    {
+      "observationId": "1c466f07-b883-410b-a171-3881d1f54de8",
+      "source": "claude.hook",
+      "cursor": "6085",
+      "patchCursor": "6085",
+      "captureIntervalNs": [
+        "550242717481083",
+        "550242717481083"
+      ],
+      "commitIntervalNs": [
+        "550242718145625",
+        "550242718596750"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.115667,
+        "commitToDomMs": 27.605375,
+        "eventToDomMs": 28.269917
+      }
+    },
+    {
+      "observationId": "37f36b08-4972-4a73-86e6-f3e5c619ce99",
+      "source": "claude.observer",
+      "cursor": "6058",
+      "patchCursor": "6062",
+      "captureIntervalNs": [
+        "550223626694833",
+        "550223642472541"
+      ],
+      "commitIntervalNs": [
+        "550224204336625",
+        "550224205099166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 578.404333,
+        "commitToDomMs": 30.414375,
+        "eventToDomMs": 608.056167
+      }
+    },
+    {
+      "observationId": "38224803-db2e-4c92-9cb8-15b829c59420",
+      "source": "claude.hook",
+      "cursor": "6079",
+      "patchCursor": "6079",
+      "captureIntervalNs": [
+        "550242448044000",
+        "550242448044000"
+      ],
+      "commitIntervalNs": [
+        "550242448920166",
+        "550242449435250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.39125,
+        "commitToDomMs": 25.830834,
+        "eventToDomMs": 26.707
+      }
+    },
+    {
+      "observationId": "4162408a-6f37-426c-8591-e8505a32a187",
+      "source": "claude.hook",
+      "cursor": "6093",
+      "patchCursor": "6093",
+      "captureIntervalNs": [
+        "550243086238375",
+        "550243086238375"
+      ],
+      "commitIntervalNs": [
+        "550243086900458",
+        "550243087117583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.879208,
+        "commitToDomMs": 24.850542,
+        "eventToDomMs": 25.512625
+      }
+    },
+    {
+      "observationId": "42b6b3e4-c17f-4b3d-908c-b4ecc93323d9",
+      "source": "claude.hook",
+      "cursor": "6089",
+      "patchCursor": "6089",
+      "captureIntervalNs": [
+        "550242900377458",
+        "550242900377458"
+      ],
+      "commitIntervalNs": [
+        "550242901135791",
+        "550242901293625"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.916167,
+        "commitToDomMs": 27.615209,
+        "eventToDomMs": 28.373542
+      }
+    },
+    {
+      "observationId": "4895f681-02ca-410f-b9ef-629a14777e8d",
+      "source": "claude.observer",
+      "cursor": "6076",
+      "patchCursor": "6077",
+      "captureIntervalNs": [
+        "550241804893833",
+        "550241824046458"
+      ],
+      "commitIntervalNs": [
+        "550241836268250",
+        "550241836678250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 31.784417,
+        "commitToDomMs": 29.48275,
+        "eventToDomMs": 60.857167
+      }
+    },
+    {
+      "observationId": "4c5f5dab-fc07-4f81-ba4b-902e204adbf7",
+      "source": "claude.observer",
+      "cursor": "6075",
+      "patchCursor": "6077",
+      "captureIntervalNs": [
+        "550241790530249",
+        "550241809682874"
+      ],
+      "commitIntervalNs": [
+        "550241836268250",
+        "550241836678250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 46.148001,
+        "commitToDomMs": 29.48275,
+        "eventToDomMs": 75.220751
+      }
+    },
+    {
+      "observationId": "50bad006-905f-4c65-bb5b-c5f8947d18d6",
+      "source": "claude.hook",
+      "cursor": "6081",
+      "patchCursor": "6081",
+      "captureIntervalNs": [
+        "550242543895416",
+        "550242543895416"
+      ],
+      "commitIntervalNs": [
+        "550242544604416",
+        "550242544951041"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.055625,
+        "commitToDomMs": 28.146584,
+        "eventToDomMs": 28.855584
+      }
+    },
+    {
+      "observationId": "534cb997-eb47-41a6-a495-4469e6a9925e",
+      "source": "claude.observer",
+      "cursor": "6059",
+      "patchCursor": "6062",
+      "captureIntervalNs": [
+        "550223728581042",
+        "550223744358750"
+      ],
+      "commitIntervalNs": [
+        "550224204336625",
+        "550224205099166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 476.518124,
+        "commitToDomMs": 30.414375,
+        "eventToDomMs": 506.169958
+      }
+    },
+    {
+      "observationId": "592adcd0-b0ae-4985-a8b0-64b51e726366",
+      "source": "claude.observer",
+      "cursor": "6061",
+      "patchCursor": "6062",
+      "captureIntervalNs": [
+        "550223773599625",
+        "550223789377333"
+      ],
+      "commitIntervalNs": [
+        "550224204336625",
+        "550224205099166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 431.499541,
+        "commitToDomMs": 30.414375,
+        "eventToDomMs": 461.151375
+      }
+    },
+    {
+      "observationId": "69bdde08-0f2c-4272-af11-cde76aaa6539",
+      "source": "claude.observer",
+      "cursor": "6064",
+      "patchCursor": "6064",
+      "captureIntervalNs": [
+        "550238600173166",
+        "550238613258541"
+      ],
+      "commitIntervalNs": [
+        "550238617338541",
+        "550238617652791"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 17.479625,
+        "commitToDomMs": 29.412459,
+        "eventToDomMs": 46.577834
+      }
+    },
+    {
+      "observationId": "69c318a0-16b4-44f0-ab07-e1f6693305aa",
+      "source": "claude.observer",
+      "cursor": "6072",
+      "patchCursor": "6072",
+      "captureIntervalNs": [
+        "550240987525042",
+        "550240998539167"
+      ],
+      "commitIntervalNs": [
+        "550241000633583",
+        "550241000886708"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 13.361666,
+        "commitToDomMs": 28.117417,
+        "eventToDomMs": 41.225958
+      }
+    },
+    {
+      "observationId": "6e0bf277-45e4-419f-99a6-e0e1f6bf2af9",
+      "source": "claude.observer",
+      "cursor": "6099",
+      "patchCursor": "6099",
+      "captureIntervalNs": [
+        "550243523539541",
+        "550243535937083"
+      ],
+      "commitIntervalNs": [
+        "550243536637708",
+        "550243536820250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 13.280709,
+        "commitToDomMs": 28.113292,
+        "eventToDomMs": 41.211459
+      }
+    },
+    {
+      "observationId": "6edbbc06-1628-478b-b348-4af13774570a",
+      "source": "claude.hook",
+      "cursor": "6094",
+      "patchCursor": "6094",
+      "captureIntervalNs": [
+        "550243132415208",
+        "550243132415208"
+      ],
+      "commitIntervalNs": [
+        "550243132980666",
+        "550243133187166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.771958,
+        "commitToDomMs": 26.770334,
+        "eventToDomMs": 27.335792
+      }
+    },
+    {
+      "observationId": "8374a9b6-b780-4851-bf41-3604fc286ca9",
+      "source": "claude.hook",
+      "cursor": "6092",
+      "patchCursor": "6092",
+      "captureIntervalNs": [
+        "550243035881000",
+        "550243035881000"
+      ],
+      "commitIntervalNs": [
+        "550243036402916",
+        "550243036574291"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.693291,
+        "commitToDomMs": 25.348084,
+        "eventToDomMs": 25.87
+      }
+    },
+    {
+      "observationId": "901c9f70-43cb-4d6c-bb37-b18266b78591",
+      "source": "claude.observer",
+      "cursor": "6070",
+      "patchCursor": "6070",
+      "captureIntervalNs": [
+        "550240663560208",
+        "550240683039958"
+      ],
+      "commitIntervalNs": [
+        "550240682727875",
+        "550240683304375"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 19.744167,
+        "commitToDomMs": 29.023125,
+        "eventToDomMs": 48.190792
+      }
+    },
+    {
+      "observationId": "95305044-ed7c-4ec6-8528-d9850a799358",
+      "source": "claude.hook",
+      "cursor": "6091",
+      "patchCursor": "6091",
+      "captureIntervalNs": [
+        "550242997058791",
+        "550242997058791"
+      ],
+      "commitIntervalNs": [
+        "550242997726500",
+        "550242998036666"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.977875,
+        "commitToDomMs": 27.0245,
+        "eventToDomMs": 27.692209
+      }
+    },
+    {
+      "observationId": "959d0573-1988-4cbe-8ec6-12ae2064672d",
+      "source": "claude.observer",
+      "cursor": "6077",
+      "patchCursor": "6077",
+      "captureIntervalNs": [
+        "550241808213249",
+        "550241827365874"
+      ],
+      "commitIntervalNs": [
+        "550241836268250",
+        "550241836678250"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 28.465001,
+        "commitToDomMs": 29.48275,
+        "eventToDomMs": 57.537751
+      }
+    },
+    {
+      "observationId": "96806528-c22f-43b4-86da-8d965c0e4606",
+      "source": "claude.hook",
+      "cursor": "6096",
+      "patchCursor": "6096",
+      "captureIntervalNs": [
+        "550243224933625",
+        "550243224933625"
+      ],
+      "commitIntervalNs": [
+        "550243225494083",
+        "550243225691875"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.75825,
+        "commitToDomMs": 26.256917,
+        "eventToDomMs": 26.817375
+      }
+    },
+    {
+      "observationId": "96cb41f7-f218-4ee0-b660-5feff3cc8ee2",
+      "source": "claude.hook",
+      "cursor": "6080",
+      "patchCursor": "6080",
+      "captureIntervalNs": [
+        "550242495074458",
+        "550242495074458"
+      ],
+      "commitIntervalNs": [
+        "550242495987125",
+        "550242496499583"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.425125,
+        "commitToDomMs": 24.763875,
+        "eventToDomMs": 25.676542
+      }
+    },
+    {
+      "observationId": "9c5e56ed-ee4b-4852-9643-9c8803c6b4d6",
+      "source": "claude.observer",
+      "cursor": "6068",
+      "patchCursor": "6068",
+      "captureIntervalNs": [
+        "550238803156000",
+        "550238819980625"
+      ],
+      "commitIntervalNs": [
+        "550238823178791",
+        "550238823617041"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 20.461041,
+        "commitToDomMs": 27.572209,
+        "eventToDomMs": 47.595
+      }
+    },
+    {
+      "observationId": "a7f644db-5aa9-4830-a8b7-9dccb626bedd",
+      "source": "claude.observer",
+      "cursor": "6074",
+      "patchCursor": "6074",
+      "captureIntervalNs": [
+        "550241235010124",
+        "550241253703499"
+      ],
+      "commitIntervalNs": [
+        "550241261378000",
+        "550241261600458"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 26.590334,
+        "commitToDomMs": 29.373,
+        "eventToDomMs": 55.740876
+      }
+    },
+    {
+      "observationId": "acbbd394-28f6-4945-ad09-8ceb98e39ce9",
+      "source": "claude.observer",
+      "cursor": "6065",
+      "patchCursor": "6068",
+      "captureIntervalNs": [
+        "550238785487875",
+        "550238802312500"
+      ],
+      "commitIntervalNs": [
+        "550238823178791",
+        "550238823617041"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 38.129166,
+        "commitToDomMs": 27.572209,
+        "eventToDomMs": 65.263125
+      }
+    },
+    {
+      "observationId": "b1bf12bc-913b-49b3-ad8a-449b55397489",
+      "source": "claude.observer",
+      "cursor": "6073",
+      "patchCursor": "6074",
+      "captureIntervalNs": [
+        "550241221035874",
+        "550241239729249"
+      ],
+      "commitIntervalNs": [
+        "550241261378000",
+        "550241261600458"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 40.564584,
+        "commitToDomMs": 29.373,
+        "eventToDomMs": 69.715126
+      }
+    },
+    {
+      "observationId": "b78d604b-5f62-4f3d-a85f-e7cbc599f757",
+      "source": "claude.observer",
+      "cursor": "6069",
+      "patchCursor": "6070",
+      "captureIntervalNs": [
+        "550240654502458",
+        "550240673982208"
+      ],
+      "commitIntervalNs": [
+        "550240682727875",
+        "550240683304375"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 28.801917,
+        "commitToDomMs": 29.023125,
+        "eventToDomMs": 57.248542
+      }
+    },
+    {
+      "observationId": "bd6e2647-7f8d-4d31-8066-524ff93f634d",
+      "source": "claude.hook",
+      "cursor": "6086",
+      "patchCursor": "6086",
+      "captureIntervalNs": [
+        "550242757788041",
+        "550242757788041"
+      ],
+      "commitIntervalNs": [
+        "550242758553333",
+        "550242758947000"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.158959,
+        "commitToDomMs": 26.197667,
+        "eventToDomMs": 26.962959
+      }
+    },
+    {
+      "observationId": "bf633380-ce9b-4993-a6a8-c66df21ff91b",
+      "source": "claude.observer",
+      "cursor": "6066",
+      "patchCursor": "6068",
+      "captureIntervalNs": [
+        "550238788868709",
+        "550238805693334"
+      ],
+      "commitIntervalNs": [
+        "550238823178791",
+        "550238823617041"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 34.748332,
+        "commitToDomMs": 27.572209,
+        "eventToDomMs": 61.882291
+      }
+    },
+    {
+      "observationId": "c545e32d-ea7d-47d0-958f-d3e1aaf2b787",
+      "source": "claude.observer",
+      "cursor": "6067",
+      "patchCursor": "6068",
+      "captureIntervalNs": [
+        "550238789348042",
+        "550238806172667"
+      ],
+      "commitIntervalNs": [
+        "550238823178791",
+        "550238823617041"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 34.268999,
+        "commitToDomMs": 27.572209,
+        "eventToDomMs": 61.402958
+      }
+    },
+    {
+      "observationId": "c64a74d4-6297-4904-94d1-41165afb6083",
+      "source": "claude.hook",
+      "cursor": "6083",
+      "patchCursor": "6083",
+      "captureIntervalNs": [
+        "550242632586666",
+        "550242632586666"
+      ],
+      "commitIntervalNs": [
+        "550242633313875",
+        "550242633692833"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.106167,
+        "commitToDomMs": 28.437125,
+        "eventToDomMs": 29.164334
+      }
+    },
+    {
+      "observationId": "cd6d3bba-23a7-4b40-86fa-8eedae585bf1",
+      "source": "claude.hook",
+      "cursor": "6084",
+      "patchCursor": "6084",
+      "captureIntervalNs": [
+        "550242672270791",
+        "550242672270791"
+      ],
+      "commitIntervalNs": [
+        "550242672870500",
+        "550242673360208"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.089417,
+        "commitToDomMs": 27.8805,
+        "eventToDomMs": 28.480209
+      }
+    },
+    {
+      "observationId": "dc84f108-16f3-47c1-b70c-9ae1f7dcc274",
+      "source": "claude.hook",
+      "cursor": "6090",
+      "patchCursor": "6090",
+      "captureIntervalNs": [
+        "550242947163041",
+        "550242947163041"
+      ],
+      "commitIntervalNs": [
+        "550242947776875",
+        "550242947979541"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 0.8165,
+        "commitToDomMs": 25.974125,
+        "eventToDomMs": 26.587959
+      }
+    },
+    {
+      "observationId": "df7e82d0-a3d4-43ee-b44e-b8833fe8bfcc",
+      "source": "claude.hook",
+      "cursor": "6078",
+      "patchCursor": "6078",
+      "captureIntervalNs": [
+        "550242405018166",
+        "550242405018166"
+      ],
+      "commitIntervalNs": [
+        "550242406018375",
+        "550242406736750"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.718584,
+        "commitToDomMs": 30.732625,
+        "eventToDomMs": 31.732834
+      }
+    },
+    {
+      "observationId": "e181aad9-225d-476d-8e5b-8418ae691bb2",
+      "source": "claude.observer",
+      "cursor": "6071",
+      "patchCursor": "6071",
+      "captureIntervalNs": [
+        "550240666365541",
+        "550240681961791"
+      ],
+      "commitIntervalNs": [
+        "550240696706291",
+        "550240700540125"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 34.174584,
+        "commitToDomMs": 30.044709,
+        "eventToDomMs": 60.385459
+      }
+    },
+    {
+      "observationId": "f34c7467-15f3-4818-bd63-3c9a0d9076e1",
+      "source": "claude.hook",
+      "cursor": "6087",
+      "patchCursor": "6087",
+      "captureIntervalNs": [
+        "550242801716750",
+        "550242801716750"
+      ],
+      "commitIntervalNs": [
+        "550242802548458",
+        "550242802876458"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.159708,
+        "commitToDomMs": 27.202542,
+        "eventToDomMs": 28.03425
+      }
+    },
+    {
+      "observationId": "f81dcc13-6462-41b8-9881-7b39fffba572",
+      "source": "claude.hook",
+      "cursor": "6088",
+      "patchCursor": "6088",
+      "captureIntervalNs": [
+        "550242851273708",
+        "550242851273708"
+      ],
+      "commitIntervalNs": [
+        "550242851959291",
+        "550242852286750"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 1.013042,
+        "commitToDomMs": 27.791709,
+        "eventToDomMs": 28.477292
+      }
+    },
+    {
+      "observationId": "fb9a09de-d336-432e-b45b-b65485733435",
+      "source": "claude.observer",
+      "cursor": "6062",
+      "patchCursor": "6062",
+      "captureIntervalNs": [
+        "550223964480792",
+        "550223980258500"
+      ],
+      "commitIntervalNs": [
+        "550224204336625",
+        "550224205099166"
+      ],
+      "upperBoundsMs": {
+        "captureToCommitMs": 240.618374,
+        "commitToDomMs": 30.414375,
+        "eventToDomMs": 270.270208
+      }
+    }
+  ],
+  "exclusions": [],
+  "errors": [
+    "clock profile is not positively qualified on the recorded native boot",
+    "missing/invalid rate, resolution or clock qualification evidence",
+    "one or more mandatory source/metric populations is empty or exceeds its p95 target"
+  ],
+  "normalPathPass": false,
+  "nativeExecution": true,
+  "verdict": "INCOMPLETE_OR_FAIL"
+}

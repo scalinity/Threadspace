@@ -1,30 +1,29 @@
 {
   "schemaVersion": 2,
-  "title": "M2 focused F1\u2013F4 remediation status and evidence index",
+  "title": "M2 focused F1–F4 remediation status and evidence index",
   "milestone": "M2",
   "branch": "m2",
-  "verdict": "M2 NATIVE CLOSURE INCOMPLETE",
+  "verdict": "M2 F4 REMEDIATION INCOMPLETE",
   "baseCommit": "af9b285da529890bc441ea00f1a92e73e39902a8",
   "rejectedCandidate": "2c4b5012f59189dcb38d61ced0b0b9fe96fb043e",
-  "sourceCommit": "9e13bad17c498282a02232d850db19b0ef01aa57",
-  "sourceIdentityNote": "Current source includes only unshipped qualification harness/test changes; product and generated-contract inputs remain the clean signed 4aef4a96f0e21844b35271246a151629a77bceb2 build. Every native run binds its own committed harness source and executable hash. Later publication metadata is not a new native execution.",
+  "sourceCommit": "bcb1d92b0150c019c8fdf5fc135601e3e4942aa7",
+  "sourceIdentityNote": "Final native source/harness 79e7064 is a clean signed Dev build of qualification-only phase/census diagnostics and a read-only retained-checkpoint test. Python calculator labels are later source-bound evidence changes. Reducer, integration ownership, route, original result identity and default capture protocol behavior remain unchanged; prior F1A/F1B/F2/F3 native evidence retains its original 4aef product/9e13 harness scope. Publication is not another native execution.",
   "currentNativeBuild": {
     "status": "BUILT_SIGNED_INSTALLED_HASH_MATCHED",
-    "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
+    "sourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
     "bundleId": "ai.scalinity.threadspace.dev",
     "executableHashes": {
-      "outer": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6",
-      "companion": "43d59886d6a8b7cd5c04734b8e738e4883970cbbabe5cd812a8516b039d50f1b",
-      "helper": "554ce67cb42f9443cb23a2f7eae13a878c35502a04275e5230e1ef56e120c60f"
+      "outer": "a56ef09041f4b2de8e61ca120284fed7134ee9a5aa6ab4041f4ac759b735cf6b",
+      "companion": "fe0c1939913879c8abba16adae66a5a4553a50ae94b255c18cdcc309bbf9b439",
+      "helper": "f9ea720566710d6c7a05d5d82a433e2208915ed848eb5e10f9df4f35e14fb8fb"
     },
-    "harnessExecutableSha256": "0874be1567b8f6573aa15634f84f50e56583c85e2ddbd231f0300cab9d7aeb73",
+    "harnessExecutableSha256": "ceea9ffb23305437db4f25a0c606bee7688037fc2e6709cc9ef6723d1ea8cab3",
     "qualificationBuild": true,
     "sourceTreeCleanAtBuild": true,
-    "evidence": "evidence/M2/remediation-2/",
+    "evidence": "evidence/M2/remediation-4",
     "devStoreBackupVerified": true,
     "productionApplicationOrStoreModified": false,
-    "latestIdentityVerification": "evidence/M2/remediation-3/final-native-identity.json",
-    "finalQualificationHarnessSha256": "5b6a3111dca483cb5b281afc169336e8eafd6836a5c74719ee5f972b68087200"
+    "latestIdentityVerification": "evidence/M2/remediation-4/final-native-identity.json"
   },
   "historicalNativeBuild": {
     "buildInfoFrom": "apps/agent-macos/build/dev/build-info.json, written by tests/native/build-app.sh dev; hashes re-read from the installed bundle",
@@ -55,8 +54,8 @@
     "readme": "evidence/M2/remediation-1/historical/rejected-candidate-README.md"
   },
   "decisions": {
-    "D-0009": "PROPOSED \u2014 pending independent re-review",
-    "D-0010": "PROPOSED \u2014 pending independent re-review"
+    "D-0009": "PROPOSED — pending independent re-review",
+    "D-0010": "PROPOSED — pending independent re-review"
   },
   "reducer": {
     "version": 4,
@@ -156,15 +155,94 @@
       "nativePercentiles": null,
       "evidence": "evidence/M2/remediation-1/f4/",
       "openGates": [
-        "Positive installed native/JavaScript runtime clock rate, precision, rounding and calibration-span qualification",
-        "Conservative source-specific native latency verdict and observer capture-to-COMMIT diagnostic investigation"
+        "Defensible installed observer/WebKit rate, precision and conversion bounds or complete tight causal native brackets",
+        "Actual provider-host first-call scheduling/startup/return decomposition and a source-bound repair for queued capture delay",
+        "Absent-companion mod-batch subprocess wall-time control: 308/311 ms failures retained"
       ],
       "nativeGate": "INCOMPLETE",
-      "macAttemptEvidence": "evidence/M2/remediation-3/README.md",
-      "nativeEvidence": "evidence/M2/remediation-1/f4/native/capture/20261010T073149Z-dev/",
-      "sourceCensus": "CLOSED: controlled hooks and real native observer, with discriminating double-loss control",
-      "unqualifiedDiagnosticNote": "Calculator uses unqualified zero-rate/precision fallback; observer capture-to-COMMIT p95 216.024625 ms is not a qualified native performance verdict.",
-      "coreRuntimeProof": "evidence/M2/remediation-3/core-runtime-proof.json"
+      "macAttemptEvidence": "evidence/M2/remediation-4/README.md",
+      "nativeEvidence": "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev",
+      "sourceCensus": "CLOSED for two telemetry-on controlled-hook + real-observer populations; telemetry-off diagnostic remains unsealed. New double-loss control independently issues 2 and identifies 1 missing.",
+      "unqualifiedDiagnosticNote": "All qualified counts remain zero. Latest zero-rate/zero-precision diagnostic observer capture-to-COMMIT p95 is 119.213624 ms, max 199.522416 ms; earlier telemetry-on p95 is 476.518124 ms. Cold observations remain included. These are not certified conservative bounds or a source-specific PASS.",
+      "coreRuntimeProof": "evidence/M2/remediation-3/core-runtime-proof.json",
+      "previousNativeEvidence": "evidence/M2/remediation-1/f4/native/capture/20261010T073149Z-dev/",
+      "diagnosticPercentiles": {
+        "claude.hook": {
+          "captureToCommitMs": {
+            "n": 20,
+            "p50": 1.230167,
+            "p95": 1.755292,
+            "max": 4.936541
+          },
+          "commitToDomMs": {
+            "n": 20,
+            "p50": 24.792,
+            "p95": 29.06975,
+            "max": 30.884833
+          },
+          "eventToDomMs": {
+            "n": 20,
+            "p50": 25.602333,
+            "p95": 29.468083,
+            "max": 31.982291
+          },
+          "population": {
+            "totalCaptured": 20,
+            "durablyAccepted": 20,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 20,
+            "noProjectionChange": 0,
+            "matchedDom": 20,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        },
+        "claude.observer": {
+          "captureToCommitMs": {
+            "n": 21,
+            "p50": 22.650125,
+            "p95": 119.213624,
+            "max": 199.522416
+          },
+          "commitToDomMs": {
+            "n": 21,
+            "p50": 28.893041,
+            "p95": 30.069583,
+            "max": 30.474958
+          },
+          "eventToDomMs": {
+            "n": 21,
+            "p50": 51.554583,
+            "p95": 142.730999,
+            "max": 227.564749
+          },
+          "population": {
+            "totalCaptured": 21,
+            "durablyAccepted": 21,
+            "deduplicatedAttempts": 0,
+            "rejected": 0,
+            "projectionChange": 21,
+            "noProjectionChange": 0,
+            "matchedDom": 21,
+            "unmatchedDom": 0,
+            "missingTelemetry": 0
+          }
+        }
+      },
+      "qualifiedSampleCounts": {
+        "claude.hook": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        },
+        "claude.observer": {
+          "captureToCommitMs": 0,
+          "commitToDomMs": 0,
+          "eventToDomMs": 0
+        }
+      },
+      "phaseEvidence": "evidence/M2/remediation-4/f4/analysis"
     }
   },
   "preservedDispositions": {
@@ -186,11 +264,12 @@
     "ownershipIncident": "Known unsafe pattern command; affected PIDs/effects unknown. See f2/harness-ownership-incident.md."
   },
   "remainingActions": [
-    "Qualify installed native/provider/UI monotonic clock rate, precision and complete cross-runtime interval uncertainty",
-    "Calculate conservative source-specific latency and diagnose remaining observer capture/COMMIT upper-bound excess",
-    "Independent GPT-6 Pro M2 acceptance re-review only after F4 passes; no merge, M3 or production deployment"
+    "Qualify installed observer/UI clock rate, precision and cross-runtime interval uncertainty or replace interpolation with complete tight native causal brackets",
+    "Isolate and repair actual provider-host first-call startup/return latency without removing early events; preserve typed receipts, fail-open and immutable budgets",
+    "Resolve the repeated absent-companion subprocess wall-time control without weakening its assertion",
+    "Independent GPT-6 Pro M2 acceptance re-review only after F4 actually passes; no merge, M3 or production deployment"
   ],
-  "remediationIndex": "evidence/M2/remediation-3/README.md",
+  "remediationIndex": "evidence/M2/remediation-4/README.md",
   "provenance": "evidence/M2/remediation-3/final-native-identity.json",
   "evidenceHashes": {
     "evidence/M2/faults/20261009T041720Z-dev/cases.jsonl": "9a7ea76b12ecadd2b84e4e2db91ba30948987edaec811a6ba6a0cfa70a70f94b",
@@ -1099,29 +1178,133 @@
     "evidence/M2/remediation-3/supplemental/cleanup-harness-clippy.log": "b2e0fff6e923c9cbc0c4f2b79c66a001398b8dfd6815ea9356a1107fa7824a27",
     "evidence/M2/remediation-3/supplemental/cleanup-report-control.log": "88335b0d06fd0d5469a37745f4b7de957f6a6fabbd1465f0da6bd95628db995b",
     "evidence/M2/remediation-3/supplemental/final-harness-build.log": "ba6b4a8961a693b3012a322407b41ba15e5d60bde3a15d096dbe65f2874b5ac7",
-    "evidence/M2/remediation-3/supplemental/final-harness-execution.json": "4c679e0bbdc4d13eaaaded879e9aad84ba354c06598da44688144536be92eb26"
+    "evidence/M2/remediation-3/supplemental/final-harness-execution.json": "4c679e0bbdc4d13eaaaded879e9aad84ba354c06598da44688144536be92eb26",
+    "evidence/M2/remediation-4/README.md": "a27dced1806f5e2e7a503d792e175fbda0dc16ea0926317e90d2436faadb940c",
+    "evidence/M2/remediation-4/checks/calculator-controls.log": "b6102bd16e5928fe3d6d717be042b7db700fa15fa3eddabd5d6a7b6641c73368",
+    "evidence/M2/remediation-4/checks/final-commit-controls.log": "9987d6771bdd6f2608dfb9c3471dfb770b042f0e12add9cd3485052bf447472c",
+    "evidence/M2/remediation-4/checks/final-journal-latency-controls.log": "b68010331cee63ff4dd1642adbbc1ea625cfe7b708788848122eee1e2e29076e",
+    "evidence/M2/remediation-4/checks/final-modbatch-controls-retry.log": "a7f58a3e1ecf5853acec3bf77860be590005022c5f2ca9488087aacdee6d100c",
+    "evidence/M2/remediation-4/checks/final-modbatch-controls.log": "6ea9510f41241b3855cb984fbafcc3827e1400292ca0dbad89648464798e2032",
+    "evidence/M2/remediation-4/checks/final-release-check.log": "c8995a2f78d2bc38d9b9e3b43160a69ae95c9439f14e506b5ae8d34d91b82ddd",
+    "evidence/M2/remediation-4/checks/legacy-anchor-test.log": "ff81295096cdfd0dd09038900d51f8aabb142e04683754f4e754f2d27f8ba1e6",
+    "evidence/M2/remediation-4/checks/progress-final-clippy.log": "4cf86278c1e6d659943a46a3d7e3da429ac15be90f0f17742e24ef85228e7d3e",
+    "evidence/M2/remediation-4/checks/progress-node-tests.log": "002056c810f7fc3e914cd800811d37304e03291453c15d9794b3dcacad2bad8a",
+    "evidence/M2/remediation-4/checks/progress-rust-tests.log": "2359d0952f82cc3f09e2ecba2857bbdb0975e538ec99b63172c96a7f95696829",
+    "evidence/M2/remediation-4/checks/provider-kit-test.log": "d4e1ef6c2d8ded5d82b61e7f9df8be80a0e53dae74bbfb3e5e63f04e8f483786",
+    "evidence/M2/remediation-4/checks/provider-kit-validate.log": "f623c3e4067b6975dd2af4515e45cc859ae0486f51e44745624be36f30fe91db",
+    "evidence/M2/remediation-4/checks/schema-freshness.log": "38bdb8bc1bdcc5b2062649dd7ebc7bf780d12391998cfaef27eb34c00eff556d",
+    "evidence/M2/remediation-4/checks/ui-tests.log": "b267009518c51fde35f277289aec010ada02abad466864291e66c200c3e9d893",
+    "evidence/M2/remediation-4/checks/workspace-clippy.log": "a1b9ab7cb31dae9906b86ddb80c7ea13cbaac1a519b1f6c9a9531c86f24fe1ee",
+    "evidence/M2/remediation-4/f4/analysis/clock-model-audit.json": "e6361bdaa0d65f9fdfb3ad2c283ec46b4b7fb4fc60d098dba1c2bc96c6d34593",
+    "evidence/M2/remediation-4/f4/analysis/native-clock-reads.json": "fb6da7ae426d462929b02be0230393e6723b7a8b0784de9b785d5103404be52b",
+    "evidence/M2/remediation-4/f4/analysis/native-comparison.json": "2a803548df05b726e9ffb94f474bd44fe342d1b77046eeb14b3f6496fda29dc2",
+    "evidence/M2/remediation-4/f4/analysis/native-startup-control.json": "34c1807469ca4c72e503ac3a3ce3170c0443444b5d722869f5df472a20baaa3a",
+    "evidence/M2/remediation-4/f4/analysis/original-slow-observations.json": "d6d71d7ab53f6bb82635251c7f06e9809e05f352ffb39c930bd1ca17297ea8f0",
+    "evidence/M2/remediation-4/f4/analysis/telemetry-off-runtime-records.json": "3c52e35f0ad660fad11314bc431e1172eb0d70a471bf16fcd2061618710d41e5",
+    "evidence/M2/remediation-4/f4/double-loss-control/census.json": "f738af8fe74557dc4887f0bfc81f14591a789548adf939ae6342459238166d62",
+    "evidence/M2/remediation-4/f4/double-loss-control/issuance.json": "7b3d10765fa66d9ab9d7ec95d29e481363ca923abb909ed4a3e56aa4a9fe8d28",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/discovery.jsonl": "6ebef16168904ee385fa8c7980723dc1856d22b1ca4f938b55a1d19bcd0f4aac",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/fixture.json": "e0bfd3ddbb2550927af34287c187ff28b2cecbc68cfba7c73f04c63e77932be6",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/hook-issuance/census.json": "f9f3df8e10ec55cd183224a241726c9e04ea5f7005436619c1e2139ef424d32b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/hook-issuance/issuance.json": "f0d0f2bee35b274000b776163c50da70478b08249f47f1f7e236e0a332968dca",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/hook-issuance/not-a-directory": "76d57ebf4389bd6b93e2881d949f173ec1ef4569bce41715d13eb5b138cc14d1",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/hook-issuance-result.json": "445c0c34ce9f583606c613365e619b1910d6464b658204c6dad5ec1ee5207c69",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/idle-gate.json": "e15f73aedddb1cbe51d6058806deef819eae49ab875687fbd748c74b9e1d832d",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/integration-acquisition.json": "2edb8e3c4f2af179a28453f986f9531ecbe830f93dc569603ac70e414d76ee6c",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/latency-end.json": "54671d7843154cd54ec3fac330f07b88c7376bc21b9218436b390a5c3e05e17f",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/latency-start.json": "9ec5e6d03d8f2ec001099e5d0c73f756d41fb353bbef8e4a7a8d5f2c7d749a61",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/launch-ownership.json": "e5c5d1a59d1f29da8001288ce28be4734bf56aabc05f969073487522ffc9c309",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/open.json": "4edd61457b8a74ff4a5161f9826d58788337356cb5a9a4787e537a99726da724",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/owned-ui.json": "73ea02c6618781ef4e09812c36df697532ef91d685a683367059443ead16e4d1",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/preflight.json": "8a5d90821c03ca027714f511cbbc1f7517aa389ad4b5c768c23a6b5e9a748ec4",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/provider-close.json": "61d92b4639255bca07380216da48d76b2643f907c5d5f58c14e5434c049c930a",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/smoke-journal.json": "bf6c1f9f3d5bbb8cfd8e18eba278245b269c2fcd01ea9f965826bd77027b4ae7",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/smoke-result.json": "5efb6e803a49528f39cd95807e96a3a72b0d2b99578ff86f3fd4ddbcde5cc1a5",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/source-identity.json": "eb191f43d20bbd62ab5e047e3efbdccf6f2f17f693c258c4db59ee416d10313b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092412Z-dev/summary.json": "657a4b06f2b994ca33940ec307e9da010ad2d925c0dd552a8ec30511df238f30",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/discovery.jsonl": "835ac89024e32adb0b5841eab82a131ec033050b3be75956a0ced3ac9c9a6cf3",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/fixture.json": "e3868290427c2f459629c57919525590061f2c1c99b5f477f571a386421d4524",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/hook-issuance/census.json": "6fb6f9eea07022ccf84418deb08c5647b21b10e11dd278bf734582985d2f582e",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/hook-issuance/issuance.json": "38dca140ac19a1a60806a56168822543d255167fd8b38d64ceabc263b54b6f79",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/hook-issuance/not-a-directory": "76d57ebf4389bd6b93e2881d949f173ec1ef4569bce41715d13eb5b138cc14d1",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/hook-issuance-result.json": "87a2bb3467f750b44ffba6031a0c3e6cb6d225ea0660f158dda0ed2e6a7156dd",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/idle-gate.json": "bc37e8693acba3cdcbf8a23a88dd23e63050d6ce0550b1d71b405f14146731d2",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/integration-acquisition.json": "fd0ce86890eeb15810e51b3f40d3379024e96eb9f4c7b72f754aa9eb44412189",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/latency-end.json": "0329a90ed28537830b6d335e72919d9c1d381342b88cfcf6c8d0cb009011849c",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/latency-start.json": "608c8ceaab7300d0d0d5476abd347ae057f4fbf872fd8e66ac19df93e8498f7d",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/launch-ownership.json": "b37c2989d7750fb5949c6f0add93a3984ed7ceb2730a9c25133287a18f9fa895",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/open.json": "53f7f18936f5da208e274e7a990de05ebcd7e8729b26823d5536825a8ad4afa5",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/owned-ui.json": "eccce6363904999c323fba4edbb4c13ce1b6607a4c4f292f8e68ef57a59d804d",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/preflight.json": "694c83fdc27bc1ba33035a9288c2e10b18a6e2456ed8cc708d8b6196e295dcf4",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/provider-close.json": "92d3743ce416bf43b9672767bf5c1834e2d7cd01e825f1603493618d3517c29b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/smoke-journal.json": "4d1db0960ce8b7b56b1b23b0cbac3b6de71d3428c5a4256221cff68ebff5b4d4",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/smoke-result.json": "44ad068fcd05e3ff9bf582538d75db91a61258d09562c59284539296fa342d1c",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/source-identity.json": "82cb1aae3df838697e9f8e1505867af101e294f3a558ea385e73d96bf39a2a94",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T092614Z-dev/summary.json": "dc21c12fab8ce402844328c45df534b7df58a034ce455179e1dda7f08b72de15",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/discovery.jsonl": "30097710774818b49bd8421993c2341f19efc78825a7101f1c423e466932fd4e",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/fixture.json": "f59a1d38082fa4ec051d0efefd2a66a299f778351aa52a0f3c934be4bcf64e0b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/hook-issuance/census.json": "3c24ac81603fb66db9fbb663c312a6394a762552b9f8e2636ebb8f455b5c8a40",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/hook-issuance/issuance.json": "4cfe4f0be0d82d65b31c4a60ea155f3c1a6228f3835a246a878bbe8d784d375a",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/hook-issuance/not-a-directory": "76d57ebf4389bd6b93e2881d949f173ec1ef4569bce41715d13eb5b138cc14d1",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/hook-issuance-result.json": "4fdc265376de02872011e68d915b3606bad4f7071d6abff3c50c65f8bc441357",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/idle-gate.json": "b46313ff4f33a6aae157baa0dace211e537db9d0ca75a4958cf5013574e87765",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/integration-acquisition.json": "947f27da603611f18da3d4b4100654b93ff4e78521118a45e5353e1481c0c1fe",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/latency-end.json": "5ce447079f6bf67e53e36435933e990a3bbcdfa3d82cb4583d18981a9b67ab45",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/latency-start.json": "a1b16c3110e43bc60eebe951e3e0fca63c9499a8ff2e6b395206abbff7dae111",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/launch-ownership.json": "e869186d15636cae13b289203d62da6688bb9fa8918cefff33949bce3ea1387d",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/open.json": "c48269a9c6ef28931c67ec28af4527926e7e671bcfde40a07dd5e43a69f5f943",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/owned-ui.json": "a598decffc94852152eea85581e918a3eb48cfa85ad6e41787a83a09536e6672",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/preflight.json": "32b4be13b0a1f59a1a63479c69866cd057e4a1f6004944e3ca730c18f1a87f9c",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/provider-close.json": "86565602d2e26fb5c4c78cbb25dc2f1fa45556323e5364117bef60fba0d47dec",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/smoke-journal.json": "3ba23e1044b30a75448fc056ce1556e84d272cdd2bc318cb1daca6fa9c269427",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/smoke-result.json": "0b7ec56618f0e626845b33fdab9bf91bd1d603eb8e276b2f63e8eacd828b715b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/source-identity.json": "5bbcf17d8e133858ddff023cbfeb400838078c2fbcf4035aac40ec0fb70a0d8b",
+    "evidence/M2/remediation-4/f4/latency-fixture/20261010T093848Z-dev/summary.json": "9adc336b3bc5ce9bc49a3f72c8582764338cebc7778870396c2865a3cb4b6ece",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/calculated-labelled.json": "f68c6d34da06026839d0dd6a9ba081cdb7436e0eba00ab7397112e03ca23b488",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/calculated.json": "6bdca836faa9458bcf007de0b8b22930875dac5cec22364f8d1216db75b84175",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/calculator-execution.json": "eabcbabbd7f73d1daa1bdd7e5018a27c212dfe3e21549dbc1c157878b035fba5",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/raw-with-hook-census.json": "9164afdbe8b57784f82379e7acd91e3601a20c59a685d9deeda7f439e1e84fb9",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/raw.json": "b1d339a543d7e36c44d39f677cefd1bd14f4222da1d24986f7553abf3e9fb3b2",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092414Z-dev/start.json": "225c71fadcb67c221129e87d005f3d106ac6630021485ffd16f1fc25696a008a",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092616Z-dev/calculated-labelled.json": "2254c9c33f86a10d383f840832af662376d55be2ab98b16bb6c321289c74af79",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092616Z-dev/calculator-execution.json": "acca1b4d8fffcaf1ade2df8fd20cd9ca324a7ea00ec3db6c4bef68dd1c4e1e57",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092616Z-dev/raw-with-hook-census.json": "ed54e375a1e66aed82ab8ae2e4118ffd282adedecd25de6118d32240b0545e96",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092616Z-dev/raw.json": "9223afe462518f3d89872f833f00724c4684713fb4ac6528bb67e0cc61b99822",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T092616Z-dev/start.json": "465df0c535533f71ae2be4f732b6f19c50b777d4056efe2cd5d3c64e55f2b341",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/calculated-labelled.json": "f9bcece970468854377d9674fde456b80450eb90a415ba687b527432e1fcdbe0",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/calculated.json": "a794d6aacfcb7de4e6cdf14c8896cca6764180e572dedd085dd574b584212344",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/calculator-execution.json": "bf1d3e1cea3b34a822da1db1b89eabba5116306f69515857dbfe60090d7c68db",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/raw-with-hook-census.json": "c1f4cb46ab095e0cce952f53976fd8c71b57273666a339bd15a3eca5ddc84a72",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/raw.json": "bab2508ef2db3baa041e82a700c5c4edfb6ec7f2142dfc29b34c87a632c8330c",
+    "evidence/M2/remediation-4/f4/native/capture/20261010T093850Z-dev/start.json": "957d13fd587f3f5b42efe0e2c0cb16a00d6d2179f5fd3fc9c06f2788e5ade606",
+    "evidence/M2/remediation-4/final-native-identity.json": "e8ccab5de0a90de2798c273fa5f501154d2127e94f88b6f0775547dd7d36ff76",
+    "evidence/M2/remediation-4/legacy/legacy-anchor-suffix.json": "b2cd971c6ebb987b0d9801a21d4be2b38708b9eeef75537d52865237e5d4d53f",
+    "evidence/M2/remediation-4/legacy/legacy-history-coverage.json": "a988492fa47cf1d4b16ffbab57d83fc47a5bd3dcefe38660679296afaa4f73ad",
+    "evidence/M2/remediation-4/legacy/legacy-prefix-coverage.json": "789cef310b0a32d0ac9c4fd9e1239a820f3933fb185abf50eae8ab3d1911c8d2",
+    "evidence/M2/remediation-4/privacy-publication.json": "05c7124a843ed61782e0fbc10bdb206c294729d9c4531e92313766ce5f077ac2",
+    "evidence/M2/remediation-4/checks/evidence-consistency.json": "c450efb440a6f6eeb98facf821669744a16c966d4d485d4c0ba40e1a33e57555"
   },
-  "harnessCommit": "9e13bad17c498282a02232d850db19b0ef01aa57",
-  "publicationMethod": "New raw originals privately preserved before literal home/owned-temp curation and removal of unrelated PID rows; previous evidence remains intact. Public and original hashes are separately indexed.",
-  "previousRemediationIndex": "evidence/M2/remediation-2/README.md",
+  "harnessCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+  "publicationMethod": "Narrow source commits and subsequent privacy-curated evidence on m2, with exact native build/harness/calculator identities per run; no merge or production deployment.",
+  "previousRemediationIndex": "evidence/M2/remediation-3/README.md",
   "previousProvenance": "evidence/M2/remediation-1/provenance.json",
   "macAttempt": {
-    "status": "M2 NATIVE CLOSURE INCOMPLETE",
+    "status": "M2 F4 REMEDIATION INCOMPLETE",
     "terminalScriptability": "TERMINAL SCRIPTABILITY RESTORED",
     "TerminalEnvironmentEvidence": "evidence/M2/remediation-3/terminal-environment.json",
     "F1A": "PASS focused native plus controlled schedules",
     "F1B": "PASS native proof/seal/post-seal Turn, controlled negatives and exact isolated native replay",
     "F2": "PASS retained, product integration source unchanged",
     "F3": "PASS five positives plus refusal/cleanup",
-    "F4": "INCOMPLETE clocks; source populations and real COMMIT/DOM collected",
-    "legacyDevEmptyGenesisFullStateCheck": "FAILED, preserved privately; pre-canonical baseline history. Complete isolated native replay separately passes.",
+    "F4": "INCOMPLETE: qualified n=0; two complete diagnostic populations, explicit first-call startup/HOL evidence and repeated wall-time failures retained",
+    "legacyDevEmptyGenesisFullStateCheck": "LEGACY DEV-STORE COMPARISON NOT APPLICABLE TO EMPTY GENESIS — qualified anchor/suffix PASS",
     "rootCauseOfHistoricalMinimizedTimeouts": "NOT_ESTABLISHED",
     "orchestration": "No ORCHESTRATION.html exists"
   },
-  "previousSourceCommit": "7e4fd265ceec4677eb7fa2091575a724cf2c323a",
-  "previousHarnessCommit": "9799b84b8cd8c2db1f033a172e9a8276ddbd1901",
-  "nativeBuildSourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
-  "compiledRustHarnessSourceCommit": "9e13bad17c498282a02232d850db19b0ef01aa57",
+  "previousSourceCommit": "9e13bad17c498282a02232d850db19b0ef01aa57",
+  "previousHarnessCommit": "9e13bad17c498282a02232d850db19b0ef01aa57",
+  "nativeBuildSourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+  "compiledRustHarnessSourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
   "previousMacAttempt": {
     "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
     "nativeBuildInstall": "PASS",
@@ -1185,5 +1368,324 @@
       "nativeGate": "INCOMPLETE",
       "macAttemptEvidence": "evidence/M2/remediation-2/README.md"
     }
+  },
+  "nativeBuildHistory": [
+    {
+      "status": "BUILT_SIGNED_INSTALLED_HASH_MATCHED",
+      "sourceCommit": "4aef4a96f0e21844b35271246a151629a77bceb2",
+      "bundleId": "ai.scalinity.threadspace.dev",
+      "executableHashes": {
+        "outer": "d849801d798576a67fedb763b6fe843297fef91a6e12f3064ade741d6becf8f6",
+        "companion": "43d59886d6a8b7cd5c04734b8e738e4883970cbbabe5cd812a8516b039d50f1b",
+        "helper": "554ce67cb42f9443cb23a2f7eae13a878c35502a04275e5230e1ef56e120c60f"
+      },
+      "harnessExecutableSha256": "0874be1567b8f6573aa15634f84f50e56583c85e2ddbd231f0300cab9d7aeb73",
+      "qualificationBuild": true,
+      "sourceTreeCleanAtBuild": true,
+      "evidence": "evidence/M2/remediation-2/",
+      "devStoreBackupVerified": true,
+      "productionApplicationOrStoreModified": false,
+      "latestIdentityVerification": "evidence/M2/remediation-3/final-native-identity.json",
+      "finalQualificationHarnessSha256": "5b6a3111dca483cb5b281afc169336e8eafd6836a5c74719ee5f972b68087200"
+    }
+  ],
+  "legacyDevStoreAdjudication": {
+    "verdict": "LEGACY DEV-STORE COMPARISON NOT APPLICABLE TO EMPTY GENESIS — qualified anchor/suffix PASS",
+    "evidence": "evidence/M2/remediation-4/legacy/legacy-anchor-suffix.json",
+    "firstCanonicalCursor": 3532,
+    "baselineAssignmentsCursor": 3529,
+    "retainedAnchorCursor": 5871,
+    "throughCursor": 6021,
+    "contiguousSuffixEntries": 150,
+    "fullStateDifferences": 0,
+    "liveStoreMutatedByAdjudication": false,
+    "completeIsolatedGenesisOracleUnchanged": true
+  },
+  "macAttemptHistory": [
+    {
+      "status": "M2 NATIVE CLOSURE INCOMPLETE",
+      "terminalScriptability": "TERMINAL SCRIPTABILITY RESTORED",
+      "TerminalEnvironmentEvidence": "evidence/M2/remediation-3/terminal-environment.json",
+      "F1A": "PASS focused native plus controlled schedules",
+      "F1B": "PASS native proof/seal/post-seal Turn, controlled negatives and exact isolated native replay",
+      "F2": "PASS retained, product integration source unchanged",
+      "F3": "PASS five positives plus refusal/cleanup",
+      "F4": "INCOMPLETE clocks; source populations and real COMMIT/DOM collected",
+      "legacyDevEmptyGenesisFullStateCheck": "FAILED, preserved privately; pre-canonical baseline history. Complete isolated native replay separately passes.",
+      "rootCauseOfHistoricalMinimizedTimeouts": "NOT_ESTABLISHED",
+      "orchestration": "No ORCHESTRATION.html exists"
+    }
+  ],
+  "finalForensicAttempt": {
+    "evidence": "evidence/M2/remediation-4/README.md",
+    "nativeRuns": [
+      {
+        "captureRun": "20261010T092414Z-dev",
+        "fixtureRun": "20261010T092412Z-dev",
+        "sourceCommit": "ac7d1c92b81c775a964e9dbc81d35a8c1a7a87ee",
+        "rawOriginalSha256": "e2a11b62248559465c810921562b7fd64f8ca5f107e179f2c0839dd9b4d03099",
+        "observerRuntime": "d61e2b02-a92c-4dba-a795-781b9f6fd589",
+        "firstHostCall": {
+          "beginMs": 303.156125,
+          "endMs": 576.281834,
+          "spanMs": 273.12570900000003,
+          "records": [
+            {
+              "capturedMs": 266.145875,
+              "observationId": "37f36b08-4972-4a73-86e6-f3e5c619ce99",
+              "status": "UNKNOWN"
+            }
+          ],
+          "helperPhases": null
+        },
+        "nextHostCallBeginMs": 829.296667,
+        "postFirstReturnToNextDrainMs": 253.01483299999995,
+        "nextQueueWaitMs": [
+          {
+            "observationId": "37f36b08-4972-4a73-86e6-f3e5c619ce99",
+            "waitMs": 563.1507919999999
+          },
+          {
+            "observationId": "534cb997-eb47-41a6-a495-4469e6a9925e",
+            "waitMs": 461.26458299999996
+          },
+          {
+            "observationId": "109e4337-36cd-4935-8b38-3e30af35ad1e",
+            "waitMs": 442.85691699999995
+          },
+          {
+            "observationId": "592adcd0-b0ae-4985-a8b0-64b51e726366",
+            "waitMs": 416.246
+          },
+          {
+            "observationId": "fb9a09de-d336-432e-b45b-b65485733435",
+            "waitMs": 225.36483299999998
+          }
+        ],
+        "observerDeliveryAttemptRecords": 22,
+        "observerRetryRecordAttempts": 1,
+        "observerReceiptAttemptStatuses": {
+          "UNKNOWN": 1,
+          "COMMITTED": 21
+        },
+        "qualifiedSampleCounts": {
+          "claude.hook": {
+            "captureToCommitMs": 0,
+            "commitToDomMs": 0,
+            "eventToDomMs": 0
+          },
+          "claude.observer": {
+            "captureToCommitMs": 0,
+            "commitToDomMs": 0,
+            "eventToDomMs": 0
+          }
+        },
+        "diagnosticPercentiles": {
+          "claude.hook": {
+            "captureToCommitMs": {
+              "n": 20,
+              "p50": 1.013042,
+              "p95": 1.425125,
+              "max": 1.718584
+            },
+            "commitToDomMs": {
+              "n": 20,
+              "p50": 27.0245,
+              "p95": 28.616959,
+              "max": 30.732625
+            },
+            "eventToDomMs": {
+              "n": 20,
+              "p50": 27.692209,
+              "p95": 29.42075,
+              "max": 31.732834
+            },
+            "population": {
+              "totalCaptured": 20,
+              "durablyAccepted": 20,
+              "deduplicatedAttempts": 0,
+              "rejected": 0,
+              "projectionChange": 20,
+              "noProjectionChange": 0,
+              "matchedDom": 20,
+              "unmatchedDom": 0,
+              "missingTelemetry": 0
+            }
+          },
+          "claude.observer": {
+            "captureToCommitMs": {
+              "n": 21,
+              "p50": 34.174584,
+              "p95": 476.518124,
+              "max": 578.404333
+            },
+            "commitToDomMs": {
+              "n": 21,
+              "p50": 29.373,
+              "p95": 30.414375,
+              "max": 30.414375
+            },
+            "eventToDomMs": {
+              "n": 21,
+              "p50": 60.857167,
+              "p95": 506.169958,
+              "max": 608.056167
+            },
+            "population": {
+              "totalCaptured": 21,
+              "durablyAccepted": 21,
+              "deduplicatedAttempts": 0,
+              "rejected": 0,
+              "projectionChange": 21,
+              "noProjectionChange": 0,
+              "matchedDom": 21,
+              "unmatchedDom": 0,
+              "missingTelemetry": 0
+            }
+          }
+        },
+        "operationError": null
+      },
+      {
+        "captureRun": "20261010T093850Z-dev",
+        "fixtureRun": "20261010T093848Z-dev",
+        "sourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+        "rawOriginalSha256": "23aa531e446336939a7aa57dca4337fc9d9e4080dc52194f887ec99a1ae32467",
+        "observerRuntime": "f479475b-67b8-4023-9990-61634aebccde",
+        "firstHostCall": {
+          "beginMs": 291.304375,
+          "endMs": 458.017583,
+          "spanMs": 166.713208,
+          "records": [
+            {
+              "capturedMs": 257.906042,
+              "observationId": "967f8cae-a8c0-4f2d-9248-5d04f137a1c4",
+              "status": "COMMITTED"
+            }
+          ],
+          "helperPhases": {
+            "bootId": "F2D2A2E9-7805-43B2-AC3A-85613557FD8E",
+            "clock": "CLOCK_UPTIME_RAW",
+            "helperElapsedMsAtAnswer": 15.400875,
+            "helperPid": 81753,
+            "measurementEnabled": true,
+            "stamps": {
+              "answerReadyNs": "551099678996375",
+              "locatorReadNs": "551099665335916",
+              "measurementBeginNs": "551099667291666",
+              "measurementFinishedNs": "551099678992000",
+              "modBatchEntryNs": "551099663660208",
+              "providerContextNs": "551099665236166",
+              "receiptReceivedNs": "551099667038750",
+              "stdinReadNs": "551099665112000",
+              "storeResolvedNs": "551099665070750"
+            }
+          }
+        },
+        "nextHostCallBeginMs": 472.137625,
+        "postFirstReturnToNextDrainMs": 14.120042000000012,
+        "nextQueueWaitMs": [
+          {
+            "observationId": "c55e43d3-fb33-4c9c-9f8f-7c7c5d3574e8",
+            "waitMs": 103.608
+          },
+          {
+            "observationId": "d6a69f19-2810-4696-8f04-688449efd548",
+            "waitMs": 86.43762500000003
+          },
+          {
+            "observationId": "e44d7504-6652-4a6f-99d4-eb65a3e26cdb",
+            "waitMs": 73.38654200000002
+          }
+        ],
+        "observerDeliveryAttemptRecords": 21,
+        "observerRetryRecordAttempts": 0,
+        "observerReceiptAttemptStatuses": {
+          "COMMITTED": 21
+        },
+        "qualifiedSampleCounts": {
+          "claude.hook": {
+            "captureToCommitMs": 0,
+            "commitToDomMs": 0,
+            "eventToDomMs": 0
+          },
+          "claude.observer": {
+            "captureToCommitMs": 0,
+            "commitToDomMs": 0,
+            "eventToDomMs": 0
+          }
+        },
+        "diagnosticPercentiles": {
+          "claude.hook": {
+            "captureToCommitMs": {
+              "n": 20,
+              "p50": 1.230167,
+              "p95": 1.755292,
+              "max": 4.936541
+            },
+            "commitToDomMs": {
+              "n": 20,
+              "p50": 24.792,
+              "p95": 29.06975,
+              "max": 30.884833
+            },
+            "eventToDomMs": {
+              "n": 20,
+              "p50": 25.602333,
+              "p95": 29.468083,
+              "max": 31.982291
+            },
+            "population": {
+              "totalCaptured": 20,
+              "durablyAccepted": 20,
+              "deduplicatedAttempts": 0,
+              "rejected": 0,
+              "projectionChange": 20,
+              "noProjectionChange": 0,
+              "matchedDom": 20,
+              "unmatchedDom": 0,
+              "missingTelemetry": 0
+            }
+          },
+          "claude.observer": {
+            "captureToCommitMs": {
+              "n": 21,
+              "p50": 22.650125,
+              "p95": 119.213624,
+              "max": 199.522416
+            },
+            "commitToDomMs": {
+              "n": 21,
+              "p50": 28.893041,
+              "p95": 30.069583,
+              "max": 30.474958
+            },
+            "eventToDomMs": {
+              "n": 21,
+              "p50": 51.554583,
+              "p95": 142.730999,
+              "max": 227.564749
+            },
+            "population": {
+              "totalCaptured": 21,
+              "durablyAccepted": 21,
+              "deduplicatedAttempts": 0,
+              "rejected": 0,
+              "projectionChange": 21,
+              "noProjectionChange": 0,
+              "matchedDom": 21,
+              "unmatchedDom": 0,
+              "missingTelemetry": 0
+            }
+          }
+        },
+        "operationError": null
+      }
+    ],
+    "clockEvidence": "evidence/M2/remediation-4/f4/analysis/clock-model-audit.json",
+    "allRunsOwnedAndCleaned": true,
+    "productionPerformanceRepair": false,
+    "nativeBuildSourceCommit": "79e7064db6010c4a9838bbb6015cf09a7bf2093e",
+    "calculatorSourceCommit": "bcb1d92b0150c019c8fdf5fc135601e3e4942aa7"
   }
 }

@@ -1,0 +1,52 @@
+(node:79175) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://~/Documents/Tools/Threadspace/packages/provider-mod/hooks/latency.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to ~/Documents/Tools/Threadspace/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ qualification remains opt-in and validates the configured runtime/command (0.651333ms)
+✔ accepted, spooled, rejected, duplicate and never-drained captures all remain in final ledger (2.945042ms)
+✔ stable UUID retries do not duplicate the closed capture population (0.814916ms)
+✔ lost last sample cannot reuse an earlier zero-failure prefix as the final census (0.385875ms)
+✔ failed final page, close or confirmation leaves no final native confirmation (0.562417ms)
+✔ malformed, wrong-runtime, wrong-digest, truncated or nonzero close receipts cannot trigger confirmation (0.6975ms)
+✔ fabricated positive close reply without native close state fails its challenge confirmation (0.189375ms)
+✔ overlapping telemetry exports stay single-flight and retain all omitted-count failures (0.197542ms)
+✔ an in-flight batch or a callback racing census pages invalidates final closure (0.175875ms)
+✔ ledger and page bounds are explicit and overflow cannot seal as a smaller population (3.31125ms)
+✔ the bounded close deadline aborts a slow export without provider rejection (0.43825ms)
+✔ real delivery timeout retains the same UUID and measurement cannot manufacture acceptance (1.751875ms)
+✔ optional measurement throwing leaves successful canonical delivery behavior unchanged (0.148125ms)
+✔ actual Session-end releases the original result at the one deadline when census stays pending (1.001416ms)
+✔ plugin-origin Session end and clear do not close an authoritative source window (0.431208ms)
+✔ immediate census completion uses only the remaining original end-drain budget (0.354791ms)
+✔ a drain that exhausts the original budget cannot reset it for census (0.098708ms)
+✔ failed finalization preserves the original Session-end result and cancels its wait (0.241ms)
+✔ unverifiable watchdog handles preserve only the original Session-end drain (1.181875ms)
+✔ actual missing-watchdog counterexample releases before 110 ms without starting the 90 ms census (112.575042ms)
+(node:79176) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://~/Documents/Tools/Threadspace/packages/provider-mod/hooks/ownership.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to ~/Documents/Tools/Threadspace/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS F1A-1: Delayed completion ENTRY after A→B resolves the retained A Turn
+PASS F1A-2: Delayed completion RETURN preserves the original immutable entry scope
+PASS F1A-3: A→B→A preserves original generations and actor-scoped repeated Turn IDs
+PASS F1A-4: Explicit native Turn-ID reuse across Sessions stays ambiguous
+PASS F1A-5: A child spawned under an original tool occurrence stays with A after parent/current change
+PASS F1A-6: First-seen late outcome is retained without Session and cannot be rebound later
+PASS F1A-7: Reused actual actor ID becomes ambiguous even when its old Turn remains retained
+PASS F1A-8: Plugin dispatch and a shortcut result cannot establish native ownership
+PASS F1A-9: Bounded retained maps never evict uncertainty or collide truncated identities
+PASS F1A-10: Provider values, exceptions, generator chunks and cancellation remain unchanged
+PASS F1A-11: Overlong native IDs cannot acquire a Session through capture truncation
+PASS F1B-bridge-1: Detached proof seals unchanged scope; only future captured Turn starts retain its token
+PASS F1B-bridge-2: A→B→A while native probe waits refuses a stale same-string seal
+PASS F1B-bridge-3: Malformed, mismatched and unsuccessful proof receipts never seal ownership
+14 passed; 0 failed (v26.10.0, darwin)
+✔ packages/provider-mod/tests/ownership.node.mjs (120.58325ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 244.002459

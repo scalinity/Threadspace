@@ -1,0 +1,24 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running tests/qualification_latency.rs (target/aarch64-apple-darwin/debug/deps/qualification_latency-d8345379ceaad747)
+
+running 17 tests
+test helper_measurements::tests::metadata_validation_refuses_wall_clocks_bad_ids_future_capture_and_provider_content ... ok
+test helper_measurements::census::tests::protocol_is_bounded_and_metadata_only ... ok
+test helper_measurements::census::tests::actual_typed_capture_receipt_is_unchanged_and_native_batch_ids_are_metadata_only ... ok
+test helper_measurements::census::tests::missing_final_page_close_or_confirmation_cannot_be_replaced_by_prefix ... ok
+test helper_measurements::census::tests::native_deadline_rejects_missing_anchor_and_late_durable_confirmation ... ok
+test helper_measurements::census::tests::completion_witness_requires_the_exact_durable_echo_and_deadline_anchor ... ok
+test helper_measurements::census::tests::historical_export_failures_and_missing_capture_clocks_remain_in_final_seal ... ok
+test helper_measurements::census::tests::removing_or_duplicating_native_file_after_ack_never_preserves_qualification ... ok
+test helper_measurements::census::tests::boot_time_and_postclose_identity_tampering_refuse_reexport ... ok
+test helper_measurements::census::tests::native_submitted_uuid_absent_from_source_census_is_an_explicit_missing_tail ... ok
+test helper_measurements::census::tests::stable_retries_are_idempotent_and_conflicting_page_never_overwrites ... ok
+test helper_measurements::census::tests::fabricated_close_token_wrong_runtime_wrong_boot_or_wrong_store_cannot_confirm ... ok
+test helper_measurements::census::tests::complete_paged_ledger_requires_positive_close_receipt_confirmation ... ok
+test helper_measurements::census::tests::every_seen_runtime_must_close_and_reused_uuid_between_runtimes_is_refused ... ok
+test actual_sqlite_admission_is_committed_before_its_timing_receipt_is_returned ... ok
+test helper_measurements::census::tests::changed_count_digest_order_duplicate_or_overflow_refuses_native_close ... ok
+test helper_measurements::census::tests::maximum_bounded_ledger_closes_with_all_4096_uuid_entries ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
