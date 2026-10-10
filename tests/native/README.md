@@ -1,5 +1,12 @@
 # Native qualification harness
 
+`m2-native-replay dev` requires an existing absolute private directory in
+`THREADSPACE_M2_PRIVATE_EVIDENCE`. It opens the live Dev database read-only for
+SQLite backup, then uses the production Journal only on its exclusively created
+private copy. It compares recovery, genesis replay, checkpoint/restart and
+materialized tables. The private database contains unrelated Dev history and
+must not be published; only the resulting hashes belong in public evidence.
+
 Reusable automation for native macOS qualification (M0C onward). It drives the
 installed bundles, the system-started companion and real macOS surfaces, and
 writes evidence under `evidence/<milestone>/`. Native fault handlers and resource

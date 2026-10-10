@@ -475,7 +475,7 @@ const report = {
   platform: process.platform,
   runtime: process.version,
   source: { registerModule: modulePath, hashes },
-  attribution: 'Executed with in-memory host origins/traces, helper receipts and timers; not native Claude or macOS execution',
+  attribution: 'Executed with in-memory host origins/traces, helper receipts and timers; not a live native Claude execution',
   passed: results.filter(result => result.result === 'PASS').length,
   failed: results.filter(result => result.result === 'FAIL').length,
   results,

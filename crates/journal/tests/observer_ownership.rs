@@ -174,7 +174,8 @@ fn run(captures: &[Capture], order: &[usize], check_steps: bool) -> CanonicalSta
     assert_eq!(digest.state_sha256, state_hash(&state));
     assert_eq!(digest.projection_sha256, digest.tables_sha256);
     write_evidence(&format!("admission-{}", digest.state_sha256), &json!({
-        "execution": "Linux portable actual observer/mod-batch adapters, SQLite and pure reducer",
+        "execution": "controlled host fixture: actual observer/mod-batch adapters, SQLite and pure reducer",
+        "platform": std::env::consts::OS,
         "deliveryOrder": order, "stepwiseSqlite": check_steps,
         "captures": captures.iter().map(|capture| &capture.envelope).collect::<Vec<_>>(),
         "entries": journal.journal_entries(0).expect("evidence canonical facts"),
