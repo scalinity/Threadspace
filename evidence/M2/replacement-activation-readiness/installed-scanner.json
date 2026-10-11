@@ -1,0 +1,104 @@
+{
+  "argv": [
+    "/Users/danny/.local/share/claude/versions/2.1.295",
+    "--settings",
+    "<owned-activation-root>/scanner/config/settings.json",
+    "--setting-sources",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--no-session-persistence",
+    "plugin",
+    "validate",
+    "<owned-activation-root>/scanner/activation-plugin",
+    "--json"
+  ],
+  "callbacksExecuted": false,
+  "cleanup": [
+    {
+      "events": [
+        "already-exited"
+      ],
+      "exitCode": 0,
+      "identity": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 46008,
+        "pid": 46012,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791749774193462,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "reaped": true,
+      "role": "validator",
+      "signalOwnership": null,
+      "spawned": true
+    }
+  ],
+  "controllerError": null,
+  "deadlineExceeded": false,
+  "deadlineSeconds": 20,
+  "entry": {
+    "files": {
+      ".claude-plugin/plugin.json": "721b71c035737b14c8947bd0c7bb3ae1a2818ea4acddf1e1ca4b04b82cb911c6",
+      "hooks/activation.ts": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+      "hooks/config.ts": "ff231413d392d68937bcd337e5dbdc4060d684f14ca559322dbeb0f6a6b1c6ab",
+      "hooks/hooks.json": "35624f28d047f31469ece29a6fd7fc61918cc55f0c8d779ed2d9ecb145a61569"
+    },
+    "modules": [
+      "./activation.ts"
+    ],
+    "name": "threadspace-socket-duration",
+    "role": "activation",
+    "root": "<owned-activation-root>/scanner/activation-plugin"
+  },
+  "exitCode": 0,
+  "kind": "NON_EXECUTING_INSTALLED_SCANNER",
+  "privateStderrHmacSha256": "b546057708e3007e6b8d96362ddfb97a5d39b0cf7aa46b0bd17a2c7d731ce3ee",
+  "privateStdoutHmacSha256": "e6cb23667f4652f6fd807789912b163019bb884000315c67be57a57ac6875170",
+  "process": {
+    "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+    "kernelVerified": true,
+    "parentPid": 46008,
+    "pid": 46012,
+    "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "startUsec": 1791749774193462,
+    "uid": 501,
+    "version": "2.1.295"
+  },
+  "report": {
+    "advice": [],
+    "contents": [
+      {
+        "errors": [],
+        "file": "<owned-activation-root>/scanner/activation-plugin/hooks/hooks.json",
+        "gatingHooks": [],
+        "notes": [
+          "./activation.ts hooks: session.start",
+          "./activation.ts calls: $.fs.write, $.http.fetch"
+        ],
+        "type": "hooks",
+        "warnings": []
+      }
+    ],
+    "manifest": {
+      "errors": [],
+      "file": "<owned-activation-root>/scanner/activation-plugin/.claude-plugin/plugin.json",
+      "gatingHooks": [],
+      "notes": [],
+      "type": "plugin",
+      "warnings": [
+        {
+          "code": null,
+          "message": "No author information provided. Consider adding author details for plugin attribution",
+          "path": "author"
+        }
+      ]
+    },
+    "strict": false,
+    "success": true,
+    "target": "<owned-activation-root>/scanner/activation-plugin/.claude-plugin/plugin.json"
+  }
+}

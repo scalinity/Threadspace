@@ -1,0 +1,62 @@
+{
+  "boundaryRule": "Nearest settled downstream entry in supported host order; never search for a matching value; valid engine/core tail required",
+  "declarationsSha256": "ca0ab16c1f79f247c9de2a574bc81bf8bc7fa401e45bdfc7809337615c0ab351",
+  "hostCounts": "Exactly-once implementation and targeted actual-source controls; native trace proves returned engine settlement, not an independent invocation counter",
+  "inputFields": {
+    "cwd": "string",
+    "isInteractive": "boolean",
+    "surface": [
+      "null",
+      "terminal",
+      "desktop",
+      "mobile",
+      "vscode"
+    ]
+  },
+  "noClockReadings": true,
+  "observerScope": "A downstream supported observer link only grants OBSERVED DOWNSTREAM; engine-only does not qualify observer",
+  "presenceEncoding": [
+    "absent",
+    "present undefined",
+    "present null",
+    "typed primitive"
+  ],
+  "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+  "resultFields": {
+    "cwd": "string"
+  },
+  "schema": "DECLARED_SESSION_START_SNAPSHOTS_V1",
+  "spans": {
+    "httpInit": {
+      "firstLine": 5209,
+      "lastLine": 5242,
+      "sha256": "1ab4275f422420a2fd6ab44e605a4dcd19536b937124979de4f024efc7a3a3a1"
+    },
+    "nextOriginTrace": {
+      "firstLine": 6561,
+      "lastLine": 6594,
+      "sha256": "6268b44ae5b7b5f70be0306a6c146dd993d54d2ab42d1ea4b4f7f508735e2fa2"
+    },
+    "renderSurface": {
+      "firstLine": 10379,
+      "lastLine": 10379,
+      "sha256": "e01395e7b0a02a713643687b98714c605cd07632b5fcead7e0e8e62ab3af288b"
+    },
+    "sessionStart": {
+      "firstLine": 11667,
+      "lastLine": 11695,
+      "sha256": "3a83f492b02e7fc2b235e556bde60f1d4ba5a4e25545073de9a9f8620b6c43e0"
+    },
+    "tiers": {
+      "firstLine": 12593,
+      "lastLine": 12614,
+      "sha256": "26e4a37322ce46b4af28708d9713503bf5b6b68552b59f0bde09a7df47c516eb"
+    },
+    "traceEntryOutcome": {
+      "firstLine": 13217,
+      "lastLine": 13270,
+      "sha256": "ffca4bcc039ace1ec6c397ce6b133126b461f24593fe57ecf76320fa957d4f7b"
+    }
+  },
+  "unsupported": "INCOMPLETE; never treat missing operands as equal"
+}

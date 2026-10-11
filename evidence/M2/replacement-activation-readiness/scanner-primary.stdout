@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "strict": false,
+  "target": "<owned-activation-root>/scanner/activation-plugin/.claude-plugin/plugin.json",
+  "manifest": {
+    "file": "<owned-activation-root>/scanner/activation-plugin/.claude-plugin/plugin.json",
+    "type": "plugin",
+    "errors": [],
+    "warnings": [
+      {
+        "path": "author",
+        "message": "No author information provided. Consider adding author details for plugin attribution",
+        "code": null
+      }
+    ],
+    "notes": [],
+    "gatingHooks": []
+  },
+  "contents": [
+    {
+      "file": "<owned-activation-root>/scanner/activation-plugin/hooks/hooks.json",
+      "type": "hooks",
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        "./activation.ts hooks: session.start",
+        "./activation.ts calls: $.fs.write, $.http.fetch"
+      ],
+      "gatingHooks": []
+    }
+  ],
+  "advice": []
+}

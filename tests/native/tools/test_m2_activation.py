@@ -14,12 +14,12 @@ class PortableActivationControls(unittest.TestCase):
     def test_actual_callback_return_forwarding_and_failures(self):
         node = shutil.which('node')
         self.assertIsNotNone(node, 'portable Node runtime required; never substitute provider')
-        result = subprocess.run([node, str(native.HERE / 'm2_activation_controls.js'), str(native.ACTIVATION)], capture_output=True, text=True, timeout=10)
+        result = subprocess.run([node, str(native.HERE / 'm2_readiness_controls.js'), str(native.ACTIVATION)], capture_output=True, text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
         controls = json.loads(result.stdout)
-        self.assertEqual(len(controls['results']), 7)
-        self.assertTrue(all(c['nextCalls'] == 1 and c['returnedOriginalPromise'] for c in controls['results']))
-        print(json.dumps(controls, sort_keys=True))
+        self.assertEqual(len(controls['results']), 17)
+        self.assertTrue(all(c['calls'] == 1 and (c['returnedOriginalPromise'] or c['synchronousOriginalError']) for c in controls['results']))
+        print(json.dumps({'kind': controls['kind'], 'cases': len(controls['results']), 'sourceSha256': controls['sourceSha256'], 'nativeProviderExecuted': False}, sort_keys=True))
 
     def test_no_measuring_or_provider_input_apis(self):
         source = native.ACTIVATION.read_text()
@@ -28,8 +28,8 @@ class PortableActivationControls(unittest.TestCase):
         self.assertEqual(source.count("on('session.start',"), 1)
         self.assertEqual(source.count('next(e)'), 1)
         self.assertNotIn('link.ms', source)
-        self.assertNotIn('link.received', source)
-        self.assertNotIn('link.returned', source)
+        self.assertIn('snapshot(link.received, false)', source)
+        self.assertIn('snapshot(link.returned, true)', source)
 
     def test_actual_readiness_protocol_forgery_and_replay(self):
         config = {key: 'synthetic-' + key for key in ('runId', 'responderId', 'nonce', 'activationSha256', 'fixtureSha256', 'observerSha256', 'bootId')}

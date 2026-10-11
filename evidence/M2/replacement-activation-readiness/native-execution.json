@@ -1,0 +1,228 @@
+{
+  "attemptRunId": "6c250603-cc11-4612-b923-50f0d11211cb",
+  "attempts": 1,
+  "childConfiguration": {
+    "CLAUDE_CONFIG_DIR": "<owned-activation-root>/positive/config"
+  },
+  "cleanup": [
+    {
+      "error": "RuntimeError: foreign child ownership",
+      "identity": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+        "kernelVerified": true,
+        "parentPid": 51705,
+        "pid": 51741,
+        "sha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+        "startUsec": 1791749876388546,
+        "uid": 501
+      },
+      "reaped": false,
+      "role": "responder",
+      "spawned": true
+    },
+    {
+      "events": [
+        "verified-child-SIGTERM"
+      ],
+      "exitCode": 143,
+      "identity": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 51705,
+        "pid": 51742,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791749876415765,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "reaped": true,
+      "role": "provider",
+      "signalOwnership": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "parentPid": 51705,
+        "pid": 51742,
+        "startUsec": 1791749876415765,
+        "uid": 501
+      },
+      "spawned": true
+    }
+  ],
+  "composition": {
+    "argv": [
+      "/Users/danny/.local/share/claude/versions/2.1.295",
+      "--print",
+      "--input-format",
+      "stream-json",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--no-session-persistence",
+      "--plugin-dir",
+      "<owned-activation-root>/positive/observer-plugin",
+      "--plugin-dir",
+      "<owned-activation-root>/positive/activation-plugin",
+      "--settings",
+      "<owned-activation-root>/positive/config/settings.json",
+      "--setting-sources",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--debug-file",
+      "<owned-activation-root>/positive/provider-debug.log"
+    ],
+    "configurationVerified": true,
+    "entries": [
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "role": "observer",
+        "root": "<owned-activation-root>/positive/observer-plugin"
+      },
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "721b71c035737b14c8947bd0c7bb3ae1a2818ea4acddf1e1ca4b04b82cb911c6",
+          "hooks/activation.ts": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+          "hooks/config.ts": {
+            "privateOriginalHmacSha256": "e614ed4f20b9949bfd3e964586bde4b9cfc8f3d827717bbfe8231a22b7552117",
+            "rawSha256": "PRIVATE"
+          },
+          "hooks/hooks.json": "35624f28d047f31469ece29a6fd7fc61918cc55f0c8d779ed2d9ecb145a61569"
+        },
+        "modules": [
+          "./activation.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "role": "activation",
+        "root": "<owned-activation-root>/positive/activation-plugin"
+      }
+    ],
+    "loadedModuleCounts": {
+      "threadspace-observer": 1,
+      "threadspace-socket-duration": 1
+    },
+    "loadingSourcesBounded": true,
+    "runtimeLoadedNames": [
+      "threadspace-observer",
+      "threadspace-socket-duration"
+    ],
+    "unexpectedContributors": []
+  },
+  "controllerError": "RuntimeError: owned cleanup incomplete",
+  "controllerPid": 51705,
+  "controllerUid": 501,
+  "deadlineExceeded": false,
+  "domain": "NATIVE",
+  "failureBoundary": "ACTIVATION_OUTPUT_AND_HTTP_RETURNED",
+  "freezePrivateHmacSha256": "038ad9125f7e5303819a0c66c5c2c609c223cdfe18e4f23aec384c5efc7e53cc",
+  "initializer": {
+    "privateOriginalHmacSha256": "ddb9bf862aa15864fffbfab79629cada561c64d8e9ed69996e9b997c3d4803fb",
+    "requestIdMatched": true,
+    "responseSubtype": "success",
+    "type": "control_response"
+  },
+  "positiveTimingModuleExecuted": false,
+  "processes": {
+    "provider": {
+      "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+      "kernelVerified": true,
+      "parentPid": 51705,
+      "pid": 51742,
+      "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "startUsec": 1791749876415765,
+      "uid": 501,
+      "version": "2.1.295"
+    },
+    "responder": {
+      "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "kernelVerified": true,
+      "parentPid": 51705,
+      "pid": 51741,
+      "sha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+      "startUsec": 1791749876388546,
+      "uid": 501
+    }
+  },
+  "readbacks": [
+    {
+      "bytes": 744,
+      "label": "entry",
+      "privateOriginalHmacSha256": "6d7d6fbbf24851417ccccee956752d4b5f7f5711634bb7f9e5c921ae4b62183f"
+    },
+    {
+      "bytes": 1223,
+      "label": "forward",
+      "privateOriginalHmacSha256": "e8cdc39ba6dd7ada63cfd9505930deff3a93fed4201a0deac5c47afe2884ad51"
+    },
+    {
+      "bytes": 918,
+      "label": "result",
+      "privateOriginalHmacSha256": "e6b9d7295542d76e0241642d6e3d5fd875193dfd353a6c4d534fc94633a6ea80"
+    }
+  ],
+  "scanner": {
+    "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+    "exitCode": 0,
+    "privateOriginalHmacSha256": "ba4a2146f7136d69d1ff8deb47b3f21ceaa22843e4c0d2c1343d4a17d604da55",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "reaped": true,
+    "success": true
+  },
+  "socketRemoved": false,
+  "timingRows": 0,
+  "transcript": [
+    {
+      "event": "start",
+      "identity": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "0c357377-f73f-4703-8efb-cfebde39f320",
+        "runId": "6c250603-cc11-4612-b923-50f0d11211cb"
+      },
+      "pid": 51741,
+      "uid": 501
+    },
+    {
+      "attempt": 1,
+      "event": "received",
+      "nonceMatched": true,
+      "peerUid": 501,
+      "status": 200
+    },
+    {
+      "attempt": 1,
+      "body": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "0c357377-f73f-4703-8efb-cfebde39f320",
+        "runId": "6c250603-cc11-4612-b923-50f0d11211cb"
+      },
+      "event": "generated",
+      "status": 200
+    },
+    {
+      "attempt": 1,
+      "event": "answered",
+      "status": 200
+    }
+  ]
+}

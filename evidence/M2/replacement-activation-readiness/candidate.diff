@@ -1,0 +1,1035 @@
+diff --git a/tests/native/tools/m2_activation_native.py b/tests/native/tools/m2_activation_native.py
+index aca1c26..2ba05f7 100644
+--- a/tests/native/tools/m2_activation_native.py
++++ b/tests/native/tools/m2_activation_native.py
+@@ -1,6 +1,10 @@
+ #!/usr/bin/env python3
+ """One activation-only smoke. Never execute the positive timing callback."""
+ from __future__ import annotations
++import ctypes
++import re
++import signal
++from contextlib import contextmanager
+ import hashlib
+ import http.client
+ import json
+@@ -16,7 +20,7 @@ from m2_socket_runner import PROVIDER, PROVIDER_VERSION, PROVIDER_SHA, image_ide
+ from m2_socket_duration import HERE, canonical_hash, source_identities, file_hash
+ from m2_activation_readiness import acknowledgement
+ from m2_activation_verdict import (REVIEWED_COMMIT, REVIEW_RECORD_SHA, read_review, admit_source,
+-    reject_retired, require_native_authority)
++    reject_retired, adjudicate, CONTRACT, ACTIVATION_SHA)
+ 
+ DEADLINE = 20
+ ACTIVATION = HERE / "m2_activation_probe.ts"
+@@ -32,18 +36,19 @@ def source_binding():
+     return {"providerPath": str(PROVIDER), "providerSha256": PROVIDER_SHA, "providerVersion": PROVIDER_VERSION,
+         "observerSha256": source_identities()["adapterSha256"],
+         "positiveProbeSha256": file_hash(HERE / "m2_socket_probe.ts"),
+-        "activationSha256": file_hash(ACTIVATION), "fixtureSha256": file_hash(FIXTURE),
+-        "controllerSha256": file_hash(__file__), "pythonExecutableSha256": file_hash(Path(sys.executable).resolve()),
++        "activationSha256": file_hash(ACTIVATION), "originalActivationSha256": ACTIVATION_SHA, "fixtureSha256": file_hash(FIXTURE),
++        "controllerSha256": file_hash(__file__), "pythonExecutableSha256": file_hash(Path(sys.executable).resolve()), "pythonExecutable": str(Path(sys.executable).resolve()),
+         "controlSourceSha256": file_hash(HERE / "m2_activation_controls.js"),
+         "testSourceSha256": file_hash(HERE / "test_m2_activation.py"),
+         "admittedStagerSha256": file_hash(HERE / "m2_socket_plugins.py"),
+         "backgroundSha256": file_hash(HERE / "m2_socket_background.ts"),
+         "conformanceSourceIdentities": source_identities(),
+         "reviewedControllerSha256": reviewed["m2_activation_native.py"],
+-        "reviewedDependencyHashes": {k: file_hash(HERE / k) for k in reviewed if k != "m2_activation_native.py"},
++        "reviewedDependencyHashes": {k: file_hash(HERE / k) for k in reviewed if k not in ("m2_activation_native.py", "m2_activation_probe.ts")},
+         "verdictSha256": file_hash(HERE / "m2_activation_verdict.py"),
+         "verdictTestSha256": file_hash(HERE / "test_m2_activation_verdict.py"),
+-        "projectionControlSha256": file_hash(HERE / "m2_activation_projection_controls.js"),
++        "readinessControlsSha256": file_hash(HERE / "m2_readiness_controls.js"),
++        "readinessTestSha256": file_hash(HERE / "test_m2_readiness.py"),
+         "observerFiles": {name: file_hash(OBSERVER / name) for name in OBSERVER_FILES}}
+ 
+ 
+@@ -61,7 +66,7 @@ def staging_files(role, config):
+             "description": "Qualification-only activation smoke; no timing measurements"}),
+             "hooks/hooks.json": json_bytes({"modules": ["./activation.ts"]}),
+             "hooks/activation.ts": ACTIVATION.read_bytes(),
+-            "hooks/config.ts": ("export const config = " + json.dumps(config, allow_nan=False) + ";\n").encode()}
++            "hooks/config.ts": ("export const config = " + json.dumps(config, sort_keys=True, allow_nan=False) + ";\n").encode()}
+     else: raise ValueError("unknown staging role")
+     return files
+ 
+@@ -106,146 +111,239 @@ def environment(root):
+     return env
+ 
+ 
++
++def kernel_child(child, executable):
++    """Independent signal ownership even if full image/hash acquisition fails."""
++    if child.poll() is not None: return None
++    lib = ctypes.CDLL('/usr/lib/libproc.dylib')
++    path, data = ctypes.create_string_buffer(4096), ctypes.create_string_buffer(136)
++    if lib.proc_pidpath(child.pid, path, len(path)) <= 0 or lib.proc_pidinfo(child.pid, 3, 0, data, 136) != 136:
++        raise RuntimeError("kernel child ownership unavailable")
++    raw = data.raw
++    identity = {"pid": child.pid, "uid": int.from_bytes(raw[20:24], 'little'),
++        "parentPid": int.from_bytes(raw[16:20], 'little'),
++        "startUsec": int.from_bytes(raw[120:128], 'little') * 1000000 + int.from_bytes(raw[128:136], 'little'),
++        "imagePath": str(Path(os.fsdecode(path.value)).resolve())}
++    if identity['uid'] != os.getuid() or identity['parentPid'] != os.getpid() or identity['imagePath'] != str(Path(executable).resolve()):
++        raise RuntimeError("foreign child ownership")
++    return identity
++
++
++def reap_owned(child, identity, executable):
++    events = []
++    current = kernel_child(child, executable)
++    baseline = {k: identity[k] for k in current} if identity and current else current
++    if current:
++        if current != baseline or kernel_child(child, executable) != baseline:
++            raise RuntimeError("cleanup refused changed child incarnation")
++        child.send_signal(signal.SIGTERM); events.append('verified-child-SIGTERM')
++        try: child.wait(timeout=3)
++        except subprocess.TimeoutExpired:
++            if kernel_child(child, executable) != baseline: raise RuntimeError("cleanup refused reused child")
++            child.kill(); events.append('verified-child-SIGKILL'); child.wait(timeout=3)
++    else:
++        child.wait(timeout=0); events.append('already-exited')
++    if child.stdin is not None: child.stdin.close()
++    return {"identity": identity, "signalOwnership": baseline, "events": events,
++            "exitCode": child.returncode, "reaped": child.poll() is not None}
++
++
++@contextmanager
++def owned_process(role, argv, executable, records, version=None, **kwargs):
++    """Every successfully spawned direct child reaches the cleanup guard."""
++    child = None; identity = None
++    receipt = {"role": role, "spawned": False, "reaped": False}
++    records.append(receipt)
++    try:
++        child = subprocess.Popen(argv, **kwargs); receipt['spawned'] = True
++        try: identity = image_identity(child, executable, version)
++        except Exception as error:
++            receipt['identityError'] = type(error).__name__ + ': ' + str(error)
++            raise
++        receipt['identity'] = identity
++        yield child, identity
++    finally:
++        if child is not None:
++            try: receipt.update(reap_owned(child, identity, executable))
++            except Exception as error:
++                receipt['error'] = type(error).__name__ + ': ' + str(error)
++                receipt['reaped'] = child.poll() is not None
++        if receipt.get('error'): raise RuntimeError('owned cleanup incomplete')
++
++
+ def validate(root, entry, env):
+-    """Supported CLI scanner only: no register evaluation, callback or inference."""
+-    verify_staging([entry])
+-    prefix = [str(PROVIDER), "--settings", str(root / "config/settings.json"), "--setting-sources", "",
+-        "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--no-session-persistence"]
+-    argv = prefix + ["plugin", "validate", entry["root"], "--json"]
+-    stdout = root / (entry["role"] + "-validation.stdout")
+-    stderr = root / (entry["role"] + "-validation.stderr")
+-    with stdout.open("xb") as out, stderr.open("xb") as err:
++    """One supported non-executing scanner; guard starts at process creation."""
++    root = Path(root); verify_staging([entry])
++    argv = [str(PROVIDER), '--settings', str(root / 'config/settings.json'), '--setting-sources', '',
++        '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--no-session-persistence',
++        'plugin', 'validate', entry['root'], '--json']
++    save(root / 'scanner-attempt.json', {'entry': entry, 'sources': source_binding(), 'deadlineSeconds': DEADLINE})
++    stdout, stderr = root / 'scanner.stdout', root / 'scanner.stderr'
++    records = []; expired = False; error = None; identity = None; child = None
++    with stdout.open('xb') as out, stderr.open('xb') as err:
+         os.chmod(stdout, 0o600); os.chmod(stderr, 0o600)
+-        child = subprocess.Popen(argv, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=err, start_new_session=True)
+-        identity = image_identity(child, PROVIDER, PROVIDER_VERSION)
+-        expired = False
+-        try: child.wait(timeout=DEADLINE)
+-        except subprocess.TimeoutExpired: expired = True
+-        cleaned = cleanup(child, identity)
+-    try: result = json.loads(stdout.read_bytes())
+-    except ValueError: result = None
+-    return {"kind": "NON_EXECUTING_INSTALLED_SCANNER", "argv": argv, "entry": entry, "process": identity,
+-        "deadlineExceeded": expired, "cleanup": cleaned, "stdoutSha256": file_hash(stdout),
+-        "stderrSha256": file_hash(stderr), "exitCode": child.returncode, "report": result}
++        until = time.monotonic() + DEADLINE
++        try:
++            with owned_process('validator', argv, PROVIDER, records, PROVIDER_VERSION, cwd=root, env=env,
++                               stdin=subprocess.DEVNULL, stdout=out, stderr=err, start_new_session=True) as (child, identity):
++                try: child.wait(timeout=max(0, until - time.monotonic()))
++                except subprocess.TimeoutExpired: expired = True
++        except Exception as failure: error = str(failure)
++    try: parsed = json.loads(stdout.read_bytes())
++    except ValueError: parsed = None
++    result = {'kind': 'NON_EXECUTING_INSTALLED_SCANNER', 'argv': argv, 'entry': entry, 'process': identity,
++        'deadlineSeconds': DEADLINE, 'deadlineExceeded': expired, 'cleanup': records,
++        'stdoutSha256': file_hash(stdout), 'stderrSha256': file_hash(stderr), 'report': parsed,
++        'exitCode': child.returncode if child else None, 'controllerError': error, 'callbacksExecuted': False}
++    save(root / 'scanner-result.json', result)
++    return result
+ 
+ 
+ def classify(outputs, diagnostic):
+-    if outputs.get("error"):
+-        return outputs["error"].get("stage", "CALLBACK_FAILURE")
+-    if outputs.get("result"): return "ACTIVATION_OUTPUT_AND_HTTP_RETURNED"
+-    if outputs.get("forward"): return "HTTP_READINESS_MISSING_AFTER_FORWARDING"
+-    if outputs.get("entry"): return "DOWNSTREAM_OR_OUTPUT_MISSING_AFTER_ENTRY"
+-    if "hooks module" in diagnostic and "failed to load" in diagnostic: return "REGISTRATION_REFUSAL_REPORTED"
+-    return "INITIALIZATION_ONLY_OR_MISSING_CALLBACK_WITNESS"
+-
+-
+-def prepare(root):
+-    root = Path(root).resolve(strict=True)
+-    if file_hash(PROVIDER) != PROVIDER_SHA: raise RuntimeError("required provider bytes changed")
+-    binding = source_binding()
+-    admit_source(binding, read_review())
+-    # No freeze/nonce/process can be created while mandatory preflight B is
+-    # unsatisfied. File existence and classify() are not acceptance authority.
+-    require_native_authority(ACTIVATION.read_bytes())
+-    ids = {**binding, "runId": str(uuid.uuid4()), "responderId": str(uuid.uuid4()), "nonce": uuid.uuid4().hex + uuid.uuid4().hex,
+-        "bootId": subprocess.check_output(["/usr/sbin/sysctl", "-n", "kern.bootsessionuuid"], text=True).strip().lower()}
+-    validation = root / "validation"; validation.mkdir(mode=0o700); env = environment(validation)
+-    dummy = {"kind": "NON_EXECUTING_VALIDATION_ONLY", "plan": [], "delays": [], "runtimeId": str(uuid.uuid4())}
+-    entries = [stage(validation / role, role, dummy) for role in ("duplicate", "observer", "positive")]
+-    owned = root / "positive"; owned.mkdir(mode=0o700); fixture = owned / "readiness"; fixture.mkdir(mode=0o700)
+-    config = {**ids, "socketPath": str(fixture / "s.sock"), "acknowledgement": acknowledgement(ids)}
+-    config.update({key + "Output": str(owned / (key + ".json")) for key in ("entry", "forward", "result", "error")})
+-    smoke_entries = [stage(owned / "observer-plugin", "observer", config), stage(owned / "duration-plugin", "activation", config)]
+-    positive_env = environment(owned)
+-    argv = provider_argv(owned, {"plugins": smoke_entries}) + ["--debug-file", str(owned / "provider-debug.log")]
+-    freeze = {"kind": "ACTIVATION_ONLY_ONE_POSITIVE", "baseSha": REVIEWED_COMMIT,
+-        "reviewedGitCommit": REVIEWED_COMMIT, "reviewRecordSha256": REVIEW_RECORD_SHA, "deadlineSeconds": DEADLINE,
+-        "ids": ids, "config": config, "validationEntries": entries, "smokeEntries": smoke_entries, "argv": argv,
+-        "osBuild": subprocess.check_output(["/usr/bin/sw_vers", "-buildVersion"], text=True).strip(),
+-        "originalPositiveModuleExecuted": False, "timingRows": 0}
+-    save(fixture / "readiness-config.json", ids)
+-    save(root / "activation-freeze.json", freeze)
+-    return freeze, env, positive_env
+-
+-
+-def protocol_control(root, ids):
+-    """One independently owned fixture-only control; no provider or measurements."""
+-    root = Path(root); root.mkdir(mode=0o700)
+-    config = {**ids, "runId": str(uuid.uuid4()), "responderId": str(uuid.uuid4()), "nonce": uuid.uuid4().hex + uuid.uuid4().hex}
+-    save(root / "readiness-config.json", config)
+-    child = subprocess.Popen([str(Path(sys.executable).resolve()), str(FIXTURE), str(root)], cwd=root,
+-        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+-    identity = image_identity(child, Path(sys.executable).resolve())
+-    results = []
+-    try:
+-        until = time.monotonic() + 3
+-        while not (root / "s.sock").exists() and child.poll() is None and time.monotonic() < until: time.sleep(.01)
+-        route = "/" + "/".join(("ready", config["runId"], config["responderId"], config["nonce"], config["activationSha256"]))
+-        requests = [("forged-nonce", route.replace(config["nonce"], "foreign"), 403),
+-            ("control-acknowledgement", route, 200), ("replay", route, 409),
+-            ("foreign-responder", route.replace(config["responderId"], "foreign"), 403)]
+-        for label, path, expected in requests:
+-            connection = http.client.HTTPConnection("localhost", timeout=2)
+-            connection.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM); connection.sock.settimeout(2); connection.sock.connect(str(root / "s.sock"))
+-            connection.request("GET", path); response = connection.getresponse(); body = json.loads(response.read()); connection.close()
+-            if response.status != expected or expected == 200 and body != acknowledgement(config): raise RuntimeError("protocol control failed: " + label)
+-            results.append({"control": label, "status": response.status, "body": body})
+-        child.wait(timeout=3)
+-    finally: cleaned = cleanup(child, identity)
+-    transcript = [json.loads(line) for line in (root / "readiness.jsonl").read_text().splitlines()]
+-    if transcript[-1] != {"event": "stop", "attempts": 4, "generated": 4, "answered": 4, "accepted": 1}: raise RuntimeError("incomplete fixture control accounting")
+-    record = {"kind": "OWNED_NATIVE_READINESS_PROTOCOL_CONTROL", "purpose": "Reject a forged/replayed nonce on the exact socket server; no provider is invoked",
+-        "sourceIdentity": source_binding(), "config": config, "process": identity, "results": results,
+-        "transcript": transcript, "cleanup": cleaned, "socketRemoved": not (root / "s.sock").exists()}
+-    save(root / "protocol-control.json", record)
+-    return record
++    if outputs.get('error'): return outputs['error'].get('stage', 'CALLBACK_FAILURE')
++    if outputs.get('result'): return 'ACTIVATION_OUTPUT_AND_HTTP_RETURNED'
++    if outputs.get('forward'): return 'HTTP_READINESS_MISSING_AFTER_FORWARDING'
++    if outputs.get('entry'): return 'DOWNSTREAM_OR_OUTPUT_MISSING_AFTER_ENTRY'
++    if 'hooks module' in diagnostic and 'failed to load' in diagnostic: return 'REGISTRATION_REFUSAL_REPORTED'
++    return 'INITIALIZATION_ONLY_OR_MISSING_CALLBACK_WITNESS'
++
++
++def require_controls(root):
++    gate = json.loads((Path(root) / 'portable-admission.json').read_bytes())
++    if gate['sources'] != source_binding() or gate['verdict'] != 'PASS' or not gate['syntheticBaselinePass']:
++        raise RuntimeError('portable evidence verifier/source admission incomplete')
++    for name, sha in gate['outputs'].items():
++        if file_hash(Path(root) / name) != sha: raise RuntimeError('changed source-bound control output')
++    return gate
++
++
++def verify_isolation(owned, entries, config, argv, env):
++    verify_staging(entries, config)
++    if [e['role'] for e in entries] != ['observer', 'activation'] or [e['name'] for e in entries] != ['threadspace-observer', 'threadspace-socket-duration']:
++        raise RuntimeError('changed plugin composition')
++    expected = provider_argv(owned, {'plugins': entries}) + ['--debug-file', str(owned / 'provider-debug.log')]
++    if argv != expected: raise RuntimeError('changed effective provider arguments')
++    if env.get('CLAUDE_CONFIG_DIR') != str(owned / 'config') or any(k.startswith('CLAUDE_CODE_PLUGIN_') for k in env):
++        raise RuntimeError('unbounded plugin environment/configuration')
++    settings = owned / 'config/settings.json'
++    if settings.read_bytes() != json_bytes({'hooks': {}, 'disableAllHooks': False}) or settings.stat().st_mode & 0o777 != 0o600:
++        raise RuntimeError('changed private settings')
++    if any(p.is_symlink() for p in (owned, owned / 'config', settings)):
++        raise RuntimeError('aliased owned configuration')
++    return {'entries': entries, 'argv': argv, 'configurationVerified': True, 'loadingSourcesBounded': True,
++            'runtimeLoadedNames': [], 'unexpectedContributors': []}
++
++
++def prepare(root, scanner):
++    """Freeze only after final portable controls and exact activation scan."""
++    root = Path(root).resolve(strict=True); require_controls(root)
++    if file_hash(PROVIDER) != PROVIDER_SHA: raise RuntimeError('provider changed')
++    binding = source_binding(); admit_source(binding, read_review())
++    if scanner.get('exitCode') != 0 or scanner.get('deadlineExceeded') or scanner.get('controllerError') or scanner.get('report', {}).get('success') is not True or not all(c.get('reaped') for c in scanner['cleanup']):
++        raise RuntimeError('fresh scanner not admitted')
++    if scanner['entry']['files']['hooks/activation.ts'] != binding['activationSha256'] or scanner['process']['sha256'] != PROVIDER_SHA:
++        raise RuntimeError('scanner source/executable mismatch')
++    ids = {**binding, 'runId': str(uuid.uuid4()), 'responderId': str(uuid.uuid4()), 'nonce': uuid.uuid4().hex + uuid.uuid4().hex,
++        'bootId': subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.bootsessionuuid'], text=True).strip().lower()}
++    owned = root / 'positive'; owned.mkdir(mode=0o700); fixture = owned / 'readiness'; fixture.mkdir(mode=0o700)
++    config = {**ids, 'socketPath': str(fixture / 's.sock'), 'acknowledgement': acknowledgement(ids)}
++    config.update({key + 'Output': str(owned / (key + '.json')) for key in ('entry', 'forward', 'result', 'error')})
++    config = json.loads(json_bytes(config))
++    entries = [stage(owned / 'observer-plugin', 'observer', config), stage(owned / 'activation-plugin', 'activation', config)]
++    env = environment(owned)
++    argv = provider_argv(owned, {'plugins': entries}) + ['--debug-file', str(owned / 'provider-debug.log')]
++    verify_isolation(owned, entries, config, argv, env)
++    freeze = {'kind': CONTRACT, 'baseSha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
++        'reviewedGitCommit': REVIEWED_COMMIT, 'reviewRecordSha256': REVIEW_RECORD_SHA, 'deadlineSeconds': DEADLINE,
++        'ids': ids, 'config': config, 'smokeEntries': entries, 'argv': argv, 'initializeRequestId': str(uuid.uuid4()),
++        'scanner': {'activationSha256': binding['activationSha256'], 'providerSha256': PROVIDER_SHA,
++            'success': True, 'exitCode': 0, 'reaped': True, 'resultSha256': canonical_hash(scanner)},
++        'osBuild': subprocess.check_output(['/usr/bin/sw_vers', '-buildVersion'], text=True).strip(),
++        'originalPositiveModuleExecuted': False, 'timingRows': 0}
++    reject_retired(freeze); save(fixture / 'readiness-config.json', ids); save(root / 'activation-freeze.json', freeze)
++    return freeze, env
++
++
++def read_outputs(owned):
++    artifacts, outputs = [], {}
++    for label in ('entry', 'forward', 'result', 'error'):
++        path = owned / (label + '.json')
++        if not path.exists(): continue
++        if path.is_symlink() or path.stat().st_uid != os.getuid(): raise RuntimeError('foreign output resource')
++        os.chmod(path, 0o600)
++        raw = path.read_bytes()
++        artifacts.append({'label': label, 'raw': raw, 'sha256': hashlib.sha256(raw).hexdigest()})
++        try: outputs[label] = json.loads(raw)
++        except ValueError: outputs[label] = {'malformed': True}
++    return artifacts, outputs
+ 
+ 
+ def smoke(root, freeze, env):
+-    reject_retired(freeze)
+-    admit_source(source_binding(), read_review())
+-    require_native_authority(ACTIVATION.read_bytes())
+-    root = Path(root); owned = root / "positive"; fixture = owned / "readiness"
+-    if (owned / "attempt-started.json").exists(): raise RuntimeError("positive activation attempt already consumed")
+-    if source_binding() != {key: freeze["ids"][key] for key in source_binding()}: raise RuntimeError("frozen activation sources changed")
+-    if canonical_hash(freeze) != canonical_hash(json.loads((root / "activation-freeze.json").read_text())): raise RuntimeError("changed frozen activation configuration")
+-    verify_staging(freeze["smokeEntries"], freeze["config"])
+-    save(owned / "attempt-started.json", {"kind": freeze["kind"], "runId": freeze["ids"]["runId"], "freezeSha256": canonical_hash(freeze)})
+-    responder = subprocess.Popen([str(Path(sys.executable).resolve()), str(FIXTURE), str(fixture)], cwd=fixture,
+-        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+-    responder_id = image_identity(responder, Path(sys.executable).resolve())
+-    child = None; provider_id = None; report = {"kind": freeze["kind"], "freezeSha256": canonical_hash(freeze),
+-        "processes": {"responder": responder_id}, "cleanup": [], "outputs": {}, "deadlineExceeded": False}
++    root = Path(root); require_controls(root); reject_retired(freeze)
++    if freeze['ids'] != {**source_binding(), **{k: freeze['ids'][k] for k in ('runId', 'responderId', 'nonce', 'bootId')}}:
++        raise RuntimeError('changed frozen source binding')
++    if (root / 'activation-freeze.json').read_bytes() != json_bytes(freeze): raise RuntimeError('changed frozen run')
++    owned = root / 'positive'; fixture = owned / 'readiness'
++    composition = verify_isolation(owned, freeze['smokeEntries'], freeze['config'], freeze['argv'], env)
++    # Exclusive, durable reservation consumes this attempt even if spawn fails.
++    save(owned / 'attempt-started.json', {'runId': freeze['ids']['runId'], 'freezeSha256': canonical_hash(freeze)})
++    record = {'domain': 'NATIVE', 'freezeSha256': canonical_hash(freeze), 'attempts': 1,
++        'attemptRunId': freeze['ids']['runId'], 'controllerUid': os.getuid(), 'controllerPid': os.getpid(),
++        'processes': {}, 'cleanup': [], 'composition': composition, 'scanner': freeze['scanner'],
++        'childConfiguration': {'CLAUDE_CONFIG_DIR': env['CLAUDE_CONFIG_DIR'], **{k: v for k, v in env.items() if k.startswith('CLAUDE_CODE_PLUGIN_')}},
++        'deadlineExceeded': False, 'timingRows': 0, 'positiveTimingModuleExecuted': False}
+     try:
+-        until = time.monotonic() + 3
+-        while not (fixture / "s.sock").exists() and responder.poll() is None and time.monotonic() < until: time.sleep(.01)
+-        if not (fixture / "s.sock").exists() or (fixture / "s.sock").stat().st_mode & 0o777 != 0o600: raise RuntimeError("readiness bind/ownership failed")
+-        with (owned / "provider-stdout.log").open("xb") as out, (owned / "provider-stderr.log").open("xb") as err:
+-            os.chmod(owned / "provider-stdout.log", 0o600); os.chmod(owned / "provider-stderr.log", 0o600)
+-            started = time.monotonic()
+-            child = subprocess.Popen(freeze["argv"], cwd=owned, env=env, stdin=subprocess.PIPE, stdout=out, stderr=err, start_new_session=True)
+-            provider_id = image_identity(child, PROVIDER, PROVIDER_VERSION); report["processes"]["provider"] = provider_id
+-            child.stdin.write((json.dumps({"type": "control_request", "request_id": str(uuid.uuid4()), "request": {"subtype": "initialize"}}) + "\n").encode()); child.stdin.flush()
+-            while time.monotonic() < started + DEADLINE:
+-                if (owned / "result.json").exists() or (owned / "error.json").exists() or child.poll() is not None: break
+-                time.sleep(.02)
+-            else: report["deadlineExceeded"] = True
+-    except Exception as error:
+-        report["controllerError"] = str(error)
+-    finally:
+-        if child is not None and provider_id is not None: report["cleanup"].append(cleanup(child, provider_id))
+-        report["cleanup"].append(cleanup(responder, responder_id))
+-        report["socketRemoved"] = not (fixture / "s.sock").exists()
+-        for label in ("entry", "forward", "result", "error"):
+-            path = owned / (label + ".json")
+-            if path.exists():
+-                raw = path.read_bytes()
+-                try: value = json.loads(raw)
+-                except ValueError: value = {"malformed": True}
+-                report["outputs"][label] = value
+-                report.setdefault("readback", {})[label] = {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+-        report["transcript"] = [json.loads(line) for line in (fixture / "readiness.jsonl").read_text().splitlines()]
+-        debug = owned / "provider-debug.log"
+-        report["failureBoundary"] = classify(report["outputs"], debug.read_text() if debug.exists() else "")
+-        save(root / "activation-execution.json", report)
+-    return report
++        with owned_process('responder', [freeze['ids']['pythonExecutable'], str(FIXTURE), str(fixture)],
++                           freeze['ids']['pythonExecutable'], record['cleanup'], cwd=fixture,
++                           stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as (responder, identity):
++            record['processes']['responder'] = identity
++            until = time.monotonic() + 3
++            while not (fixture / 's.sock').exists() and responder.poll() is None and time.monotonic() < until: time.sleep(.01)
++            if not (fixture / 's.sock').exists() or (fixture / 's.sock').stat().st_mode & 0o777 != 0o600:
++                raise RuntimeError('owned readiness bind failed')
++            with (owned / 'provider-stdout.log').open('xb') as out, (owned / 'provider-stderr.log').open('xb') as err:
++                os.chmod(owned / 'provider-stdout.log', 0o600); os.chmod(owned / 'provider-stderr.log', 0o600)
++                deadline = time.monotonic() + DEADLINE
++                with owned_process('provider', freeze['argv'], PROVIDER, record['cleanup'], PROVIDER_VERSION,
++                                   cwd=owned, env=env, stdin=subprocess.PIPE, stdout=out, stderr=err, start_new_session=True) as (child, identity):
++                    record['processes']['provider'] = identity
++                    child.stdin.write((json.dumps({'type': 'control_request', 'request_id': freeze['initializeRequestId'], 'request': {'subtype': 'initialize'}}) + '\n').encode()); child.stdin.flush()
++                    while time.monotonic() < deadline:
++                        complete = False
++                        for label in ('result', 'error'):
++                            try:
++                                value = json.loads((owned / (label + '.json')).read_bytes())
++                                complete |= isinstance(value, dict) and value.get('runId') == freeze['ids']['runId'] and bool(value.get('stage'))
++                            except (OSError, ValueError): pass
++                        if complete or child.poll() is not None: break
++                        time.sleep(.02)
++                    else: record['deadlineExceeded'] = True
++    except Exception as error: record['controllerError'] = type(error).__name__ + ': ' + str(error)
++    record['socketRemoved'] = not (fixture / 's.sock').exists()
++    transcript = fixture / 'readiness.jsonl'
++    try: record['transcript'] = [json.loads(line) for line in transcript.read_text().splitlines()] if transcript.exists() else []
++    except ValueError: record['transcript'] = []; record['controllerError'] = 'malformed native transcript'
++    stdout = owned / 'provider-stdout.log'
++    for line in stdout.read_bytes().splitlines() if stdout.exists() else []:
++        try: response = json.loads(line)
++        except ValueError: continue
++        if response.get('type') == 'control_response' and response.get('response', {}).get('request_id') == freeze['initializeRequestId']:
++            if 'initializer' in record: record['controllerError'] = 'duplicate initialize response'
++            record['initializer'] = response
++    debug = owned / 'provider-debug.log'; diagnostic = debug.read_text() if debug.exists() else ''
++    loaded = re.findall(r'hooks module ([^\n]*?) loaded \(([^\n]*?)\); events: ([^\n]*)', diagnostic)
++    names = set(); counts = {}
++    for label, metadata, events in loaded:
++        matches = [e['name'] for e in freeze['smokeEntries'] if e['name'] in label or e['root'] in label]
++        if len(matches) == 1 and 'session.start' in events:
++            names.add(matches[0]); counts[matches[0]] = counts.get(matches[0], 0) + 1
++        elif 'tier builtin' not in metadata: composition['unexpectedContributors'].append('unresolved-module-label')
++    composition['runtimeLoadedNames'] = [e['name'] for e in freeze['smokeEntries'] if e['name'] in names]
++    composition['loadedModuleCounts'] = counts
++    if 'failed to load' in diagnostic or 'refused' in diagnostic: record['controllerError'] = 'loader refusal diagnostic'
++    artifacts, outputs = read_outputs(owned)
++    record['failureBoundary'] = classify(outputs, diagnostic)
++    record['readback'] = [{'label': a['label'], 'sha256': a['sha256'], 'bytes': len(a['raw'])} for a in artifacts]
++    verdict = adjudicate(freeze, artifacts, record)
++    save(root / 'activation-execution.json', record); save(root / 'readiness-verdict.json', verdict)
++    return record, verdict
+diff --git a/tests/native/tools/m2_activation_probe.ts b/tests/native/tools/m2_activation_probe.ts
+index 446771d..0e2e623 100644
+--- a/tests/native/tools/m2_activation_probe.ts
++++ b/tests/native/tools/m2_activation_probe.ts
+@@ -1,41 +1,69 @@
+ import { config } from './config.ts';
+ 
+-// Qualification-only activation telemetry. The positive timing module is separate.
++// Exact 2.1.295 session.start shapes; private diagnostics, never timing samples.
++const snapshot = (value: any, result: any) => {
++  const names = result ? ['cwd'] : ['cwd', 'surface', 'isInteractive'];
++  const fields: any = {};
++  let supported = value !== null && typeof value === 'object' && !Array.isArray(value);
++  const unexpected = supported ? Object.keys(value).filter((name: any) => !names.includes(name)) : [];
++  if (unexpected.length) supported = false;
++  for (const name of names) {
++    if (value === null || typeof value !== 'object' || !Object.prototype.hasOwnProperty.call(value, name)) {
++      fields[name] = { presence: 'absent' }; supported = false; continue;
++    }
++    const operand = value[name];
++    const type = operand === null ? 'null' : typeof operand;
++    fields[name] = { presence: 'present', type };
++    if (['string', 'boolean', 'number'].includes(type)) fields[name].value = operand;
++    if (name === 'cwd' ? type !== 'string' : name === 'isInteractive' ? type !== 'boolean' :
++      !(type === 'null' || type === 'string' && ['terminal', 'desktop', 'mobile', 'vscode'].includes(operand))) supported = false;
++  }
++  return { schema: result ? 'SessionStartResult/2.1.295/v1' : 'SessionStartInput/2.1.295/v1', supported, fields, unexpected };
++};
++
+ export const register = (on: any) => {
+   on('session.start', ($: any, e: any, next: any) => {
++    let original: any;
++    try { original = snapshot(e, false); }
++    catch { original = { supported: false, reason: 'snapshot-unavailable' }; }
+     const forwarded = next(e);
+     void (async () => {
+       let phase = 'entry';
+-      const identity = { kind: 'ACTIVATION_ONLY', runId: config.runId, nonce: config.nonce,
++      const identity = { kind: 'ACTIVATION_READINESS_V1', runId: config.runId, nonce: config.nonce,
+         activationSha256: config.activationSha256, positiveProbeSha256: config.positiveProbeSha256 };
+       try {
+-        await $.fs.write(config.entryOutput, JSON.stringify({ ...identity, stage: 'CALLBACK_ENTERED' }));
++        const origin = { plugin: next.origin.plugin, tier: next.origin.tier };
++        const event = next.event;
++        await $.fs.write(config.entryOutput, JSON.stringify({ ...identity, sequence: 1,
++          stage: 'CALLBACK_ENTERED', origin, event, original }));
+         phase = 'forward';
+-        await forwarded;
++        const returned = await forwarded;
+         phase = 'trace';
++        const result = snapshot(returned, true);
+         const trace = next.trace.map((link: any) => ({ index: link.index, plugin: link.plugin,
+-          tier: link.tier, event: link.event, outcome: link.outcome, reason: link.reason }));
+-        const origin = { plugin: next.origin.plugin, tier: next.origin.tier };
++          tier: link.tier, event: link.event, outcome: link.outcome, reason: link.reason,
++          received: snapshot(link.received, false), returned: snapshot(link.returned, true) }));
+         phase = 'forward-output';
+-        await $.fs.write(config.forwardOutput, JSON.stringify({ ...identity, stage: 'DOWNSTREAM_SETTLED',
+-          origin, event: next.event, trace }));
++        await $.fs.write(config.forwardOutput, JSON.stringify({ ...identity, sequence: 2,
++          stage: 'DOWNSTREAM_SETTLED', origin, event, result, trace }));
+         phase = 'http';
+         const route = ['ready', config.runId, config.responderId, config.nonce, config.activationSha256].join('/');
+-        const answer = await $.http.fetch('http://localhost/' + route,
+-          { socketPath: config.socketPath, method: 'GET' });
++        const answer = await $.http.fetch('http://localhost/' + route, { socketPath: config.socketPath, method: 'GET' });
+         if (!answer.ok || answer.status !== 200) throw new Error('readiness rejected');
+         const acknowledgement = JSON.parse(answer.text);
++        if (Object.keys(acknowledgement).length !== Object.keys(config.acknowledgement).length) throw new Error('foreign readiness acknowledgement');
+         for (const [key, value] of Object.entries(config.acknowledgement)) {
+           if (acknowledgement[key] !== value) throw new Error('foreign readiness acknowledgement');
+         }
+         phase = 'result-output';
+-        await $.fs.write(config.resultOutput, JSON.stringify({ ...identity, stage: 'READINESS_READ_BACK', acknowledgement }));
++        await $.fs.write(config.resultOutput, JSON.stringify({ ...identity, sequence: 3,
++          stage: 'READINESS_READ_BACK', httpStatus: answer.status, acknowledgement }));
+       } catch (error) {
+         const failure = phase === 'forward' ? 'DOWNSTREAM_FAILURE' : phase === 'trace' ? 'CALLBACK_FAILURE' : phase === 'http' ? 'HTTP_READINESS_FAILURE' : 'OUTPUT_WRITE_FAILURE';
+         try {
+           await $.fs.write(config.errorOutput, JSON.stringify({ ...identity, stage: failure, phase,
+             errorType: error instanceof Error ? error.name : 'unknown' }));
+-        } catch { /* Host diagnostics and controller readback remain independent. */ }
++        } catch { /* Independent controller and fixture records remain authoritative. */ }
+       }
+     })();
+     return forwarded;
+diff --git a/tests/native/tools/m2_activation_verdict.py b/tests/native/tools/m2_activation_verdict.py
+index ca1df25..efc8a59 100644
+--- a/tests/native/tools/m2_activation_verdict.py
++++ b/tests/native/tools/m2_activation_verdict.py
+@@ -1,12 +1,13 @@
+ """Accepted-source admission and fail-closed activation evidence preflight.
+ 
+-The unchanged activation entry cannot supply every required native witness.
+-Consistent output files are partial evidence, never an activation PASS.
++Versioned readiness is separate from canonical observer qualification.
++Only complete independent readback and owned cleanup can establish readiness.
+ """
+ from __future__ import annotations
+ import hashlib
+ import json
+ import subprocess
++from m2_activation_readiness import acknowledgement
+ from pathlib import Path
+ 
+ REPO = Path(__file__).resolve().parents[3]
+@@ -38,7 +39,7 @@ def admit_source(binding, raw, reviewed_commit=REVIEWED_COMMIT):
+     expected = reviewed["conformanceSourceIdentities"]
+     pairs = {"providerPath": reviewed["providerPath"], "providerSha256": reviewed["providerSha256"],
+              "providerVersion": reviewed["providerVersion"], "positiveProbeSha256": expected["probeSha256"],
+-             "activationSha256": ACTIVATION_SHA, "observerSha256": expected["adapterSha256"],
++             "originalActivationSha256": ACTIVATION_SHA, "observerSha256": expected["adapterSha256"],
+              "backgroundSha256": expected["backgroundSha256"],
+              "admittedStagerSha256": expected["pluginStagerSha256"],
+              "fixtureSha256": reviewed["sources"]["m2_activation_readiness.py"]}
+@@ -51,13 +52,16 @@ def admit_source(binding, raw, reviewed_commit=REVIEWED_COMMIT):
+     # Only the controller is authorized to change in this unit. Its reviewed
+     # baseline and fresh execution hash have separate meanings.
+     sources = binding.get("reviewedDependencyHashes", {})
+-    unchanged = {k: v for k, v in reviewed["sources"].items() if k != "m2_activation_native.py"}
++    unchanged = {k: v for k, v in reviewed["sources"].items() if k not in ("m2_activation_native.py", "m2_activation_probe.ts")}
+     if sources != unchanged:
+         raise RuntimeError("changed reviewed controller dependency")
+     if binding.get("reviewedControllerSha256") != reviewed["sources"]["m2_activation_native.py"]:
+         raise RuntimeError("changed reviewed controller baseline")
+     fresh_sources = {"controllerSha256": "m2_activation_native.py", "verdictSha256": "m2_activation_verdict.py",
+-                     "verdictTestSha256": "test_m2_activation_verdict.py", "projectionControlSha256": "m2_activation_projection_controls.js"}
++                     "verdictTestSha256": "test_m2_activation_verdict.py", "activationSha256": "m2_activation_probe.ts",
++                     "readinessControlsSha256": "m2_readiness_controls.js",
++                     "readinessTestSha256": "test_m2_readiness.py",
++                     "controlSourceSha256": "m2_activation_controls.js", "testSourceSha256": "test_m2_activation.py"}
+     for key, name in fresh_sources.items():
+         value = binding.get(key)
+         if value != digest((REPO / "tests/native/tools" / name).read_bytes()):
+@@ -76,89 +80,150 @@ def reject_retired(freeze):
+             raise RuntimeError("missing or retired activation " + key)
+ 
+ 
+-def authority_preflight(activation_raw):
+-    if digest(activation_raw) != ACTIVATION_SHA:
+-        raise RuntimeError("changed accepted activation module")
+-    return {"kind": "NATIVE_EVIDENCE_AUTHORITY_PREFLIGHT", "activationSha256": ACTIVATION_SHA,
+-            "verdict": "INCOMPLETE", "nativeExecutionAdmitted": False,
+-            "missingAuthority": [
+-                "No independently retained original event and downstream result values: the fixed entry projects them out of next.trace and only awaits its result.",
+-                "next.trace covers links beneath the activation hook only; engine-only completion cannot attribute an upstream canonical observer.",
+-                "The fixed entry does not retain an independent dispatch/continuation count or a host-owned output-persistence sequence receipt."
+-            ],
+-            "supportedPartialEvidence": ["callback file bytes", "host origin/event and downstream trace labels",
+-                                         "readiness acknowledgement and independent fixture transcript"],
+-            "resultFilePresenceIsPassAuthority": False}
+-
+-
+-def require_native_authority(activation_raw):
+-    verdict = authority_preflight(activation_raw)
+-    if not verdict["nativeExecutionAdmitted"]:
+-        raise RuntimeError("NATIVE_EVIDENCE_AUTHORITY_INCOMPLETE: " + "; ".join(verdict["missingAuthority"]))
+-
+-
+-def assess_partial_outputs(config, artifacts, transcript):
+-    """Check independently read bytes; cannot manufacture the missing authority.
+-
+-    artifacts is an ordered list of {label, raw, sha256}. raw is bytes read
+-    by the controller, not a supplied parsed result.json or a PASS flag.
+-    This portable adjudicator is not a native execution receipt.
+-    """
+-    failures = []
+-    outputs = {}
+-    if [a.get("label") for a in artifacts] != ["entry", "forward", "result"]:
+-        failures.append("missing, duplicate or reordered output readbacks")
++
++CONTRACT = "ACTIVATION_READINESS_V1"
++
++
++def snapshot_supported(value, result=False):
++    """Validate the exact declared shape; absent/undefined/null remain distinct."""
++    if not isinstance(value, dict): return False
++    names = ["cwd"] if result else ["cwd", "surface", "isInteractive"]
++    if set(value) != {"schema", "supported", "fields", "unexpected"}: return False
++    if value["schema"] != ("SessionStartResult/2.1.295/v1" if result else "SessionStartInput/2.1.295/v1"):
++        return False
++    if value["supported"] is not True or value["unexpected"] != [] or set(value["fields"]) != set(names): return False
++    for name in names:
++        field = value["fields"][name]
++        if not isinstance(field, dict) or field.get("presence") != "present": return False
++        kind = field.get("type")
++        if name == "cwd":
++            valid = kind == "string" and type(field.get("value")) is str
++        elif name == "isInteractive":
++            valid = kind == "boolean" and type(field.get("value")) is bool
++        else:
++            valid = kind == "null" and "value" not in field or kind == "string" and field.get("value") in ("terminal", "desktop", "mobile", "vscode")
++        if not valid or set(field) != ({"presence", "type"} if kind == "null" else {"presence", "type", "value"}): return False
++    return True
++
++
++def compare(left, right, result=False):
++    supported = snapshot_supported(left, result) and snapshot_supported(right, result)
++    names = ["cwd"] if result else ["cwd", "surface", "isInteractive"]
++    mismatches = [n for n in names if left.get("fields", {}).get(n) != right.get("fields", {}).get(n)] if supported else []
++    return {"supported": supported, "equal": supported and not mismatches, "mismatchFields": mismatches}
++
++
++def adjudicate(freeze, artifacts, execution, *, synthetic=False):
++    """Actual acceptance predicate. Operands stay private; output is value-free."""
++    failures, missing = [], []
++    def require(condition, label, absent=False):
++        if not condition: (missing if absent else failures).append(label)
++    ids = freeze.get("ids", {}); cfg = freeze.get("config", {})
++    require(freeze.get("kind") == CONTRACT and freeze.get("deadlineSeconds") == 20, "changed readiness contract/deadline")
++    require(freeze.get("reviewRecordSha256") == REVIEW_RECORD_SHA, "changed immutable review binding")
++    require(all(cfg.get(k) == v for k, v in ids.items()), "configuration/source run identity inconsistent")
++    require(execution.get("domain") == ("SYNTHETIC" if synthetic else "NATIVE"), "wrong execution domain")
++    try:
++        reject_retired(freeze); admit_source(ids, read_review())
++    except (ValueError, KeyError, RuntimeError) as error:
++        failures.append("source admission: " + str(error))
++    require(execution.get("freezeSha256") == digest(json.dumps(freeze, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()), "changed frozen run")
++    require(execution.get("attempts") == 1 and execution.get("attemptRunId") == ids.get("runId"), "missing or repeated attempt")
++    require(execution.get("deadlineExceeded") is False, "external deadline exceeded")
++    require(not execution.get("controllerError"), "controller failure")
++    require(execution.get("timingRows") == 0 and execution.get("positiveTimingModuleExecuted") is False, "timing path entered")
++    processes = execution.get("processes", {})
++    cleanup = execution.get("cleanup", [])
++    for role, path, sha in (("provider", ids.get("providerPath"), ids.get("providerSha256")),
++                            ("responder", ids.get("pythonExecutable"), ids.get("pythonExecutableSha256"))):
++        process = processes.get(role, {})
++        require(bool(process), role + " process missing", True)
++        require(process.get("kernelVerified") is True and process.get("imagePath") == path and process.get("sha256") == sha,
++                role + " image identity inconsistent")
++        require(process.get("uid") == execution.get("controllerUid") and process.get("parentPid") == execution.get("controllerPid")
++                and type(process.get("startUsec")) is int and process.get("startUsec", 0) > 0, role + " ownership/incarnation inconsistent")
++        matches = [c for c in cleanup if c.get("role") == role]
++        require(len(matches) == 1 and matches[0].get("identity") == process and matches[0].get("reaped") is True
++                and not matches[0].get("error"), role + " cleanup incomplete")
++    require(len(cleanup) == 2 and execution.get("socketRemoved") is True, "cleanup accounting/socket incomplete")
++    init = execution.get("initializer", {})
++    response = init.get("response", {})
++    require(init.get("type") == "control_response" and response.get("subtype") == "success" and
++            response.get("request_id") == freeze.get("initializeRequestId"), "initializer acknowledgement missing", True)
++    composition = execution.get("composition", {})
++    require(composition.get("entries") == freeze.get("smokeEntries") and composition.get("argv") == freeze.get("argv")
++            and composition.get("configurationVerified") is True and composition.get("loadingSourcesBounded") is True
++            and composition.get("unexpectedContributors") == [], "plugin composition/isolation incomplete")
++    # Independently re-read staged/configuration bytes. Producer flags are not authority.
++    try:
++        from m2_activation_native import verify_isolation
++        owned = Path(cfg["entryOutput"]).parent
++        verify_isolation(owned, freeze["smokeEntries"], cfg, freeze["argv"], execution["childConfiguration"])
++    except (KeyError, ValueError, RuntimeError, OSError):
++        failures.append("independent staged/configuration readback failed")
++    # Loading is bounded independently by source, roots, arguments and isolated
++    # configuration. Available pre-admission logs are supporting observations,
++    # not a newly required exhaustive post-admission receipt.
++    require(all(name in ("threadspace-observer", "threadspace-socket-duration") and count == 1
++                for name, count in composition.get("loadedModuleCounts", {}).items()), "duplicate or unexpected module loading")
++    scan = execution.get("scanner", {})
++    require(scan.get("activationSha256") == ids.get("activationSha256") and scan.get("providerSha256") == ids.get("providerSha256")
++            and scan.get("success") is True and scan.get("exitCode") == 0 and scan.get("reaped") is True, "fresh scanner admission missing")
++    require([a.get("label") for a in artifacts] == ["entry", "forward", "result"], "missing duplicate or reordered output")
++    output = {}
+     for item in artifacts:
+         raw = item.get("raw")
+         if not isinstance(raw, bytes) or digest(raw) != item.get("sha256"):
+-            failures.append("output bytes/hash mismatch")
+-            continue
+-        try:
+-            value = json.loads(raw)
+-        except (ValueError, UnicodeError):
+-            failures.append("malformed output bytes")
+-            continue
+-        if not isinstance(value, dict):
+-            failures.append("malformed output object")
+-            continue
+-        identity = {"kind": "ACTIVATION_ONLY", **{k: config[k] for k in
+-                    ("runId", "nonce", "activationSha256", "positiveProbeSha256")}}
+-        if any(value.get(k) != v for k, v in identity.items()):
+-            failures.append("foreign or stale source/run/nonce")
+-        outputs[item["label"]] = value
+-    expected_stages = {"entry": "CALLBACK_ENTERED", "forward": "DOWNSTREAM_SETTLED", "result": "READINESS_READ_BACK"}
+-    if any(outputs.get(k, {}).get("stage") != v for k, v in expected_stages.items()):
+-        failures.append("missing or inconsistent callback stage")
+-    forward = outputs.get("forward", {})
+-    if forward.get("origin") != {"plugin": "engine", "tier": "core"} or forward.get("event") != "session.start":
+-        failures.append("foreign dispatch origin/event")
++            failures.append("output bytes/hash inconsistent"); continue
++        try: value = json.loads(raw)
++        except (ValueError, UnicodeError): failures.append("malformed output"); continue
++        if not isinstance(value, dict): failures.append("malformed output object"); continue
++        require(value.get("kind") == CONTRACT and all(value.get(k) == ids.get(k) for k in ("runId", "nonce", "activationSha256", "positiveProbeSha256")), "foreign output source/run/nonce")
++        output[item["label"]] = value
++    for n, label in enumerate(("entry", "forward", "result"), 1):
++        stages = {"entry": "CALLBACK_ENTERED", "forward": "DOWNSTREAM_SETTLED", "result": "READINESS_READ_BACK"}
++        require(output.get(label, {}).get("sequence") == n and output.get(label, {}).get("stage") == stages[label], "missing or reordered " + label, label not in output)
++    entry, forward, result = (output.get(k, {}) for k in ("entry", "forward", "result"))
++    for item in (entry, forward):
++        require(item.get("origin") == {"plugin": "engine", "tier": "core"} and item.get("event") == "session.start", "wrong dispatch origin/event")
+     trace = forward.get("trace", [])
+-    if not isinstance(trace, list) or not trace or any(not isinstance(t, dict) for t in trace):
+-        failures.append("missing host trace")
+-    else:
++    trace_valid = isinstance(trace, list) and bool(trace) and all(isinstance(t, dict) for t in trace)
++    require(trace_valid, "settled trace missing", True)
++    boundary, observer = {}, "CANONICAL_OBSERVER_PARTICIPATION_UNVERIFIED"
++    if trace_valid:
+         indices = [t.get("index") for t in trace]
+-        if any(type(i) is not int for i in indices) or indices != sorted(set(indices)):
+-            failures.append("duplicate or reordered trace")
+-        if any(t.get("event") != "session.start" or t.get("outcome") not in ("returned", "passed") or "reason" in t for t in trace):
+-            failures.append("unsettled or bypassed dispatch")
+-        if len([t for t in trace if t.get("plugin") == "threadspace-observer"]) != 1:
+-            failures.append("original observer attribution UNVERIFIED")
+-        if any(t.get("plugin") == "threadspace-observer" and t.get("tier") != "user" for t in trace):
+-            failures.append("foreign observer tier")
+-        if trace[-1].get("plugin") != "engine" or trace[-1].get("tier") != "core":
+-            failures.append("missing engine tail")
+-        if any(t.get("plugin") not in ("threadspace-observer", "engine") for t in trace):
+-            failures.append("unexpected trace contributor")
+-    ack = config["acknowledgement"]
+-    if outputs.get("result", {}).get("acknowledgement") != ack:
+-        failures.append("foreign readiness acknowledgement")
+-    if not isinstance(transcript, list) or any(not isinstance(t, dict) for t in transcript) or [t.get("event") for t in transcript] != ["start", "received", "generated", "answered", "stop"]:
+-        failures.append("incomplete or reordered native transcript")
+-    elif (transcript[0].get("identity") != ack or
+-          any(t.get("attempt") != 1 or t.get("status") != 200 for t in transcript[1:4]) or
+-          transcript[1].get("nonceMatched") is not True or transcript[2].get("body") != ack or
+-          any(transcript[-1].get(k) != 1 for k in ("attempts", "generated", "answered", "accepted"))):
+-        failures.append("inconsistent, replayed or foreign readiness exchange")
+-    return {"verdict": "INCOMPLETE", "structuralReadbacksConsistent": not failures,
+-            "failures": failures, "nativeExecutionOrCleanupCertified": False,
+-            "missingAuthority": authority_preflight((REPO / "tests/native/tools/m2_activation_probe.ts").read_bytes())["missingAuthority"]}
++        require(all(type(i) is int and i >= 0 for i in indices) and indices == sorted(set(indices)), "trace reordered or duplicated")
++        require(all(t.get("event") == "session.start" and t.get("outcome") in ("returned", "passed") and "reason" not in t
++                    and (t.get("plugin") in ("threadspace-observer", "engine") or t.get("tier") == "builtin") for t in trace), "unsettled self-answer or unexpected trace")
++        require(trace[-1].get("plugin") == "engine" and trace[-1].get("tier") == "core" and
++                sum(t.get("plugin") == "engine" for t in trace) == 1, "valid engine tail missing")
++        # Host ordering is nearest beneath first. Never search for a matching value.
++        boundary = trace[0]
++        require(all(snapshot_supported(t.get("received")) and snapshot_supported(t.get("returned"), True) for t in trace), "unsupported or missing trace operands", True)
++        observed = [t for t in trace if t.get("plugin") == "threadspace-observer"]
++        if observed:
++            require(len(observed) == 1 and observed[0].get("tier") == "user", "invalid observer trace attribution")
++            if len(observed) == 1 and observed[0].get("tier") == "user" and observed[0].get("outcome") in ("returned", "passed"):
++                observer = "OBSERVED DOWNSTREAM"
++    comparisons = {"originalToReceived": compare(entry.get("original", {}), boundary.get("received", {})),
++                   "resolvedToReturned": compare(forward.get("result", {}), boundary.get("returned", {}), True)}
++    for label, comparison in comparisons.items():
++        require(comparison["supported"], label + " operands unsupported/missing", True)
++        if comparison["supported"]: require(comparison["equal"], label + " value mismatch")
++    ack = cfg.get("acknowledgement")
++    try: expected_ack = acknowledgement(ids)
++    except KeyError: expected_ack = None
++    require(expected_ack is not None and ack == expected_ack, "acknowledgement does not bind source/run/responder/boot")
++    require(result.get("acknowledgement") == ack and result.get("httpStatus") == 200, "readiness acknowledgement inconsistent")
++    transcript = execution.get("transcript", [])
++    complete = isinstance(transcript, list) and all(isinstance(t, dict) for t in transcript) and [t.get("event") for t in transcript] == ["start", "received", "generated", "answered", "stop"]
++    require(complete, "incomplete duplicate reordered or extra native transcript", True)
++    if complete:
++        require(transcript[0].get("identity") == ack and transcript[0].get("pid") == processes.get("responder", {}).get("pid")
++                and transcript[0].get("uid") == execution.get("controllerUid"), "foreign responder transcript")
++        require(all(t.get("attempt") == 1 and t.get("status") == 200 for t in transcript[1:4]) and
++                transcript[1].get("nonceMatched") is True and transcript[1].get("peerUid") == execution.get("controllerUid") and transcript[2].get("body") == ack and
++                all(transcript[-1].get(k) == 1 for k in ("attempts", "generated", "answered", "accepted")), "forged replayed or incomplete HTTP exchange")
++    return {"contract": CONTRACT, "domain": "SYNTHETIC" if synthetic else "NATIVE",
++            "verdict": "FAIL" if failures else "INCOMPLETE" if missing else "PASS", "failures": failures, "missing": missing,
++            "comparisons": comparisons, "canonicalObserver": observer, "timingQualified": False}
+diff --git a/tests/native/tools/test_m2_activation.py b/tests/native/tools/test_m2_activation.py
+index 430eba5..119ca23 100644
+--- a/tests/native/tools/test_m2_activation.py
++++ b/tests/native/tools/test_m2_activation.py
+@@ -14,12 +14,12 @@ class PortableActivationControls(unittest.TestCase):
+     def test_actual_callback_return_forwarding_and_failures(self):
+         node = shutil.which('node')
+         self.assertIsNotNone(node, 'portable Node runtime required; never substitute provider')
+-        result = subprocess.run([node, str(native.HERE / 'm2_activation_controls.js'), str(native.ACTIVATION)], capture_output=True, text=True, timeout=10)
++        result = subprocess.run([node, str(native.HERE / 'm2_readiness_controls.js'), str(native.ACTIVATION)], capture_output=True, text=True, timeout=10)
+         self.assertEqual(result.returncode, 0, result.stderr)
+         controls = json.loads(result.stdout)
+-        self.assertEqual(len(controls['results']), 7)
+-        self.assertTrue(all(c['nextCalls'] == 1 and c['returnedOriginalPromise'] for c in controls['results']))
+-        print(json.dumps(controls, sort_keys=True))
++        self.assertEqual(len(controls['results']), 17)
++        self.assertTrue(all(c['calls'] == 1 and (c['returnedOriginalPromise'] or c['synchronousOriginalError']) for c in controls['results']))
++        print(json.dumps({'kind': controls['kind'], 'cases': len(controls['results']), 'sourceSha256': controls['sourceSha256'], 'nativeProviderExecuted': False}, sort_keys=True))
+ 
+     def test_no_measuring_or_provider_input_apis(self):
+         source = native.ACTIVATION.read_text()
+@@ -28,8 +28,8 @@ class PortableActivationControls(unittest.TestCase):
+         self.assertEqual(source.count("on('session.start',"), 1)
+         self.assertEqual(source.count('next(e)'), 1)
+         self.assertNotIn('link.ms', source)
+-        self.assertNotIn('link.received', source)
+-        self.assertNotIn('link.returned', source)
++        self.assertIn('snapshot(link.received, false)', source)
++        self.assertIn('snapshot(link.returned, true)', source)
+ 
+     def test_actual_readiness_protocol_forgery_and_replay(self):
+         config = {key: 'synthetic-' + key for key in ('runId', 'responderId', 'nonce', 'activationSha256', 'fixtureSha256', 'observerSha256', 'bootId')}
+diff --git a/tests/native/tools/test_m2_activation_verdict.py b/tests/native/tools/test_m2_activation_verdict.py
+index e640340..ed8f3de 100644
+--- a/tests/native/tools/test_m2_activation_verdict.py
++++ b/tests/native/tools/test_m2_activation_verdict.py
+@@ -1,172 +1,40 @@
+-import copy
+-import json
+-import tempfile
++"""Immutable historical refusal and revised source-admission checks."""
++import subprocess
++import types
+ import unittest
+-from pathlib import Path
+-from unittest.mock import patch
+ import m2_activation_native as native
+ import m2_activation_verdict as verdict
+ 
+ 
+-class SourcePinControls(unittest.TestCase):
+-    @classmethod
+-    def setUpClass(cls):
+-        cls.raw = verdict.read_review()
+-        cls.binding = native.source_binding()
+-
+-    def test_exact_accepted_git_source(self):
+-        result = verdict.admit_source(self.binding, self.raw)
+-        self.assertEqual(result['reviewedGitCommit'], verdict.REVIEWED_COMMIT)
+-        self.assertEqual(result['sourceAdmission'], 'PASS')
+-        self.assertEqual(result['nativeActivation'], 'NOT_RUN')
+-
+-    def test_old_source_and_matching_relabel_rejected(self):
+-        old = (verdict.REPO / 'evidence/M2/replacement-activation-repair/source-identities.json').read_bytes()
+-        with self.assertRaisesRegex(RuntimeError, 'unaccepted Git source'):
+-            verdict.admit_source(self.binding, old, '5b8ac24c3bcdc2d7e17f8e8777094c93a1ca5e8c')
+-        changed = json.loads(self.raw)
+-        changed['sourceBinding']['conformanceSourceIdentities']['probeSha256'] = 'a' * 64
+-        binding = copy.deepcopy(self.binding); binding['positiveProbeSha256'] = 'a' * 64
+-        with self.assertRaisesRegex(RuntimeError, 'unaccepted Git source'):
+-            verdict.admit_source(binding, json.dumps(changed).encode())
+-
+-    def test_all_component_substitutions_rejected(self):
+-        for key in ('providerPath', 'providerSha256', 'providerVersion', 'positiveProbeSha256',
+-                    'activationSha256', 'observerSha256', 'backgroundSha256', 'admittedStagerSha256',
+-                    'fixtureSha256', 'reviewedControllerSha256', 'controllerSha256', 'verdictSha256',
+-                    'verdictTestSha256', 'projectionControlSha256'):
+-            with self.subTest(key=key):
+-                changed = copy.deepcopy(self.binding); changed[key] = 'a' * 64
+-                with self.assertRaises(RuntimeError): verdict.admit_source(changed, self.raw)
+-        for key in ('observerFiles', 'conformanceSourceIdentities', 'reviewedDependencyHashes'):
+-            with self.subTest(key=key):
+-                changed = copy.deepcopy(self.binding); changed[key] = {}
+-                with self.assertRaises(RuntimeError): verdict.admit_source(changed, self.raw)
+-
+-    def test_changed_composition_and_config_rejected(self):
+-        for key in ('name', 'modules', 'files'):
+-            changed = copy.deepcopy(self.binding)
+-            target = changed['conformanceSourceIdentities']['pluginComposition']['observer']
+-            target[key] = {'foreign': 'capture-enabled'} if key == 'files' else 'foreign'
+-            with self.assertRaisesRegex(RuntimeError, 'composition'): verdict.admit_source(changed, self.raw)
+-        with tempfile.TemporaryDirectory() as d:
+-            observer = native.stage(Path(d) / 'observer', 'observer', {})
+-            activation = native.stage(Path(d) / 'activation', 'activation', {'kind': 'SYNTHETIC_ONLY'})
+-            native.verify_staging([observer, activation])
+-            (Path(activation['root']) / 'hooks/config.ts').write_text('export const config = {foreign: true};')
+-            with self.assertRaisesRegex(RuntimeError, 'changed staged source'): native.verify_staging([observer, activation])
+-            activation['files']['hooks/config.ts'] = native.file_hash(Path(activation['root']) / 'hooks/config.ts')
+-            with self.assertRaisesRegex(RuntimeError, 'configuration'):
+-                native.verify_staging([observer, activation], {'kind': 'SYNTHETIC_ONLY'})
+-
+-    def test_retired_activation_freeze_and_identities_rejected(self):
+-        old = json.loads((verdict.REPO / 'evidence/M2/replacement-activation-native/frozen-activation.json').read_text())
+-        with self.assertRaisesRegex(RuntimeError, 'stale activation'): verdict.reject_retired(old)
+-        fresh = {'reviewedGitCommit': verdict.REVIEWED_COMMIT,
+-                 'ids': {k: 'synthetic-unused-' + k for k in verdict.RETIRED}}
+-        verdict.reject_retired(fresh)
+-        for key, value in verdict.RETIRED.items():
+-            changed = copy.deepcopy(fresh); changed['ids'][key] = value
+-            with self.assertRaisesRegex(RuntimeError, 'retired'): verdict.reject_retired(changed)
+-
+-    def test_prepare_and_direct_smoke_stop_before_native_or_freeze(self):
+-        with tempfile.TemporaryDirectory() as d, patch.object(native, 'read_review', return_value=self.raw), \
+-             patch('subprocess.Popen', side_effect=AssertionError('native process forbidden')) as process, \
+-             patch('subprocess.check_output', side_effect=AssertionError('native query forbidden')) as query:
+-            with self.assertRaisesRegex(RuntimeError, 'NATIVE_EVIDENCE_AUTHORITY_INCOMPLETE'):
+-                native.prepare(Path(d))
+-            freeze = {'reviewedGitCommit': verdict.REVIEWED_COMMIT,
+-                      'ids': {k: 'synthetic-unused-' + k for k in verdict.RETIRED}}
+-            with self.assertRaisesRegex(RuntimeError, 'NATIVE_EVIDENCE_AUTHORITY_INCOMPLETE'):
+-                native.smoke(Path(d), freeze, {})
+-            self.assertEqual(list(Path(d).iterdir()), [])
+-            process.assert_not_called(); query.assert_not_called()
+-
+-
+-class EvidenceVerdictControls(unittest.TestCase):
+-    def setUp(self):
+-        self.config = {'runId': 'synthetic-only-run', 'nonce': 'synthetic-only-nonce',
+-                       'activationSha256': verdict.ACTIVATION_SHA, 'positiveProbeSha256': 'synthetic-only-positive',
+-                       'acknowledgement': {'kind': 'ACTIVATION_ONLY_READY', 'nonce': 'synthetic-only-nonce',
+-                                           'responderId': 'synthetic-only-responder'}}
+-        identity = {'kind': 'ACTIVATION_ONLY', **{k: self.config[k] for k in
+-                    ('runId', 'nonce', 'activationSha256', 'positiveProbeSha256')}}
+-        self.values = [{'label': 'entry', 'value': {**identity, 'stage': 'CALLBACK_ENTERED'}},
+-                       {'label': 'forward', 'value': {**identity, 'stage': 'DOWNSTREAM_SETTLED',
+-                        'origin': {'plugin': 'engine', 'tier': 'core'}, 'event': 'session.start', 'trace': [
+-                            {'index': 1, 'plugin': 'threadspace-observer', 'tier': 'user', 'event': 'session.start', 'outcome': 'returned'},
+-                            {'index': 2, 'plugin': 'engine', 'tier': 'core', 'event': 'session.start', 'outcome': 'returned'}]}},
+-                       {'label': 'result', 'value': {**identity, 'stage': 'READINESS_READ_BACK', 'acknowledgement': self.config['acknowledgement']}}]
+-        self.transcript = [{'event': 'start', 'identity': self.config['acknowledgement']},
+-                           {'event': 'received', 'attempt': 1, 'status': 200, 'nonceMatched': True},
+-                           {'event': 'generated', 'attempt': 1, 'status': 200, 'body': self.config['acknowledgement']},
+-                           {'event': 'answered', 'attempt': 1, 'status': 200},
+-                           {'event': 'stop', 'attempts': 1, 'generated': 1, 'answered': 1, 'accepted': 1}]
+-
+-    def artifacts(self):
+-        result = []
+-        for item in self.values:
+-            raw = json.dumps(item['value'], sort_keys=True).encode()
+-            result.append({'label': item['label'], 'raw': raw, 'sha256': verdict.digest(raw)})
+-        return result
+-
+-    def assess(self):
+-        return verdict.assess_partial_outputs(self.config, self.artifacts(), self.transcript)
+-
+-    def test_even_consistent_complete_synthetic_files_cannot_pass(self):
+-        result = self.assess()
+-        self.assertTrue(result['structuralReadbacksConsistent'])
++class HistoricalAndCurrentAdmission(unittest.TestCase):
++    def test_original_fail_closed_verifier_remains_demonstrably_refusing(self):
++        base = '263e644accde1f789e99717fc8b5f4ba8dcc047e'
++        prefix = 'tests/native/tools/'
++        code = subprocess.check_output(['git', 'show', base + ':' + prefix + 'm2_activation_verdict.py'])
++        entry = subprocess.check_output(['git', 'show', base + ':' + prefix + 'm2_activation_probe.ts'])
++        module = types.ModuleType('historical_verdict')
++        module.__file__ = str(native.HERE / 'm2_activation_verdict.py')
++        exec(compile(code, 'immutable-historical-verdict', 'exec'), module.__dict__)
++        result = module.authority_preflight(entry)
+         self.assertEqual(result['verdict'], 'INCOMPLETE')
+-        self.assertFalse(result['nativeExecutionOrCleanupCertified'])
++        self.assertFalse(result['nativeExecutionAdmitted'])
++        self.assertEqual(verdict.digest(entry), verdict.ACTIVATION_SHA)
+         self.assertEqual(len(result['missingAuthority']), 3)
+-        # classify()'s positive-looking label is descriptive only.
+-        outputs = {item['label']: item['value'] for item in self.values}
+-        self.assertEqual(native.classify(outputs, ''), 'ACTIVATION_OUTPUT_AND_HTTP_RETURNED')
+ 
+-    def test_foreign_stale_source_run_nonce_and_host_origin(self):
+-        for key in ('activationSha256', 'positiveProbeSha256', 'runId', 'nonce'):
+-            with self.subTest(key=key):
+-                old = self.values[2]['value'][key]; self.values[2]['value'][key] = 'forged'
+-                self.assertIn('foreign or stale source/run/nonce', self.assess()['failures'])
+-                self.values[2]['value'][key] = old
+-        self.values[1]['value']['origin']['plugin'] = 'foreign'
+-        self.assertIn('foreign dispatch origin/event', self.assess()['failures'])
+-
+-    def test_missing_duplicate_reordered_or_hash_inconsistent_outputs(self):
+-        artifacts = self.artifacts()
+-        for changed in (artifacts[1:], artifacts[:-1], artifacts[::-1], artifacts + artifacts[:1]):
+-            result = verdict.assess_partial_outputs(self.config, changed, self.transcript)
+-            self.assertIn('missing, duplicate or reordered output readbacks', result['failures'])
+-        changed = copy.deepcopy(artifacts); changed[0]['raw'] = b'forged'
+-        self.assertIn('output bytes/hash mismatch', verdict.assess_partial_outputs(self.config, changed, self.transcript)['failures'])
+-        changed[0]['sha256'] = verdict.digest(b'forged')
+-        self.assertIn('malformed output bytes', verdict.assess_partial_outputs(self.config, changed, self.transcript)['failures'])
+-
+-    def test_engine_only_skipped_reordered_and_foreign_trace(self):
+-        trace = self.values[1]['value']['trace']
+-        self.values[1]['value']['trace'] = trace[1:]
+-        self.assertIn('original observer attribution UNVERIFIED', self.assess()['failures'])
+-        self.values[1]['value']['trace'] = trace[::-1]
+-        self.assertIn('duplicate or reordered trace', self.assess()['failures'])
+-        self.values[1]['value']['trace'] = trace
+-        trace[0]['outcome'] = 'skipped'
+-        self.assertIn('unsettled or bypassed dispatch', self.assess()['failures'])
+-        trace[0]['outcome'] = 'returned'; trace[0]['plugin'] = 'foreign'
+-        self.assertIn('unexpected trace contributor', self.assess()['failures'])
++    def test_current_admission_retains_exact_immutable_review_and_original_activation(self):
++        binding = native.source_binding()
++        result = verdict.admit_source(binding, verdict.read_review())
++        self.assertEqual(result['reviewRecordSha256'], verdict.REVIEW_RECORD_SHA)
++        self.assertEqual(binding['originalActivationSha256'], verdict.ACTIVATION_SHA)
++        self.assertNotEqual(binding['activationSha256'], verdict.ACTIVATION_SHA)
++        self.assertEqual(result['nativeActivation'], 'NOT_RUN')
+ 
+-    def test_wrong_responder_ack_replay_and_incomplete_transcript(self):
+-        original = copy.deepcopy(self.transcript)
+-        for changed in (original[1:], original[:-1], original[::-1], original + original[1:4]):
+-            self.transcript = changed
+-            self.assertIn('incomplete or reordered native transcript', self.assess()['failures'])
+-        self.transcript = copy.deepcopy(original)
+-        self.transcript[2]['body'] = {'kind': 'ACTIVATION_ONLY_READY', 'responderId': 'foreign'}
+-        self.assertIn('inconsistent, replayed or foreign readiness exchange', self.assess()['failures'])
+-        self.transcript = copy.deepcopy(original); self.transcript[-1]['accepted'] = 2
+-        self.assertIn('inconsistent, replayed or foreign readiness exchange', self.assess()['failures'])
+-        self.values[2]['value']['acknowledgement'] = {'kind': 'ACTIVATION_ONLY_READY', 'nonce': 'foreign'}
+-        self.assertIn('foreign readiness acknowledgement', self.assess()['failures'])
++    def test_retired_conformance_stays_zero_of_fourteen(self):
++        import json
++        original = json.loads((verdict.REPO / 'evidence/M2/replacement-duration-instrument-v2/conformance.json').read_bytes())
++        self.assertFalse(original['complete'])
++        self.assertEqual(original['rows'], [])
++        self.assertFalse(any(row.get('event') == 'received' for row in original['nativeTranscript']))
+ 
+ 
+-if __name__ == '__main__':
+-    unittest.main(verbosity=2)
++if __name__ == '__main__': unittest.main(verbosity=2)

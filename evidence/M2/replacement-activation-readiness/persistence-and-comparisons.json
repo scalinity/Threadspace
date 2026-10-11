@@ -1,0 +1,107 @@
+{
+  "comparisons": {
+    "originalToReceived": {
+      "equal": true,
+      "mismatchFields": [],
+      "supported": true
+    },
+    "resolvedToReturned": {
+      "equal": true,
+      "mismatchFields": [],
+      "supported": true
+    }
+  },
+  "integrity": "HMAC-SHA256; random key retained privately",
+  "pathValueHashesPublic": false,
+  "rawOperandsPublic": false,
+  "readbacks": [
+    {
+      "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+      "bytes": 744,
+      "event": "session.start",
+      "kind": "ACTIVATION_READINESS_V1",
+      "label": "entry",
+      "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+      "origin": {
+        "plugin": "engine",
+        "tier": "core"
+      },
+      "originalOperand": {
+        "fields": {
+          "cwd": {
+            "presence": "present",
+            "type": "string"
+          },
+          "isInteractive": {
+            "presence": "present",
+            "type": "boolean"
+          },
+          "surface": {
+            "presence": "present",
+            "type": "null"
+          }
+        },
+        "schema": "SessionStartInput/2.1.295/v1",
+        "supported": true
+      },
+      "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "privateOriginalHmacSha256": "6d7d6fbbf24851417ccccee956752d4b5f7f5711634bb7f9e5c921ae4b62183f",
+      "runId": "6c250603-cc11-4612-b923-50f0d11211cb",
+      "sequence": 1,
+      "stage": "CALLBACK_ENTERED"
+    },
+    {
+      "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+      "actualResolvedOperand": {
+        "schema": "SessionStartResult/2.1.295/v1",
+        "supported": true
+      },
+      "bytes": 1223,
+      "event": "session.start",
+      "kind": "ACTIVATION_READINESS_V1",
+      "label": "forward",
+      "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+      "origin": {
+        "plugin": "engine",
+        "tier": "core"
+      },
+      "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "privateOriginalHmacSha256": "e8cdc39ba6dd7ada63cfd9505930deff3a93fed4201a0deac5c47afe2884ad51",
+      "runId": "6c250603-cc11-4612-b923-50f0d11211cb",
+      "sequence": 2,
+      "stage": "DOWNSTREAM_SETTLED",
+      "trace": [
+        {
+          "event": "session.start",
+          "index": 2,
+          "outcome": "returned",
+          "plugin": "engine",
+          "tier": "core"
+        }
+      ]
+    },
+    {
+      "acknowledgement": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "0c357377-f73f-4703-8efb-cfebde39f320",
+        "runId": "6c250603-cc11-4612-b923-50f0d11211cb"
+      },
+      "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+      "bytes": 918,
+      "httpStatus": 200,
+      "kind": "ACTIVATION_READINESS_V1",
+      "label": "result",
+      "nonce": "aa63b5ba27764f40b1e2bb851dd90e4792476249aa6f4fe18d0ff471da5f26bf",
+      "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "privateOriginalHmacSha256": "e6b9d7295542d76e0241642d6e3d5fd875193dfd353a6c4d534fc94633a6ea80",
+      "runId": "6c250603-cc11-4612-b923-50f0d11211cb",
+      "sequence": 3,
+      "stage": "READINESS_READ_BACK"
+    }
+  ]
+}
