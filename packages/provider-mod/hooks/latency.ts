@@ -15,7 +15,8 @@ export const MEASUREMENT_LIMITS = {
 
 export type BatchMeasurement = { beginMs: number; ids: readonly string[]; failure?: { name: string; message: string } }
 export type DeliveryMeasurement = {
-  capture: (id: string) => void
+  readCapture: () => number | null
+  capture: (id: string, reading?: number | null) => void
   begin: (ids: readonly string[]) => BatchMeasurement
   end: (io: Io, batch: BatchMeasurement, result: ProcessRunResult | undefined, statuses: ReadonlyMap<string, ReceiptStatus> | undefined) => Promise<void>
   // Standalone primitive used by focused fixtures. Production calls
@@ -44,6 +45,7 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
   // rejected, evicted and never-drained UUIDs all remain in the denominator.
   // Removing accepted UUIDs here would conceal a lost final telemetry batch.
   const captures = new Map<string, Capture>()
+  const phaseEntries = new Set<string>()
   let totalCaptured = 0
   let overflow = 0
   let failedExports = 0
@@ -54,10 +56,15 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
   let expired = false
   let anchor: { token: string; endMs: number } | undefined
   let openedMs: number | undefined
+  let lastReading = 0
   const now = () => {
     const value = performance.now()
-    if (!Number.isFinite(value) || value < 0) throw new Error('unavailable monotonic clock')
+    if (!Number.isFinite(value) || value < lastReading) throw new Error('unavailable or reset monotonic clock')
+    lastReading = value
     return value
+  }
+  const read = (): number | null => {
+    try { return now() } catch { failedExports += 1; return null }
   }
   const reply = (value: ProcessRunResult): Reply => {
     if (value.exitCode !== 0 || value.isStdoutTruncated || new TextEncoder().encode(value.stdout).length > MEASUREMENT_LIMITS.receiptBytes) throw new Error('missing measurement receipt')
@@ -113,14 +120,20 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
     if (confirmed.token !== saved.token || confirmed.totalCaptured !== frozenTotal || confirmed.observationIdsSha256 !== observationIdsSha256) throw new Error('wrong census confirmation receipt')
   }
   return {
-    capture: id => {
+    readCapture: read,
+    capture: (id, reading) => {
       if (closed) { failedExports += 1; return }
       if (captures.has(id)) return
       totalCaptured += 1
       if (captures.size >= MEASUREMENT_LIMITS.captures) { overflow += 1; return }
       let capturedMs: number | null = null
-      try { capturedMs = now(); openedMs ??= capturedMs } catch { failedExports += 1 }
+      try {
+        capturedMs = reading === undefined ? now() : reading
+        if (capturedMs === null || !Number.isFinite(capturedMs) || capturedMs < 0) throw new Error('missing phase capture')
+        openedMs ??= capturedMs
+      } catch { capturedMs = null; failedExports += 1 }
       captures.set(id, { observationId: id, capturedMs })
+      if (reading !== undefined && capturedMs !== null) phaseEntries.add(id)
     },
     begin: ids => {
       if (closed) { failedExports += 1; throw new Error('source measurement window closed') }
@@ -129,22 +142,27 @@ export function createLatencyMeasurement(argv: readonly string[] | undefined, ru
       return batch
     },
     end: async (io, batch, result, statuses) => {
+      // Synchronous first operation after delivery's receipt validation. This
+      // one reading serves both methods; evidence export never retimestamps it.
+      const endMs = read()
       inFlightBatches = Math.max(0, inFlightBatches - 1)
       let ownExport: Promise<void> | undefined
       try {
         // Taken immediately on return of the real mod-batch invocation,
         // including timeout/rejection, before optional evidence persistence.
-        const endMs = now()
+        if (endMs === null) throw new Error('missing validated receipt reading')
         let nativeToken: unknown
         try { nativeToken = result && (JSON.parse(result.stdout) as { qualificationClock?: { token?: unknown } }).qualificationClock?.token } catch { /* invalid receipt remains invalid */ }
         if (canonicalUuid(nativeToken)) anchor = { token: nativeToken, endMs }
         const body = {
-          kind: 'observer-clock-bracket', schemaVersion: 1, runtimeId, clock: 'performance.now',
+          kind: argv.includes('--qualification-composed-duration') ? 'observer-duration-attempt' : 'observer-clock-bracket',
+          schemaVersion: argv.includes('--qualification-composed-duration') ? 3 : 1, runtimeId, clock: 'performance.now',
           beginMs: batch.beginMs, endMs, nativeToken: canonicalUuid(nativeToken) ? nativeToken : null,
           totalCaptured, overflow, failedExports,
           records: batch.ids.map(observationId => ({ observationId,
             capturedMs: captures.get(observationId)?.capturedMs ?? null,
-            status: statuses?.get(observationId) ?? 'UNKNOWN' })),
+            status: statuses?.get(observationId) ?? 'UNKNOWN',
+            ...(argv.includes('--qualification-composed-duration') ? { phaseEntry: phaseEntries.has(observationId) } : {}) })),
           ...(argv.includes('--qualification-phases') && result ? {
             helperPhases: (JSON.parse(result.stdout) as { qualificationPhases?: unknown }).qualificationPhases ?? null,
             processResult: { exitCode: result.exitCode, isStdoutTruncated: result.isStdoutTruncated,

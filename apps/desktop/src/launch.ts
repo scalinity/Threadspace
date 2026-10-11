@@ -9,7 +9,7 @@ export interface LaunchConfig {
 }
 
 function read(): LaunchConfig {
-  const raw = (window as unknown as { __THREADSPACE_LAUNCH__?: Record<string, unknown> }).__THREADSPACE_LAUNCH__;
+  const raw = typeof window === "undefined" ? undefined : (window as unknown as { __THREADSPACE_LAUNCH__?: Record<string, unknown> }).__THREADSPACE_LAUNCH__;
   return {
     rendererMode: raw?.rendererMode === "webgl2-compatibility" ? "webgl2-compatibility" : "webgpu",
     qualificationBuild: raw?.qualificationBuild === true,

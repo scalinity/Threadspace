@@ -101,6 +101,8 @@ pub struct StreamSender<S: FrameSink> {
     last_cursor: String,
     intents_by_seq: BTreeMap<u32, String>,
     state: State,
+    #[cfg(feature = "qualification")]
+    composed_history: VecDeque<UiFrame>,
 }
 
 impl<S: FrameSink> StreamSender<S> {
@@ -117,6 +119,8 @@ impl<S: FrameSink> StreamSender<S> {
             last_cursor: "0".into(),
             intents_by_seq: BTreeMap::new(),
             state: State::AwaitingSnapshot(VecDeque::new()),
+            #[cfg(feature = "qualification")]
+            composed_history: VecDeque::new(),
         }
     }
 
@@ -171,6 +175,8 @@ impl<S: FrameSink> StreamSender<S> {
             self.retire();
             return Err(StreamError::WindowExhausted);
         }
+        #[cfg(feature = "qualification")]
+        let proof = frame.clone();
         if let Err(error) = self.sink.deliver(frame) {
             self.retire();
             return Err(StreamError::ChannelClosed(error));
@@ -183,7 +189,52 @@ impl<S: FrameSink> StreamSender<S> {
         self.unacked_bytes += bytes;
         self.next_seq += 1;
         self.last_cursor = cursor.to_owned();
+        #[cfg(feature = "qualification")]
+        {
+            if self.composed_history.len() == 512 { self.composed_history.pop_front(); }
+            self.composed_history.push_back(proof);
+        }
         Ok(seq)
+    }
+
+    #[cfg(feature = "qualification")]
+    pub fn composed_baseline(&self, seq: u32, cursor: &str) -> bool {
+        !self.is_retired() && self.is_hydrated()
+            && self.composed_history.iter().any(|f| f.header.stream_seq == seq && f.header.cursor == cursor)
+    }
+
+    /// A diagnostic cursor cannot replace contiguous, actually sent patches.
+    #[cfg(feature = "qualification")]
+    pub fn composed_coverage(&self, witness: &threadspace_contracts::composed::Witness) -> bool {
+        use threadspace_contracts::cursor::parse_cursor;
+        if !threadspace_contracts::composed::valid_witness(witness) { return false; }
+        if !self.composed_baseline(witness.from_stream_seq, &witness.from_cursor) { return false; }
+        let mut expected = witness.from_stream_seq + 1;
+        let mut cursor = witness.from_cursor.clone();
+        for frame in self.composed_history.iter().filter(|f| f.header.stream_seq > witness.from_stream_seq && f.header.stream_seq <= witness.stream_seq) {
+            if frame.header.stream_seq != expected { return false; }
+            expected += 1;
+            match &frame.body {
+                UiFrameBody::ProjectionPatch { patch } => {
+                    if patch.from_cursor != cursor { return false; }
+                    cursor = patch.to_cursor.clone();
+                    for (entity, id, revision, absent) in patch.session_upserts.iter().map(|r| ("SESSION", &r.session_id, &r.revision, false))
+                        .chain(patch.attention_upserts.iter().map(|r| ("ATTENTION", &r.attention_id, &r.revision, r.resolved_at_ms.is_some()))) {
+                        if !witness.revisions.iter().any(|r| r.entity == entity && r.id == *id
+                            && parse_cursor(&r.revision).zip(parse_cursor(revision)).is_some_and(|(a, b)| a >= b)
+                            && (r.absent == absent || parse_cursor(&r.revision) > parse_cursor(revision))) { return false; }
+                    }
+                    for tombstone in &patch.tombstones {
+                        let entity = match tombstone.entity { threadspace_contracts::projection::EntityKind::Session => "SESSION", threadspace_contracts::projection::EntityKind::Attention => "ATTENTION" };
+                        if !witness.revisions.iter().any(|r| r.entity == entity && r.id == tombstone.id && r.absent) { return false; }
+                    }
+                }
+                UiFrameBody::BridgeHeartbeat | UiFrameBody::NativeIntent { .. } => {}
+                _ => return false,
+            }
+            if frame.header.cursor != cursor { return false; }
+        }
+        expected == witness.stream_seq + 1 && cursor == witness.cursor
     }
 
     /// Enforces the snapshot bounds before `SnapshotBegin`, emits the complete
@@ -351,6 +402,70 @@ mod tests {
     use super::*;
     use std::sync::{Arc, Mutex};
     use threadspace_contracts::projection::{AttentionCounts, IntentAction, IntentSource};
+
+    #[cfg(feature = "qualification")]
+    fn composed_sender() -> (StreamSender<Sink>, threadspace_contracts::composed::Witness) {
+        use threadspace_contracts::composed::{Context, Witness};
+        let id = || uuid::Uuid::new_v4().to_string();
+        let context = Context { run_id: id(), dom_runtime_id: id(), native_incarnation: id(), subscription_id: id(), view_epoch: id(), core_generation: id(), store_generation: id() };
+        let identity = FrameIdentity { store_generation: context.store_generation.clone(), core_generation: context.core_generation.clone(), subscription_id: context.subscription_id.clone(), view_epoch: context.view_epoch.clone() };
+        let mut sender = StreamSender::new(Sink::default(), identity);
+        sender.emit_snapshot("7", &snapshot(0)).expect("snapshot");
+        let seq = sender.next_seq - 1;
+        sender.ack(seq, "7").expect("hydrate");
+        let witness = Witness { schema_version: 3, witness_id: id(), context, from_cursor: "7".into(), cursor: "8".into(), from_stream_seq: seq,
+            stream_seq: seq + 1, revisions: vec![], pending_hydration: 0, visible: true };
+        (sender, witness)
+    }
+
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn composed_proves_actual_contiguous_sent_frames_after_ordinary_ack() {
+        let (mut sender, mut witness) = composed_sender();
+        sender.push_patch("8", patch("8")).expect("patch");
+        sender.ack(witness.stream_seq, "8").expect("ordinary ACK unchanged");
+        assert!(sender.composed_coverage(&witness), "ACK does not erase independent witness history");
+        witness.from_cursor = "6".into();
+        assert!(!sender.composed_coverage(&witness));
+        witness.from_cursor = "7".into(); witness.stream_seq += 1;
+        assert!(!sender.composed_coverage(&witness), "future/impossible sequence");
+        witness.stream_seq -= 1; witness.pending_hydration = 1;
+        assert!(!sender.composed_coverage(&witness), "unresolved page invalidation");
+    }
+
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn composed_cursor_alone_cannot_cover_an_affected_row_revision() {
+        use threadspace_contracts::composed::Revision;
+        let (mut sender, mut witness) = composed_sender();
+        let entity_id = uuid::Uuid::new_v4().to_string();
+        let mut patch = patch("8");
+        patch.attention_upserts.push(serde_json::from_value(serde_json::json!({
+            "attentionId":entity_id,"sessionId":uuid::Uuid::new_v4().to_string(),"turnId":null,"category":"TURN_COMPLETE",
+            "priority":40,"summary":null,"createdAtMs":1,"acknowledgedAtMs":null,"resolvedAtMs":null,"notificationState":"NOT_REQUESTED","revision":"8"
+        })).expect("row"));
+        sender.push_patch("8", patch).expect("patch");
+        assert!(!sender.composed_coverage(&witness));
+        witness.revisions.push(Revision { entity: "ATTENTION".into(), id: entity_id, revision: "7".into(), absent: false });
+        assert!(!sender.composed_coverage(&witness));
+        witness.revisions[0].revision = "8".into();
+        assert!(sender.composed_coverage(&witness));
+        witness.revisions[0].absent = true;
+        assert!(!sender.composed_coverage(&witness), "same revision must have the relevant visible membership");
+        sender.retire();
+        assert!(!sender.composed_coverage(&witness), "retired view");
+    }
+
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn composed_history_overflow_never_promotes_a_cursor_to_proof() {
+        let (mut sender, witness) = composed_sender();
+        for _ in 0..513 {
+            sender.heartbeat().expect("heartbeat");
+            sender.ack(sender.next_seq - 1, "7").expect("ordinary ack");
+        }
+        assert!(!sender.composed_baseline(witness.from_stream_seq, &witness.from_cursor));
+    }
 
     #[derive(Clone, Default)]
     struct Sink(Arc<Mutex<Vec<UiFrame>>>);

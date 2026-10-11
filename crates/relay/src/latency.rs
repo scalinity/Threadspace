@@ -24,6 +24,8 @@ struct Record {
     observation_id: String,
     captured_ms: Option<f64>,
     status: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    phase_entry: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -62,8 +64,8 @@ fn validated(bytes: &[u8]) -> Option<ObserverBracket> {
     }
     let value: ObserverBracket = serde_json::from_slice(bytes).ok()?;
     let mut ids = std::collections::BTreeSet::new();
-    let good = value.kind == "observer-clock-bracket"
-        && value.schema_version == 1
+    let good = ((value.kind == "observer-clock-bracket" && value.schema_version == 1)
+        || (value.kind == "observer-duration-attempt" && value.schema_version == 3))
         && uuid(&value.runtime_id)
         && value.clock == "performance.now"
         && finite(value.begin_ms)
@@ -74,6 +76,7 @@ fn validated(bytes: &[u8]) -> Option<ObserverBracket> {
         && value.records.len() <= MAX_RECORDS
         && value.records.iter().all(|record| {
             uuid(&record.observation_id)
+                && (value.schema_version != 3 || record.phase_entry == Some(true))
                 && ids.insert(&record.observation_id)
                 && record
                     .captured_ms

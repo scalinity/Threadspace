@@ -303,6 +303,8 @@ pub enum UiAction {
         report_kind: String,
         report: serde_json::Value,
     },
+    /// Qualification only; parsed into the strict schema 3 request natively.
+    QualifyComposedDuration { request: serde_json::Value },
     /// Qualification builds only (G15 overlap witness): hold the office
     /// view's next same-scheme response whose path contains `path_contains`
     /// inside the shell's own `tauri://` handler, release the held response,
@@ -397,6 +399,7 @@ pub enum UiActionResult {
     QualificationReportRecorded {
         file_name: String,
     },
+    ComposedDuration { result: serde_json::Value },
     ResourceHold {
         state: serde_json::Value,
     },

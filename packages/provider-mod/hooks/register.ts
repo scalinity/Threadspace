@@ -123,10 +123,10 @@ export const register: Register = (on, options) => {
     return ownership.current()
   }
 
-  const emit = (ctx: EntryContext, phase: string, resultSequence: string | undefined, payload: () => Payload): void => {
+  const emit = (ctx: EntryContext, phase: string, resultSequence: string | undefined, payload: () => Payload, reading: number | null | undefined): void => {
     try {
       const observationId = crypto.randomUUID()
-      try { measurement?.capture(observationId) } catch { /* Optional qualification telemetry is fail-open. */ }
+      try { measurement?.capture(observationId, reading) } catch { /* Optional qualification telemetry is fail-open. */ }
       // The callback's own time: a retried record carries it unchanged, so
       // the helper rebuilds the same envelope and the journal recognizes it.
       const capturedAtMs = Date.now()
@@ -173,6 +173,7 @@ export const register: Register = (on, options) => {
     origin: Origin,
     ids: Ids,
     payload: () => Payload,
+    reading: number | null | undefined,
     owner?: Ownership,
   ): EntryContext | undefined => {
     let ctx: EntryContext
@@ -202,7 +203,7 @@ export const register: Register = (on, options) => {
     } catch {
       return undefined
     }
-    emit(ctx, 'entry', undefined, payload)
+    emit(ctx, 'entry', undefined, payload, reading)
     return ctx
   }
 
@@ -218,7 +219,7 @@ export const register: Register = (on, options) => {
     }
   }
 
-  const settle = (ctx: EntryContext | undefined, phase: string, payload: () => Payload): void => {
+  const settle = (ctx: EntryContext | undefined, phase: string, payload: () => Payload, reading = measurement?.readCapture()): void => {
     if (!ctx) return
     let resultSequence: string
     try {
@@ -226,7 +227,7 @@ export const register: Register = (on, options) => {
     } catch {
       return
     }
-    emit(ctx, phase, resultSequence, payload)
+    emit(ctx, phase, resultSequence, payload, reading)
   }
 
   // A host-read Session ID is not independent identity. Ask the native
@@ -256,6 +257,7 @@ export const register: Register = (on, options) => {
             }),
             timeoutMs: 2000,
           })
+          const proofReading = measurement?.readCapture()
           if (result.exitCode !== 0 || result.isStdoutTruncated || result.stdout.length > 16 * 1024) return
           const receipt: unknown = JSON.parse(result.stdout)
           if (receipt === null || typeof receipt !== 'object') return
@@ -271,7 +273,7 @@ export const register: Register = (on, options) => {
           ) return
           if (!ownership.sealCurrentScope(scope, proof.proofToken)) return
           const sealed = ownership.current()
-          const ctx = enter('ownership.seal', { plugin: ADAPTER_ID, tier: 'user' }, {}, () => ({}), sealed)
+          const ctx = enter('ownership.seal', { plugin: ADAPTER_ID, tier: 'user' }, {}, () => ({}), proofReading, sealed)
           settle(ctx, 'result', () => ({ proofToken: nativeId(proof.proofToken) }))
         } catch {
           // A missing helper, malformed/intercepted reply or timeout leaves
@@ -295,20 +297,24 @@ export const register: Register = (on, options) => {
     remembered?: (result: R, scope: OwnershipScope | undefined) => void,
   ): Promise<R> => {
     let result: R
+    let resultReading: number | null | undefined
     try {
       result = await run()
+      resultReading = measurement?.readCapture()
     } catch (error) {
-      settle(ctx, 'provider-error', () => ({ core: traceProof(trace()) }))
+      const errorReading = measurement?.readCapture()
+      settle(ctx, 'provider-error', () => ({ core: traceProof(trace()) }), errorReading)
       throw error
     }
     if (remembered) remember(ctx, trace, scope => remembered(result, scope))
-    settle(ctx, 'result', () => ({ ...payload(result), core: traceProof(trace()) }))
+    settle(ctx, 'result', () => ({ ...payload(result), core: traceProof(trace()) }), resultReading)
     return result
   }
 
   on('session.start', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
-    const ctx = enter('session.start', next.origin, {}, () => ({ isInteractive: e.isInteractive, surface: e.surface }))
+    const ctx = enter('session.start', next.origin, {}, () => ({ isInteractive: e.isInteractive, surface: e.surface }), entryReading)
     const settled = pass(ctx, () => next(e), () => next.trace, () => ({}))
     // Bootstrap metadata only: every read here is middleware-interceptable, so
     // the session ID they give stays at a lower tier than classic.SessionStart.
@@ -342,6 +348,7 @@ export const register: Register = (on, options) => {
   })
 
   on('classic.SessionStart', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     try {
       if (next.origin.plugin === 'engine' && next.origin.tier === 'core') ownership.changeSession(e.session_id, 'classic.SessionStart')
@@ -351,20 +358,21 @@ export const register: Register = (on, options) => {
     const ctx = enter('classic.SessionStart', next.origin, { actor: e.agent_id }, () => ({
       source: e.source,
       agentType: id(e.agent_type),
-    }))
+    }), entryReading)
     return pass(ctx, () => next(e), () => next.trace, () => ({}), (_result, scope) => {
       if (e.agent_id !== undefined) ownership.rememberActor(e.agent_id, scope)
     })
   })
 
   on('session.end', async ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ending = nativeId(e.sessionId) === ownership.getCurrentScope().sessionId ? ownership.current() : unknown
     const ctx = enter('session.end', next.origin, {}, () => ({
       reason: e.reason,
       endingSessionId: id(e.sessionId),
       resumeId: id(e.resume?.id),
-    }), ending)
+    }), entryReading, ending)
     try {
       if (ctx?.engineDispatch && ctx.ownership && ownership.scopeUnchanged(ctx.ownership)) ownership.changeSession(undefined, 'session.end')
     } catch {
@@ -388,29 +396,32 @@ export const register: Register = (on, options) => {
   })
 
   on('session.attach', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
-    const ctx = enter('session.attach', next.origin, {}, () => ({ surface: e.surface, clientId: id(e.clientId) }))
+    const ctx = enter('session.attach', next.origin, {}, () => ({ surface: e.surface, clientId: id(e.clientId) }), entryReading)
     return pass(ctx, () => next(e), () => next.trace, () => ({}))
   })
 
   on('session.detach', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('session.detach', next.origin, {}, () => ({
       surface: e.surface,
       clientId: id(e.clientId),
       reason: e.reason,
-    }))
+    }), entryReading)
     return pass(ctx, () => next(e), () => next.trace, () => ({}))
   })
 
   on('prompt.submit', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('prompt.submit', next.origin, {}, () => ({
       origin: promptOrigin(e.origin),
       activeTurnIdAtSubmission: id(e.turnId),
       wait: e.wait,
       attachmentCount: e.attachments?.length ?? 0,
-    }), original('prompt.submit', { turn: e.turnId }))
+    }), entryReading, original('prompt.submit', { turn: e.turnId }))
     return pass(ctx, () => next(e), () => next.trace, result => ({
       outcome: result.drop === undefined ? 'entered' : 'dropped',
       resultOrigin: result.drop === undefined ? promptOrigin(result.origin) : undefined,
@@ -418,23 +429,26 @@ export const register: Register = (on, options) => {
   })
 
   on('turn.start', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
-    const ctx = enter('turn.start', next.origin, { turn: e.turnId }, () => ({}))
+    const ctx = enter('turn.start', next.origin, { turn: e.turnId }, () => ({}), entryReading)
     return pass(ctx, () => next(e), () => next.trace, result => ({ echoedTurnId: id(result.turnId) }), (result, scope) => {
       if (nativeId(result.turnId) === nativeId(e.turnId)) ownership.rememberTurn(e.turnId, undefined, scope)
     })
   })
 
   on('turn.step', async function* ($, e, next) {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('turn.step', next.origin, { turn: e.turnId, actor: e.agentId }, () => ({
       index: e.index,
       messageCount: e.messageCount,
       model: id(e.model),
-    }))
+    }), entryReading)
     let isSettled = false
     try {
       const result = yield* next(e)
+      const resultReading = measurement?.readCapture()
       isSettled = true
       remember(ctx, () => next.trace, scope => {
         ownership.rememberTurn(e.turnId, e.agentId, scope)
@@ -446,25 +460,28 @@ export const register: Register = (on, options) => {
         serverToolUseCount: result.serverToolUses?.length ?? 0,
         chunksBeneath: next.trace[0]?.chunks ?? null,
         core: traceProof(next.trace),
-      }))
+      }), resultReading)
       return result
     } catch (error) {
+      const errorReading = measurement?.readCapture()
       isSettled = true
-      settle(ctx, 'provider-error', () => ({ core: traceProof(next.trace) }))
+      settle(ctx, 'provider-error', () => ({ core: traceProof(next.trace) }), errorReading)
       throw error
     } finally {
-      if (!isSettled) settle(ctx, 'abandoned', () => ({ core: traceProof(next.trace) }))
+      const abandonedReading = !isSettled ? measurement?.readCapture() : undefined
+      if (!isSettled) settle(ctx, 'abandoned', () => ({ core: traceProof(next.trace) }), abandonedReading)
     }
   })
 
   on('turn.complete', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('turn.complete', next.origin, { turn: e.turnId, actor: e.agentId }, () => ({
       reason: e.reason,
       isAborted: e.isAborted,
       durationMs: e.durationMs,
       refusalCategory: e.reason === 'refusal' ? id(e.refusal.category) : undefined,
-    }))
+    }), entryReading)
     try {
       if (ctx?.engineDispatch && !ctx.ownership) ownership.rememberTurn(e.turnId, e.agentId, undefined)
     } catch {
@@ -476,10 +493,11 @@ export const register: Register = (on, options) => {
   })
 
   on('tool.call', { tool: /^(?!(?:EnterWorktree|ExitWorktree)$)/ }, ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('tool.call', next.origin, { actor: e.agentId, occurrence: e.tool_use_id }, () => ({
       tool: id(String(e.tool)),
-    }))
+    }), entryReading)
     try {
       // Freeze the original engine dispatch's occurrence before next can
       // invoke nested tool.check/agent.spawn or outlive a Session change.
@@ -495,15 +513,17 @@ export const register: Register = (on, options) => {
   })
 
   on('tool.check', { tool: /^(?!(?:EnterWorktree|ExitWorktree)$)/ }, ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('tool.check', next.origin, { actor: e.agentId, occurrence: e.tool_use_id }, () => ({
       tool: id(String(e.tool)),
       ceiling: e.ceiling,
-    }))
+    }), entryReading)
     return pass(ctx, () => next(e), () => next.trace, result => ({ decision: result.decision }))
   })
 
   on('agent.spawn', ($, e, next) => {
+    const entryReading = measurement?.readCapture()
     delivery.bind({ run: (argv, init) => $.process.run(argv, init), after: (ms, fn) => $.clock.after(ms, fn) })
     const ctx = enter('agent.spawn', next.origin, { actor: e.parentAgentId, occurrence: e.tool_use_id }, () => ({
       subagentType: id(e.subagentType),
@@ -511,7 +531,7 @@ export const register: Register = (on, options) => {
       background: e.background,
       fork: e.fork,
       isTeammate: e.isTeammate === true,
-    }))
+    }), entryReading)
     return pass(ctx, () => next(e), () => next.trace, result => ({
       outcome: result.deny === undefined ? 'started' : 'denied',
       agentId: id(result.agentId),

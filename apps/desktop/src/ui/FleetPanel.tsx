@@ -1,4 +1,5 @@
 import type { BridgeClient, ViewState } from "../bridge/client";
+import { launch } from "../launch";
 import type { SessionView } from "../contracts/generated/SessionView";
 import { openCountText, openItemsFor } from "./attention";
 import { LINK_CONFLICT_TEXT, coverageLine, inventoryText, presenceText, turnText } from "./coverage";
@@ -46,6 +47,7 @@ export function FleetPanel({ state, client }: { state: ViewState; client: Bridge
               className={`row row--worker ${selected ? "row--selected" : ""} ${worker === "ended" ? "row--ended" : ""}`}
               data-testid="fleet-row"
               data-session-id={session.sessionId}
+              data-projection-revision={launch.qualificationBuild ? session.revision : undefined}
             >
               <button type="button" className="row__main" onClick={() => client.select(session.sessionId)} aria-current={selected ? "true" : undefined} data-testid="fleet-select">
                 <span className="row__label">

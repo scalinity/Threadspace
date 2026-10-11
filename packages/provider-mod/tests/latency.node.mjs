@@ -12,6 +12,79 @@ import { register } from '../hooks/register.ts';
 const runtime = '11111111-1111-4111-8111-111111111111';
 const token = '44444444-4444-4444-8444-444444444444';
 const argv = ['/owned/threadspace-hook', 'mod-batch', '--agent', 'ai.scalinity.threadspace.dev.agent', '--qualification-latency'];
+
+test('composed capture is the first callback operation and result has its own pre-ownership reading', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'performance');
+  let clock = 0;
+  const operations = [];
+  Object.defineProperty(globalThis, 'performance', { configurable: true, value: { now: () => { operations.push('clock'); return clock; } } });
+  try {
+    for (const [name, field] of [['turn.start', 'turnId'], ['session.attach', 'surface']]) {
+      const handlers = new Map();
+      const fixture = backend(async ({ body }, state) => {
+        if (body.kind === 'observer-duration-attempt') { state.saved.push(body); return result({ accepted: true }); }
+      });
+      register((name, options, handler) => handlers.set(name, handler ?? options), { captureArgv: [...argv, '--qualification-composed-duration'] });
+      const event = { get [field]() { operations.push('entry-ownership'); clock += 50; return 'turn'; } };
+      const original = { get turnId() { operations.push('result-ownership'); clock += 50; return 'turn'; } };
+      const next = Object.assign(async input => { assert.equal(input, event); clock = 200; return original; }, { origin: { plugin: 'engine', tier: 'core' }, trace: [{ plugin: 'engine', tier: 'core', outcome: 'returned' }] });
+      clock = 10; operations.length = 0;
+      const returned = await handlers.get(name)({ process: { run: fixture.io.run }, clock: { after: fixture.io.after } }, event, next);
+      assert.equal(returned, original);
+      assert.equal(operations[0], 'clock', 'before entry context and UUID work');
+      if (name === 'turn.start') assert.ok(operations.indexOf('result-ownership') > operations.indexOf('clock', 1), 'result read precedes result ownership preparation');
+      fixture.timers.find(timer => timer.ms === 0).callback();
+      await ticks();
+      const attempt = fixture.saved.find(body => body.kind === 'observer-duration-attempt');
+      assert.deepEqual(attempt.records.map(r => r.capturedMs), [10, 200]);
+      assert.ok(attempt.records.every(r => r.phaseEntry === true));
+      assert.equal(attempt.schemaVersion, 3);
+    }
+  } finally { Object.defineProperty(globalThis, 'performance', descriptor); }
+});
+
+test('composed ownership proof retains its capture reading and explicit sealed scope', async () => {
+  const handlers = new Map();
+  const fixture = backend(async ({ argv: actual, body }, state) => {
+    if (actual.includes('observer-proof')) return result({ ...body, protocolVersion: 1, status: 'COMMITTED', proofToken: token });
+    if (body.kind === 'observer-duration-attempt') { state.saved.push(body); return result({ accepted: true }); }
+  });
+  register((name, options, handler) => handlers.set(name, handler ?? options), { captureArgv: [...argv, '--qualification-composed-duration'] });
+  const event = { isInteractive: true, surface: 'terminal' };
+  const next = Object.assign(async input => input, { origin: { plugin: 'engine', tier: 'core' }, trace: [{ plugin: 'engine', tier: 'core', outcome: 'returned' }] });
+  await handlers.get('session.start')({ process: { run: fixture.io.run }, clock: { after: fixture.io.after }, session: { id: async () => 'Session-A', version: async () => 'fixture' } }, event, next);
+  await ticks();
+  fixture.timers.find(timer => timer.ms === 0).callback();
+  await ticks();
+  const records = fixture.calls.filter(call => call.argv[1] === 'mod-batch').flatMap(call => call.body.records);
+  const seals = records.filter(record => record.nativeEvent === 'ownership.seal');
+  assert.equal(seals.length, 2);
+  assert.ok(seals.every(record => record.sessionId === 'Session-A' && record.ownershipStatus === 'HOST_READ' && record.ownershipProofToken === token));
+  const measured = fixture.saved.filter(body => body.kind === 'observer-duration-attempt').flatMap(body => body.records);
+  for (const seal of seals) assert.equal(measured.find(row => row.observationId === seal.observationId)?.phaseEntry, true);
+});
+
+test('composed retries preserve UUID, original reading, source epoch and every failed attempt', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'performance');
+  let clock = 10;
+  Object.defineProperty(globalThis, 'performance', { configurable: true, value: { now: () => clock } });
+  try {
+    const measurement = createLatencyMeasurement([...argv, '--qualification-composed-duration'], runtime);
+    const saved = [];
+    const io = { run: async (_argv, init) => { saved.push(JSON.parse(init.stdin)); return result({ accepted: true }); }, after: () => ({ cancel() {} }) };
+    measurement.capture(id(0), measurement.readCapture());
+    const failed = measurement.begin([id(0)]); clock = 20;
+    await measurement.end(io, failed, undefined, undefined);
+    clock = 30;
+    const retry = measurement.begin([id(0)]); clock = 40;
+    await measurement.end(io, retry, batchResult, new Map([[id(0), 'ALREADY_COMMITTED']]));
+    assert.deepEqual(saved.map(s => [s.runtimeId, s.records[0].observationId, s.records[0].capturedMs, s.records[0].status]),
+      [[runtime, id(0), 10, 'UNKNOWN'], [runtime, id(0), 10, 'ALREADY_COMMITTED']]);
+    assert.deepEqual(saved.map(s => s.endMs), [20, 40]);
+    clock = 1;
+    assert.equal(measurement.readCapture(), null, 'a reset cannot be silently rebased');
+  } finally { Object.defineProperty(globalThis, 'performance', descriptor); }
+});
 const id = index => `22222222-2222-4222-8222-${index.toString(16).padStart(12, '0')}`;
 const result = body => ({ exitCode: 0, stdout: JSON.stringify(body), stderr: '', isStdoutTruncated: false, isStderrTruncated: false });
 const batchResult = result({ qualificationClock: { token } });

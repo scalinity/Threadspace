@@ -54,6 +54,13 @@ const TRANSIENT_LIMIT: usize = 32;
 const PATCH_UPSERT_BUDGET: usize = FRAME_MAX_BYTES - 4096;
 
 pub enum WriterCommand {
+    #[cfg(feature = "qualification")]
+    ComposedDuration {
+        connection_id: u64,
+        request_id: u64,
+        request: threadspace_contracts::composed::Request,
+        outbound: Outbound,
+    },
     AttachView {
         connection_id: u64,
         request_id: u64,
@@ -234,6 +241,8 @@ pub enum WriterCommand {
 }
 
 struct View {
+    #[cfg(feature = "qualification")]
+    composed: Option<crate::composed::Run>,
     connection_id: u64,
     outbound: Outbound,
     hydrated: bool,
@@ -409,6 +418,13 @@ impl Writer {
     ) -> Result<Vec<RecordReceipt>, JournalError> {
         let outcome = self.journal.admit_batch(admissions, delivery, log::now_ms())?;
         #[cfg(feature = "qualification")]
+        let projection_requirements = outcome.change.as_ref().and_then(|change| self.journal.patch_for(self.last_cursor, change).ok()).map(|patch| json!({
+            "toCursor": patch.to_cursor,
+            "sessionUpserts": patch.session_upserts.iter().map(|r| json!({"sessionId":r.session_id,"revision":r.revision})).collect::<Vec<_>>(),
+            "attentionUpserts": patch.attention_upserts.iter().map(|r| json!({"attentionId":r.attention_id,"revision":r.revision,"resolvedAtMs":r.resolved_at_ms})).collect::<Vec<_>>(),
+            "tombstones": patch.tombstones,
+        }));
+        #[cfg(feature = "qualification")]
         for record in &outcome.records {
             let envelope = admissions.iter().find(|item| item.envelope.observation_id == record.observation_id).map(|item| item.envelope);
             log::info("M2_COMMITTED_MEASUREMENT", json!({
@@ -419,6 +435,7 @@ impl Writer {
                 "cursor": record.cursor.map(|c| c.to_string()),
                 "status": record.status,
                 "commit": outcome.commit_timing,
+                "projectionRequirements": projection_requirements,
                 "bootId": threadspace_surfaces_macos::process::boot_session_id().ok(),
                 "patchCursor": outcome.change.as_ref().map(|change| change.cursor.to_string()),
                 "storeGeneration": self.journal.store_generation(),
@@ -640,6 +657,21 @@ impl Writer {
 
     fn handle(&mut self, command: WriterCommand) {
         match command {
+            #[cfg(feature = "qualification")]
+            WriterCommand::ComposedDuration { connection_id, request_id, request, outbound } => {
+                let result = self.views.get_mut(&request.context().subscription_id)
+                    .filter(|view| view.connection_id == connection_id && view.hydrated)
+                    .ok_or_else(|| ControlError::new(ControlErrorCode::UnknownSubscription, "stale composed subscription"))
+                    .and_then(|view| {
+                        if request.context().store_generation != self.journal.store_generation() || RUNTIME.asleep() {
+                            return Err(ControlError::new(ControlErrorCode::StaleGeneration, "store or suspend discontinuity"));
+                        }
+                        let power = RUNTIME.power();
+                        crate::composed::apply(&mut view.composed, &request, &self.identity.boot_id, power.sleeps, power.wakes, crate::composed::native_ns)
+                    });
+                log::info("M2_COMPOSED_DOM_MEASUREMENT", json!({ "request":request, "result":result.as_ref().ok(), "error":result.as_ref().err() }));
+                respond(&outbound, request_id, result.map(|result| ControlResponseBody::ComposedDuration { result }));
+            }
             WriterCommand::AttachView {
                 connection_id,
                 request_id,
@@ -673,6 +705,8 @@ impl Writer {
                         self.views.insert(
                             subscription_id,
                             View {
+                                #[cfg(feature = "qualification")]
+                                composed: None,
                                 connection_id,
                                 outbound,
                                 hydrated: false,
@@ -2139,6 +2173,8 @@ mod tests {
         rig.writer.views.insert(
             "view".to_owned(),
             View {
+                #[cfg(feature = "qualification")]
+                composed: None,
                 connection_id: 1,
                 outbound: view,
                 hydrated: true,

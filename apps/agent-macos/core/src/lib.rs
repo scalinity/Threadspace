@@ -12,6 +12,8 @@
 //!   responses into the core.
 
 mod adapters;
+#[cfg(feature = "qualification")]
+mod composed;
 mod bridge;
 mod discovery;
 mod events;

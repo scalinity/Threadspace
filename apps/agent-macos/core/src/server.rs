@@ -291,6 +291,17 @@ fn dispatch(
     let request_id = request.request_id;
     let outbound_clone = outbound.clone();
     match request.body {
+        #[cfg(feature = "qualification")]
+        ControlRequestBody::QualifyComposedDuration { request } => {
+            if role != ClientRole::Ui || request.context().core_generation != context.core_generation
+                || request.context().store_generation != context.store_generation {
+                refuse(outbound, request_id, ControlErrorCode::StaleGeneration, "composed request requires the current native UI connection");
+            } else {
+                to_writer(context, outbound, request_id, WriterCommand::ComposedDuration {
+                    connection_id, request_id, request, outbound: outbound_clone,
+                });
+            }
+        }
         ControlRequestBody::Hello { .. } => {
             respond(
                 outbound,

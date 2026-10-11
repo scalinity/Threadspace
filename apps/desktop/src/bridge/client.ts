@@ -205,6 +205,8 @@ export class BridgeClient {
    */
   readonly faults = { dropFrames: "none" as "none" | "next" | "all", withholdAcks: false, ackDelayMs: 0, stallNext: false, dropped: 0 };
   private qualificationHandler: QualificationHandler | null = null;
+  private composedFrame: ((header: FrameHeader, patch: ProjectionPatch | null) => void) | null = null;
+  private composedHydration: ((kind: string, through: string) => void) | null = null;
   private pagingEpoch: string | null = null;
   /** Intents this view applied, across resubscriptions; one is never applied twice. */
   private readonly appliedIntentIds: string[] = [];
@@ -215,6 +217,22 @@ export class BridgeClient {
   };
 
   readonly getSnapshot = (): ViewState => this.state;
+
+  qualificationComposedListeners(frame: (header: FrameHeader, patch: ProjectionPatch | null) => void,
+    hydration: (kind: string, through: string) => void): void {
+    if (!launch.qualificationBuild) return;
+    this.composedFrame = frame;
+    this.composedHydration = hydration;
+  }
+
+  /** No report queue: preserve the DOM-time context through the native call. */
+  async qualificationComposed(request: unknown, context: UiCallContext): Promise<unknown> {
+    if (!launch.qualificationBuild) throw new Error("qualification build required");
+    const result = await ipc.action({ action: { kind: "QualifyComposedDuration", request: request as never },
+      context: { ...context }, expectedRevision: null, requestId: crypto.randomUUID() });
+    if (result.kind !== "ComposedDuration") throw new Error("missing composed receipt");
+    return result.result;
+  }
 
   private set(partial: Partial<ViewState>): void {
     this.state = { ...this.state, ...partial };
@@ -434,6 +452,7 @@ export class BridgeClient {
     active.expectedSeq += 1;
     const stream = { ...this.state.stream, lastSeq: header.streamSeq, lastFrameAtMs: performance.now(), framesApplied: this.state.stream.framesApplied + 1 };
     const body = frame.body;
+    try { this.composedFrame?.(header, body.kind === "ProjectionPatch" ? body.patch : null); } catch { /* optional evidence cannot change application */ }
     switch (body.kind) {
       case "SnapshotBegin":
         if (active.hydrated || active.staging) return this.reconnect("unexpected snapshot");
@@ -516,6 +535,8 @@ export class BridgeClient {
    */
   private async pageFrom(kind: "FleetPage" | "AttentionPage", after: string | null): Promise<void> {
     const epoch = this.active?.viewEpoch;
+    const requestedThrough = this.state.cursor;
+    let hydratedThrough = requestedThrough;
     let next = after;
     while (epoch && this.active?.viewEpoch === epoch && this.pagingEpoch === epoch) {
       let raw: unknown;
@@ -530,6 +551,7 @@ export class BridgeClient {
         return;
       }
       const parsed = parsePage(raw);
+      if (compareCursors(parsed.page.viewRevision, hydratedThrough) < 0) hydratedThrough = parsed.page.viewRevision;
       const newer = <T extends { revision: string }>(current: T | undefined, row: T) =>
         current === undefined || compareCursors(row.revision, current.revision) >= 0;
       if (parsed.kind === "FleetPage") {
@@ -544,6 +566,7 @@ export class BridgeClient {
       this.set({ paging: { ...this.state.paging, pagesLoaded: this.state.paging.pagesLoaded + 1 } });
       next = parsed.page.nextAfter;
       if (next === null) {
+        try { this.composedHydration?.(kind === "FleetPage" ? "SESSION" : "ATTENTION", hydratedThrough); } catch { /* fail open */ }
         this.recordQualificationReport("paging-complete", {
           kind,
           viewEpoch: epoch,

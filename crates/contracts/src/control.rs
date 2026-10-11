@@ -36,6 +36,8 @@ pub struct ControlRequest {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all_fields = "camelCase", deny_unknown_fields)]
 pub enum ControlRequestBody {
+    #[cfg(feature = "qualification")]
+    QualifyComposedDuration { request: crate::composed::Request },
     /// Must be the first request. `expected_core_generation` comes from the
     /// owner-only runtime locator; a mismatch means a stale locator.
     Hello {
@@ -206,6 +208,8 @@ pub enum ControlRequestBody {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all_fields = "camelCase")]
 pub enum ControlResponseBody {
+    #[cfg(feature = "qualification")]
+    ComposedDuration { result: serde_json::Value },
     HelloAck {
         protocol_version: u32,
         core_generation: String,

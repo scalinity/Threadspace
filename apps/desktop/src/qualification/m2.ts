@@ -8,6 +8,7 @@
 import type { BridgeClient, ViewState } from "../bridge/client";
 import type { ExtraHandler } from "./commands";
 import { LatencyStore, type LatencyContext } from "./latencyStore";
+import { ComposedDomStore, renderedRevisions, type ComposedContext } from "./composedDuration";
 
 /** Longer than any Return's two-second budget plus the companion round trip. */
 const RESULT_TIMEOUT_MS = 10_000;
@@ -241,9 +242,49 @@ function latencyMarks(client: BridgeClient): LatencyStore {
 /** The M2 extra handler: `m2-fleet`, `m2-select`, `m2-press-return`, `m2-press-mark-handled`, `m2-latency`. */
 export function m2Commands(client: BridgeClient): ExtraHandler {
   const marks = latencyMarks(client);
+  const composed = new ComposedDomStore();
+  let pending: Promise<void> | null = null;
+  const appliedDom = () => {
+    const state = client.getSnapshot();
+    const witness = composed.witness(state, renderedRevisions(state, document), document.visibilityState === "visible");
+    if (!witness) return;
+    pending = client.qualificationComposed({ op: "Witness", witness }, witness.context)
+      .then(reply => composed.receipt(witness, reply), () => composed.lost())
+      .finally(() => { pending = null; appliedDom(); });
+  };
+  client.qualificationComposedListeners((header, patch) => composed.frame(header, patch), (kind, through) => composed.hydrated(kind, through));
+  const composedObserver = new MutationObserver(appliedDom);
+  composedObserver.observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true,
+    attributeFilter: ["data-projection-revision", "data-count", "data-state", "data-needs-attention", "data-awaiting-action"] });
+  document.addEventListener("visibilitychange", () => { if (composed.status().context) composed.fail(); });
   return (command, args) => {
     const input = (args ?? {}) as Record<string, unknown>;
     switch (command) {
+      case "m2-composed-start":
+        return (async () => {
+          const state = client.getSnapshot();
+          if (state.phase !== "live" || !state.connection || document.visibilityState !== "visible"
+            || state.sessions.length !== state.paging.totalSessions
+            || state.attention.filter(row => row.resolvedAtMs === null).length !== state.paging.totalAttention) throw new Error("composed measurement requires completed visible hydration");
+          const context: ComposedContext = { runId: crypto.randomUUID(), domRuntimeId: crypto.randomUUID(),
+            nativeIncarnation: "00000000-0000-0000-0000-000000000000", ...state.connection };
+          composed.start(context, state.cursor, state.stream.lastSeq);
+          const result = await client.qualificationComposed({ op: "Start", context, cursor: state.cursor, streamSeq: state.stream.lastSeq }, context) as { kind: string; schemaVersion: number; context: ComposedContext; cursor: string; streamSeq: number };
+          if (result.kind !== "composed-duration-start" || result.schemaVersion !== 3 || result.cursor !== state.cursor || result.streamSeq !== state.stream.lastSeq) { composed.fail(); throw new Error("unbound composed start"); }
+          composed.issuedContext(result.context);
+          appliedDom();
+          return { status: composed.status(), nativeStart: result };
+        })();
+      case "m2-composed-status":
+        return Promise.resolve(composed.status());
+      case "m2-composed-stop":
+        return (async () => {
+          if (pending) await pending;
+          const request = composed.close();
+          if (!request.context) throw new Error("no composed run");
+          const receipt = await client.qualificationComposed(request, request.context);
+          return { status: composed.status(), nativeCensus: receipt };
+        })();
       case "m2-latency": {
         return Promise.resolve(marks.page(Number(input.offset ?? 0), Number(input.limit ?? 100)));
       }

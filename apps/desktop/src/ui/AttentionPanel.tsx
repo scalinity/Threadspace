@@ -1,4 +1,5 @@
 import type { BridgeClient, ViewState } from "../bridge/client";
+import { launch } from "../launch";
 import { awaitingAction, categoryText, needsAttention } from "./attention";
 
 /** Outstanding items only: a resolved item stays in the projection but leaves this list. */
@@ -6,7 +7,9 @@ export function AttentionPanel({ state, client }: { state: ViewState; client: Br
   const needs = needsAttention(state.attention);
   const awaiting = awaitingAction(state.attention);
   return (
-    <section className="panel" aria-labelledby="attention-heading">
+    <section className="panel" aria-labelledby="attention-heading" data-testid="attention-panel"
+      data-needs-attention={launch.qualificationBuild ? state.counts.needsAttention : undefined}
+      data-awaiting-action={launch.qualificationBuild ? state.counts.awaitingAction : undefined}>
       <h2 id="attention-heading" className="panel__title">Attention</h2>
       <p className="panel__subtitle">
         {state.counts.needsAttention} need attention · {state.counts.awaitingAction} awaiting action
@@ -18,6 +21,7 @@ export function AttentionPanel({ state, client }: { state: ViewState; client: Br
             className={`row ${state.inspector?.attentionId === item.attentionId ? "row--selected" : ""}`}
             data-testid="attention-row"
             data-attention-id={item.attentionId}
+            data-projection-revision={launch.qualificationBuild ? item.revision : undefined}
           >
             <button type="button" className="row__main" onClick={() => client.openAttention(item.attentionId)} data-testid="attention-open">
               <span className="row__label">{categoryText(item.category)}</span>

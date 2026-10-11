@@ -429,6 +429,40 @@ pub async fn ui_action<R: Runtime>(
             }
         }
         #[cfg(feature = "qualification")]
+        UiAction::QualifyComposedDuration { request: raw } => {
+            use threadspace_contracts::composed::{Request, valid_context, valid_witness};
+            let mut measurement: Request = parse_request(raw)?;
+            // Start issues the actual native incarnation. Later messages carry
+            // that immutable issued identity, never today's replacement context.
+            if let Request::Start { context, .. } = &mut measurement {
+                context.native_incarnation = incarnation.to_string();
+            }
+            let context = measurement.context();
+            if !valid_context(context) || context.native_incarnation != incarnation.to_string()
+                || context.subscription_id != subscription.id || context.view_epoch != subscription.view_epoch
+                || context.core_generation != subscription.core_generation || context.store_generation != subscription.store_generation {
+                return Err(UiError::new(UiErrorCode::StaleContext, "composed witness context changed"));
+            }
+            {
+                let stream = subscription.stream.lock().map_err(|_| UiError::invalid("stream lock"))?;
+                let covered = match &measurement {
+                    Request::Start { cursor, stream_seq, .. } => stream.composed_baseline(*stream_seq, cursor),
+                    Request::Witness { witness } => valid_witness(witness) && stream.composed_coverage(witness),
+                    Request::Close { .. } => !stream.is_retired() && stream.is_hydrated(),
+                };
+                if !covered { return Err(UiError::invalid("missing contiguous hydrated DOM coverage")); }
+            }
+            let reply = link.request(ControlRequestBody::QualifyComposedDuration { request: measurement }, QUICK).await.map_err(link_error)?;
+            // Losing the view during the native round trip leaves incomplete
+            // evidence even if the companion retained the actual late stamp.
+            if !bridge.views.is_active(incarnation) { return Err(UiError::new(UiErrorCode::StaleContext, "composed view retired during acknowledgement")); }
+            bridge.validate_context(incarnation, &request.context)?;
+            match reply {
+                ControlResponseBody::ComposedDuration { result } => UiActionResult::ComposedDuration { result },
+                _ => return Err(UiError::invalid("unexpected composed receipt")),
+            }
+        }
+        #[cfg(feature = "qualification")]
         UiAction::RecordQualificationReport {
             report_kind,
             report,
