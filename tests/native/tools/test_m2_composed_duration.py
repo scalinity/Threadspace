@@ -1,33 +1,21 @@
 import copy
 import unittest
 from m2_composed_duration import analyze, METHOD
-from m2_duration_conformance import qualify, POLICY, canonical_hash
+from m2_socket_duration import qualify, make_profile, artifact_identity, IDENTITY_KEYS
+from test_m2_socket_duration import fixture as conformance, record
 from test_m2_latency import fixture as legacy, BOOT, EPOCH, TOKEN, OBSERVER, BASE
 
 ENTITY = "00000000-0000-4000-8000-000000000010"
 WITNESS = "00000000-0000-4000-8000-000000000011"
 
 
-def conformance():
-    rows, start = [], 0
-    for delay in POLICY["requestedDelaysMs"]:
-        readings = [start + k * .001 for k in range(256)]
-        c, r = start + 1, start + 1 + delay + 20
-        native = lambda ms: {"nativeNs": str(BASE + round(ms * 1e6)), "bootId": BOOT, "clock": "CLOCK_UPTIME_RAW"}
-        rows.append({"requestedDelayMs": delay, "readings": readings + [c, r], "captureLower": native(c - .001), "captureUpper": native(c + .001), "endLower": native(r - .001), "endUpper": native(r + .001)})
-        start = r + 1
-    return {"complete": True, "first": 0, "wrapper": "() => guarded(helpers.now)()", "rows": rows,
-        "bootBefore": BOOT, "bootAfter": BOOT, "powerDiscontinuity": False}
-
-
 def fixture():
     raw = legacy()
     raw.update(schemaVersion=3, method=METHOD, suspendDiscontinuity=False)
     check = conformance()
-    profile = {**qualify(check), "providerSha256": "synthetic-provider", "adapterSha256": "synthetic-adapter", "osBuild": "synthetic-build",
-        "bootId": BOOT, "conformanceSha256": canonical_hash(check), "policySha256": canonical_hash(POLICY)}
+    profile = make_profile(check)
     raw.update(instrumentProfile=profile, conformance=check,
-        artifactIdentity={"observerAdapterSha256": profile["adapterSha256"], "providerSha256": profile["providerSha256"]})
+        artifactIdentity=artifact_identity(check))
     raw["helperRecords"][1].update(runtimeId=EPOCH, requestObservationIds=[r["observationId"] for r in raw["helperRecords"][2]["records"]])
     raw["helperRecords"][2].update(kind="observer-duration-attempt", schemaVersion=3)
     for r in raw["helperRecords"][2]["records"]: r["phaseEntry"] = True
@@ -46,6 +34,18 @@ def fixture():
 
 
 class ComposedControls(unittest.TestCase):
+    def test_profile_and_artifact_changed_together_cannot_relabel_conformance(self):
+        for key in IDENTITY_KEYS:
+            raw = fixture()
+            raw['instrumentProfile'][key] = raw['artifactIdentity'][key] = 'substituted-together'
+            result = analyze(raw)
+            self.assertFalse(result['metricsQualified'], key)
+            self.assertTrue(all(count == 0 for metrics in result['qualifiedSampleCounts'].values() for count in metrics.values()), key)
+            record('composed-calculator-identity-'+key, {'metricsQualified':result['metricsQualified'], 'qualifiedSampleCounts':result['qualifiedSampleCounts'], 'errors':result['errors']})
+        raw = fixture()
+        raw['instrumentProfile']['policySha256'] = raw['artifactIdentity']['policySha256'] = 'old-policy'
+        self.refuse(raw)
+
     def refuse(self, raw, text=None):
         result = analyze(raw)
         self.assertFalse(result["normalPathPass"], result)

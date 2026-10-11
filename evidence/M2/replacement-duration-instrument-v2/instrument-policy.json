@@ -1,0 +1,29 @@
+{
+  "instrument": "m2-http-unix-uptime-v2",
+  "version": 2,
+  "requestedDelaysMs": [0, 25, 50, 100, 200, 250, 405],
+  "conditions": ["quiet", "background"],
+  "positiveAttempts": 1,
+  "totalRows": 14,
+  "maximumDurationMs": 400,
+  "maximumEnclosureMs": 10,
+  "observerAdditiveMs": 10,
+  "residualGuardMs": 1,
+  "zeroUpperMs": 20,
+  "boundaryLowerMs": 400,
+  "boundaryUpperMs": 425,
+  "maximumStepMs": 1,
+  "nativeAdditiveMs": 0.001,
+  "outwardStepMs": 0.001,
+  "externalDeadlineSeconds": 20,
+  "cleanupGraceSeconds": 3,
+  "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+  "background": {
+    "ticks": 256,
+    "operationsPerTick": 2048,
+    "intervalMs": 5,
+    "start": "before-first-clock-reading",
+    "operation": "x = ((x ^ i) * 1664525 + 1013904223) >>> 0",
+    "ownership": "qualification-mod-local-memory-and-clock-timers-only"
+  }
+}

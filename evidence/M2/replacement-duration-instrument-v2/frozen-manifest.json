@@ -1,0 +1,423 @@
+{
+  "baseSha": "b5c9e030d238018632979f2242631c4770b17169",
+  "controlLogSha256": "6157525567e276ab265e9c5b3e33e4e27b6d07355c704a9a821103462a9fa9ce",
+  "controlOutputSha256": "e4bef6eef508ae07e846a3b9e501b0ce26a0ddffe180dd58b4ad504b50c779b0",
+  "controlSources": {
+    "test_m2_composed_duration.py": "6ffd1dd161bdd2e4b95f18d93d446cff92599a0dd15f7c95bb8079fab60d6bd5",
+    "test_m2_latency.py": "c9994f84b432fbf2447522f8d6de89b29fab5421f138bacbd2a0888ca5df3ec5",
+    "test_m2_socket_duration.py": "32fd4fa0db2d4106b6aaf86ec62fa58c4075d342824f6e45d3861ed29968fcfe"
+  },
+  "frozenAtUtc": "2026-10-11T05:07:00.378262+00:00",
+  "identities": {
+    "adapterSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+    "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+    "calculatorSha256": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+    "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+    "collectorSha256": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+    "evaluatorSha256": "6c467eac263d62fbde5e8c808a950270381074c348996d323cce395f4a4d3400",
+    "nativeClock": "CLOCK_UPTIME_RAW",
+    "observerClock": "performance.now",
+    "osBuild": "26B5101f",
+    "policyFileSha256": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+    "policySha256": "ab51d8b1d3f04950e123b4dc6a16858e51f8cc522ce1155032602352931f7c3a",
+    "probeSha256": "3fc661869696a5435e8c98c2aba434e09e2e84ec6bbf3a32865b915631d8218e",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "responderExecutableSha256": "de8e3bf32cb5a1685077d276c5963bce3a6e1faca195431d292988ee197a2152",
+    "responderId": "bd2c793e-2847-4949-af58-1503ae3f230e",
+    "responderSourceSha256": "5840862316271b69fcc0a548d641d411ef25110ca5b895ca9dafea98497acad2",
+    "runId": "4a23b08a-239f-450f-8ec9-4f0a23453e43",
+    "runnerSha256": "e8dc1178021c5afe4e191958aab42e88820f175c6b042a770ca5927c5c72dac8"
+  },
+  "plan": [
+    {
+      "challenge": "249726255b354d95b6db85f7ffb05414587f70e34361476e86d549f53d352271",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 0,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "6fb37ed0906b42ceae1a1f1a61969fb56398612381924fe6beb5780ee0bb7491",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 1,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "4d869283cb7e4e2f91599ddc209beaf6619a39d19c8c4203ae5a555af46efcf6",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 2,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "def1b114b417499ca845898b3cb86b2cda6e4b2c9df04528b10ebc7131091ff7",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 3,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "964d76aa1cd64f2c9612f794084b1e02f793b824b7d44fc497987b1318ec7cac",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 4,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "d5c5337e94e34460967cd2999be16eff719ca16afc364aba85ba6d9a5811fbe8",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 5,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "cca9622890654f1b8e2be9584d3392ec8bd0325779ac4122b62908049563ef2f",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 6,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "429828861adc455b9caeff41f3e52392bcf63aefb8644add95925ebfeca2b5cc",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 7,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "c7219a3b876a48c6a488cffbc43288f5e04e1fe287a1462c892afbfefe4bca53",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 8,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "7f21b78764aa4b26ad5a412137a1a994a000e7dd4ecd4a6d9cb96db00981b2af",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 9,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "9f4c6417e33842c1a92da5e95ecbb265f216392512874c3b9edf63550125a0a8",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 10,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "02ac979a84404e21a23c68eb6f3853a7d9c9ce36ade642fa8b20b3a0deb15984",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 11,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "c8a6c01f6feb49dd931bddfcecd531d4246c9f390f1e41ad9e70e2959a83c626",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 12,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "9111a93fa35f4e40ac7b9abaaac6ba8f5352ab807da6432497790ba4cb9bfd8f",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 13,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "db64b5990d6b40a79a76ed3c35529741028cc6e005d545edb2b8f9b8faa748d9",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 14,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "a314b298253b4182986a2d40360544d10c9bd2ed9a8b4feab17160afa6b31f74",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 15,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "40c074f179584f2f844c3d6fbab6a63d4305c07395534d1ebd45d4dd7f6340c9",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 16,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "f8678b739440494f957e28062b2a3338d5f73e1e169b4a2780e41fccff821785",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 17,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "3c99381999a14124aa628523061d241e84f45a7fa25c42898ca1d9695c7c2271",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 18,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "1550c1a0bebd430196fbf25d827143b93620f744c2d7459e918e9768b8e8f5dd",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 19,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "b85a1c45973645a29da5e15ef6654591b8737c2dd21c4c348ddc38acc41a6cd1",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 20,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "f5445696c12b49bb99acb6214567325d410fd5388b154c23b06ef43ab89b9686",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 21,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "c75624fbbe914cfe96924284d7c9e2e6a71433d3cb6341aa934e9e3b9342298e",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 22,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "8e6c75bfa9d0424e8f676d6a679985a6f98aaf90ae2b46ea89a987924b2f6e77",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 23,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "2b579e5c3f4f44debc54c6086cedda5188f5f9f2197047c8b25795e138dd9424",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 24,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "ae123c3c354646dc8b02deebe114825e9a9b40006995432388b7e33d06ce6f96",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 25,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "a632d09e205843a4b3a3dcc33063be2f1c519706c3a942379f5c18a9699b6348",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 26,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "c1916ee3e9ae4654ab7bfeb894a303f7ff525b3cb23b44288f3d55357eddf331",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sequence": 27,
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "challenge": "0e5124c9302c46d591fac33120a732e2f710a7dd0e814e48a517bb3deb662bf2",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 28,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "ee11abdbb9864c9588e869492ce8a0674445e273d5cd48419a39ff5001f20bd5",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 29,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "18bdeb1e55564776854063002ce04fa36b5c59d4fb5d41ddb72e978d66c3caaf",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 30,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "2a4d9c2ab39144288d1a1b87ad17a73b2429d482eed843068cb8ddf847f38dc7",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 31,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "673cb77a331e43e18c15579156d21999d14a3028ab8a4450ae86b013c5a7078f",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 32,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "1bde6fb825814b61a8051eea173d130f26f67944c00047c9907a11095b12977c",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 33,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "704fb917bda74118884292435915590dc5d3554dfbd741a9a3cbf38b5732df28",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 34,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "a43f7e9981294c5ebdf4a559c15572c6121d25d5a87842458f4cf9ebe778dbea",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 35,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "3a5712e18b7745769803912c061825cc924c0ef6598242609db087ebc6f5f2b6",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 36,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "96a816c09e6a4c35be4d1bb6233ba94880353c9ac51d434f851246cf6e742cf8",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 37,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "fb03104617ae4e8d9b75e3af6849750d5f7005e9e63b47b989305a63d81a22d7",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 38,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "8e4aa4888f3b41caaa609e534bb0d849e9e5bbf04c3b4fa4af1dde94565e9bb5",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 39,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "f665424b9cc84179a5598ef48eabec51b305cabae73b4afb8caa1fa018d6b0c3",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 40,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "7e7c152b5192437e8ab718858ef3c8a006eb3cc760b64c4d971ce72066a4f505",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 41,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "c283ad996d3b4ce29b24bd2e5f0dbf11a35cca005fc24a0cbf4c6513047a1bc7",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 42,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "84ecd2955cdb437aa6961c7234c1ae779345cbc7261c4a099939b8a1d342f4c0",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 43,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "fc5647305e6f49d4bc28a439dd0224ccbe584d8e85d648749fd7cd432eecb390",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 44,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "3031578b04084631bd6ae3a0be686b64db5b4109769c4267ba2cf03c0297d551",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 45,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "9976a1b1252e43f1b1a0c12484c3ed383adf412a7d0e4961bada9e7e31afb221",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 46,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "293f9ccff26a4c62a36d6d0baac53e0544745a40ef424810aa90341e55785c73",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 47,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "1c8afc87b94642b796f3e7182ebfc393bb212142cf944073a60c829c5cd3a74a",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 48,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "b375e3bd56ea49b79bb203799e8444b6d30d67f989be4f7ca16c2ba136f2e76b",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 49,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "874e460fcf0243c0a3c74c994d5a3da0fa10a2f16c06415eb2afbd1b533c1c2a",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 50,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "4fef867060ff40d5975fcf68386901e3efc9776ff7a344ec9bfc1971425d3322",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 51,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "c7c820951df24ef4be4051027db2b4cfdcc084f088474553adb2a32824f31a42",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 52,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "5efd21d43f7947178d02cdb53d8da9521e4bbcd5658944e0a6b4d0a1053a44bc",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 53,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "6c8dfc86a0504665b1ce5e03c3028118b005c5623b6d4956b2250c9a15843a50",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 54,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    },
+    {
+      "challenge": "92592a1fda084f0ebfcc877fe237651cd401b9f44c5f4a0caf9915178e594a58",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sequence": 55,
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    }
+  ],
+  "policy": {
+    "background": {
+      "intervalMs": 5,
+      "operation": "x = ((x ^ i) * 1664525 + 1013904223) >>> 0",
+      "operationsPerTick": 2048,
+      "ownership": "qualification-mod-local-memory-and-clock-timers-only",
+      "start": "before-first-clock-reading",
+      "ticks": 256
+    },
+    "boundaryLowerMs": 400,
+    "boundaryUpperMs": 425,
+    "cleanupGraceSeconds": 3,
+    "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+    "conditions": [
+      "quiet",
+      "background"
+    ],
+    "externalDeadlineSeconds": 20,
+    "instrument": "m2-http-unix-uptime-v2",
+    "maximumDurationMs": 400,
+    "maximumEnclosureMs": 10,
+    "maximumStepMs": 1,
+    "nativeAdditiveMs": 0.001,
+    "observerAdditiveMs": 10,
+    "outwardStepMs": 0.001,
+    "positiveAttempts": 1,
+    "requestedDelaysMs": [
+      0,
+      25,
+      50,
+      100,
+      200,
+      250,
+      405
+    ],
+    "residualGuardMs": 1,
+    "totalRows": 14,
+    "version": 2,
+    "zeroUpperMs": 20
+  },
+  "runtimePlan": [
+    {
+      "condition": "quiet",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "condition": "background",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    }
+  ]
+}

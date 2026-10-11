@@ -15,7 +15,7 @@ import uuid
 from pathlib import Path
 
 from m2_latency import integer, number, percentiles, SOURCES, TARGETS
-from m2_duration_conformance import qualify, canonical_hash, POLICY
+from m2_socket_duration import validate_binding
 
 METHOD = "composed-duration-v1"
 
@@ -37,12 +37,11 @@ def analyze(raw):
     if profile.get("universalRateBound") is not False or not all(profile.get(key) for key in ("providerSha256", "adapterSha256", "conformanceSha256", "policySha256", "osBuild")):
         errors.append("missing installed instrument identities or uncertainty authority")
     conformance = raw.get("conformance", {})
-    checked = qualify(conformance)
-    if not checked["qualified"] or profile.get("conformanceSha256") != canonical_hash(conformance) or profile.get("policySha256") != canonical_hash(POLICY) or any(profile.get(k) != checked[k] for k in ("observerAdditiveMs", "nativeAdditiveMs", "outwardStepMs", "maximumDurationMs")):
-        errors.append("instrument profile is not bound to the fixed native conformance/uncertainty model")
+    if raw.get("executionKind") == "NATIVE" and conformance.get("executionKind") != "NATIVE_INSTALLED_PROVIDER":
+        errors.append("native F4 samples lack an installed-provider conformance")
     identity = raw.get("artifactIdentity", {})
-    if identity.get("observerAdapterSha256") != profile.get("adapterSha256") or identity.get("providerSha256") != profile.get("providerSha256"):
-        errors.append("changed installed observer instrument identity")
+    checked, binding_errors = validate_binding(conformance, profile, identity)
+    errors.extend(binding_errors)
     try:
         eo = Decimal(str(number(profile["observerAdditiveMs"])))
         en = Decimal(str(number(profile["nativeAdditiveMs"])))
@@ -78,6 +77,8 @@ def analyze(raw):
         try:
             epoch = item["runtimeId"]
             if not canonical_uuid(epoch): raise ValueError("invalid observer epoch")
+            if epoch not in {r.get("runtimeId") for r in conformance.get("identities", {}).get("runtimes", [])}:
+                raise ValueError("observer runtime is outside original conformance")
             begin, end = number(item["beginMs"]), number(item["endMs"])
             if item.get("schemaVersion") != 3 or item.get("clock") != "performance.now" or end < begin: raise ValueError("reset/units/schema mismatch")
             if item.get("overflow") != 0 or item.get("failedExports") != 0: raise ValueError("observer evidence loss")

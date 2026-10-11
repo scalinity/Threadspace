@@ -1,0 +1,58 @@
+{
+  "adjacentRelease": "same relevant implementation in v1.4.2",
+  "authority": "Latest assignment contains the independent GPT-6 Pro ruling and explicitly accepts the upstream source-identity inference for this bounded engineering attempt.",
+  "chain": [
+    "mod performance.now()",
+    "guarded injected helper",
+    "host-global performance.now()",
+    "Bun ordinary VM origin timer",
+    "Rust std::time::Instant.elapsed()",
+    "elapsed nanoseconds converted to milliseconds"
+  ],
+  "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+  "exactPrivateRevisionEquality": "UNPROVEN; explicitly accepted within engineering scope",
+  "files": [
+    "src/jsc/bindings/webcore/JSPerformance.cpp",
+    "src/jsc/virtual_machine_exports.rs",
+    "src/jsc/VirtualMachine.rs"
+  ],
+  "installedNativeLiterals": [
+    {
+      "literal": "1.4.3",
+      "nativeOffsets": [
+        59270118,
+        59270233,
+        59365144,
+        59383293,
+        59402918,
+        59449780,
+        59450496,
+        59452428,
+        59533424,
+        59541632,
+        59556525,
+        60236620
+      ]
+    },
+    {
+      "literal": "eecfd55debb281c3fe3518098b1a49f76429637c",
+      "nativeOffsets": [
+        59270248,
+        59383304,
+        60305151,
+        60558553,
+        62679396
+      ]
+    }
+  ],
+  "laterDurationScopeMs": [
+    0,
+    400
+  ],
+  "observedRuntimeClockInThisAttempt": false,
+  "officialBunTag": "v1.4.3",
+  "officialCommit": "c6da4a4d3010e5553438c60f6bd76d981976867c",
+  "sourceProvenanceInvestigationReopened": false,
+  "universalClockRateCertificate": false,
+  "verdict": "INSTALLED DURATION PREMISE SUFFICIENT \u2014 REPLACEMENT INSTRUMENT MAY PROCEED"
+}

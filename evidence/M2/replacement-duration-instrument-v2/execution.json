@@ -1,0 +1,113 @@
+{
+  "actualOwnedProviderProcesses": [
+    {
+      "condition": "quiet",
+      "process": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 92934,
+        "pid": 92941,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791695228837976,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    }
+  ],
+  "actualResponderProcess": {
+    "imagePath": "/private/tmp/ts-f4v2-n8gtdjee/responder",
+    "kernelVerified": true,
+    "parentPid": 92934,
+    "pid": 92940,
+    "sha256": "de8e3bf32cb5a1685077d276c5963bce3a6e1faca195431d292988ee197a2152",
+    "startUsec": 1791695228822180,
+    "uid": 501
+  },
+  "allLaunchedProcessesReaped": true,
+  "backgroundRuntimeStarted": false,
+  "baseSha": "b5c9e030d238018632979f2242631c4770b17169",
+  "cleanup": [
+    {
+      "events": [
+        "verified-child-SIGTERM"
+      ],
+      "exitCode": 143,
+      "identity": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 92934,
+        "pid": 92941,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791695228837976,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "reaped": true
+    },
+    {
+      "events": [
+        "verified-child-SIGTERM"
+      ],
+      "exitCode": 0,
+      "identity": {
+        "imagePath": "/private/tmp/ts-f4v2-n8gtdjee/responder",
+        "kernelVerified": true,
+        "parentPid": 92934,
+        "pid": 92940,
+        "sha256": "de8e3bf32cb5a1685077d276c5963bce3a6e1faca195431d292988ee197a2152",
+        "startUsec": 1791695228822180,
+        "uid": 501
+      },
+      "reaped": true
+    }
+  ],
+  "completeRows": 0,
+  "controllerError": null,
+  "deadlineExceeded": true,
+  "failureCauseBeyondPrimaryEvidence": "UNVERIFIED; no second invocation or implementation change after failure",
+  "finalMarkerMissing": true,
+  "firstMarkerMissing": true,
+  "freezeSha256": "f4aad2446282d5bb4381204e9aad516045272b9fd1bdd93be18c65d3942c56dd",
+  "plannedRuntimeIdentities": [
+    {
+      "condition": "quiet",
+      "runtimeId": "feeb8695-efab-4367-9ad6-a88959758c9b",
+      "sourceEpoch": "feeb8695-efab-4367-9ad6-a88959758c9b"
+    },
+    {
+      "condition": "background",
+      "runtimeId": "485dafbd-f155-431f-a291-530e2984d6d9",
+      "sourceEpoch": "485dafbd-f155-431f-a291-530e2984d6d9"
+    }
+  ],
+  "positiveAttempts": 1,
+  "providerInitializerAcknowledged": true,
+  "socketRemoved": true,
+  "sourceIdentities": {
+    "adapterSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+    "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+    "calculatorSha256": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+    "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+    "collectorSha256": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+    "evaluatorSha256": "6c467eac263d62fbde5e8c808a950270381074c348996d323cce395f4a4d3400",
+    "nativeClock": "CLOCK_UPTIME_RAW",
+    "observerClock": "performance.now",
+    "osBuild": "26B5101f",
+    "policyFileSha256": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+    "policySha256": "ab51d8b1d3f04950e123b4dc6a16858e51f8cc522ce1155032602352931f7c3a",
+    "probeSha256": "3fc661869696a5435e8c98c2aba434e09e2e84ec6bbf3a32865b915631d8218e",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "responderExecutableSha256": "de8e3bf32cb5a1685077d276c5963bce3a6e1faca195431d292988ee197a2152",
+    "responderId": "bd2c793e-2847-4949-af58-1503ae3f230e",
+    "responderSourceSha256": "5840862316271b69fcc0a548d641d411ef25110ca5b895ca9dafea98497acad2",
+    "runId": "4a23b08a-239f-450f-8ec9-4f0a23453e43",
+    "runnerSha256": "e8dc1178021c5afe4e191958aab42e88820f175c6b042a770ca5927c5c72dac8"
+  },
+  "sourceWorktreeStatusBeforeAttempt": "Two authorized tracked calculator/control edits plus seven new test-only instrument files; no unrelated changes",
+  "stderrBytes": 0,
+  "suspendDiscontinuity": false
+}
