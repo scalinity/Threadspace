@@ -1,0 +1,75 @@
+{
+  "callbackOutputBytes": null,
+  "callbackOutputSha256": null,
+  "freezeDigest": "beaadb855076d1e5a5566a714ec5e220248bfef3241e659e9d725c1c42aabc8d",
+  "positiveConformanceAuthorized": false,
+  "positiveReadinessReceipt": null,
+  "stages": [
+    {
+      "disposition": "PASS_FOR_THREE_VALIDATOR_INVOCATIONS_ONLY",
+      "stage": "process launch and kernel identity"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "initializer"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "runtime plugin discovery"
+    },
+    {
+      "disposition": "FAIL_NATIVE_SCANNER_REFUSAL",
+      "stage": "exact positive module scanner admission"
+    },
+    {
+      "disposition": "PASS_SOURCE_SCAN_ONLY",
+      "stage": "original observer scanner admission"
+    },
+    {
+      "disposition": "NOT_RUN_AFTER_MANDATORY_FAILURE",
+      "stage": "activation handler admission"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "session.start dispatch"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "callback entry"
+    },
+    {
+      "disposition": "UNVERIFIED",
+      "stage": "original observer callback attribution"
+    },
+    {
+      "disposition": "UNVERIFIED",
+      "stage": "native exactly-once forwarding"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "callback output persistence/readback"
+    },
+    {
+      "disposition": "NOT_RUN",
+      "stage": "installed-mod Unix HTTP readiness"
+    },
+    {
+      "disposition": "PASS",
+      "stage": "owned control cleanup"
+    }
+  ],
+  "unitDisposition": {
+    "activationEntryValidation": "NOT_RUN_AFTER_MANDATORY_FAILURE",
+    "allocatedPositiveIdentities": "RETIRED_UNUSED_AFTER_MANDATORY_VALIDATION_FAILURE",
+    "baselineUnchangedFiles": 1163,
+    "callbackOutputsPresent": [],
+    "mandatoryGate": "EXACT_POSITIVE_MODULE_SCANNER_REFUSED",
+    "positiveActivationAttempts": 0,
+    "positiveAttemptMarkerExists": false,
+    "positiveProviderStarted": false,
+    "positiveResponderStarted": false,
+    "positiveSocketExists": false,
+    "positiveTimingAttemptsThisUnit": 0
+  },
+  "verdict": "F4 ACTIVATION SMOKE INCOMPLETE \u2014 SPECIFIC NATIVE GATE OPEN"
+}

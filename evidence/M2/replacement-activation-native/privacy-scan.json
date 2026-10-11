@@ -1,0 +1,48 @@
+{
+  "classifiedFindings": [
+    {
+      "classification": "FUNCTIONAL_OWNED_RESOURCE_PATHS",
+      "disposition": "RETAIN; exact executable, repository and private harness paths bind source/process evidence",
+      "files": [
+        "evidence/M2/replacement-activation-native/README.md",
+        "evidence/M2/replacement-activation-native/checks.json",
+        "evidence/M2/replacement-activation-native/cleanup.json",
+        "evidence/M2/replacement-activation-native/frozen-activation.json",
+        "evidence/M2/replacement-activation-native/loader-validations.json",
+        "evidence/M2/replacement-activation-native/scanner-failure.json",
+        "evidence/M2/replacement-activation-native/source-identities.json"
+      ]
+    },
+    {
+      "classification": "FRESH_TEST_IDENTITIES",
+      "disposition": "RETAIN; UUIDs/nonces identify isolated readiness controls or retired unused smoke identities, not owner history or credentials"
+    },
+    {
+      "classification": "OWNED_PROCESS_KEYS",
+      "disposition": "RETAIN; only kernel-verified validator and protocol-control resources are published"
+    },
+    {
+      "classification": "SYNTHETIC_HOST_CONTROL_DATA",
+      "disposition": "RETAIN; explicitly marked portable fixtures, never native callback witnesses"
+    },
+    {
+      "classification": "COMPLETE_VENDOR_CONTEXTS",
+      "disposition": "PRIVATE_OUTSIDE_GIT; only scoped span hashes and native diagnostics are public"
+    }
+  ],
+  "credentialHits": [],
+  "filesScanned": 18,
+  "finalFilesScannedIncludingGeneratedInventory": 20,
+  "patterns": [
+    "private-key",
+    "aws-key",
+    "github-token",
+    "api-token"
+  ],
+  "privateSessionUrlHits": [],
+  "rawOwnerHistoryOrPromptsCollected": false,
+  "redactionsApplied": false,
+  "scope": "All five new sources and new public native evidence before staging",
+  "unrelatedProcessInventoryPublished": false,
+  "verdict": "NO_REAL_SENSITIVE_PUBLICATION_VALUE_IDENTIFIED"
+}

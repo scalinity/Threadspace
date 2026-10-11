@@ -1,0 +1,15 @@
+{
+  "affectedPositiveSourceSha256": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c",
+  "diagnosticTruncation": "Original CLI bounded message retained verbatim; missing tail not reconstructed",
+  "nativeExitCode": 1,
+  "nativeRegistrationOrCallbackRun": false,
+  "positiveActivationAttempts": 0,
+  "primaryDiagnostic": {
+    "code": null,
+    "message": "positive: /private/tmp/ts-an-72brb4e9/validation/positive/hooks/register.ts, compiled line 11 `const background = config.condition === \"background\" ? startBackground($) : null...`: $ is passed to \"startBackground\", imported from \"./background.ts\": $ is followed only into a function declared in this same file, never across an import; $ is always spelled $.noun.event(...) at the call site, on is alw\u2026 [+64 chars]",
+    "path": "modules../register.ts"
+  },
+  "repairAndBackgroundUnchanged": true,
+  "sourceInspectionJoin": "CLI hooks validator calls rFs; rFs and runtime kho both link d$n and apply Re",
+  "verdict": "EXACT_POSITIVE_MODULE_SCANNER_REFUSED"
+}

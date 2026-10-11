@@ -1,0 +1,357 @@
+{
+  "activationModuleValidation": "NOT_RUN_AFTER_MANDATORY_REFUSAL",
+  "actualTwoPluginRuntimeInventory": null,
+  "executions": [
+    {
+      "argv": [
+        "/Users/danny/.local/share/claude/versions/2.1.295",
+        "--settings",
+        "/private/tmp/ts-an-72brb4e9/validation/config/settings.json",
+        "--setting-sources",
+        "",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--no-session-persistence",
+        "plugin",
+        "validate",
+        "/private/tmp/ts-an-72brb4e9/validation/duplicate",
+        "--json"
+      ],
+      "cleanup": {
+        "events": [
+          "already-exited"
+        ],
+        "exitCode": 1,
+        "identity": {
+          "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+          "kernelVerified": true,
+          "parentPid": 14123,
+          "pid": 14124,
+          "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+          "startUsec": 1791733280098614,
+          "uid": 501,
+          "version": "2.1.295"
+        },
+        "reaped": true
+      },
+      "deadlineExceeded": false,
+      "entry": {
+        "files": {
+          ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+          "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+          "hooks/config.ts": "597a88f4855408c199ebdaf37379bcad94746ad2c320168c4055a6dc370abfc6",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/observer.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "3fc661869696a5435e8c98c2aba434e09e2e84ec6bbf3a32865b915631d8218e"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "role": "duplicate",
+        "root": "/private/tmp/ts-an-72brb4e9/validation/duplicate"
+      },
+      "exitCode": 1,
+      "kind": "NON_EXECUTING_INSTALLED_SCANNER",
+      "process": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 14123,
+        "pid": 14124,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791733280098614,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "report": {
+        "advice": [],
+        "contents": [
+          {
+            "errors": [
+              {
+                "code": null,
+                "message": "duplicate: /private/tmp/ts-an-72brb4e9/validation/duplicate/hooks/register.ts, compiled line 8 `on(\"session.start\", ($, e, next) => {`: on(\"session.start\") is registered twice without a matcher; the first is at /private/tmp/ts-an-72brb4e9/validation/duplicate/hooks/observer.ts:217; $ is always spelled $.noun.event(...) at the call site, on is always on(\"<event>\", hook), and next.to always next.to(\u2026 [+12 chars]",
+                "path": "modules../register.ts"
+              }
+            ],
+            "file": "/private/tmp/ts-an-72brb4e9/validation/duplicate/hooks/hooks.json",
+            "gatingHooks": [],
+            "notes": [],
+            "type": "hooks",
+            "warnings": []
+          }
+        ],
+        "manifest": {
+          "errors": [],
+          "file": "/private/tmp/ts-an-72brb4e9/validation/duplicate/.claude-plugin/plugin.json",
+          "gatingHooks": [],
+          "notes": [],
+          "type": "plugin",
+          "warnings": [
+            {
+              "code": null,
+              "message": "No description provided. Adding a description helps users understand what your plugin does",
+              "path": "description"
+            },
+            {
+              "code": null,
+              "message": "No author information provided. Consider adding author details for plugin attribution",
+              "path": "author"
+            }
+          ]
+        },
+        "strict": false,
+        "success": false,
+        "target": "/private/tmp/ts-an-72brb4e9/validation/duplicate/.claude-plugin/plugin.json"
+      },
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "bdabcc4c997198ff110c88e2ec835426e604d65b866ee82c7dd47a807a97bdff"
+    },
+    {
+      "argv": [
+        "/Users/danny/.local/share/claude/versions/2.1.295",
+        "--settings",
+        "/private/tmp/ts-an-72brb4e9/validation/config/settings.json",
+        "--setting-sources",
+        "",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--no-session-persistence",
+        "plugin",
+        "validate",
+        "/private/tmp/ts-an-72brb4e9/validation/observer",
+        "--json"
+      ],
+      "cleanup": {
+        "events": [
+          "already-exited"
+        ],
+        "exitCode": 0,
+        "identity": {
+          "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+          "kernelVerified": true,
+          "parentPid": 14368,
+          "pid": 14369,
+          "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+          "startUsec": 1791733300164453,
+          "uid": 501,
+          "version": "2.1.295"
+        },
+        "reaped": true
+      },
+      "deadlineExceeded": false,
+      "entry": {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "role": "observer",
+        "root": "/private/tmp/ts-an-72brb4e9/validation/observer"
+      },
+      "exitCode": 0,
+      "kind": "NON_EXECUTING_INSTALLED_SCANNER",
+      "process": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 14368,
+        "pid": 14369,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791733300164453,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "report": {
+        "advice": [],
+        "contents": [
+          {
+            "errors": [],
+            "file": "/private/tmp/ts-an-72brb4e9/validation/observer/hooks/hooks.json",
+            "gatingHooks": [
+              {
+                "hasCatch": false,
+                "hook": "classic.SessionStart",
+                "module": "./register.ts",
+                "pattern": "classic.SessionStart"
+              },
+              {
+                "hasCatch": false,
+                "hook": "prompt.submit",
+                "module": "./register.ts",
+                "pattern": "prompt.submit"
+              },
+              {
+                "hasCatch": false,
+                "hook": "tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+                "module": "./register.ts",
+                "pattern": "tool.call"
+              },
+              {
+                "hasCatch": false,
+                "hook": "tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+                "module": "./register.ts",
+                "pattern": "tool.check"
+              },
+              {
+                "hasCatch": false,
+                "hook": "agent.spawn",
+                "module": "./register.ts",
+                "pattern": "agent.spawn"
+              }
+            ],
+            "notes": [
+              "./register.ts hooks: session.start, classic.SessionStart, session.end, session.attach, session.detach, prompt.submit, turn.start, turn.step, turn.complete, tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}, agent.spawn",
+              "./register.ts gating hook without .catch: classic.SessionStart",
+              "./register.ts gating hook without .catch: prompt.submit",
+              "./register.ts gating hook without .catch: tool.call{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+              "./register.ts gating hook without .catch: tool.check{tool=/\"^(?!(?:EnterWorktree|ExitWorktree)$)\"/}",
+              "./register.ts gating hook without .catch: agent.spawn",
+              "./register.ts calls: $.clock.after, $.process.run, $.session.id, $.session.version, $.state.get, $.state.set",
+              "./register.ts state writes: threadspace-observer.epoch",
+              "./register.ts state reads: threadspace-observer.epoch"
+            ],
+            "type": "hooks",
+            "warnings": []
+          }
+        ],
+        "manifest": {
+          "errors": [],
+          "file": "/private/tmp/ts-an-72brb4e9/validation/observer/.claude-plugin/plugin.json",
+          "gatingHooks": [],
+          "notes": [
+            "types ./types/index.d.ts declares on $: nothing (no EngineInterface member)",
+            "types ./types/index.d.ts declares state: threadspace-observer.epoch"
+          ],
+          "type": "plugin",
+          "warnings": []
+        },
+        "strict": false,
+        "success": true,
+        "target": "/private/tmp/ts-an-72brb4e9/validation/observer/.claude-plugin/plugin.json"
+      },
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "7079d521d85db05d863fe726e0e757244a9da0fbdc4ee8df0c53417f943a4bf7"
+    },
+    {
+      "argv": [
+        "/Users/danny/.local/share/claude/versions/2.1.295",
+        "--settings",
+        "/private/tmp/ts-an-72brb4e9/validation/config/settings.json",
+        "--setting-sources",
+        "",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--no-session-persistence",
+        "plugin",
+        "validate",
+        "/private/tmp/ts-an-72brb4e9/validation/positive",
+        "--json"
+      ],
+      "cleanup": {
+        "events": [
+          "already-exited"
+        ],
+        "exitCode": 1,
+        "identity": {
+          "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+          "kernelVerified": true,
+          "parentPid": 14368,
+          "pid": 14375,
+          "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+          "startUsec": 1791733300495232,
+          "uid": 501,
+          "version": "2.1.295"
+        },
+        "reaped": true
+      },
+      "deadlineExceeded": false,
+      "entry": {
+        "files": {
+          ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+          "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+          "hooks/config.ts": "597a88f4855408c199ebdaf37379bcad94746ad2c320168c4055a6dc370abfc6",
+          "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/register.ts": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "role": "positive",
+        "root": "/private/tmp/ts-an-72brb4e9/validation/positive"
+      },
+      "exitCode": 1,
+      "kind": "NON_EXECUTING_INSTALLED_SCANNER",
+      "process": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 14368,
+        "pid": 14375,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791733300495232,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "report": {
+        "advice": [],
+        "contents": [
+          {
+            "errors": [
+              {
+                "code": null,
+                "message": "positive: /private/tmp/ts-an-72brb4e9/validation/positive/hooks/register.ts, compiled line 11 `const background = config.condition === \"background\" ? startBackground($) : null...`: $ is passed to \"startBackground\", imported from \"./background.ts\": $ is followed only into a function declared in this same file, never across an import; $ is always spelled $.noun.event(...) at the call site, on is alw\u2026 [+64 chars]",
+                "path": "modules../register.ts"
+              }
+            ],
+            "file": "/private/tmp/ts-an-72brb4e9/validation/positive/hooks/hooks.json",
+            "gatingHooks": [],
+            "notes": [],
+            "type": "hooks",
+            "warnings": []
+          }
+        ],
+        "manifest": {
+          "errors": [],
+          "file": "/private/tmp/ts-an-72brb4e9/validation/positive/.claude-plugin/plugin.json",
+          "gatingHooks": [],
+          "notes": [],
+          "type": "plugin",
+          "warnings": [
+            {
+              "code": null,
+              "message": "No description provided. Adding a description helps users understand what your plugin does",
+              "path": "description"
+            },
+            {
+              "code": null,
+              "message": "No author information provided. Consider adding author details for plugin attribution",
+              "path": "author"
+            }
+          ]
+        },
+        "strict": false,
+        "success": false,
+        "target": "/private/tmp/ts-an-72brb4e9/validation/positive/.claude-plugin/plugin.json"
+      },
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSha256": "abc5ae74dd1c94bf6c246194d44650591ff03f911fec21bf74d103b93b8561ff"
+    }
+  ],
+  "kind": "PRIMARY_NON_EXECUTING_INSTALLED_SCANNER_RESULTS",
+  "originalPositiveCallbackExecuted": false
+}

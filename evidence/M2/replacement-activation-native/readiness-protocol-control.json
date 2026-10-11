@@ -1,0 +1,226 @@
+{
+  "cleanup": {
+    "events": [
+      "already-exited"
+    ],
+    "exitCode": 0,
+    "identity": {
+      "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "kernelVerified": true,
+      "parentPid": 13842,
+      "pid": 13845,
+      "sha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+      "startUsec": 1791733258149800,
+      "uid": 501
+    },
+    "reaped": true
+  },
+  "config": {
+    "activationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+    "admittedStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+    "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+    "controlSourceSha256": "f9847603a82d6dc9d784df5428b52e623b9c1459f789f20ecc43dcbbb5bd1bff",
+    "controllerSha256": "d2e91fa5e0cdb2feffa0d118a000b853f0bc677f5e56e65bc1d7254a4208f7e0",
+    "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+    "nonce": "03593c8f76e44503905981e9913c04428b129a9905f24c50a7c18dc0cc64362c",
+    "observerFiles": {
+      ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+      "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+      "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+      "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+      "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+      "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+    },
+    "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "positiveProbeSha256": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "pythonExecutableSha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+    "responderId": "e175bb8f-4ec2-4463-b586-0a300682a7ba",
+    "runId": "1a7c418b-6417-4d01-868a-6d93c7c926ea",
+    "testSourceSha256": "d0ad489a98da46d59e5608b8781dc0c216881758e781aa1cce88ac66a0951193"
+  },
+  "kind": "OWNED_NATIVE_READINESS_PROTOCOL_CONTROL",
+  "process": {
+    "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+    "kernelVerified": true,
+    "parentPid": 13842,
+    "pid": 13845,
+    "sha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+    "startUsec": 1791733258149800,
+    "uid": 501
+  },
+  "purpose": "Reject a forged/replayed nonce on the exact socket server; no provider is invoked",
+  "results": [
+    {
+      "body": {
+        "kind": "READINESS_REJECTED"
+      },
+      "control": "forged-nonce",
+      "status": 403
+    },
+    {
+      "body": {
+        "activationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "03593c8f76e44503905981e9913c04428b129a9905f24c50a7c18dc0cc64362c",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "e175bb8f-4ec2-4463-b586-0a300682a7ba",
+        "runId": "1a7c418b-6417-4d01-868a-6d93c7c926ea"
+      },
+      "control": "control-acknowledgement",
+      "status": 200
+    },
+    {
+      "body": {
+        "kind": "READINESS_REPLAY_REJECTED"
+      },
+      "control": "replay",
+      "status": 409
+    },
+    {
+      "body": {
+        "kind": "READINESS_REJECTED"
+      },
+      "control": "foreign-responder",
+      "status": 403
+    }
+  ],
+  "socketRemoved": true,
+  "sourceIdentity": {
+    "activationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+    "admittedStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+    "controlSourceSha256": "f9847603a82d6dc9d784df5428b52e623b9c1459f789f20ecc43dcbbb5bd1bff",
+    "controllerSha256": "d2e91fa5e0cdb2feffa0d118a000b853f0bc677f5e56e65bc1d7254a4208f7e0",
+    "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+    "observerFiles": {
+      ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+      "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+      "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+      "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+      "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+      "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+    },
+    "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "positiveProbeSha256": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "pythonExecutableSha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+    "testSourceSha256": "d0ad489a98da46d59e5608b8781dc0c216881758e781aa1cce88ac66a0951193"
+  },
+  "transcript": [
+    {
+      "event": "start",
+      "identity": {
+        "activationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "03593c8f76e44503905981e9913c04428b129a9905f24c50a7c18dc0cc64362c",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "e175bb8f-4ec2-4463-b586-0a300682a7ba",
+        "runId": "1a7c418b-6417-4d01-868a-6d93c7c926ea"
+      },
+      "pid": 13845,
+      "uid": 501
+    },
+    {
+      "attempt": 1,
+      "event": "received",
+      "nonceMatched": false,
+      "peerUid": 501,
+      "status": 403
+    },
+    {
+      "attempt": 1,
+      "body": {
+        "kind": "READINESS_REJECTED"
+      },
+      "event": "generated",
+      "status": 403
+    },
+    {
+      "attempt": 1,
+      "event": "answered",
+      "status": 403
+    },
+    {
+      "attempt": 2,
+      "event": "received",
+      "nonceMatched": true,
+      "peerUid": 501,
+      "status": 200
+    },
+    {
+      "attempt": 2,
+      "body": {
+        "activationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "03593c8f76e44503905981e9913c04428b129a9905f24c50a7c18dc0cc64362c",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "e175bb8f-4ec2-4463-b586-0a300682a7ba",
+        "runId": "1a7c418b-6417-4d01-868a-6d93c7c926ea"
+      },
+      "event": "generated",
+      "status": 200
+    },
+    {
+      "attempt": 2,
+      "event": "answered",
+      "status": 200
+    },
+    {
+      "attempt": 3,
+      "event": "received",
+      "nonceMatched": false,
+      "peerUid": 501,
+      "status": 409
+    },
+    {
+      "attempt": 3,
+      "body": {
+        "kind": "READINESS_REPLAY_REJECTED"
+      },
+      "event": "generated",
+      "status": 409
+    },
+    {
+      "attempt": 3,
+      "event": "answered",
+      "status": 409
+    },
+    {
+      "attempt": 4,
+      "event": "received",
+      "nonceMatched": false,
+      "peerUid": 501,
+      "status": 403
+    },
+    {
+      "attempt": 4,
+      "body": {
+        "kind": "READINESS_REJECTED"
+      },
+      "event": "generated",
+      "status": 403
+    },
+    {
+      "attempt": 4,
+      "event": "answered",
+      "status": 403
+    },
+    {
+      "accepted": 1,
+      "answered": 4,
+      "attempts": 4,
+      "event": "stop",
+      "generated": 4
+    }
+  ]
+}
