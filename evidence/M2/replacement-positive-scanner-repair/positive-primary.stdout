@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "strict": false,
+  "target": "/private/tmp/ts-psr-0f8o680h/scanner-owned/positive/duration-plugin/.claude-plugin/plugin.json",
+  "manifest": {
+    "file": "/private/tmp/ts-psr-0f8o680h/scanner-owned/positive/duration-plugin/.claude-plugin/plugin.json",
+    "type": "plugin",
+    "errors": [],
+    "warnings": [
+      {
+        "path": "description",
+        "message": "No description provided. Adding a description helps users understand what your plugin does",
+        "code": null
+      },
+      {
+        "path": "author",
+        "message": "No author information provided. Consider adding author details for plugin attribution",
+        "code": null
+      }
+    ],
+    "notes": [],
+    "gatingHooks": []
+  },
+  "contents": [
+    {
+      "file": "/private/tmp/ts-psr-0f8o680h/scanner-owned/positive/duration-plugin/hooks/hooks.json",
+      "type": "hooks",
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        "./register.ts hooks: session.start",
+        "./register.ts calls: $.clock.after, $.fs.write, $.http.fetch"
+      ],
+      "gatingHooks": []
+    }
+  ],
+  "advice": []
+}

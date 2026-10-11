@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "strict": false,
+  "target": "/private/tmp/ts-psr-0f8o680h/scanner-owned/activation/.claude-plugin/plugin.json",
+  "manifest": {
+    "file": "/private/tmp/ts-psr-0f8o680h/scanner-owned/activation/.claude-plugin/plugin.json",
+    "type": "plugin",
+    "errors": [],
+    "warnings": [
+      {
+        "path": "author",
+        "message": "No author information provided. Consider adding author details for plugin attribution",
+        "code": null
+      }
+    ],
+    "notes": [],
+    "gatingHooks": []
+  },
+  "contents": [
+    {
+      "file": "/private/tmp/ts-psr-0f8o680h/scanner-owned/activation/hooks/hooks.json",
+      "type": "hooks",
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        "./activation.ts hooks: session.start",
+        "./activation.ts calls: $.fs.write, $.http.fetch"
+      ],
+      "gatingHooks": []
+    }
+  ],
+  "advice": []
+}

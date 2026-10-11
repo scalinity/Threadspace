@@ -1,0 +1,162 @@
+{
+  "activationScannerSuccess": true,
+  "backgroundResult": {
+    "checksum": 1722810369,
+    "complete": true,
+    "operations": 524288,
+    "ticks": 256
+  },
+  "buildOrInstall": "NOT_RUN",
+  "developmentFailures": [
+    "initial synthetic scheduler microtask drain failure; final control corrected and passed",
+    "retired scanner input config serialization refusal before process creation; roundtrip control corrected and passed"
+  ],
+  "diffArtifact": {
+    "disposition": "Regenerated as a valid zero-context diff; original context diff retained privately; candidate source unchanged",
+    "generationArgv": [
+      "git",
+      "diff",
+      "--unified=0",
+      "445794e778e27ed071f8e053aadce8b401c64ba4",
+      "--",
+      "tests/native/tools/m2_socket_probe.ts"
+    ],
+    "initialStagedCheck": "Trailing whitespace on the legitimate blank context marker in the patch artifact"
+  },
+  "existingRegressionSources": {
+    "test_m2_composed_duration.py": "6ffd1dd161bdd2e4b95f18d93d446cff92599a0dd15f7c95bb8079fab60d6bd5",
+    "test_m2_socket_duration.py": "32fd4fa0db2d4106b6aaf86ec62fa58c4075d342824f6e45d3861ed29968fcfe",
+    "test_m2_socket_plugins.py": "8e230c131731b062dd7ad363e057ab77106050b4f67b237f2b9476256dfc25de"
+  },
+  "gitDiffCheck": "PASS",
+  "mutationControlsRejected": [
+    "tick-count",
+    "operations-per-tick",
+    "arithmetic",
+    "schedule",
+    "operation-accounting",
+    "completion-accounting",
+    "start-boundary",
+    "completion-boundary",
+    "duplicate-forwarding"
+  ],
+  "nativeCallbacksOrTimingAttemptExecuted": false,
+  "nativeScannerInvocations": 2,
+  "portableCommands": [
+    {
+      "argv": [
+        "node",
+        "tests/native/tools/m2_positive_scanner_controls.js",
+        "tests/native/tools/m2_socket_probe.ts",
+        "tests/native/tools/m2_socket_background.ts",
+        "evidence/M2/replacement-positive-scanner-repair/original-positive-probe.ts"
+      ],
+      "cwd": "/Users/danny/Documents/Tools/Threadspace",
+      "outputSha256": "9836972e115b881d20a2a0bccecc17ebe5666905608f6a00e3682cd3731b8831",
+      "passed": true
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_m2_positive_scanner.PortableScannerRepairControls"
+      ],
+      "cwd": "/Users/danny/Documents/Tools/Threadspace/tests/native/tools",
+      "errors": 0,
+      "failures": 0,
+      "outputSha256": "194a9c2b3cb7eae5cc0d0c1b16f88e4d96b126f7bd1b9a207f1906f0cf8b0a9f",
+      "passed": true,
+      "tests": 6
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_m2_socket_plugins",
+        "test_m2_socket_duration.EvaluatorControls",
+        "test_m2_composed_duration"
+      ],
+      "cwd": "/Users/danny/Documents/Tools/Threadspace/tests/native/tools",
+      "errors": 0,
+      "failures": 0,
+      "outputSha256": "c4d4009f24ca489d2e6f1811259bc09c75fc3c3534f17f8b4c55c15810bb3898",
+      "passed": true,
+      "tests": 30
+    }
+  ],
+  "positiveCandidateImplementations": 1,
+  "positiveScannerSuccess": true,
+  "pythonTestsPassed": 36,
+  "sourceBinding": {
+    "conformanceSourceIdentities": {
+      "adapterSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+      "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+      "calculatorSha256": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+      "collectorSha256": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      "evaluatorSha256": "40ced6953f53bc2e0f5042e092c7757779f9ce978d967c791fbbb9039cc77c5f",
+      "pluginComposition": {
+        "observer": {
+          "files": {
+            ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+            "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+            "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+            "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+            "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+            "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+            "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+          },
+          "modules": [
+            "./register.ts"
+          ],
+          "name": "threadspace-observer",
+          "version": "0.1.0"
+        },
+        "qualification": {
+          "files": {
+            ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+            "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+            "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+            "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+            "hooks/register.ts": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa"
+          },
+          "modules": [
+            "./register.ts"
+          ],
+          "name": "threadspace-socket-duration",
+          "version": "2.0.0"
+        },
+        "schemaVersion": 1
+      },
+      "pluginStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+      "policyFileSha256": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+      "policySha256": "ab51d8b1d3f04950e123b4dc6a16858e51f8cc522ce1155032602352931f7c3a",
+      "probeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "providerVersion": "2.1.295",
+      "responderSourceSha256": "5840862316271b69fcc0a548d641d411ef25110ca5b895ca9dafea98497acad2",
+      "runnerSha256": "abf36c70117f98dc5d5debe8c1cd57614920e14d291cfbc355ba22d3a64e348c"
+    },
+    "localBackgroundHashEncoding": "canonical JSON object containing exact declaration bytes",
+    "localBackgroundSha256": "15d17326b7194aabb0fd14925929619efcc866524532b7fffe1732391feb7e27",
+    "providerPath": "/Users/danny/.local/share/claude/versions/2.1.295",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "sources": {
+      "m2_activation_native.py": "d2e91fa5e0cdb2feffa0d118a000b853f0bc677f5e56e65bc1d7254a4208f7e0",
+      "m2_activation_probe.ts": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+      "m2_activation_readiness.py": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+      "m2_composed_duration.py": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+      "m2_positive_scanner.py": "f972c11b26448c35949f0ea655db9a682318f2a5d36f662bd73da3d277733e79",
+      "m2_positive_scanner_controls.js": "3a894d3e5b77fbfa3f66bfe0819214625b5f8bd748d5ed7e0bd2ada924be27f1",
+      "m2_socket_background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+      "m2_socket_duration.py": "40ced6953f53bc2e0f5042e092c7757779f9ce978d967c791fbbb9039cc77c5f",
+      "m2_socket_plugins.py": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+      "m2_socket_policy.json": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+      "m2_socket_probe.ts": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "m2_socket_runner.py": "abf36c70117f98dc5d5debe8c1cd57614920e14d291cfbc355ba22d3a64e348c",
+      "test_m2_positive_scanner.py": "0e1d941834e0c581e566f64cb6069902e77754aac7d73164ad007b589c213f01"
+    }
+  }
+}

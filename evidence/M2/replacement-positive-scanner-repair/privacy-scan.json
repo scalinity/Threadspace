@@ -1,0 +1,32 @@
+{
+  "classifiedFindings": [
+    {
+      "disposition": "RETAIN; executable, source and private harness paths bind execution",
+      "kind": "FUNCTIONAL_OWNED_PATHS"
+    },
+    {
+      "disposition": "RETAIN; only the two verified scanner children",
+      "kind": "OWNED_PROCESS_IDENTITIES"
+    },
+    {
+      "disposition": "RETAIN; explicitly synthetic run/challenge/clock fields, not owner history",
+      "kind": "SYNTHETIC_FIXTURE_VALUES"
+    },
+    {
+      "disposition": "RETAIN; scoped package warnings and registration notes, not full vendor declarations",
+      "kind": "PRIMARY_VENDOR_SCANNER_OUTPUT"
+    },
+    {
+      "disposition": "PRIVATE; no new complete vendor excerpts published",
+      "kind": "COMPLETE_VENDOR_BINARY_CONTEXTS"
+    }
+  ],
+  "filesScannedBeforeGeneratedPrivacyAndManifest": 28,
+  "finalFilesScannedIncludingGeneratedInventory": 30,
+  "ownerPromptsOrHistoryCollected": false,
+  "realSensitivePublicationValueIdentified": false,
+  "redactionsApplied": false,
+  "scope": "All new evidence and four affected sources",
+  "sensitivePatternHits": [],
+  "unrelatedProcessInventoryPublished": false
+}

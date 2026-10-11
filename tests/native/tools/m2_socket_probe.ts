@@ -1,6 +1,23 @@
 import { createLatencyMeasurement } from './latency.ts';
-import { startBackground } from './background.ts';
 import { config } from './config.ts';
+
+// Same-file copy of the frozen fixture for the installed host-object scanner.
+const startBackground = ($: any) => {
+  let ticks = 0, operations = 0, x = 1;
+  const wait = (ms: number) => new Promise<void>(resolve => $.clock.after(ms, resolve));
+  const done = (async () => {
+    for (let tick = 0; tick < 256; tick++) {
+      await wait(5);
+      for (let i = 0; i < 2048; i++) {
+        x = ((x ^ i) * 1664525 + 1013904223) >>> 0;
+        operations++;
+      }
+      ticks++;
+    }
+    return { ticks, operations, checksum: x, complete: true };
+  })();
+  return done;
+};
 
 export const register = (on: any) => {
   const meter = createLatencyMeasurement(['/unused-capture-helper', 'mod-batch', '--qualification-latency'], config.runtimeId)!;
