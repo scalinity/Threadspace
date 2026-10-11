@@ -1,0 +1,112 @@
+{
+  "exactExecutableSha256": "c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937",
+  "extraction": {
+    "binaryOffset": 232158688,
+    "compressedBytes": 138638,
+    "decompressedBytes": 621811,
+    "compressedSha256": "ae7be983ce5bd6d3bd5619ff4127cb8f2593b9c1e4857ab98a5f865385b59705",
+    "declarationsSha256": "cf4afc180ffef03cb8138916c0e8f49b8186242a81e226f01ba24341018e5e90",
+    "embeddedName": "/$bunfs/root/claude-code.d.ts-77980b00.txt.zst"
+  },
+  "declarationsWereNotEmittedByInitializeOnlyRun": true,
+  "byteSource": "compressed declaration asset embedded in exact installed executable",
+  "headerWriterBinding": {
+    "binaryOffset": 209399845,
+    "behavior": "prefixes declaration text with exact provider version; no inherited generated declaration used"
+  },
+  "lineSpans": {
+    "httpNamespace": [
+      3473,
+      3496
+    ],
+    "httpInit": [
+      5213,
+      5249
+    ],
+    "performanceGlobal": [
+      14877,
+      14877
+    ],
+    "sessionVersion": [
+      2853,
+      2869
+    ],
+    "sessionStartInput": [
+      11675,
+      11698
+    ]
+  },
+  "registerAndNextDeclarationLines": [
+    6542,
+    6628,
+    6655,
+    6664,
+    9308,
+    9314
+  ],
+  "spanByteSha256": {
+    "httpNamespace": "7da27cef5cef9ac3e3a7de23843a9ee5fad0cd0c5c6170f897ff276c154f612c",
+    "httpInit": "85af3d71239bc06b693706683eba10a7834c4dce241184839b15a1e73e6b056f",
+    "performanceGlobal": "6fd051c3da2811632935f1934576609f9e9ba238149d43ee18c168ca84bf5d9c",
+    "sessionVersion": "5a89ab2c22890898f445ea6eabd7b6dffcdb5c818832daafdecfd6cd8f555f91",
+    "sessionStartInput": "b10f51906b06170e2f1f8f3cd7b5258dc88f7d5f49de50b7beb49fa27692fc4d"
+  },
+  "declarationSignatures": {
+    "http": "fetch: (url: string, init?: HttpInit) => Promise<HttpResponse>",
+    "socket": "socketPath?: string",
+    "performance": "var performance: { now(): number }"
+  },
+  "httpInitFields": [
+    "method",
+    "headers",
+    "body",
+    "auth",
+    "socketPath"
+  ],
+  "httpTimeoutFieldSupported": false,
+  "httpSignalFieldSupported": false,
+  "socketAbsolutePathRequired": true,
+  "socketPathLengthDocumentation": "near 100 bytes at most",
+  "httpResponseFields": [
+    "status",
+    "ok",
+    "headers",
+    "text"
+  ],
+  "installedHTTPAdapterBinaryOffset": 190557487,
+  "httpAdapterForwardsSocketPath": true,
+  "liveUnixSocketCall": "NOT_RUN",
+  "nativeCallbackAPIProbe": "session.start and session.version executed",
+  "performanceDurationDocumentationPresent": false,
+  "wrapperToHelperToHostGlobalBinding": "VERIFIED_STATIC",
+  "exactHostNativeClockDurationBinding": "UNVERIFIED",
+  "binaryRanges": [
+    {
+      "name": "guarded-wrapper",
+      "offset": 190417350,
+      "length": 19650,
+      "sha256": "df3b15c268d8435b21f648f0ae163da2b632e2a97b4f097bcd4622d9093f04e9"
+    },
+    {
+      "name": "helper-clock-binding",
+      "offset": 190518760,
+      "length": 1290,
+      "sha256": "960d876f794a88ba6435ee29138e2ae9ec73088861a5a72fc6ef9e9dae4cadb2"
+    },
+    {
+      "name": "vm-helper-injection",
+      "offset": 190549650,
+      "length": 1250,
+      "sha256": "2881e19de24f6f52e3860d53ece28ed76c237f169e50b1888a80595291dea183"
+    },
+    {
+      "name": "mod-http-implementation",
+      "offset": 190557000,
+      "length": 3300,
+      "sha256": "94022b3745b030178ce737da3f8c8232a43634a4e57a4ed948224f297f20e79f"
+    }
+  ],
+  "wrapperSource": "() => guarded(helpers.now)()",
+  "guardBehavior": "exception conversion only in inspected source",
+  "helperBehavior": "direct host-global performance.now call in inspected source"
+}

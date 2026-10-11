@@ -1,0 +1,139 @@
+{
+  "verdict": "REPLACEMENT_F4_INSTRUMENT_INCOMPLETE",
+  "mandatoryGate": "BLOCKED",
+  "failedPremise": "No exact-installed-API vendor duration statement or completed auditable binding to exact host runtime clock implementation establishes elapsed-duration, precision/coarsening and awake-time semantics.",
+  "proved": [
+    "exact provider executable and independently reported version",
+    "corrected adapter final source hash",
+    "exact embedded mod declarations",
+    "supported callback and declared Unix-socket HTTP interface",
+    "static guarded wrapper-to-helper-to-host-global binding",
+    "embedded runtime version/revision identity"
+  ],
+  "unverified": [
+    "exact native host clock implementation duration semantics",
+    "supported precision/coarsening",
+    "awake-time behavior",
+    "live Unix-socket request"
+  ],
+  "positiveAttempts": 0,
+  "conformanceRows": [],
+  "allRowResidualAssessment": null,
+  "positivePrecisionAssessment": null,
+  "conformanceUncertaintyAllowance": null,
+  "replacementProfileQualified": false,
+  "calculatorRemediation": "NOT_IMPLEMENTED_STOPPED_AT_MANDATORY_GATE",
+  "identityDefectSource": {
+    "path": "tests/native/tools/m2_composed_duration.py",
+    "lines": [
+      29,
+      46
+    ],
+    "findings": "profile/artifact provider and adapter checks are not bound to conformance-owned identity fields; selected numeric result join only",
+    "newBadJoinExecutions": "NOT_RUN"
+  },
+  "falsificationControls": [
+    {
+      "name": "provider/profile changed together retaining old conformance",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "adapter substitution",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "boot or OS build substitution",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "instrument policy/probe substitution",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "responder substitution",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "runtime/epoch substitution",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "corrected evaluator with old policy",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "incomplete or reordered conformance transcript",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "forged/replayed challenges",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "missing first/final marker",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "reordered responses",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "duplicate sequence",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "wrong run/boot/responder",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "incomplete transcript/provider termination",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "native width above 10 ms",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "native/observer inconsistent duration",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "0.9-scale clock",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "clock paused during asynchronous waits",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "clock reset/nonfinite",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "wrong units/excessive coarsening",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "lost runtime/sleep interruption",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "delayed socket widening",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "changed identities",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "missing near-zero/upper coverage",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    },
+    {
+      "name": "constant-offset clock positive control",
+      "status": "NOT_RUN_PREREQUISITE_BLOCKED"
+    }
+  ],
+  "M2": "UNACCEPTED",
+  "stopBoundaryHonored": true
+}

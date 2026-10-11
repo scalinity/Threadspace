@@ -1,0 +1,48 @@
+{
+  "status": "PASS_CANDIDATE_FILES_ONLY",
+  "scanScope": "new replacement-duration-instrument artifacts; existing published history was not rewritten",
+  "credentialPatternHits": 0,
+  "emailHits": 0,
+  "privateRuntimePathHits": 0,
+  "privateProviderHistoryHits": 0,
+  "rawProcessInventoryPublished": false,
+  "classifiedRealValues": [
+    {
+      "kind": "harness-owned private output path",
+      "action": "replace only its complete JSON-quoted literal in public probe template; retain private original before substitution",
+      "occurrencesReplaced": 2,
+      "replacement": "__HARNESS_OWNED_GATE_OUTPUT__"
+    },
+    {
+      "kind": "provider canonical path",
+      "action": "retain as functional executable identity; reveals username and installed version only",
+      "value": "/Users/danny/.local/share/claude/versions/2.1.296"
+    },
+    {
+      "kind": "boot and semantic-probe runtime IDs",
+      "action": "retain as functional experimental identity; not provider session/history identifiers"
+    },
+    {
+      "kind": "owned provider PID, parent, UID, kernel birth",
+      "action": "retain raw record privately; publish verification results and hashes only"
+    },
+    {
+      "kind": "vendor declaration and binary source bytes",
+      "action": "retain complete copyrighted source privately; publish hashes, locations, facts and minimal signatures only"
+    },
+    {
+      "kind": "source/probe/transcript hash",
+      "action": "retain as functional reproducibility metadata; private transcript contents are not published"
+    }
+  ],
+  "syntheticValues": [
+    {
+      "value": "__HARNESS_OWNED_GATE_OUTPUT__",
+      "classification": "placeholder, not a real filesystem path"
+    }
+  ],
+  "patternBasedRedactions": false,
+  "privateOriginalsRetainedBeforeRedaction": true,
+  "privateOriginalInventory": "private-originals.json",
+  "sourceLicenseScope": "original Threadspace gate probe; complete vendor declarations/binary excerpts excluded"
+}

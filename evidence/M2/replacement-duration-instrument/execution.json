@@ -1,0 +1,59 @@
+{
+  "kind": "INITIALIZATION_ONLY_API_SEMANTIC_PROBE",
+  "notConformance": true,
+  "probeInstantiatedSourceSha256": "535f0f681d75d6a8fa5e79fdb515d74779bdd5545ed8ecf28fe058ee2e54a014",
+  "publishedProbeTemplateSha256": "f6fe91d3f6d96c8ce33af2bafcd8731260f82a56ccfe961619517ab6330e5b64",
+  "substitution": "exact literal of owned output path; private original retained",
+  "callbackResult": {
+    "complete": true,
+    "version": {
+      "version": "2.1.296",
+      "base": "2.1.296",
+      "builtAt": "2026-10-09T01:31:52Z"
+    },
+    "runtimeId": "f2a1fca1-04e4-41b5-b15b-09114704d22f",
+    "wrapper": "() => guarded(helpers.now)()",
+    "oneReading": 32.112917,
+    "clockKeys": [
+      "now"
+    ],
+    "callback": "session.start",
+    "nextCalls": 1,
+    "inferenceRequested": false
+  },
+  "controller": {
+    "initializeOnly": true,
+    "inferenceRequested": false,
+    "calibrationRun": false,
+    "externalDeadlineSeconds": 20,
+    "complete": true,
+    "exitCode": 0,
+    "cleanup": [
+      "close owned stdin"
+    ],
+    "providerReaped": true,
+    "stdoutSha256": "9d8112e2b869b7949ff5d1b6e4ee6d80665abc0bf8fdbb1a50064175902b98d3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ownedProcessVerification": {
+    "independentMechanism": "libproc proc_pidpath and PROC_PIDTBSDINFO",
+    "matchingParent": true,
+    "matchingUid": true,
+    "canonicalExecutableMatches": true,
+    "kernelBirthRecordedPrivately": true,
+    "primaryRecordSha256": "b6cf230e8b3a93c9ca3b228bc0922560de25b671dc104fabf2f51a106cd23d6c",
+    "primaryNativeIdentitySha256": "b0f26f75844a4e604055202254ab3a34ee5f80333f8eebaf2dbee9dd3cde1ab6"
+  },
+  "privateRootPermission": "0o700",
+  "exclusiveCreation": true,
+  "rootOwnedByCurrentUid": true,
+  "socketCreated": false,
+  "responderStarted": false,
+  "signalSent": false,
+  "persistentServiceInstalled": false,
+  "positiveAttempts": 0,
+  "positiveRows": [],
+  "positiveRowsExpectedIfAdmitted": 14,
+  "positiveAssessment": "NOT_RUN_PREREQUISITE_BLOCKED",
+  "qualification": false
+}
