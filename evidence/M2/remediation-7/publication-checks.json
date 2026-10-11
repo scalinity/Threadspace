@@ -1,0 +1,31 @@
+{
+  "sourceAndDocumentWhitespaceCheck": {
+    "exitCode": 0,
+    "result": "PASS",
+    "scope": "Staged source/documents/JSON; captured check logs excluded"
+  },
+  "fullStagedWhitespaceCheck": {
+    "exitCode": 2,
+    "result": "FAIL",
+    "reason": "Captured raw test output contains blank lines at EOF and whitespace-only error-rendering lines; logs retained byte-for-byte",
+    "diagnostics": [
+      "evidence/M2/remediation-7/checks/bridge-controls.log:34: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/bridge-final.log:39: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/bridge-initial.log:21: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/contracts-feature-off.log:215: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/contracts.log:213: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/frontend-closeout.log:11: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/frontend-publish.log:11: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/frontend.log:11: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/native-controls.log:14: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/native-final.log:20: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/native-initial.log:39: new blank line at EOF.",
+      "evidence/M2/remediation-7/checks/observer-review-final.log:62: trailing whitespace.",
+      "+  ",
+      "evidence/M2/remediation-7/checks/observer-review-final.log:64: trailing whitespace.",
+      "+  ",
+      "evidence/M2/remediation-7/checks/relay-controls.log:29: new blank line at EOF."
+    ]
+  },
+  "logContentModified": false
+}

@@ -1,0 +1,21 @@
+   Compiling threadspace-contracts v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/contracts)
+   Compiling threadspace-desktop v0.1.0 (/Users/danny/Documents/Tools/Threadspace/apps/desktop/src-tauri)
+   Compiling threadspace-state-engine v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/state-engine)
+   Compiling threadspace-surfaces-macos v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/surfaces-macos)
+   Compiling threadspace-provider-claude v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/provider-claude)
+   Compiling threadspace-relay v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/relay)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.90s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_desktop-9149c4be3e452d7e)
+
+running 8 tests
+test bridge::stream::tests::chunking_preserves_text ... ok
+test bridge::stream::tests::ack_rules ... ok
+test bridge::stream::tests::snapshot_then_buffered_patch_in_order ... ok
+test bridge::stream::tests::hydration_requires_snapshot_end ... ok
+test bridge::stream::tests::intents_are_consumed_by_ack ... ok
+test bridge::stream::tests::window_exhaustion_retires_instead_of_buffering ... ok
+test bridge::stream::tests::oversized_snapshot_is_refused_before_begin ... ok
+test bridge::stream::tests::escape_heavy_snapshots_still_fit_frames ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.04s
+

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 3,
+  "sourceCommit": "d81f3f14684e2cd6c1dcb24fb5540b50e713262d",
+  "M2": "UNACCEPTED",
+  "adapterPrerequisite": "FAILED",
+  "executed": [
+    {
+      "check": "Observer collector, delivery and ownership controlled fixtures",
+      "result": "PASS",
+      "counts": "23 node test cases plus the ownership file; node reports 24 passing tests. Ownership file contains 14 passing assertions.",
+      "log": "checks/observer-publish.log"
+    },
+    {
+      "check": "Renderer and panel controlled fixtures",
+      "result": "PASS",
+      "counts": "3 files, 21 tests (9 composed, 7 legacy latency, 5 panels)",
+      "log": "checks/frontend-closeout.log"
+    },
+    {
+      "check": "Companion composed native unit controls",
+      "result": "PASS",
+      "counts": "3 passed; 24 unrelated tests filtered. Actual CLOCK_UPTIME_RAW bracket and retained delay exercised.",
+      "log": "checks/native-final.log"
+    },
+    {
+      "check": "Desktop native library and bridge controls",
+      "result": "PASS",
+      "counts": "23 passed, including 3 new composed coverage controls",
+      "log": "checks/bridge-final.log"
+    },
+    {
+      "check": "Relay measurement and census controls",
+      "result": "PASS",
+      "counts": "16 passed; 28 unrelated tests filtered",
+      "log": "checks/relay-controls.log"
+    },
+    {
+      "check": "Contracts with qualification feature",
+      "result": "PASS",
+      "counts": "181 unit tests and two 3-test integration suites",
+      "log": "checks/contracts.log"
+    },
+    {
+      "check": "Contracts without qualification feature",
+      "result": "PASS",
+      "counts": "183 unit tests and two 3-test integration suites",
+      "log": "checks/contracts-feature-off.log"
+    },
+    {
+      "check": "Distinct calculator and conformance fault controls",
+      "result": "PASS",
+      "counts": "12 tests with adversarial subcases",
+      "log": "checks/calculator-final.log"
+    },
+    {
+      "check": "Legacy calculator controls",
+      "result": "PASS",
+      "counts": "23 tests; legacy calculator bytes unchanged",
+      "log": "checks/legacy-calculator.log"
+    },
+    {
+      "check": "One fixed installed provider duration conformance",
+      "result": "FAILED",
+      "counts": "One initialization-only provider process; delays 0, 100, 250 ms once each; no inference or acceptance cohort",
+      "log": "checks/installed-conformance.log"
+    },
+    {
+      "check": "Protected source and historical evidence comparison",
+      "result": "PASS",
+      "counts": "150 files byte-identical to base",
+      "evidence": "preserved-scope.json"
+    },
+    {
+      "check": "Whitespace/diff check",
+      "result": "PASS",
+      "log": "checks/diff-closeout.log"
+    }
+  ],
+  "unrun": [
+    {
+      "check": "Installed composed DOM/native round trip in WebKit",
+      "result": "UNVERIFIED",
+      "reason": "No new application/helper build or installation was authorized; clock prerequisite failed."
+    },
+    {
+      "check": "New full schema 3 native cohort exporter and 20-hook/21-observer F4 acceptance",
+      "result": "NOT_RUN",
+      "reason": "Separate later unit; current exporter only consumes legacy observer-clock-bracket."
+    },
+    {
+      "check": "Production/release build, typecheck and feature-off desktop/companion qualification execution",
+      "result": "UNVERIFIED",
+      "reason": "Build/compile and installation commands not authorized. Rust tests compiled test executables only."
+    },
+    {
+      "check": "Compact helper comparison and original cold subprocess gate",
+      "result": "NOT_RUN",
+      "reason": "Explicitly separate unresolved gate; historical failures retained."
+    },
+    {
+      "check": "M2 acceptance, M3, migration and merge",
+      "result": "NOT_RUN",
+      "reason": "Outside authorized scope."
+    }
+  ],
+  "retainedFailures": [
+    "checks/frontend-initial.log: window ReferenceError in node panel tests; guarded window access fixed before passing controls.",
+    "checks/native-initial.log: initial selector ran zero tests; does not prove any composed control.",
+    "checks/observer-review.log and checks/observer-review-final.log: added control assumptions were wrong for attach-result payload and flat HOST_READ ownership fields; corrected before passing controls.",
+    "duration-conformance.json: actual fixed installed qualification failure; not repeated, tuned or promoted."
+  ]
+}

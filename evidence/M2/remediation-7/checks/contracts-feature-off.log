@@ -1,0 +1,215 @@
+   Compiling threadspace-contracts v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/contracts)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.77s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_contracts-29745a97cb941480)
+
+running 183 tests
+test canonical::causal::export_bindings_causalorder ... ok
+test canonical::causal::export_bindings_causalpoint ... ok
+test canonical::command::export_bindings_owneraction ... ok
+test canonical::envelope::export_bindings_processrole ... ok
+test canonical::command::export_bindings_ownercommand ... ok
+test canonical::fact::export_bindings_activityresult ... ok
+test canonical::capture::export_bindings_capturerefusal ... ok
+test canonical::envelope::export_bindings_clockquality ... ok
+test canonical::capture::export_bindings_recordreceipt ... ok
+test canonical::fact::export_bindings_actorrelationkind ... ok
+test canonical::fact::export_bindings_actorrole ... ok
+test canonical::fact::export_bindings_attachedpresence ... ok
+test canonical::envelope::export_bindings_captureclock ... ok
+test canonical::envelope::export_bindings_processsample ... ok
+test canonical::fact::export_bindings_bindingmethod ... ok
+test canonical::capture::export_bindings_recordstatus ... ok
+test canonical::fact::export_bindings_bindingproof ... ok
+test canonical::fact::export_bindings_canonicalrefs ... ok
+test canonical::fact::export_bindings_executionmode ... ok
+test canonical::fact::export_bindings_canonicalfactkind ... ok
+test canonical::fact::export_bindings_delivery ... ok
+test canonical::envelope::export_bindings_sequencemeaning ... ok
+test canonical::capture::export_bindings_modbatchreceipt ... ok
+test canonical::capture::export_bindings_capturereply ... ok
+test canonical::fact::export_bindings_acceptanceproof ... ok
+test canonical::capture::export_bindings_capturebatch ... ok
+test canonical::fact::export_bindings_snapshotinterval ... ok
+test canonical::envelope::export_bindings_observationenvelope ... ok
+test canonical::fact::export_bindings_inputorigin ... ok
+test canonical::fact::export_bindings_turnoutcome ... ok
+test canonical::fact::export_bindings_evidenceclass ... ok
+test canonical::fact::export_bindings_waitsignal ... ok
+test canonical::fact::export_bindings_sessionrecordstate ... ok
+test canonical::keys::export_bindings_nativeactorref ... ok
+test canonical::fact::export_bindings_waitcategory ... ok
+test canonical::keys::export_bindings_nativeexecutionref ... ok
+test canonical::keys::export_bindings_nativesessionref ... ok
+test canonical::records::export_bindings_commandeffect ... ok
+test canonical::records::export_bindings_activityrecord ... ok
+test canonical::records::export_bindings_actorrelationrecord ... ok
+test canonical::fact::export_bindings_observerownership ... ok
+test canonical::keys::export_bindings_nativesurfaceref ... ok
+test canonical::fact::export_bindings_nativerefs ... ok
+test canonical::fact::export_bindings_snapshotrow ... ok
+test canonical::records::export_bindings_humanfrontier ... ok
+test canonical::records::export_bindings_attentionscope ... ok
+test canonical::records::export_bindings_namespacerecord ... ok
+test canonical::records::export_bindings_observertier ... ok
+test canonical::records::export_bindings_outboxrecord ... ok
+test canonical::records::export_bindings_inputsubmission ... ok
+test canonical::records::export_bindings_outboxstate ... ok
+test canonical::records::export_bindings_attachobservation ... ok
+test canonical::records::export_bindings_attentionrecord ... ok
+test canonical::records::export_bindings_actorrecord ... ok
+test canonical::records::export_bindings_executionrecord ... ok
+test canonical::records::export_bindings_exactrequestrecord ... ok
+test canonical::records::export_bindings_inventoryobservation ... ok
+test canonical::records::export_bindings_pendingoutcome ... ok
+test canonical::records::export_bindings_owneractionkind ... ok
+test canonical::records::export_bindings_resolutioncause ... ok
+test canonical::records::export_bindings_ownershipstart ... ok
+test canonical::records::export_bindings_routerecord ... ok
+test canonical::records::export_bindings_sequencerange ... ok
+test canonical::records::export_bindings_sourcesurfacerecord ... ok
+test canonical::records::export_bindings_ownershipproof ... ok
+test canonical::records::export_bindings_waitepisode ... ok
+test canonical::records::export_bindings_resolutionkind ... ok
+test canonical::records::export_bindings_processrecord ... ok
+test control::release_build_tests::qualification_requests_do_not_exist_in_release_builds ... ok
+test control::tests::qualification_requests_do_not_parse_in_release_builds ... ok
+test control::tests::unknown_request_kinds_are_rejected ... ok
+test control::tests::request_round_trip ... ok
+test cursor::tests::accepts_canonical_values ... ok
+test cursor::tests::numeric_not_lexical_order ... ok
+test cursor::tests::rejects_noncanonical_and_out_of_range_values ... ok
+test canonical::records::export_bindings_sourcecoverage ... ok
+test canonical::records::export_bindings_waitscoperecord ... ok
+test diagnostics::export_bindings_automationpermission ... ok
+test diagnostics::export_bindings_desktopdiagnostics ... ok
+test canonical::records::export_bindings_surfacebindingrecord ... ok
+test canonical::records::export_bindings_turnidentitykind ... ok
+test diagnostics::export_bindings_launchprovenance ... ok
+test canonical::records::export_bindings_inputrecord ... ok
+test canonical::records::export_bindings_linkobservation ... ok
+test canonical::records::export_bindings_waitownerdecision ... ok
+test canonical::fact::export_bindings_factpayload ... ok
+test canonical::records::export_bindings_summaryauthority ... ok
+test diagnostics::export_bindings_processidentity ... ok
+test diagnostics::export_bindings_accessibilitypreferences ... ok
+test frames::tests::escape_heavy_json_counts_escaped_bytes ... ok
+test diagnostics::export_bindings_notificationsettings ... ok
+test diagnostics::export_bindings_powerhistory ... ok
+test diagnostics::export_bindings_companionintegration ... ok
+test diagnostics::export_bindings_sqlitediagnostics ... ok
+test diagnostics::export_bindings_terminalintegration ... ok
+test projection::export_bindings_bindingview ... ok
+test diagnostics::export_bindings_servicestatus ... ok
+test diagnostics::export_bindings_servicereport ... ok
+test diagnostics::export_bindings_companiondiagnostics ... ok
+test diagnostics::export_bindings_terminaldictionary ... ok
+test canonical::records::export_bindings_processimage ... ok
+test projection::export_bindings_executionpresence ... ok
+test projection::export_bindings_entityref ... ok
+test projection::export_bindings_attentionview ... ok
+test diagnostics::export_bindings_terminalinventorysummary ... ok
+test projection::export_bindings_entitykind ... ok
+test projection::export_bindings_attentioncategory ... ok
+test projection::export_bindings_attentioncounts ... ok
+test projection::export_bindings_intentsource ... ok
+test projection::export_bindings_turnstate ... ok
+test projection::export_bindings_notificationstate ... ok
+test route::export_bindings_appgeneration ... ok
+test route::export_bindings_bindingchoice ... ok
+test projection::export_bindings_observationstate ... ok
+test projection::export_bindings_processview ... ok
+test canonical::records::export_bindings_sessionrecord ... ok
+test projection::export_bindings_intentaction ... ok
+test canonical::records::export_bindings_turnrecord ... ok
+test route::export_bindings_inventoryevidence ... ok
+test route::export_bindings_phasetiming ... ok
+test route::export_bindings_processevidence ... ok
+test route::export_bindings_frontmostapplication ... ok
+test route::export_bindings_inputreadiness ... ok
+test route::export_bindings_inventoryrowevidence ... ok
+test route::export_bindings_provisionalcandidate ... ok
+test route::export_bindings_processkey ... ok
+test route::export_bindings_discoverysummary ... ok
+test route::export_bindings_routerequest ... ok
+test route::tests::axes_serialize_as_spec_names ... ok
+test route::tests::route_request_rejects_unknown_fields ... ok
+test route::export_bindings_focusevidence ... ok
+test route::export_bindings_routesummary ... ok
+test route::export_bindings_surfaceresult ... ok
+test route::export_bindings_sessionverification ... ok
+test route::export_bindings_sampleevidence ... ok
+test ui::export_bindings_commandreceipt ... ok
+test canonical::fact::export_bindings_nativefactdraft ... ok
+test route::export_bindings_terminaltabevidence ... ok
+test route::export_bindings_terminalevidence ... ok
+test projection::export_bindings_nativeintent ... ok
+test ui::export_bindings_connectionstatus ... ok
+test ui::export_bindings_frameheader ... ok
+test ui::export_bindings_receiptstatus ... ok
+test ui::export_bindings_uiackreply ... ok
+test ui::export_bindings_uiackrequest ... ok
+test ui::export_bindings_companionlink ... ok
+test ui::export_bindings_uicallcontext ... ok
+test ui::export_bindings_resourceholdop ... ok
+test ui::export_bindings_streamlimits ... ok
+test canonical::fact::export_bindings_journalentry ... ok
+test projection::export_bindings_sessionview ... ok
+test projection::export_bindings_fleetsnapshot ... ok
+test ui::export_bindings_uiconnectrequest ... ok
+test ui::export_bindings_uiconnectreply ... ok
+test route::export_bindings_routeevidence ... ok
+test ui::export_bindings_uierror ... ok
+test ui::export_bindings_fleetpage ... ok
+test ui::export_bindings_uiactionrequest ... ok
+test ui::export_bindings_attentionpage ... ok
+test ui::export_bindings_diagnosticsreport ... ok
+test ui::tests::error_detail_is_bounded ... ok
+test ui::tests::heartbeat_is_a_bare_tag ... ok
+test ui::tests::acknowledge_attention_requires_its_field ... ok
+test ui::tests::payloadless_actions_reject_unexpected_payloads ... ok
+test ui::tests::return_to_session_requires_its_session ... ok
+test ui::tests::unknown_action_kind_is_malformed_but_later_actions_parse ... ok
+test ui::tests::unknown_fields_are_malformed ... ok
+test ui::tests::uuid_validation_is_canonical ... ok
+test ui::export_bindings_uidisconnectrequest ... ok
+test ui::export_bindings_uierrorcode ... ok
+test ui::export_bindings_windowstate ... ok
+test ui::export_bindings_uiquery ... ok
+test ui::export_bindings_integrationreport ... ok
+test ui::export_bindings_uiaction ... ok
+test ui::export_bindings_uiqueryrequest ... ok
+test route::export_bindings_routeresult ... ok
+test projection::export_bindings_projectionpatch ... ok
+test canonical::fact::export_bindings_resolvedfact ... ok
+test ui::export_bindings_uiframebody ... ok
+test ui::export_bindings_uiframe ... ok
+test ui::export_bindings_uiactionresult ... ok
+test canonical::records::export_bindings_canonicalstate ... ok
+test ui::export_bindings_uiqueryresult ... ok
+
+test result: ok. 183 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+
+     Running tests/canonical_compat.rs (target/aarch64-apple-darwin/debug/deps/canonical_compat-7154725ae1b053ea)
+
+running 3 tests
+test an_earlier_wait_scope_without_owner_decisions_loads ... ok
+test an_earlier_binding_without_a_proof_point_loads ... ok
+test an_earlier_journal_entry_defaults_to_its_original_admission_version ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/schemas.rs (target/aarch64-apple-darwin/debug/deps/schemas-21776f8abea6d397)
+
+running 3 tests
+test unknown_fact_discriminators_do_not_deserialize ... ok
+test every_schema_is_a_draft_2020_12_object_schema ... ok
+test json_schemas_match_the_rust_contracts ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests threadspace_contracts
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

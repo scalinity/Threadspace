@@ -1,0 +1,39 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling threadspace-contracts v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/contracts)
+   Compiling threadspace-surfaces-macos v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/surfaces-macos)
+   Compiling threadspace-state-engine v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/state-engine)
+   Compiling threadspace-provider-claude v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/provider-claude)
+   Compiling threadspace-relay v0.1.0 (/Users/danny/Documents/Tools/Threadspace/crates/relay)
+   Compiling threadspace-desktop v0.1.0 (/Users/danny/Documents/Tools/Threadspace/apps/desktop/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.55s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_desktop-9149c4be3e452d7e)
+
+running 23 tests
+test launch::tests::parses_integration_flags ... ok
+test launch::tests::parses_service_and_renderer_flags ... ok
+test bridge::stream::tests::chunking_preserves_text ... ok
+test prefs::tests::offscreen_bounds_move_onto_the_display ... ok
+test prefs::tests::oversized_bounds_shrink_and_visible_bounds_stay ... ok
+test bridge::stream::tests::ack_rules ... ok
+test bridge::stream::tests::hydration_requires_snapshot_end ... ok
+test bridge::stream::tests::composed_proves_actual_contiguous_sent_frames_after_ordinary_ack ... ok
+test bridge::stream::tests::snapshot_then_buffered_patch_in_order ... ok
+test bridge::stream::tests::intents_are_consumed_by_ack ... ok
+test bridge::stream::tests::composed_cursor_alone_cannot_cover_an_affected_row_revision ... ok
+test bridge::stream::tests::window_exhaustion_retires_instead_of_buffering ... ok
+test integration::tests::resolves_the_owned_dir_and_bundled_sources ... ok
+test window::tests::window_dependencies_are_the_ones_d0008_qualified ... ok
+test bridge::stream::tests::composed_history_overflow_never_promotes_a_cursor_to_proof ... ok
+test mock_ipc_tests::later_milestone_queries_are_typed_not_implemented ... ok
+test mock_ipc_tests::bootstrap_status_is_a_typed_success_without_a_companion ... ok
+test mock_ipc_tests::connect_reports_companion_unavailable ... ok
+test mock_ipc_tests::pages_require_a_subscription_context ... ok
+test mock_ipc_tests::malformed_requests_are_typed_invalid_request ... ok
+test mock_ipc_tests::a_view_without_the_native_marker_is_stale ... ok
+test bridge::stream::tests::oversized_snapshot_is_refused_before_begin ... ok
+test bridge::stream::tests::escape_heavy_snapshots_still_fit_frames ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

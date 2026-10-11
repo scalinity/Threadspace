@@ -1,0 +1,35 @@
+npm notice run @threadspace/desktop@0.1.0 test
+npm notice run vitest run src/qualification/latencyStore.test.ts src/ui/panels.test.tsx
+
+ RUN  v5.0.3 /Users/danny/Documents/Tools/Threadspace/apps/desktop
+
+ ❯ src/ui/panels.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/ui/panels.test.tsx [ src/ui/panels.test.tsx ]
+ReferenceError: window is not defined
+ ❯ read src/launch.ts:12:16
+     10|
+     11| function read(): LaunchConfig {
+     12|   const raw = (window as unknown as { __THREADSPACE_LAUNCH__?: Record<…
+       |                ^
+     13|   return {
+     14|     rendererMode: raw?.rendererMode === "webgl2-compatibility" ? "webg…
+ ❯ src/launch.ts:21:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  7 passed (7)
+   Start at  20:54:38
+   Duration  201ms (transform 56%, worker 18%, import 18%, tests 8%)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /Users/danny/Documents/Tools/Threadspace/apps/desktop
+npm error workspace @threadspace/desktop@0.1.0
+npm error location /Users/danny/Documents/Tools/Threadspace/apps/desktop
+npm error command failed
+npm error command sh -c vitest run src/qualification/latencyStore.test.ts src/ui/panels.test.tsx

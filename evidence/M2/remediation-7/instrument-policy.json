@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 3,
+  "method": "composed-duration-v1",
+  "requestedDelaysMs": [
+    0,
+    100,
+    250
+  ],
+  "runs": 1,
+  "repeatsUntilPass": false,
+  "maximumBracketWidthMs": 60,
+  "maximumObserverAllowanceMs": 30,
+  "maximumObservedClockStepMs": 1,
+  "maximumDurationMs": 400,
+  "guardMs": 1,
+  "nativeAdditiveMs": 0.001,
+  "outwardStepMs": 0.001,
+  "observerModel": "max(0, native upper elapsed enclosure minus observer elapsed) over fixed checks, plus largest observed positive read step and 1 ms guard, rounded outward",
+  "scope": "pinned installed executable and guarded host performance.now wrapper; same-epoch intervals within 0..400 ms, same boot/build, awake, no reset or lost census",
+  "limitation": "fixed engineering conformance and uncertainty; empirical consistency is not a universal rate bound"
+}

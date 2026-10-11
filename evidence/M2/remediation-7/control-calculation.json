@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 3,
+  "method": "composed-duration-v1",
+  "metricsQualified": true,
+  "nativeExecution": false,
+  "qualifiedSampleCounts": {
+    "claude.hook": {
+      "captureToCommitMs": 1,
+      "commitToDomMs": 1,
+      "eventToDomMs": 1
+    },
+    "claude.observer": {
+      "captureToCommitMs": 2,
+      "commitToDomMs": 1,
+      "eventToDomMs": 1
+    }
+  },
+  "bySource": {
+    "claude.hook": {
+      "captureToCommitMs": {
+        "n": 1,
+        "p50": 3.001,
+        "p95": 3.001,
+        "max": 3.001
+      },
+      "commitToDomMs": {
+        "n": 1,
+        "p50": 38.001,
+        "p95": 38.001,
+        "max": 38.001
+      },
+      "eventToDomMs": {
+        "n": 1,
+        "p50": 40.001,
+        "p95": 40.001,
+        "max": 40.001
+      },
+      "population": {
+        "totalCaptured": 1,
+        "durablyAccepted": 1,
+        "deduplicatedAttempts": 0,
+        "projectionChange": 1,
+        "noProjectionChange": 0,
+        "matchedDom": 1,
+        "missingTelemetry": 0
+      }
+    },
+    "claude.observer": {
+      "captureToCommitMs": {
+        "n": 2,
+        "p50": 6.004,
+        "p95": 7.004,
+        "max": 7.004
+      },
+      "commitToDomMs": {
+        "n": 1,
+        "p50": 37.001,
+        "p95": 37.001,
+        "max": 37.001
+      },
+      "eventToDomMs": {
+        "n": 1,
+        "p50": 44.005,
+        "p95": 44.005,
+        "max": 44.005
+      },
+      "population": {
+        "totalCaptured": 2,
+        "durablyAccepted": 2,
+        "deduplicatedAttempts": 0,
+        "projectionChange": 1,
+        "noProjectionChange": 1,
+        "matchedDom": 1,
+        "missingTelemetry": 0
+      }
+    }
+  },
+  "joinedSamples": [
+    {
+      "observationId": "22222222-2222-4222-8222-222222222222",
+      "source": "claude.hook",
+      "originalCommitBeginNs": "1012000000",
+      "originalCommitEndNs": "1013000000",
+      "receiptToken": null,
+      "upperBoundsMs": {
+        "captureToCommitMs": 3.001,
+        "commitToDomMs": 38.001,
+        "eventToDomMs": 40.001
+      },
+      "retainedAttempts": 0
+    },
+    {
+      "observationId": "33333333-3333-4333-8333-333333333333",
+      "source": "claude.observer",
+      "originalCommitBeginNs": "1013000000",
+      "originalCommitEndNs": "1014000000",
+      "receiptToken": "55555555-5555-4555-8555-555555555555",
+      "upperBoundsMs": {
+        "captureToCommitMs": 7.004,
+        "commitToDomMs": 37.001,
+        "eventToDomMs": 44.005
+      },
+      "retainedAttempts": 1
+    },
+    {
+      "observationId": "44444444-4444-4444-8444-444444444444",
+      "source": "claude.observer",
+      "originalCommitBeginNs": "1013000000",
+      "originalCommitEndNs": "1014000000",
+      "receiptToken": "55555555-5555-4555-8555-555555555555",
+      "upperBoundsMs": {
+        "captureToCommitMs": 6.004
+      },
+      "retainedAttempts": 1
+    }
+  ],
+  "exclusions": [
+    {
+      "observationId": "44444444-4444-4444-8444-444444444444",
+      "reason": "original transaction had no public projection change",
+      "metrics": [
+        "commitToDomMs",
+        "eventToDomMs"
+      ]
+    }
+  ],
+  "errors": [],
+  "normalPathPass": true,
+  "verdict": "INCOMPLETE_OR_FAIL"
+}

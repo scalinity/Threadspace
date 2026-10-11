@@ -1,0 +1,47 @@
+{
+  "filesScanned": 44,
+  "realCredentialHits": 0,
+  "privateSessionLinkHits": 0,
+  "privateAttachmentOrRawProviderPathHits": 0,
+  "classifications": [
+    {
+      "kind": "Token-shaped source literal",
+      "classification": "synthetic controlled fixture UUID",
+      "source": "source-privacy-scan.json",
+      "redaction": "none"
+    },
+    {
+      "kind": "Boot, runtime, run, witness, receipt and observation UUIDs in conformance/fixtures",
+      "classification": "real functional clock identity or explicitly synthetic fixture ID; not account credentials",
+      "redaction": "none"
+    },
+    {
+      "kind": "Absolute repository paths in prompts/test diagnostics",
+      "classification": "real functional source paths needed for reproducible startup and error provenance",
+      "redaction": "none"
+    },
+    {
+      "kind": "Literal private URLs, internal hostnames, private attachment/runtime paths, provider prompts/stdout/stderr",
+      "classification": "no occurrences in publication; original process output remains outside Git",
+      "redaction": "none"
+    },
+    {
+      "kind": "Generated contracts header URL",
+      "classification": "public ts-rs source link already present in generated files",
+      "redaction": "none"
+    }
+  ],
+  "redactions": [],
+  "scope": "New adapter source and new remediation-7 publication only; existing remote privacy unchanged, no public conversion or history rewrite.",
+  "consistency": {
+    "allMarkdownTargetsExist": true,
+    "sourceFilesMatchCommit": true,
+    "realConformanceQualified": false,
+    "syntheticVerdictIsNotPASS": true,
+    "protectedFilesByteIdentical": 150,
+    "M2": "UNACCEPTED",
+    "handoffStartupPathsExist": true,
+    "failedCheckSourcePreservedPrivately": true
+  },
+  "sourceFilesScanned": 26
+}
