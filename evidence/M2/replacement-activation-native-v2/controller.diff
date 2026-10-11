@@ -1,0 +1,62 @@
+diff --git a/tests/native/tools/m2_activation_native.py b/tests/native/tools/m2_activation_native.py
+index bcd9b76..aca1c26 100644
+--- a/tests/native/tools/m2_activation_native.py
++++ b/tests/native/tools/m2_activation_native.py
+@@ -17,0 +18,2 @@ from m2_activation_readiness import acknowledgement
++from m2_activation_verdict import (REVIEWED_COMMIT, REVIEW_RECORD_SHA, read_review, admit_source,
++    reject_retired, require_native_authority)
+@@ -29 +31,2 @@ def source_binding():
+-    return {"providerSha256": PROVIDER_SHA, "providerVersion": PROVIDER_VERSION,
++    reviewed = json.loads(read_review())["sourceBinding"]["sources"]
++    return {"providerPath": str(PROVIDER), "providerSha256": PROVIDER_SHA, "providerVersion": PROVIDER_VERSION,
+@@ -36,0 +40,7 @@ def source_binding():
++        "backgroundSha256": file_hash(HERE / "m2_socket_background.ts"),
++        "conformanceSourceIdentities": source_identities(),
++        "reviewedControllerSha256": reviewed["m2_activation_native.py"],
++        "reviewedDependencyHashes": {k: file_hash(HERE / k) for k in reviewed if k != "m2_activation_native.py"},
++        "verdictSha256": file_hash(HERE / "m2_activation_verdict.py"),
++        "verdictTestSha256": file_hash(HERE / "test_m2_activation_verdict.py"),
++        "projectionControlSha256": file_hash(HERE / "m2_activation_projection_controls.js"),
+@@ -40,2 +50 @@ def source_binding():
+-def stage(root, role, config):
+-    root.mkdir(mode=0o700)
++def staging_files(role, config):
+@@ -56,0 +66,6 @@ def stage(root, role, config):
++    return files
++
++
++def stage(root, role, config):
++    root.mkdir(mode=0o700)
++    files = staging_files(role, config)
+@@ -64 +79 @@ def stage(root, role, config):
+-def verify_staging(entries):
++def verify_staging(entries, config=None):
+@@ -67,0 +83,9 @@ def verify_staging(entries):
++        expected = staging_files(entry["role"], config)
++        # A metadata/file substitution cannot relabel canonical package bytes.
++        # Full configuration admission additionally requires its frozen config.
++        if config is None: expected.pop("hooks/config.ts", None)
++        allowed = set(expected) | ({"hooks/config.ts"} if config is None else set())
++        if set(entry["files"]) - allowed:
++            raise RuntimeError("unexpected canonical staged resource")
++        if any(entry["files"].get(name) != hashlib.sha256(raw).hexdigest() for name, raw in expected.items()):
++            raise RuntimeError("changed canonical staged composition/configuration")
+@@ -122,3 +146,4 @@ def prepare(root):
+-    reviewed = json.loads((HERE.parents[2] / "evidence/M2/replacement-activation-repair/source-identities.json").read_text())
+-    if binding["positiveProbeSha256"] != reviewed["identities"]["probeSha256"]: raise RuntimeError("admitted positive module changed")
+-    if binding["observerSha256"] != "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b": raise RuntimeError("canonical observer changed")
++    admit_source(binding, read_review())
++    # No freeze/nonce/process can be created while mandatory preflight B is
++    # unsatisfied. File existence and classify() are not acceptance authority.
++    require_native_authority(ACTIVATION.read_bytes())
+@@ -136 +161,2 @@ def prepare(root):
+-    freeze = {"kind": "ACTIVATION_ONLY_ONE_POSITIVE", "baseSha": "5b8ac24c3bcdc2d7e17f8e8777094c93a1ca5e8c", "deadlineSeconds": DEADLINE,
++    freeze = {"kind": "ACTIVATION_ONLY_ONE_POSITIVE", "baseSha": REVIEWED_COMMIT,
++        "reviewedGitCommit": REVIEWED_COMMIT, "reviewRecordSha256": REVIEW_RECORD_SHA, "deadlineSeconds": DEADLINE,
+@@ -178,0 +205,3 @@ def smoke(root, freeze, env):
++    reject_retired(freeze)
++    admit_source(source_binding(), read_review())
++    require_native_authority(ACTIVATION.read_bytes())
+@@ -183 +212 @@ def smoke(root, freeze, env):
+-    verify_staging(freeze["smokeEntries"])
++    verify_staging(freeze["smokeEntries"], freeze["config"])

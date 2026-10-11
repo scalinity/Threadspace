@@ -15,6 +15,8 @@ from m2_socket_plugins import OBSERVER_FILES, OBSERVER, write_private, json_byte
 from m2_socket_runner import PROVIDER, PROVIDER_VERSION, PROVIDER_SHA, image_identity, cleanup, provider_argv
 from m2_socket_duration import HERE, canonical_hash, source_identities, file_hash
 from m2_activation_readiness import acknowledgement
+from m2_activation_verdict import (REVIEWED_COMMIT, REVIEW_RECORD_SHA, read_review, admit_source,
+    reject_retired, require_native_authority)
 
 DEADLINE = 20
 ACTIVATION = HERE / "m2_activation_probe.ts"
@@ -26,7 +28,8 @@ def save(path, value):
 
 
 def source_binding():
-    return {"providerSha256": PROVIDER_SHA, "providerVersion": PROVIDER_VERSION,
+    reviewed = json.loads(read_review())["sourceBinding"]["sources"]
+    return {"providerPath": str(PROVIDER), "providerSha256": PROVIDER_SHA, "providerVersion": PROVIDER_VERSION,
         "observerSha256": source_identities()["adapterSha256"],
         "positiveProbeSha256": file_hash(HERE / "m2_socket_probe.ts"),
         "activationSha256": file_hash(ACTIVATION), "fixtureSha256": file_hash(FIXTURE),
@@ -34,11 +37,17 @@ def source_binding():
         "controlSourceSha256": file_hash(HERE / "m2_activation_controls.js"),
         "testSourceSha256": file_hash(HERE / "test_m2_activation.py"),
         "admittedStagerSha256": file_hash(HERE / "m2_socket_plugins.py"),
+        "backgroundSha256": file_hash(HERE / "m2_socket_background.ts"),
+        "conformanceSourceIdentities": source_identities(),
+        "reviewedControllerSha256": reviewed["m2_activation_native.py"],
+        "reviewedDependencyHashes": {k: file_hash(HERE / k) for k in reviewed if k != "m2_activation_native.py"},
+        "verdictSha256": file_hash(HERE / "m2_activation_verdict.py"),
+        "verdictTestSha256": file_hash(HERE / "test_m2_activation_verdict.py"),
+        "projectionControlSha256": file_hash(HERE / "m2_activation_projection_controls.js"),
         "observerFiles": {name: file_hash(OBSERVER / name) for name in OBSERVER_FILES}}
 
 
-def stage(root, role, config):
-    root.mkdir(mode=0o700)
+def staging_files(role, config):
     observer, positive = package_files(config)
     if role == "observer": files = observer
     elif role == "positive": files = positive
@@ -54,6 +63,12 @@ def stage(root, role, config):
             "hooks/activation.ts": ACTIVATION.read_bytes(),
             "hooks/config.ts": ("export const config = " + json.dumps(config, allow_nan=False) + ";\n").encode()}
     else: raise ValueError("unknown staging role")
+    return files
+
+
+def stage(root, role, config):
+    root.mkdir(mode=0o700)
+    files = staging_files(role, config)
     for directory in sorted({str(Path(name).parent) for name in files}): (root / directory).mkdir(mode=0o700)
     for name, data in files.items(): write_private(root / name, data)
     manifest = json.loads(files[".claude-plugin/plugin.json"])
@@ -61,10 +76,19 @@ def stage(root, role, config):
         "modules": json.loads(files["hooks/hooks.json"])["modules"], "files": {name: hashlib.sha256(data).hexdigest() for name, data in files.items()}}
 
 
-def verify_staging(entries):
+def verify_staging(entries, config=None):
     if len({entry["root"] for entry in entries}) != len(entries) or len({entry["name"] for entry in entries}) != len(entries): raise RuntimeError("duplicate plugin root/name")
     for entry in entries:
         root = Path(entry["root"])
+        expected = staging_files(entry["role"], config)
+        # A metadata/file substitution cannot relabel canonical package bytes.
+        # Full configuration admission additionally requires its frozen config.
+        if config is None: expected.pop("hooks/config.ts", None)
+        allowed = set(expected) | ({"hooks/config.ts"} if config is None else set())
+        if set(entry["files"]) - allowed:
+            raise RuntimeError("unexpected canonical staged resource")
+        if any(entry["files"].get(name) != hashlib.sha256(raw).hexdigest() for name, raw in expected.items()):
+            raise RuntimeError("changed canonical staged composition/configuration")
         if root.is_symlink() or root.stat().st_uid != os.getuid() or root.stat().st_mode & 0o777 != 0o700: raise RuntimeError("unowned staged root")
         actual = {str(p.relative_to(root)) for p in root.rglob("*") if p.is_file()}
         if actual != set(entry["files"]): raise RuntimeError("missing or unexpected staged file")
@@ -119,9 +143,10 @@ def prepare(root):
     root = Path(root).resolve(strict=True)
     if file_hash(PROVIDER) != PROVIDER_SHA: raise RuntimeError("required provider bytes changed")
     binding = source_binding()
-    reviewed = json.loads((HERE.parents[2] / "evidence/M2/replacement-activation-repair/source-identities.json").read_text())
-    if binding["positiveProbeSha256"] != reviewed["identities"]["probeSha256"]: raise RuntimeError("admitted positive module changed")
-    if binding["observerSha256"] != "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b": raise RuntimeError("canonical observer changed")
+    admit_source(binding, read_review())
+    # No freeze/nonce/process can be created while mandatory preflight B is
+    # unsatisfied. File existence and classify() are not acceptance authority.
+    require_native_authority(ACTIVATION.read_bytes())
     ids = {**binding, "runId": str(uuid.uuid4()), "responderId": str(uuid.uuid4()), "nonce": uuid.uuid4().hex + uuid.uuid4().hex,
         "bootId": subprocess.check_output(["/usr/sbin/sysctl", "-n", "kern.bootsessionuuid"], text=True).strip().lower()}
     validation = root / "validation"; validation.mkdir(mode=0o700); env = environment(validation)
@@ -133,7 +158,8 @@ def prepare(root):
     smoke_entries = [stage(owned / "observer-plugin", "observer", config), stage(owned / "duration-plugin", "activation", config)]
     positive_env = environment(owned)
     argv = provider_argv(owned, {"plugins": smoke_entries}) + ["--debug-file", str(owned / "provider-debug.log")]
-    freeze = {"kind": "ACTIVATION_ONLY_ONE_POSITIVE", "baseSha": "5b8ac24c3bcdc2d7e17f8e8777094c93a1ca5e8c", "deadlineSeconds": DEADLINE,
+    freeze = {"kind": "ACTIVATION_ONLY_ONE_POSITIVE", "baseSha": REVIEWED_COMMIT,
+        "reviewedGitCommit": REVIEWED_COMMIT, "reviewRecordSha256": REVIEW_RECORD_SHA, "deadlineSeconds": DEADLINE,
         "ids": ids, "config": config, "validationEntries": entries, "smokeEntries": smoke_entries, "argv": argv,
         "osBuild": subprocess.check_output(["/usr/bin/sw_vers", "-buildVersion"], text=True).strip(),
         "originalPositiveModuleExecuted": False, "timingRows": 0}
@@ -176,11 +202,14 @@ def protocol_control(root, ids):
 
 
 def smoke(root, freeze, env):
+    reject_retired(freeze)
+    admit_source(source_binding(), read_review())
+    require_native_authority(ACTIVATION.read_bytes())
     root = Path(root); owned = root / "positive"; fixture = owned / "readiness"
     if (owned / "attempt-started.json").exists(): raise RuntimeError("positive activation attempt already consumed")
     if source_binding() != {key: freeze["ids"][key] for key in source_binding()}: raise RuntimeError("frozen activation sources changed")
     if canonical_hash(freeze) != canonical_hash(json.loads((root / "activation-freeze.json").read_text())): raise RuntimeError("changed frozen activation configuration")
-    verify_staging(freeze["smokeEntries"])
+    verify_staging(freeze["smokeEntries"], freeze["config"])
     save(owned / "attempt-started.json", {"kind": freeze["kind"], "runId": freeze["ids"]["runId"], "freezeSha256": canonical_hash(freeze)})
     responder = subprocess.Popen([str(Path(sys.executable).resolve()), str(FIXTURE), str(fixture)], cwd=fixture,
         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

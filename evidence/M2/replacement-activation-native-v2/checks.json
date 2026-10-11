@@ -1,0 +1,62 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_m2_activation_verdict",
+        "test_m2_activation.PortableActivationControls"
+      ],
+      "cwd": "tests/native/tools",
+      "exitCode": 0,
+      "logSha256": "2cffd173de6a4131fb06e4b10c044fe701edefdc715c5b3420a2bbd2033febf3"
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_m2_socket_plugins",
+        "test_m2_socket_duration.EvaluatorControls",
+        "test_m2_composed_duration"
+      ],
+      "cwd": "tests/native/tools",
+      "exitCode": 0,
+      "logSha256": "70eb80083a9ef939abd1f21d78e745be58fc04584ef694a3c669b4e2b6dcebdd"
+    },
+    {
+      "argv": [
+        "node",
+        "tests/native/tools/m2_activation_projection_controls.js",
+        "tests/native/tools/m2_activation_probe.ts"
+      ],
+      "cwd": ".",
+      "exitCode": 0,
+      "logSha256": "408087ef8b7e05c95c5e4a9d8eb158cc326947a1b43ec0abfc9424fa4d466576"
+    }
+  ],
+  "nativeActivationOrHttpCertifiedByPortableControls": false,
+  "newFullNativePassVerifier": "INCOMPLETE: fixed source lacks required witnesses",
+  "originalClassifyStillDescriptive": true,
+  "originalDeadlineSeconds": 20,
+  "positiveActivationAttempts": 0,
+  "preflightA": "PASS",
+  "preflightB": "INCOMPLETE",
+  "preflightC": "NOT_RUN after mandatory B refusal",
+  "preserved20SecondDeadline": true,
+  "providerCommandsThisUnit": 0,
+  "providerExecutableSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+  "providerVersionAuthority": "Historical independent version verification for the same exact pinned bytes; --version NOT_RUN this unit",
+  "readinessProcessesThisUnit": 0,
+  "testCounts": {
+    "actualEntryProjectionJavaScriptControl": 1,
+    "existingPortableActivationPythonControls": 5,
+    "finalPythonTotal": 46,
+    "identityRegressionPythonControls": 30,
+    "newSourceAndEvidencePythonControls": 11
+  },
+  "timingAttempts": 0
+}

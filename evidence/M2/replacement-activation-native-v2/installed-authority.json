@@ -1,0 +1,66 @@
+{
+  "additionalApiOrTransportProposed": false,
+  "binarySpans": {
+    "below-only-trace": {
+      "binaryOffset": 189799420,
+      "bytes": 850,
+      "interpretation": "Host next trace traverses the run beneath this hook, not its own or preceding links.",
+      "sha256": "ccf16bb898d24068e7e3ec88d63e7a1de36351f222c416e300a2c4b75856da9c"
+    },
+    "host-diagnostic-sink": {
+      "binaryOffset": 196841415,
+      "bytes": 1100,
+      "interpretation": "The chain diagnostic sink forwards logs to the supported debug logger; ordinary trace entries are not emitted here.",
+      "sha256": "d1bdda7c5b52c6b497ea25e03d1be2c653e208896eb0e0e5be0f2bdf4b65942a"
+    },
+    "loader-pre-admission-log": {
+      "binaryOffset": 196806759,
+      "bytes": 2100,
+      "interpretation": "Loaded-module diagnostic occurs before LKe returns admitted/refused sets; loaded is not admission.",
+      "sha256": "ac0a3e59d7d7ba7c978d1f5f9d53948da5174a5f25537ec86c96c2559b1547be"
+    },
+    "next-readonly-trace": {
+      "binaryOffset": 189788111,
+      "bytes": 1800,
+      "interpretation": "Host freezes next; its trace getter is supplied by the dispatch chain.",
+      "sha256": "c4202445bc8cf6317e35780be86a385f47dd58cdc33e8e6fd04df532a0cd7005"
+    },
+    "trace-settle-values": {
+      "binaryOffset": 189803950,
+      "bytes": 700,
+      "interpretation": "Host records received argument and returned value when a link settles.",
+      "sha256": "23c2f20354d8378171843a86b50a204e04bff42e89d4e2a8724cad86f4e313b6"
+    }
+  },
+  "clockProvenanceReopened": false,
+  "completeVendorExcerptsPublic": false,
+  "declarationSpans": {
+    "nextOriginTrace": {
+      "firstLine": 6566,
+      "lastLine": 6594,
+      "sha256": "ff108086391e9283311b9eaa4c1586d5d605ecd3be24ebe5e318cfd47d005c44"
+    },
+    "sessionStartResult": {
+      "firstLine": 11688,
+      "lastLine": 11695,
+      "sha256": "63cd0748fcc2f82ba4c21278d23c1b1311ab805705fc83ceb93aee973d1d8811"
+    },
+    "traceEntry": {
+      "firstLine": 13217,
+      "lastLine": 13254,
+      "sha256": "ea0fa476d882b5ab80ec253f4a1e993f15a5b350e90bad9c68712411e2260d7a"
+    },
+    "traceOutcome": {
+      "firstLine": 13256,
+      "lastLine": 13270,
+      "sha256": "bba8853affc58c255d4bdbc26b3e06311bd7fa09fec52cf2a3faf2179286aa07"
+    }
+  },
+  "declarationsSha256": "ca0ab16c1f79f247c9de2a574bc81bf8bc7fa401e45bdfc7809337615c0ab351",
+  "kind": "EXACT_INSTALLED_ACTIVATION_AUTHORITY_INSPECTION",
+  "providerPath": "/Users/danny/.local/share/claude/versions/2.1.295",
+  "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+  "providerVersion": "2.1.295",
+  "supportedDebugLimitation": "Module loaded diagnostics precede admission and do not provide normal per-link received/returned value receipts or next invocation counts.",
+  "versionAuthority": "Previously independently verified exact bytes; no new executable invocation in this preflight"
+}
