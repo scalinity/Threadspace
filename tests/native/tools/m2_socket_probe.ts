@@ -1,10 +1,8 @@
 import { createLatencyMeasurement } from './latency.ts';
-import { register as registerObserver } from './observer.ts';
 import { startBackground } from './background.ts';
 import { config } from './config.ts';
 
-export const register = (on: any, options: any) => {
-  registerObserver(on, options);
+export const register = (on: any) => {
   const meter = createLatencyMeasurement(['/unused-capture-helper', 'mod-batch', '--qualification-latency'], config.runtimeId)!;
   on('session.start', ($: any, e: any, next: any) => {
     const forwarded = next(e);

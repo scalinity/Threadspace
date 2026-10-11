@@ -6,6 +6,7 @@ import json
 import math
 from decimal import Decimal, ROUND_FLOOR, ROUND_CEILING
 from pathlib import Path
+from m2_socket_plugins import composition_identity, validate_manifest
 
 HERE = Path(__file__).resolve().parent
 POLICY = json.loads((HERE / "m2_socket_policy.json").read_text())
@@ -18,6 +19,7 @@ IDENTITY_KEYS = (
     "evaluatorSha256", "calculatorSha256", "policySha256", "policyFileSha256", "probeSha256",
     "backgroundSha256", "osBuild", "bootId", "nativeClock", "observerClock",
     "clockScope", "responderId", "responderProcess", "runId", "runtimes",
+    "pluginComposition", "pluginStagerSha256",
 )
 MARKERS = ("captureLower", "captureUpper", "endLower", "endUpper")
 
@@ -42,6 +44,8 @@ def source_identities():
         "policyFileSha256": file_hash(HERE / "m2_socket_policy.json"),
         "probeSha256": file_hash(HERE / "m2_socket_probe.ts"),
         "backgroundSha256": file_hash(HERE / "m2_socket_background.ts"),
+        "pluginComposition": composition_identity(),
+        "pluginStagerSha256": file_hash(HERE / "m2_socket_plugins.py"),
     }
 
 def decimal(value):
@@ -71,6 +75,22 @@ def qualify(report):
     require(all(ids.get(k) == v for k, v in source_identities().items()), "changed source/provider/adapter/evaluator/policy/probe")
     require(all(ids.get(k) == v for k, v in freeze.get("identities", {}).items()), "conformance identity differs from frozen source")
     require(all(ids.get(k) not in (None, "", [], {}) for k in IDENTITY_KEYS), "missing original conformance identity")
+    if report.get("executionKind") == "NATIVE_INSTALLED_PROVIDER":
+        staging = report.get("pluginStaging", [])
+        require(len(staging) == 2, "missing original two-plugin staging identities")
+        for index, entry in enumerate(staging):
+            try:
+                manifest = entry["manifest"]
+                owned = Path(manifest["plugins"][0]["root"]).parent
+                runtime = freeze["runtimePlan"][index]
+                config = {**runtime, **{k: ids[k] for k in ("runId", "bootId", "responderId")},
+                    "plan": freeze["plan"], "firstSequence": index * 28, "delays": POLICY["requestedDelaysMs"],
+                    "socketPath": str(owned.parent / "s.sock"), "freezeSha256": report["freezeSha256"],
+                    "output": str(owned / "host-result.json")}
+                validate_manifest(manifest, owned, config, ids["pluginComposition"])
+                require(entry.get("condition") == runtime["condition"] and entry.get("manifestSha256") == canonical_hash(manifest), "changed original plugin staging digest/condition")
+            except (KeyError, ValueError, RuntimeError, TypeError, IndexError) as error:
+                errors.append("unbound original plugin staging: " + str(error))
     require(ids.get("nativeClock") == "CLOCK_UPTIME_RAW" and ids.get("observerClock") == "performance.now" and ids.get("clockScope") == POLICY["clockScope"], "clock implementation/scope")
     runtimes = ids.get("runtimes", [])
     require(len(runtimes) == 2 and [r.get("condition") for r in runtimes] == POLICY["conditions"], "missing fresh runtime conditions")

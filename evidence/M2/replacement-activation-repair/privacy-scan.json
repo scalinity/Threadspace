@@ -1,0 +1,116 @@
+{
+  "classifiedBeforeRedaction": [
+    {
+      "class": "FUNCTIONAL_SOURCE_AND_EXECUTION_PATHS",
+      "disposition": "RETAIN; repository and exact provider paths are necessary identities, placeholder paths are explicitly synthetic",
+      "findings": [
+        {
+          "line": 16,
+          "path": "tests/native/tools/m2_socket_runner.py"
+        },
+        {
+          "line": 100,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 112,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 151,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 152,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 153,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 192,
+          "path": "tests/native/tools/test_m2_socket_plugins.py"
+        },
+        {
+          "line": 11,
+          "path": "evidence/M2/replacement-activation-repair/README.md"
+        },
+        {
+          "line": 8,
+          "path": "evidence/M2/replacement-activation-repair/checks.json"
+        },
+        {
+          "line": 20,
+          "path": "evidence/M2/replacement-activation-repair/checks.json"
+        },
+        {
+          "line": 3,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 12,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 14,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 16,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 24,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 35,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 86,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 103,
+          "path": "evidence/M2/replacement-activation-repair/launch-configuration.json"
+        },
+        {
+          "line": 62,
+          "path": "evidence/M2/replacement-activation-repair/source-identities.json"
+        }
+      ]
+    },
+    {
+      "class": "SYNTHETIC_FIXTURE_IDENTITIES",
+      "disposition": "RETAIN; fixed test runtime/epoch/boot/challenges and substitution strings are synthetic inputs, no native run or owner history"
+    },
+    {
+      "class": "PATTERN_CONSTRUCTING_CODE",
+      "disposition": "RETAIN; environment prefix filters and hash/JSON construction are executable logic, not credentials"
+    },
+    {
+      "class": "PRIVATE_VENDOR_EXCERPTS",
+      "disposition": "EXCLUDE; complete installed-loader contexts retained outside Git with scoped public offsets and hashes"
+    }
+  ],
+  "credentialHits": [],
+  "credentialPatterns": [
+    "private-key",
+    "aws-access-key",
+    "github-token",
+    "openai-token",
+    "credential-literal"
+  ],
+  "filesScanned": 18,
+  "finalFilesScannedIncludingGeneratedInventory": 20,
+  "fullVendorDeclarationsPublished": false,
+  "generatedPrivacyAndInventoryScan": "NO_CREDENTIAL_OR_PRIVATE_URL_MATCH",
+  "privateSessionOrCredentialUrlHits": [],
+  "rawOwnerPromptsHistoryOrCredentialsCollected": false,
+  "redactionsApplied": false,
+  "scope": "All changed source and new evidence files, before staging; public repository already exists; no history rewrite",
+  "unrelatedProcessInventoryCollected": false,
+  "verdict": "NO_REAL_SENSITIVE_VALUE_IDENTIFIED_IN_CANDIDATE_PUBLICATION"
+}

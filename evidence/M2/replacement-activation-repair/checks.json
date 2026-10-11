@@ -1,0 +1,72 @@
+{
+  "buildExecuted": false,
+  "calibrationExecuted": false,
+  "checks": [
+    {
+      "assertions": 137,
+      "command": "python3 tests/native/tools/test_m2_socket_plugins.py",
+      "cwd": "/Users/danny/Documents/Tools/Threadspace",
+      "errors": 0,
+      "exitCode": 0,
+      "failures": 0,
+      "outputSha256": "579a1a9aa39e11e9f04337d7d19e7fa813e571aac39323f9a339535bf195ac84",
+      "processLaunchGuard": "subprocess.Popen patched to fail; each test asserts zero calls; controller command/responder methods additionally patched in refusal test",
+      "tests": 13
+    },
+    {
+      "assertionCountDisposition": "NOT_INSTRUMENTED",
+      "assertions": null,
+      "command": "python3 -m unittest test_m2_socket_duration.EvaluatorControls test_m2_composed_duration",
+      "cwd": "/Users/danny/Documents/Tools/Threadspace/tests/native/tools",
+      "errors": 0,
+      "exitCode": 0,
+      "failures": 0,
+      "outputSha256": "c940ba553da06d4ac019c460fdea0d3f22a1d8bbd1ec60c172f54883de10aea0",
+      "selection": "Portable synthetic evaluator and calculator classes only; NativeProtocolControls not selected",
+      "tests": 17
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "executedSources": {
+    "tests/native/tools/m2_socket_duration.py": "40ced6953f53bc2e0f5042e092c7757779f9ce978d967c791fbbb9039cc77c5f",
+    "tests/native/tools/m2_socket_plugins.py": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+    "tests/native/tools/m2_socket_probe.ts": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c",
+    "tests/native/tools/m2_socket_runner.py": "abf36c70117f98dc5d5debe8c1cd57614920e14d291cfbc355ba22d3a64e348c",
+    "tests/native/tools/test_m2_socket_plugins.py": "8e230c131731b062dd7ad363e057ab77106050b4f67b237f2b9476256dfc25de"
+  },
+  "executedSupportingSources": {
+    "tests/native/tools/m2_composed_duration.py": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+    "tests/native/tools/m2_socket_policy.json": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+    "tests/native/tools/test_m2_composed_duration.py": "6ffd1dd161bdd2e4b95f18d93d446cff92599a0dd15f7c95bb8079fab60d6bd5",
+    "tests/native/tools/test_m2_socket_duration.py": "32fd4fa0db2d4106b6aaf86ec62fa58c4075d342824f6e45d3861ed29968fcfe"
+  },
+  "kind": "EXECUTED_PORTABLE_CHECKS",
+  "providerLaunched": false,
+  "pythonRuntime": {
+    "executableSha256": "7ebde552773a4045532637b114d645a313e045ac07b26f5e520bf039f1e34063",
+    "implementation": "CPython",
+    "version": "3.14.8"
+  },
+  "recordedAtUtc": "2026-10-11T06:03:52.326648+00:00",
+  "responderLaunched": false,
+  "syntheticNativeRecordBranch": "Only fixture data exercises conditional identity validation; no native observation",
+  "totalTests": 30,
+  "unexecuted": [
+    "installed loader/validator",
+    "plugin discovery and registration",
+    "observer callback",
+    "timing callback",
+    "next(e) native readback",
+    "callback output persistence",
+    "native HTTP readiness",
+    "clock qualification",
+    "full F4",
+    "compact helper comparison",
+    "application build/install",
+    "M2 merge",
+    "M3"
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "argv": [
+    "/Users/danny/.local/share/claude/versions/2.1.295",
+    "--print",
+    "--input-format",
+    "stream-json",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence",
+    "--plugin-dir",
+    "/SOURCE_ONLY_OWNED/quiet/observer-plugin",
+    "--plugin-dir",
+    "/SOURCE_ONLY_OWNED/quiet/duration-plugin",
+    "--settings",
+    "/SOURCE_ONLY_OWNED/quiet/config/settings.json",
+    "--setting-sources",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}"
+  ],
+  "childEnvironmentChanges": {
+    "CLAUDE_CONFIG_DIR": "/SOURCE_ONLY_OWNED/quiet/config",
+    "removeKeysWithPrefix": "CLAUDE_CODE_PLUGIN_"
+  },
+  "disposableSettings": {
+    "disableAllHooks": false,
+    "hooks": {}
+  },
+  "kind": "SYNTHETIC_SOURCE_ONLY_REPRESENTATION_NEVER_LAUNCHED",
+  "nativePluginInventory": "UNVERIFIED; future gate rejects unexpected non-built-in plugins",
+  "noPositiveFreezeOrChallenges": true,
+  "parentEnvironmentUnchanged": true,
+  "pathSemantics": "/SOURCE_ONLY_OWNED is a placeholder, not a created experiment directory",
+  "plugins": {
+    "composition": {
+      "observer": {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "version": "0.1.0"
+      },
+      "qualification": {
+        "files": {
+          ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+          "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+          "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/register.ts": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "version": "2.0.0"
+      },
+      "schemaVersion": 1
+    },
+    "plugins": [
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "role": "observer",
+        "root": "/SOURCE_ONLY_OWNED/quiet/observer-plugin",
+        "version": "0.1.0"
+      },
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+          "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+          "hooks/config.ts": "bb173b1574bd0903c78eff34629e07f5d98d8c38850e54a57d766a95f42a795a",
+          "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/register.ts": "bfe2cbba9b1bdfa3c307f3044b262aee76aa155cee54f584c91ba3ae4af0b73c"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "role": "qualification",
+        "root": "/SOURCE_ONLY_OWNED/quiet/duration-plugin",
+        "version": "2.0.0"
+      }
+    ],
+    "schemaVersion": 1
+  },
+  "settingsSha256": "e3b1bd7775f2301778e3b46f8101ea67509fde00e90d57e0f0680548184d4be5"
+}
