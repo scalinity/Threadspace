@@ -1,0 +1,2679 @@
+{
+  "bootAfter": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+  "freezeSha256": "32b79cce9d1651f8dcff1936624a2c68ec7f47fc798fa510b7969102a1c4caca",
+  "rows": [
+    {
+      "arm": "release",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "st_ctime_ns": 1791866475263499925,
+            "st_dev": 16777231,
+            "st_ino": 167692875,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475263419466,
+            "st_size": 1665504,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18242,
+            "startUsec": 1791866487219911,
+            "uid": 501
+          },
+          "childPid": 18242,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18242,
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "startUsec": 1791866487219911,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475263499925,
+                "st_dev": 16777231,
+                "st_ino": 167692875,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475263419466,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18242,
+                "startUsec": 1791866487219911,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475263499925,
+                "st_dev": 16777231,
+                "st_ino": 167692875,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475263419466,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18242,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18242,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "st_ctime_ns": 1791866475263499925,
+        "st_dev": 16777231,
+        "st_ino": 167692875,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475263419466,
+        "st_size": 1665504,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": true,
+      "launchToReapMs": 618.910875,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211876686091000,
+        "parentReapNs": 211877305001875,
+        "successfulSpawnReturnNs": 211876695452250
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18242,
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "startUsec": 1791866487219911,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "release",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "st_ctime_ns": 1791866475263499925,
+            "st_dev": 16777231,
+            "st_ino": 167692875,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475263419466,
+            "st_size": 1665504,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18266,
+            "startUsec": 1791866487844125,
+            "uid": 501
+          },
+          "childPid": 18266,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18266,
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "startUsec": 1791866487844125,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475263499925,
+                "st_dev": 16777231,
+                "st_ino": 167692875,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475263419466,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18266,
+                "startUsec": 1791866487844125,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475263499925,
+                "st_dev": 16777231,
+                "st_ino": 167692875,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475263419466,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18266,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18266,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "st_ctime_ns": 1791866475263499925,
+        "st_dev": 16777231,
+        "st_ino": 167692875,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475263419466,
+        "st_size": 1665504,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": false,
+      "launchToReapMs": 17.018625,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877310445833,
+        "parentReapNs": 211877327464458,
+        "successfulSpawnReturnNs": 211877313455541
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18266,
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "startUsec": 1791866487844125,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "st_ctime_ns": 1791866475347540854,
+            "st_dev": 16777231,
+            "st_ino": 167692878,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475347393479,
+            "st_size": 1057360,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18272,
+            "startUsec": 1791866487865790,
+            "uid": 501
+          },
+          "childPid": 18272,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18272,
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "startUsec": 1791866487865790,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475347540854,
+                "st_dev": 16777231,
+                "st_ino": 167692878,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475347393479,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18272,
+                "startUsec": 1791866487865790,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475347540854,
+                "st_dev": 16777231,
+                "st_ino": 167692878,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475347393479,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18272,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18272,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "st_ctime_ns": 1791866475347540854,
+        "st_dev": 16777231,
+        "st_ino": 167692878,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475347393479,
+        "st_size": 1057360,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": true,
+      "launchToReapMs": 105.901833,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877332115583,
+        "parentReapNs": 211877438017416,
+        "successfulSpawnReturnNs": 211877338261041
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18272,
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "startUsec": 1791866487865790,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "st_ctime_ns": 1791866475347540854,
+            "st_dev": 16777231,
+            "st_ino": 167692878,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475347393479,
+            "st_size": 1057360,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18306,
+            "startUsec": 1791866487976643,
+            "uid": 501
+          },
+          "childPid": 18306,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18306,
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "startUsec": 1791866487976643,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475347540854,
+                "st_dev": 16777231,
+                "st_ino": 167692878,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475347393479,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18306,
+                "startUsec": 1791866487976643,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475347540854,
+                "st_dev": 16777231,
+                "st_ino": 167692878,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475347393479,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18306,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18306,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "st_ctime_ns": 1791866475347540854,
+        "st_dev": 16777231,
+        "st_ino": 167692878,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475347393479,
+        "st_size": 1057360,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": false,
+      "launchToReapMs": 27.460791,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877442924375,
+        "parentReapNs": 211877470385166,
+        "successfulSpawnReturnNs": 211877446172750
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18306,
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "startUsec": 1791866487976643,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "st_ctime_ns": 1791866475431601284,
+            "st_dev": 16777231,
+            "st_ino": 167692881,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475431504659,
+            "st_size": 1057360,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18313,
+            "startUsec": 1791866488008326,
+            "uid": 501
+          },
+          "childPid": 18313,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18313,
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "startUsec": 1791866488008326,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475431601284,
+                "st_dev": 16777231,
+                "st_ino": 167692881,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475431504659,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18313,
+                "startUsec": 1791866488008326,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475431601284,
+                "st_dev": 16777231,
+                "st_ino": 167692881,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475431504659,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18313,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18313,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "st_ctime_ns": 1791866475431601284,
+        "st_dev": 16777231,
+        "st_ino": 167692881,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475431504659,
+        "st_size": 1057360,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": true,
+      "launchToReapMs": 80.85925,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877474593625,
+        "parentReapNs": 211877555452875,
+        "successfulSpawnReturnNs": 211877480508458
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18313,
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "startUsec": 1791866488008326,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "st_ctime_ns": 1791866475431601284,
+            "st_dev": 16777231,
+            "st_ino": 167692881,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475431504659,
+            "st_size": 1057360,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18325,
+            "startUsec": 1791866488093337,
+            "uid": 501
+          },
+          "childPid": 18325,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18325,
+            "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+            "startUsec": 1791866488093337,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475431601284,
+                "st_dev": 16777231,
+                "st_ino": 167692881,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475431504659,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18325,
+                "startUsec": 1791866488093337,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+                "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+                "st_ctime_ns": 1791866475431601284,
+                "st_dev": 16777231,
+                "st_ino": 167692881,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475431504659,
+                "st_size": 1057360,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18325,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18325,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "st_ctime_ns": 1791866475431601284,
+        "st_dev": 16777231,
+        "st_ino": 167692881,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475431504659,
+        "st_size": 1057360,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": false,
+      "launchToReapMs": 29.055917,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877559664958,
+        "parentReapNs": 211877588720875,
+        "successfulSpawnReturnNs": 211877562494208
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/capture-compact-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18325,
+        "sha256": "bc764a4280f6d21d26efd0be6e01b83fbabadee8d69ce2bb8b11a4499f14840b",
+        "startUsec": 1791866488093337,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "release",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "st_ctime_ns": 1791866475523887023,
+            "st_dev": 16777231,
+            "st_ino": 167692892,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475523747106,
+            "st_size": 1665504,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18326,
+            "startUsec": 1791866488127644,
+            "uid": 501
+          },
+          "childPid": 18326,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18326,
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "startUsec": 1791866488127644,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475523887023,
+                "st_dev": 16777231,
+                "st_ino": 167692892,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475523747106,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18326,
+                "startUsec": 1791866488127644,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475523887023,
+                "st_dev": 16777231,
+                "st_ino": 167692892,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475523747106,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18326,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18326,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "st_ctime_ns": 1791866475523887023,
+        "st_dev": 16777231,
+        "st_ino": 167692892,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475523747106,
+        "st_size": 1665504,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": true,
+      "launchToReapMs": 100.491625,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877593987541,
+        "parentReapNs": 211877694479166,
+        "successfulSpawnReturnNs": 211877599629875
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18326,
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "startUsec": 1791866488127644,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "release",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "st_ctime_ns": 1791866475523887023,
+            "st_dev": 16777231,
+            "st_ino": 167692892,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475523747106,
+            "st_size": 1665504,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18327,
+            "startUsec": 1791866488233624,
+            "uid": 501
+          },
+          "childPid": 18327,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18327,
+            "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+            "startUsec": 1791866488233624,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475523887023,
+                "st_dev": 16777231,
+                "st_ino": 167692892,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475523747106,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18327,
+                "startUsec": 1791866488233624,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+                "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+                "st_ctime_ns": 1791866475523887023,
+                "st_dev": 16777231,
+                "st_ino": 167692892,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475523747106,
+                "st_size": 1665504,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18327,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18327,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "exitCode": 0,
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "st_ctime_ns": 1791866475523887023,
+        "st_dev": 16777231,
+        "st_ino": 167692892,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475523747106,
+        "st_size": 1665504,
+        "st_uid": 501
+      },
+      "firstExecutionOfAcquiredInode": false,
+      "launchToReapMs": 16.3305,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877699516958,
+        "parentReapNs": 211877715847458,
+        "successfulSpawnReturnNs": 211877702185333
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification/release-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18327,
+        "sha256": "1fe32971b96b4008cefc956b70397b3bd81f68196de34a427909f25d8de8b1dc",
+        "startUsec": 1791866488233624,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification"
+    },
+    {
+      "arm": "release",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "st_ctime_ns": 1791866475611236960,
+            "st_dev": 16777231,
+            "st_ino": 167692897,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475611129168,
+            "st_size": 1687952,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18328,
+            "startUsec": 1791866488254810,
+            "uid": 501
+          },
+          "childPid": 18328,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18328,
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "startUsec": 1791866488254810,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475611236960,
+                "st_dev": 16777231,
+                "st_ino": 167692897,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475611129168,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18328,
+                "startUsec": 1791866488254810,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475611236960,
+                "st_dev": 16777231,
+                "st_ino": 167692897,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475611129168,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18328,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18328,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211877834971125,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "st_ctime_ns": 1791866475611236960,
+        "st_dev": 16777231,
+        "st_ino": 167692897,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475611129168,
+        "st_size": 1687952,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211877834930000,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18328,
+        "stamps": {
+          "initializationCompletedNs": 211877824861750,
+          "locatorReadNs": 211877826926541,
+          "mainEntryNs": 211877824789083,
+          "modBatchEntryNs": 211877824871000,
+          "receiptReadyNs": 211877834893125,
+          "stdoutFlushCompletedNs": 211877834927750
+        }
+      },
+      "launchToReapMs": 118.567208,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877721044625,
+        "parentReapNs": 211877839611833,
+        "successfulSpawnReturnNs": 211877726800458
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.041125,
+        "flushToReap": 4.684083,
+        "initializedToModBatch": 0.00925,
+        "launchToMain": 103.744458,
+        "launchToReap": 118.567208,
+        "locatorToReceiptReady": 7.966584,
+        "mainToInitialized": 0.072667,
+        "modBatchToLocator": 2.055541,
+        "receiptReadyToFlush": 0.034625,
+        "spawnCall": 5.755833
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18328,
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "startUsec": 1791866488254810,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211877834930000,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18328,\"stamps\":{\"initializationCompletedNs\":211877824861750,\"locatorReadNs\":211877826926541,\"mainEntryNs\":211877824789083,\"modBatchEntryNs\":211877824871000,\"receiptReadyNs\":211877834893125,\"stdoutFlushCompletedNs\":211877834927750}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211877834971125,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "release",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "st_ctime_ns": 1791866475611236960,
+            "st_dev": 16777231,
+            "st_ino": 167692897,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475611129168,
+            "st_size": 1687952,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18329,
+            "startUsec": 1791866488379149,
+            "uid": 501
+          },
+          "childPid": 18329,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18329,
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "startUsec": 1791866488379149,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475611236960,
+                "st_dev": 16777231,
+                "st_ino": 167692897,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475611129168,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18329,
+                "startUsec": 1791866488379149,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475611236960,
+                "st_dev": 16777231,
+                "st_ino": 167692897,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475611129168,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18329,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18329,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211877859939666,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "st_ctime_ns": 1791866475611236960,
+        "st_dev": 16777231,
+        "st_ino": 167692897,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475611129168,
+        "st_size": 1687952,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": false,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211877859901833,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18329,
+        "stamps": {
+          "initializationCompletedNs": 211877851064958,
+          "locatorReadNs": 211877853037125,
+          "mainEntryNs": 211877851025041,
+          "modBatchEntryNs": 211877851066958,
+          "receiptReadyNs": 211877859886166,
+          "stdoutFlushCompletedNs": 211877859899916
+        }
+      },
+      "launchToReapMs": 17.156041,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877845337500,
+        "parentReapNs": 211877862493541,
+        "successfulSpawnReturnNs": 211877848356416
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.037833,
+        "flushToReap": 2.593625,
+        "initializedToModBatch": 0.002,
+        "launchToMain": 5.687541,
+        "launchToReap": 17.156041,
+        "locatorToReceiptReady": 6.849041,
+        "mainToInitialized": 0.039917,
+        "modBatchToLocator": 1.970167,
+        "receiptReadyToFlush": 0.01375,
+        "spawnCall": 3.018916
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18329,
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "startUsec": 1791866488379149,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211877859901833,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18329,\"stamps\":{\"initializationCompletedNs\":211877851064958,\"locatorReadNs\":211877853037125,\"mainEntryNs\":211877851025041,\"modBatchEntryNs\":211877851066958,\"receiptReadyNs\":211877859886166,\"stdoutFlushCompletedNs\":211877859899916}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211877859939666,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "st_ctime_ns": 1791866475703867908,
+            "st_dev": 16777231,
+            "st_ino": 167692902,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475703602615,
+            "st_size": 1064976,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18330,
+            "startUsec": 1791866488401223,
+            "uid": 501
+          },
+          "childPid": 18330,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18330,
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "startUsec": 1791866488401223,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475703867908,
+                "st_dev": 16777231,
+                "st_ino": 167692902,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475703602615,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18330,
+                "startUsec": 1791866488401223,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475703867908,
+                "st_dev": 16777231,
+                "st_ino": 167692902,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475703602615,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18330,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18330,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211877977774000,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "st_ctime_ns": 1791866475703867908,
+        "st_dev": 16777231,
+        "st_ino": 167692902,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475703602615,
+        "st_size": 1064976,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211877977699458,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18330,
+        "stamps": {
+          "initializationCompletedNs": 211877968157250,
+          "locatorReadNs": 211877969779041,
+          "mainEntryNs": 211877968059500,
+          "modBatchEntryNs": 211877968164750,
+          "receiptReadyNs": 211877977685208,
+          "stdoutFlushCompletedNs": 211877977695833
+        }
+      },
+      "launchToReapMs": 112.997125,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877867532708,
+        "parentReapNs": 211877980529833,
+        "successfulSpawnReturnNs": 211877872426333
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.074542,
+        "flushToReap": 2.834,
+        "initializedToModBatch": 0.0075,
+        "launchToMain": 100.526792,
+        "launchToReap": 112.997125,
+        "locatorToReceiptReady": 7.906167,
+        "mainToInitialized": 0.09775,
+        "modBatchToLocator": 1.614291,
+        "receiptReadyToFlush": 0.010625,
+        "spawnCall": 4.893625
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18330,
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "startUsec": 1791866488401223,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211877977699458,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18330,\"stamps\":{\"initializationCompletedNs\":211877968157250,\"locatorReadNs\":211877969779041,\"mainEntryNs\":211877968059500,\"modBatchEntryNs\":211877968164750,\"receiptReadyNs\":211877977685208,\"stdoutFlushCompletedNs\":211877977695833}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211877977774000,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "st_ctime_ns": 1791866475703867908,
+            "st_dev": 16777231,
+            "st_ino": 167692902,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475703602615,
+            "st_size": 1064976,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18331,
+            "startUsec": 1791866488518581,
+            "uid": 501
+          },
+          "childPid": 18331,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18331,
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "startUsec": 1791866488518581,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475703867908,
+                "st_dev": 16777231,
+                "st_ino": 167692902,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475703602615,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18331,
+                "startUsec": 1791866488518581,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475703867908,
+                "st_dev": 16777231,
+                "st_ino": 167692902,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475703602615,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18331,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18331,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 0,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211877999758125,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "st_ctime_ns": 1791866475703867908,
+        "st_dev": 16777231,
+        "st_ino": 167692902,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475703602615,
+        "st_size": 1064976,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": false,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211877999707666,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18331,
+        "stamps": {
+          "initializationCompletedNs": 211877989811291,
+          "locatorReadNs": 211877991850833,
+          "mainEntryNs": 211877989783375,
+          "modBatchEntryNs": 211877989812583,
+          "receiptReadyNs": 211877999700041,
+          "stdoutFlushCompletedNs": 211877999705458
+        }
+      },
+      "launchToReapMs": 16.547291,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211877984936250,
+        "parentReapNs": 211878001483541,
+        "successfulSpawnReturnNs": 211877988016750
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.050459,
+        "flushToReap": 1.778083,
+        "initializedToModBatch": 0.001292,
+        "launchToMain": 4.847125,
+        "launchToReap": 16.547291,
+        "locatorToReceiptReady": 7.849208,
+        "mainToInitialized": 0.027916,
+        "modBatchToLocator": 2.03825,
+        "receiptReadyToFlush": 0.005417,
+        "spawnCall": 3.0805
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-0/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18331,
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "startUsec": 1791866488518581,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211877999707666,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18331,\"stamps\":{\"initializationCompletedNs\":211877989811291,\"locatorReadNs\":211877991850833,\"mainEntryNs\":211877989783375,\"modBatchEntryNs\":211877989812583,\"receiptReadyNs\":211877999700041,\"stdoutFlushCompletedNs\":211877999705458}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211877999758125,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "st_ctime_ns": 1791866475790262759,
+            "st_dev": 16777231,
+            "st_ino": 167692906,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475790176467,
+            "st_size": 1064976,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18332,
+            "startUsec": 1791866488542322,
+            "uid": 501
+          },
+          "childPid": 18332,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18332,
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "startUsec": 1791866488542322,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475790262759,
+                "st_dev": 16777231,
+                "st_ino": 167692906,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475790176467,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18332,
+                "startUsec": 1791866488542322,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475790262759,
+                "st_dev": 16777231,
+                "st_ino": 167692906,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475790176467,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18332,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18332,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211878086546458,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "st_ctime_ns": 1791866475790262759,
+        "st_dev": 16777231,
+        "st_ino": 167692906,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475790176467,
+        "st_size": 1064976,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211878086494375,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18332,
+        "stamps": {
+          "initializationCompletedNs": 211878077307083,
+          "locatorReadNs": 211878078650458,
+          "mainEntryNs": 211878077223583,
+          "modBatchEntryNs": 211878077314291,
+          "receiptReadyNs": 211878086488541,
+          "stdoutFlushCompletedNs": 211878086492833
+        }
+      },
+      "launchToReapMs": 81.310625,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211878008612916,
+        "parentReapNs": 211878089923541,
+        "successfulSpawnReturnNs": 211878014144208
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.052083,
+        "flushToReap": 3.430708,
+        "initializedToModBatch": 0.007208,
+        "launchToMain": 68.610667,
+        "launchToReap": 81.310625,
+        "locatorToReceiptReady": 7.838083,
+        "mainToInitialized": 0.0835,
+        "modBatchToLocator": 1.336167,
+        "receiptReadyToFlush": 0.004292,
+        "spawnCall": 5.531292
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18332,
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "startUsec": 1791866488542322,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211878086494375,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18332,\"stamps\":{\"initializationCompletedNs\":211878077307083,\"locatorReadNs\":211878078650458,\"mainEntryNs\":211878077223583,\"modBatchEntryNs\":211878077314291,\"receiptReadyNs\":211878086488541,\"stdoutFlushCompletedNs\":211878086492833}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211878086546458,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "capture-compact",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "st_ctime_ns": 1791866475790262759,
+            "st_dev": 16777231,
+            "st_ino": 167692906,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475790176467,
+            "st_size": 1064976,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18333,
+            "startUsec": 1791866488628741,
+            "uid": 501
+          },
+          "childPid": 18333,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18333,
+            "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+            "startUsec": 1791866488628741,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475790262759,
+                "st_dev": 16777231,
+                "st_ino": 167692906,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475790176467,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18333,
+                "startUsec": 1791866488628741,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+                "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+                "st_ctime_ns": 1791866475790262759,
+                "st_dev": 16777231,
+                "st_ino": 167692906,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475790176467,
+                "st_size": 1064976,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18333,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18333,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211878110602041,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "st_ctime_ns": 1791866475790262759,
+        "st_dev": 16777231,
+        "st_ino": 167692906,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475790176467,
+        "st_size": 1064976,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": false,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211878110558916,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18333,
+        "stamps": {
+          "initializationCompletedNs": 211878100733541,
+          "locatorReadNs": 211878102660375,
+          "mainEntryNs": 211878100694000,
+          "modBatchEntryNs": 211878100735666,
+          "receiptReadyNs": 211878110552000,
+          "stdoutFlushCompletedNs": 211878110557083
+        }
+      },
+      "launchToReapMs": 16.998083,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211878094958083,
+        "parentReapNs": 211878111956166,
+        "successfulSpawnReturnNs": 211878097965041
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.043125,
+        "flushToReap": 1.399083,
+        "initializedToModBatch": 0.002125,
+        "launchToMain": 5.735917,
+        "launchToReap": 16.998083,
+        "locatorToReceiptReady": 7.891625,
+        "mainToInitialized": 0.039541,
+        "modBatchToLocator": 1.924709,
+        "receiptReadyToFlush": 0.005083,
+        "spawnCall": 3.006958
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/capture-compact-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18333,
+        "sha256": "5f2ecc5987a121add812c41b3c62842212160a6cdecdf8577c52ef94eba5f133",
+        "startUsec": 1791866488628741,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211878110558916,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18333,\"stamps\":{\"initializationCompletedNs\":211878100733541,\"locatorReadNs\":211878102660375,\"mainEntryNs\":211878100694000,\"modBatchEntryNs\":211878100735666,\"receiptReadyNs\":211878110552000,\"stdoutFlushCompletedNs\":211878110557083}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211878110602041,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "release",
+      "call": 0,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "st_ctime_ns": 1791866475878702407,
+            "st_dev": 16777231,
+            "st_ino": 167692909,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475878567490,
+            "st_size": 1687952,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18334,
+            "startUsec": 1791866488651827,
+            "uid": 501
+          },
+          "childPid": 18334,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18334,
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "startUsec": 1791866488651827,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475878702407,
+                "st_dev": 16777231,
+                "st_ino": 167692909,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475878567490,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18334,
+                "startUsec": 1791866488651827,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475878702407,
+                "st_dev": 16777231,
+                "st_ino": 167692909,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475878567490,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18334,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18334,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211878199516333,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "st_ctime_ns": 1791866475878702407,
+        "st_dev": 16777231,
+        "st_ino": 167692909,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475878567490,
+        "st_size": 1687952,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": true,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211878199460625,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18334,
+        "stamps": {
+          "initializationCompletedNs": 211878189665458,
+          "locatorReadNs": 211878191336000,
+          "mainEntryNs": 211878189583625,
+          "modBatchEntryNs": 211878189674541,
+          "receiptReadyNs": 211878199416458,
+          "stdoutFlushCompletedNs": 211878199457166
+        }
+      },
+      "launchToReapMs": 92.454,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211878118059625,
+        "parentReapNs": 211878210513625,
+        "successfulSpawnReturnNs": 211878123516750
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.055708,
+        "flushToReap": 11.056459,
+        "initializedToModBatch": 0.009083,
+        "launchToMain": 71.524,
+        "launchToReap": 92.454,
+        "locatorToReceiptReady": 8.080458,
+        "mainToInitialized": 0.081833,
+        "modBatchToLocator": 1.661459,
+        "receiptReadyToFlush": 0.040708,
+        "spawnCall": 5.457125
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18334,
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "startUsec": 1791866488651827,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211878199460625,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18334,\"stamps\":{\"initializationCompletedNs\":211878189665458,\"locatorReadNs\":211878191336000,\"mainEntryNs\":211878189583625,\"modBatchEntryNs\":211878189674541,\"receiptReadyNs\":211878199416458,\"stdoutFlushCompletedNs\":211878199457166}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211878199516333,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    },
+    {
+      "arm": "release",
+      "call": 1,
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "st_ctime_ns": 1791866475878702407,
+            "st_dev": 16777231,
+            "st_ino": 167692909,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791866475878567490,
+            "st_size": 1687952,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "parentPid": 18241,
+            "pid": 18335,
+            "startUsec": 1791866488749985,
+            "uid": 501
+          },
+          "childPid": 18335,
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+            "kernelVerified": true,
+            "parentPid": 18241,
+            "pid": 18335,
+            "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+            "startUsec": 1791866488749985,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475878702407,
+                "st_dev": 16777231,
+                "st_ino": 167692909,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475878567490,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "parentPid": 18241,
+                "pid": 18335,
+                "startUsec": 1791866488749985,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+                "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+                "st_ctime_ns": 1791866475878702407,
+                "st_dev": 16777231,
+                "st_ino": 167692909,
+                "st_mode": 33261,
+                "st_mtime_ns": 1791866475878567490,
+                "st_size": 1687952,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 18335,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "helper",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 18335,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "copy": 1,
+      "emission": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionCompletedNs": 211878230457000,
+        "kind": "qualification-startup-emitted"
+      },
+      "exitCode": 0,
+      "exitLimitation": "Parent reap follows child termination and output collection; it is not exact exit.",
+      "file": {
+        "path": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "st_ctime_ns": 1791866475878702407,
+        "st_dev": 16777231,
+        "st_ino": 167692909,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791866475878567490,
+        "st_size": 1687952,
+        "st_uid": 501
+      },
+      "finalProcessExitNs": null,
+      "firstExecutionOfAcquiredInode": false,
+      "helper": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "diagnosticEmissionStartedNs": 211878230422000,
+        "finalProcessExitNs": null,
+        "kind": "qualification-startup",
+        "pid": 18335,
+        "stamps": {
+          "initializationCompletedNs": 211878220890875,
+          "locatorReadNs": 211878222578416,
+          "mainEntryNs": 211878220865208,
+          "modBatchEntryNs": 211878220892541,
+          "receiptReadyNs": 211878230400333,
+          "stdoutFlushCompletedNs": 211878230420000
+        }
+      },
+      "launchToReapMs": 16.74525,
+      "ownershipChecksCountedInWallInterval": true,
+      "parent": {
+        "bootId": "B25EE6BF-6973-4B99-9543-E37EF1A59C87",
+        "clock": "CLOCK_UPTIME_RAW",
+        "parentLaunchRequestNs": 211878215942000,
+        "parentReapNs": 211878232687250,
+        "successfulSpawnReturnNs": 211878218834875
+      },
+      "phaseMs": {
+        "diagnosticEmission": 0.035,
+        "flushToReap": 2.26725,
+        "initializedToModBatch": 0.001666,
+        "launchToMain": 4.923208,
+        "launchToReap": 16.74525,
+        "locatorToReceiptReady": 7.821917,
+        "mainToInitialized": 0.025667,
+        "modBatchToLocator": 1.685875,
+        "receiptReadyToFlush": 0.019667,
+        "spawnCall": 2.892875
+      },
+      "process": {
+        "imagePath": "/private/tmp/ts-compact-c6zhph0i/acquired/qualification-startup/release-1/threadspace-hook",
+        "kernelVerified": true,
+        "parentPid": 18241,
+        "pid": 18335,
+        "sha256": "985fffd4d1c031d70f4d48dd2e8eae730bdfadf4ee14212258c4d308e67141d8",
+        "startUsec": 1791866488749985,
+        "uid": 501
+      },
+      "receipt": {
+        "receiptVersion": 1,
+        "results": [
+          {
+            "observationId": "00000000-0000-4000-8000-000000000001",
+            "reason": null,
+            "status": "LOCAL_SPOOLED"
+          }
+        ]
+      },
+      "semanticPass": true,
+      "spoolProof": {
+        "observationId": "00000000-0000-4000-8000-000000000001",
+        "privateSpoolHmacSha256": "e5596a56b18ce3f7cd811a11d48dbd5c0458c9b0c751f0f53097abff2228b0f4",
+        "readyCount": 1,
+        "sourceEpoch": "6d1c7f0e-1111-4aaa-8bbb-000000000001"
+      },
+      "stderr": "{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionStartedNs\":211878230422000,\"finalProcessExitNs\":null,\"kind\":\"qualification-startup\",\"pid\":18335,\"stamps\":{\"initializationCompletedNs\":211878220890875,\"locatorReadNs\":211878222578416,\"mainEntryNs\":211878220865208,\"modBatchEntryNs\":211878220892541,\"receiptReadyNs\":211878230400333,\"stdoutFlushCompletedNs\":211878230420000}}\n{\"bootId\":\"B25EE6BF-6973-4B99-9543-E37EF1A59C87\",\"clock\":\"CLOCK_UPTIME_RAW\",\"diagnosticEmissionCompletedNs\":211878230457000,\"kind\":\"qualification-startup-emitted\"}\n",
+      "stdout": "{\"receiptVersion\":1,\"results\":[{\"observationId\":\"00000000-0000-4000-8000-000000000001\",\"status\":\"LOCAL_SPOOLED\",\"reason\":null}]}",
+      "variant": "qualification-startup"
+    }
+  ],
+  "verdict": "INCONCLUSIVE_BENEFIT"
+}

@@ -1,0 +1,117 @@
+[
+  {
+    "feature": "qualification",
+    "profile": "release",
+    "argv": [
+      "cargo",
+      "build",
+      "--locked",
+      "-p",
+      "threadspace-relay",
+      "--bin",
+      "threadspace-hook",
+      "--features",
+      "qualification",
+      "--profile",
+      "release",
+      "--target",
+      "aarch64-apple-darwin",
+      "--target-dir",
+      "/private/tmp/ts-compact-c6zhph0i/build-qualification",
+      "--message-format=json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "feature": "qualification",
+    "profile": "capture-compact",
+    "argv": [
+      "cargo",
+      "build",
+      "--locked",
+      "-p",
+      "threadspace-relay",
+      "--bin",
+      "threadspace-hook",
+      "--features",
+      "qualification",
+      "--profile",
+      "capture-compact",
+      "--target",
+      "aarch64-apple-darwin",
+      "--target-dir",
+      "/private/tmp/ts-compact-c6zhph0i/build-qualification",
+      "--message-format=json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "feature": "qualification-startup",
+    "profile": "release",
+    "argv": [
+      "cargo",
+      "build",
+      "--locked",
+      "-p",
+      "threadspace-relay",
+      "--bin",
+      "threadspace-hook",
+      "--features",
+      "qualification-startup",
+      "--profile",
+      "release",
+      "--target",
+      "aarch64-apple-darwin",
+      "--target-dir",
+      "/private/tmp/ts-compact-c6zhph0i/build-qualification-startup",
+      "--message-format=json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "feature": "qualification-startup",
+    "profile": "capture-compact",
+    "argv": [
+      "cargo",
+      "build",
+      "--locked",
+      "-p",
+      "threadspace-relay",
+      "--bin",
+      "threadspace-hook",
+      "--features",
+      "qualification-startup",
+      "--profile",
+      "capture-compact",
+      "--target",
+      "aarch64-apple-darwin",
+      "--target-dir",
+      "/private/tmp/ts-compact-c6zhph0i/build-qualification-startup",
+      "--message-format=json"
+    ],
+    "exitCode": 0
+  },
+  {
+    "kind": "original-test-no-run",
+    "argv": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "threadspace-relay",
+      "--features",
+      "qualification",
+      "--profile",
+      "capture-compact",
+      "--test",
+      "mod_batch",
+      "--no-run",
+      "--target",
+      "aarch64-apple-darwin",
+      "--target-dir",
+      "/private/tmp/ts-compact-c6zhph0i/build-qualification",
+      "--message-format=json"
+    ],
+    "exitCode": 0
+  }
+]

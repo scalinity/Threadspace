@@ -1,0 +1,62 @@
+{
+  "kind": "COMPACT_HELPER_PREDECLARED_COMPARISON",
+  "base": "52c121b58df92daccf9654400342dba63dc18672",
+  "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: aarch64-apple-darwin\nrelease: 1.99.0\nLLVM version: 23.1.1\n",
+  "target": "aarch64-apple-darwin",
+  "dependencyLockSha256": "5ad54eedcd676d8682728b62a01f8930cfcf3ff77441b38e053b3e6703d96034",
+  "originalModBatchTestSha256": "a04d3b3bfc1c5e8bcc691346b6a32857f1b440607bf2a88d147a131e58a21088",
+  "profile": {
+    "name": "capture-compact",
+    "inherits": "release",
+    "opt-level": "z",
+    "codegen-units": 1,
+    "lto": "fat",
+    "panic": "unwind"
+  },
+  "comparison": {
+    "arms": [
+      "release",
+      "capture-compact"
+    ],
+    "variants": [
+      "qualification",
+      "qualification-startup"
+    ],
+    "independentInodesPerArmPerVariant": 2,
+    "order": [
+      [
+        "release",
+        0
+      ],
+      [
+        "capture-compact",
+        0
+      ],
+      [
+        "capture-compact",
+        1
+      ],
+      [
+        "release",
+        1
+      ]
+    ],
+    "executionsPerAcquiredInode": [
+      "first",
+      "repeat"
+    ],
+    "store": "fresh absent-companion store per execution",
+    "input": "identical original mod-batch fixture",
+    "helperBudgetMs": 80,
+    "wallLimitMs": 250,
+    "nativeNumericalGuardMs": 0.001,
+    "discriminatingFirstImprovementMs": 11.0,
+    "noCacheReset": true,
+    "noPrewarm": true,
+    "noFavorableRetries": true,
+    "discriminationReason": "Exceeds the retained exact-wait polling quantum of 10 ms plus 1 ms engineering guard. All parent overhead stays included."
+  },
+  "signing": "same selected Apple Development identity; hardened runtime; timestamp none; identical helper identifier; no entitlements",
+  "originalTest": "unchanged a_batch_without_a_companion_is_spooled_and_answered_within_its_budget against intended capture-compact qualification helper",
+  "stop": "NO_GO on compact first wall failure, semantic failure, incomparable features/signing/toolchain; INCONCLUSIVE_BENEFIT if no discriminating paired benefit; no second configuration"
+}

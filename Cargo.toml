@@ -71,3 +71,12 @@ unimplemented = "deny"
 
 [patch.crates-io]
 libsqlite3-sys = { path = "third_party/libsqlite3-sys" }
+
+# Qualification-only capture-helper comparison; select only for the helper.
+# Agent and desktop builds retain their existing profiles.
+[profile.capture-compact]
+inherits = "release"
+opt-level = "z"
+codegen-units = 1
+lto = "fat"
+panic = "unwind"
