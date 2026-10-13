@@ -10,6 +10,7 @@ import subprocess
 import time
 import uuid
 from pathlib import Path
+from m2_activation_process import owned_process, image_file, approved_image, wait_exact, observe
 from m2_socket_duration import HERE, POLICY, PROVIDER_SHA, PROVIDER_VERSION, canonical_hash, file_hash, source_identities, qualify, make_profile
 from m2_socket_plugins import composition_identity, stage_plugins, verify_plugins, json_bytes
 
@@ -44,6 +45,15 @@ def image_identity(child, executable, version=None):
     return result
 
 def cleanup(child, identity):
+    if hasattr(child, '_owned_guard'):
+        if child._owned_receipt.get('identity') != identity:
+            raise RuntimeError('cleanup refused changed process identity')
+        guard = child._owned_guard
+        if guard is not None:
+            child._owned_guard = None
+            guard.__exit__(None, None, None)
+        return child._owned_receipt
+    # Historical non-executing scanner compatibility; positive runs use a guard.
     events = []
     if child.poll() is None:
         current = image_identity(child,identity['imagePath'],identity.get('version'))
@@ -57,21 +67,39 @@ def cleanup(child, identity):
     if child.stdin is not None: child.stdin.close()
     return {'identity':identity,'events':events,'exitCode':child.returncode,'reaped':child.poll() is not None}
 
-def await_result(child, output, seconds=POLICY['externalDeadlineSeconds']):
-    deadline = time.monotonic()+seconds
+def child_exited(child):
+    if hasattr(child, '_owned_receipt'): return wait_exact(child, child._owned_receipt) is not None
+    return child.poll() is not None
+
+
+def launch_owned(argv, executable, records, role, policy, version=None, **kwargs):
+    def pinned_image(path):
+        actual = image_file(path)
+        if actual != policy: raise RuntimeError('frozen native executable changed')
+        if role == 'provider' and actual != approved_image(PROVIDER): raise RuntimeError('unapproved provider image')
+        return actual
+    guard = owned_process(role, argv, executable, records, version, image_policy=policy,
+                          image_checker=pinned_image, **kwargs)
+    child, identity = guard.__enter__()
+    child._owned_guard = guard; child._owned_receipt = records[-1]
+    return child, identity
+
+
+def await_result(child, output, seconds=POLICY['externalDeadlineSeconds'], deadline=None):
+    if deadline is None: deadline = time.monotonic()+seconds
     while time.monotonic()<deadline:
         if output.exists():
             try:
                 result=json.loads(output.read_text())
                 if result.get('complete') or result.get('error'): return result,False,False
             except ValueError: pass
-        if child.poll() is not None: return {},False,True
+        if child_exited(child): return {},False,True
         time.sleep(.02)
     try: result=json.loads(output.read_text()) if output.exists() else {}
     except ValueError: result={}
     return result,True,False
 
-def start_responder(root, executable, freeze, delay=None):
+def start_responder(root, executable, freeze, delay=None, records=None):
     planfile=root/'plan.tsv'
     with planfile.open('x') as f:
         os.chmod(planfile,0o600)
@@ -80,14 +108,21 @@ def start_responder(root, executable, freeze, delay=None):
     ids=freeze['identities']
     argv=[str(executable),str(root),ids['runId'],ids['bootId'],ids['responderId'],canonical_hash(freeze),str(planfile)]
     if delay: argv.extend(map(str,delay))
-    child=subprocess.Popen(argv,cwd=root,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-    identity=image_identity(child,executable)
-    until=time.monotonic()+3
-    while not (root/'s.sock').exists() and child.poll() is None and time.monotonic()<until: time.sleep(.01)
-    if not (root/'s.sock').exists():
-        cleanup(child,identity); raise RuntimeError('responder failed to bind')
-    if (root/'s.sock').stat().st_mode & 0o777 != 0o600: raise RuntimeError('unprotected socket')
-    return child,identity
+    records = [] if records is None else records
+    policy = freeze['identities']['responderImagePolicy']
+    child, identity = launch_owned(argv, executable, records, 'responder', policy,
+                                  cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        until=time.monotonic()+3
+        while not (root/'s.sock').exists() and not child_exited(child) and time.monotonic()<until: time.sleep(.01)
+        if not (root/'s.sock').exists(): raise RuntimeError('responder failed to bind')
+        st = (root/'s.sock').stat()
+        if st.st_mode & 0o777 != 0o600 or st.st_uid != os.getuid(): raise RuntimeError('unprotected socket')
+        observe(child, policy, child._owned_receipt, 'fixture-ready', child._owned_receipt['baseline'])
+        return child,identity
+    except BaseException:
+        cleanup(child, identity)
+        raise
 
 def provider_argv(root, plugins):
     # The exact 2.1.295 CLI declares --plugin-dir <path> repeatable.
@@ -120,17 +155,25 @@ def verify_provider(root, config, composition, prepared):
     if settings.is_symlink() or settings.stat().st_uid!=os.getuid() or settings.stat().st_mode&0o777!=0o600 or settings.read_bytes()!=json_bytes({'hooks':{},'disableAllHooks':False}):
         raise RuntimeError('changed disposable settings')
 
-def start_provider(root, config, prepared=None):
+def start_provider(root, config, prepared=None, records=None, policy=None):
     root=Path(root).resolve(strict=True)
     prepared=prepare_provider(root,config) if prepared is None else prepared
     verify_provider(root,config,composition_identity(),prepared)
     out=(root/'provider-stdout.log').open('xb'); err=(root/'provider-stderr.log').open('xb')
-    child=subprocess.Popen(prepared['argv'],cwd=root,env=prepared['env'],stdin=subprocess.PIPE,stdout=out,stderr=err,start_new_session=True)
-    identity=image_identity(child,PROVIDER,PROVIDER_VERSION)
-    return child,identity,out,err
+    os.chmod(root/'provider-stdout.log', 0o600); os.chmod(root/'provider-stderr.log', 0o600)
+    records = [] if records is None else records
+    try:
+        child, identity = launch_owned(prepared['argv'], PROVIDER, records, 'provider',
+            policy or approved_image(PROVIDER), PROVIDER_VERSION, cwd=root,env=prepared['env'],
+            stdin=subprocess.PIPE,stdout=out,stderr=err,start_new_session=True)
+        return child,identity,out,err
+    except BaseException:
+        out.close(); err.close()
+        raise
 
 def new_freeze(executable):
     ids={**source_identities(),'responderExecutableSha256':file_hash(executable),
+        'responderImagePolicy':image_file(executable),'providerImagePolicy':approved_image(PROVIDER),
         'osBuild':subprocess.check_output(['/usr/bin/sw_vers','-buildVersion'],text=True).strip(),
         'bootId':sysctl('kern.bootsessionuuid'),'nativeClock':'CLOCK_UPTIME_RAW','observerClock':'performance.now',
         'clockScope':POLICY['clockScope'],'runId':str(uuid.uuid4()),'responderId':str(uuid.uuid4())}
@@ -161,44 +204,57 @@ def run(root, executable, freeze):
     save(root/'frozen-manifest.json',freeze)
     if freeze['identities'] != {**new_freeze(executable)['identities'], 'runId':freeze['identities']['runId'],'responderId':freeze['identities']['responderId']}: raise RuntimeError('frozen sources/build/boot changed')
     prepared=prepare_conditions(root,freeze)
-    if file_hash(PROVIDER)!=PROVIDER_SHA or subprocess.check_output([str(PROVIDER),'--version'],text=True).strip()!='2.1.295 (Claude Code)': raise RuntimeError('required provider changed')
+    # Version authority is the retained independent 2.1.295 executable audit;
+    # exact bytes are reverified here and on every owned process admission.
+    if approved_image(PROVIDER)!=freeze['identities']['providerImagePolicy'] or freeze['identities']['providerVersion']!=PROVIDER_VERSION:
+        raise RuntimeError('required provider changed')
     sleep_before=sysctl('kern.sleeptime'); wake_before=sysctl('kern.waketime')
-    responder,rpid=start_responder(root,executable,freeze)
+    receipts=[]; responder=None
     report={'instrument':POLICY['instrument'],'positiveAttempt':1,'policy':POLICY,'freeze':freeze,'freezeSha256':canonical_hash(freeze),
-        'bootBefore':freeze['identities']['bootId'],'identities':{**freeze['identities'],'responderProcess':rpid,'runtimes':[]},
+        'bootBefore':freeze['identities']['bootId'],'identities':{**freeze['identities'],'runtimes':[]},
         'rows':[],'complete':True,'deadlineExceeded':False,'providerLost':False,'responderLost':False,'cleanup':[],
-        'socketOwnership':{'directoryMode':root.stat().st_mode&0o777,'socketMode':(root/'s.sock').stat().st_mode&0o777,'uid':root.stat().st_uid},
         'executionKind':'NATIVE_INSTALLED_PROVIDER',
         'pluginStaging':[{'condition':config['condition'],'manifest':inputs['plugins'],
             'manifestSha256':canonical_hash(inputs['plugins']),'argv':inputs['argv'],
             'settingsSha256':file_hash(owned/'config/settings.json')}
             for owned,config,inputs in prepared]}
     try:
+        responder,rpid=start_responder(root,executable,freeze,records=receipts)
+        report['identities']['responderProcess']=rpid
+        report['socketOwnership']={'directoryMode':root.stat().st_mode&0o777,'socketMode':(root/'s.sock').stat().st_mode&0o777,'uid':root.stat().st_uid}
         for index,runtime in enumerate(freeze['runtimePlan']):
             owned,config,inputs=prepared[index]; output=owned/'host-result.json'
-            child,pid,out,err=start_provider(owned,config,inputs)
+            deadline=time.monotonic()+POLICY['externalDeadlineSeconds']
+            child,pid,out,err=start_provider(owned,config,inputs,receipts,freeze['identities']['providerImagePolicy'])
             report['identities']['runtimes'].append({**runtime,'process':pid})
             save(root/'process-identities.json',report['identities'])
             try:
                 child.stdin.write((json.dumps({'type':'control_request','request_id':str(uuid.uuid4()),'request':{'subtype':'initialize'}})+'\n').encode()); child.stdin.flush()
-                result,expired,lost=await_result(child,output)
+                result,expired,lost=await_result(child,output,deadline=deadline)
                 report['rows'].extend(result.get('rows',[]))
                 report['complete'] &= result.get('complete') is True
                 report['deadlineExceeded'] |= expired; report['providerLost'] |= lost
                 report.setdefault('runtimeResults',[]).append(result)
                 if runtime['condition']=='background': report['background']=result.get('background')
             finally:
-                report['cleanup'].append(cleanup(child,pid)); out.close(); err.close()
+                try: cleanup(child,pid)
+                finally: out.close(); err.close()
             if expired or lost or not result.get('complete'): break
     except Exception as error:
         report['complete']=False; report['controllerError']=str(error)
     finally:
-        report['responderLost']=responder.poll() is not None
-        report['cleanup'].append(cleanup(responder,rpid))
+        if responder is not None:
+            try:
+                report['responderLost']=child_exited(responder)
+                cleanup(responder,rpid)
+            except Exception as error:
+                report['complete']=False; report['cleanupError']=str(error)
+        report['cleanup']=[c for c in receipts if c['role']=='provider']+[c for c in receipts if c['role']=='responder']
         report['socketRemoved']=not (root/'s.sock').exists()
         report['bootAfter']=sysctl('kern.bootsessionuuid')
         report['powerDiscontinuity']=sysctl('kern.sleeptime')!=sleep_before or sysctl('kern.waketime')!=wake_before
-        report['nativeTranscript']=[json.loads(line) for line in (root/'native.jsonl').read_text().splitlines()]
+        transcript=root/'native.jsonl'
+        report['nativeTranscript']=[json.loads(line) for line in transcript.read_text().splitlines()] if transcript.exists() else []
         report['transcriptSha256']=canonical_hash(report['nativeTranscript'])
         report['rowAccounting']=[{'index':i,'condition':POLICY['conditions'][i//7],'requestedDelayMs':POLICY['requestedDelaysMs'][i%7],
             'disposition':'RETAINED' if i<len(report['rows']) else 'MISSING_AFTER_FAILURE'} for i in range(14)]

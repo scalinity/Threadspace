@@ -65,10 +65,10 @@ def observe(child, policy, receipt, phase, baseline=None):
         raise
 
 
-def check_file(policy, receipt, phase):
+def check_file(policy, receipt, phase, image_checker=None):
     event = {'phase': phase}; receipt.setdefault('observations', []).append(event)
     try:
-        actual = approved_image(policy['path']); event['file'] = actual
+        actual = (image_checker or approved_image)(policy['path']); event['file'] = actual
         if actual != policy: raise RuntimeError('frozen executable file substituted')
         event['admitted'] = True
     except Exception as error:
@@ -99,13 +99,13 @@ def wait_exact(child, receipt, timeout=0):
         time.sleep(.01)
 
 
-def terminate_owned(child, baseline, policy, receipt):
+def terminate_owned(child, baseline, policy, receipt, image_checker=None):
     if wait_exact(child, receipt): return
     if baseline is None: raise RuntimeError('no authoritative launch baseline; signal refused')
     for signum, name in ((signal.SIGTERM, 'SIGTERM'), (signal.SIGKILL, 'SIGKILL')):
         try:
             observe(child, policy, receipt, 'pre-' + name, baseline)
-            check_file(policy, receipt, 'file-pre-' + name)
+            check_file(policy, receipt, 'file-pre-' + name, image_checker)
             if wait_exact(child, receipt): return
             observe(child, policy, receipt, 'final-pre-' + name, baseline)
         except Exception:
@@ -123,19 +123,19 @@ def terminate_owned(child, baseline, policy, receipt):
 
 
 @contextmanager
-def owned_process(role, argv, executable, records, version=None, image_policy=None, **kwargs):
+def owned_process(role, argv, executable, records, version=None, image_policy=None, image_checker=None, **kwargs):
     child = None; baseline = None
-    policy = approved_image(executable) if image_policy is None else image_policy
+    policy = (image_checker or approved_image)(executable) if image_policy is None else image_policy
     receipt = {'role': role, 'spawned': False, 'reaped': False, 'approvedImage': policy, 'observations': [], 'signals': []}
     records.append(receipt)
     # Never learn an approved file identity from child-supplied labels.
-    check_file(policy, receipt, 'file-before-spawn')
+    check_file(policy, receipt, 'file-before-spawn', image_checker)
     try:
         child = subprocess.Popen(argv, **kwargs); receipt['spawned'] = True
         receipt['childPid'] = child.pid
         baseline = observe(child, policy, receipt, 'launch-baseline')
         receipt['baseline'] = baseline
-        check_file(policy, receipt, 'full-image')
+        check_file(policy, receipt, 'full-image', image_checker)
         identity = {**baseline, 'sha256': policy['sha256'], 'kernelVerified': True}
         if version: identity['version'] = version
         receipt['identity'] = identity
@@ -146,7 +146,7 @@ def owned_process(role, argv, executable, records, version=None, image_policy=No
     finally:
         if child is not None:
             try:
-                terminate_owned(child, baseline, policy, receipt)
+                terminate_owned(child, baseline, policy, receipt, image_checker)
                 receipt.update({'reaped': True, 'exitCode': receipt['wait']['exitCode'],
                     'events': ['verified-child-' + s for s in receipt['signals']] or ['already-exited']})
                 if child.stdin is not None: child.stdin.close()

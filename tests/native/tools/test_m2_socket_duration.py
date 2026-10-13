@@ -9,7 +9,7 @@ import time
 import unittest
 from pathlib import Path
 from m2_socket_duration import *
-from m2_socket_runner import new_freeze, start_responder, cleanup, image_identity, await_result, save, start_provider
+from m2_socket_runner import new_freeze, start_responder, cleanup, image_identity, await_result, save, start_provider, launch_owned, image_file
 
 def record(name, result):
     if 'M2_CONTROL_OUTPUT' not in os.environ: return
@@ -25,11 +25,18 @@ def fixture():
     ids={**source_identities(),'responderExecutableSha256':'a'*64,'bootId':'qualification-boot','osBuild':'test-build',
         'nativeClock':'CLOCK_UPTIME_RAW','observerClock':'performance.now','clockScope':POLICY['clockScope'],
         'runId':'test-run','responderId':'test-responder','runtimes':runtimes,
+        'providerImagePolicy':{'path':'/synthetic-provider','sha256':PROVIDER_SHA},
+        'responderImagePolicy':{'path':'/synthetic-responder','sha256':'a'*64},
         'responderProcess':{'pid':99,'startUsec':99,'kernelVerified':True,'sha256':'a'*64}}
+    for proc in [r['process'] for r in runtimes]+[ids['responderProcess']]:
+        proc.update(uid=os.getuid(),parentPid=os.getpid(),imagePath='/synthetic-provider' if proc['pid']!=99 else '/synthetic-responder')
+    from test_m2_activation_process import synthetic_receipt
+    receipts=[{**synthetic_receipt(r['process'],ids['providerImagePolicy']),'role':'provider'} for r in runtimes]
+    receipts.append({**synthetic_receipt(ids['responderProcess'],ids['responderImagePolicy']),'role':'responder'})
     plan=[{'sequence':i,'runtimeId':runtimes[i//28]['runtimeId'],'sourceEpoch':runtimes[i//28]['sourceEpoch'],'challenge':f'{i:064x}'} for i in range(56)]
     freeze={'identities':{k:v for k,v in ids.items() if k not in ('runtimes','responderProcess')},'policy':POLICY,'plan':plan,'runtimePlan':[{k:v for k,v in r.items() if k!='process'} for r in runtimes]}
     frozen=canonical_hash(freeze)
-    transcript=[{'event':'start',**{k:ids[k] for k in ('runId','bootId','responderId')},'pid':99,'manifestSha256':frozen}]
+    transcript=[{'event':'start',**{k:ids[k] for k in ('runId','bootId','responderId')},'pid':99,'uid':os.getuid(),'manifestSha256':frozen}]
     rows=[]
     for index in range(14):
         runtime=runtimes[index//7]; start=1000+index*1000; delay=POLICY['requestedDelaysMs'][index%7]
@@ -51,9 +58,9 @@ def fixture():
         'nativeTranscript':transcript,'transcriptSha256':canonical_hash(transcript),'rows':rows,'complete':True,
         'positiveAttempt':1,'bootBefore':'qualification-boot','bootAfter':'qualification-boot','powerDiscontinuity':False,
         'deadlineExceeded':False,'providerLost':False,'responderLost':False,
-        'background':{'ticks':256,'operations':524288,'complete':True},'executionKind':'SYNTHETIC_CONTROL',
-        'socketRemoved':True,'socketOwnership':{'directoryMode':0o700,'socketMode':0o600},
-        'cleanup':[{'reaped':True,'identity':r['process']} for r in runtimes]+[{'reaped':True,'identity':ids['responderProcess']}],
+        'background':{'ticks':256,'operations':524288,'checksum':1722810369,'complete':True},'executionKind':'SYNTHETIC_CONTROL',
+        'socketRemoved':True,'socketOwnership':{'directoryMode':0o700,'socketMode':0o600,'uid':os.getuid()},
+        'cleanup':receipts,
         'runtimeResults':runtime_results}
 
 class EvaluatorControls(unittest.TestCase):
@@ -208,9 +215,10 @@ class NativeProtocolControls(unittest.TestCase):
             server,server_id=start_responder(root,self.executable,freeze,delay=(0,100))
             entry={**freeze['identities'],**freeze['plan'][0]}
             route='/'.join(str(entry[k]) for k in ('runId','bootId','responderId','runtimeId','sourceEpoch','sequence','challenge'))
-            child=subprocess.Popen(['/usr/bin/curl','--silent','--max-time','2','--unix-socket',str(root/'s.sock'),'http://localhost/'+route],
+            client_receipts=[]
+            child,pid=launch_owned(['/usr/bin/curl','--silent','--max-time','2','--unix-socket',str(root/'s.sock'),'http://localhost/'+route],
+                Path('/usr/bin/curl'),client_receipts,'client',image_file('/usr/bin/curl'),
                 cwd=root,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-            pid=image_identity(child,Path('/usr/bin/curl'))
             try:
                 deadline=time.monotonic()+2
                 while '"event":"generated"' not in (root/'native.jsonl').read_text() and time.monotonic()<deadline: time.sleep(.001)

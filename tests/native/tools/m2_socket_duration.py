@@ -19,7 +19,8 @@ IDENTITY_KEYS = (
     "evaluatorSha256", "calculatorSha256", "policySha256", "policyFileSha256", "probeSha256",
     "backgroundSha256", "osBuild", "bootId", "nativeClock", "observerClock",
     "clockScope", "responderId", "responderProcess", "runId", "runtimes",
-    "pluginComposition", "pluginStagerSha256",
+    "pluginComposition", "pluginStagerSha256", "processSourceSha256",
+    "providerImagePolicy", "responderImagePolicy",
 )
 MARKERS = ("captureLower", "captureUpper", "endLower", "endUpper")
 
@@ -46,6 +47,7 @@ def source_identities():
         "backgroundSha256": file_hash(HERE / "m2_socket_background.ts"),
         "pluginComposition": composition_identity(),
         "pluginStagerSha256": file_hash(HERE / "m2_socket_plugins.py"),
+        "processSourceSha256": file_hash(HERE / "m2_activation_process.py"),
     }
 
 def decimal(value):
@@ -76,6 +78,13 @@ def qualify(report):
     require(all(ids.get(k) == v for k, v in freeze.get("identities", {}).items()), "conformance identity differs from frozen source")
     require(all(ids.get(k) not in (None, "", [], {}) for k in IDENTITY_KEYS), "missing original conformance identity")
     if report.get("executionKind") == "NATIVE_INSTALLED_PROVIDER":
+        from m2_activation_process import verify_cleanup
+        for receipt in report.get("cleanup", []):
+            role = receipt.get("role")
+            require(role in ("provider", "responder")
+                    and receipt.get("approvedImage") == ids.get(role + "ImagePolicy", {})
+                    and verify_cleanup(receipt, receipt.get("identity"), orderly=role == "responder"),
+                    "missing exact-image cleanup/wait authority")
         staging = report.get("pluginStaging", [])
         require(len(staging) == 2, "missing original two-plugin staging identities")
         for index, entry in enumerate(staging):
@@ -176,8 +185,8 @@ def qualify(report):
         item.update(errors=row_errors, **{"pass": not row_errors})
         checks.append(item)  # Failed rows stay in the complete residual denominator.
         errors.extend(f"row {index}: {error}" for error in row_errors)
-    background = report.get("background", {})
-    require(background.get("ticks") == POLICY["background"]["ticks"] and background.get("operations") == POLICY["background"]["ticks"]*POLICY["background"]["operationsPerTick"] and background.get("complete") is True, "incomplete frozen background fixture")
+    background = report.get("background") or {}
+    require(background.get("ticks") == POLICY["background"]["ticks"] and background.get("operations") == POLICY["background"]["ticks"]*POLICY["background"]["operationsPerTick"] and background.get("checksum") == 1722810369 and background.get("complete") is True, "incomplete frozen background fixture")
     return {"qualified": not errors, "errors": errors, "checks": checks,
         "assessedRows": len(checks), "maximumResidualMs": max((c.get("residualMs",0) for c in checks),default=None),
         "observerAdditiveMs": 10, "nativeAdditiveMs": .001, "outwardStepMs": .001,

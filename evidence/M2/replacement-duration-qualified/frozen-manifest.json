@@ -1,0 +1,478 @@
+{
+  "identities": {
+    "adapterSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+    "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+    "calculatorSha256": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+    "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+    "collectorSha256": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+    "evaluatorSha256": "ebd77bd687b74b14154b46c8a8a2adffb676067602a163e6bc6d7b9bb473f02a",
+    "nativeClock": "CLOCK_UPTIME_RAW",
+    "observerClock": "performance.now",
+    "osBuild": "26B5101f",
+    "pluginComposition": {
+      "observer": {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "version": "0.1.0"
+      },
+      "qualification": {
+        "files": {
+          ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+          "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+          "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/register.ts": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "version": "2.0.0"
+      },
+      "schemaVersion": 1
+    },
+    "pluginStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+    "policyFileSha256": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+    "policySha256": "ab51d8b1d3f04950e123b4dc6a16858e51f8cc522ce1155032602352931f7c3a",
+    "probeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+    "processSourceSha256": "aaaaabf66ba0778a394d08a4c284690caac539f447af46281cb1b4a8f11c31eb",
+    "providerImagePolicy": {
+      "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+      "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "st_ctime_ns": 1791490378985162496,
+      "st_dev": 16777231,
+      "st_ino": 152193867,
+      "st_mode": 33261,
+      "st_mtime_ns": 1791490378797501260,
+      "st_size": 239695888,
+      "st_uid": 501
+    },
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "responderExecutableSha256": "09a227cb506d807d0805eba2cf53f0d1a908365529f989e70485c69f8931d451",
+    "responderId": "8911f1c9-4b95-49db-b011-01ce20b98bf5",
+    "responderImagePolicy": {
+      "path": "/private/tmp/ts-f4-time-6w0hn7i8/timestamp-responder",
+      "sha256": "09a227cb506d807d0805eba2cf53f0d1a908365529f989e70485c69f8931d451",
+      "st_ctime_ns": 1791865719133311547,
+      "st_dev": 16777231,
+      "st_ino": 167651174,
+      "st_mode": 33261,
+      "st_mtime_ns": 1791865719133311547,
+      "st_size": 35488,
+      "st_uid": 501
+    },
+    "responderSourceSha256": "5840862316271b69fcc0a548d641d411ef25110ca5b895ca9dafea98497acad2",
+    "runId": "578382b5-7bf8-4305-8c29-410df24bfb0d",
+    "runnerSha256": "af0087c164911094a58b28d893dcece2f87c7d0f2b2884b5224d6f6b066faf69"
+  },
+  "plan": [
+    {
+      "challenge": "ad56911dccb44c2997be90db3b15452042193079b1f74384910236965a113ed3",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 0,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "0404787e0eff4346b4f06a2e8243784c05a403dae7b84cb99732e016b6cea6c5",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 1,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "1a25691a97294ddfad605a7f28528ef4392df12c562f4ef4a2abb3a3634f3e80",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 2,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "a860e6c6934a465e84cf6aecbc8f555abd5bd19ac7594c6ab79503d3d90f4fc2",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 3,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "e1a2b5e11db3462e8e35a1da27ab14a4ca807886f5c04bfdb8d202516940b7c1",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 4,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "13f0a69647c94c0686e7bf4ea196df16b6ce29885221425bb055351476d016e0",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 5,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "acec0c4aa38044e5af26a7261a84b40b8cd91700a5ea468eb8ff0a80c4c73ed6",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 6,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "4eeaf5b0c9de4b6681393a211f3c19dd514b38afafdc449995109f446e501a67",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 7,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "f11e6b51831745f88e4bc693bd43db3721b00e7f4f1d450695f4401ae3b1f960",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 8,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "8add36cf828c4a3b825a4868efda90d6868fc0df41564be6b5d351464fe83ad6",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 9,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "717daaf9d2b543e1b925566ede96c36b1d46ce13dc4940a4ad95b23e351d5853",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 10,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "20e47a4270274912ab74bdf0832d56a4d49be0097baf4ac48c284dd1fd44b6fa",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 11,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "2db39ef92f2c4b3a84be4b919d71165a65e99667322446fb90b3adf68cacf95d",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 12,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "2fb7ea08a6d3447fbe201d94fb9d274576135ef7a2094ae2a52fea2bbf9378bc",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 13,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "2d987d8bbde94596a5e7c8d84c05c8ccae472e0652e14b0ba4dc900cb3e1e52b",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 14,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "64dccfb3536746e0b92090e67bcbc8e65fb1f63009a04f978ee0c368d4571a5a",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 15,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "61940c68864f49c4b5dfa5f6e692ad58b98acfb373754d08bb694c6a63d05bc3",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 16,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "40a8df8987f04fbbaf39636af07a14f229ce5043296342a49d802f7edc4cb011",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 17,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "a896365d656f440489cdb72d3990fab5bdb10b01661248bda065331ae887aaa9",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 18,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "6dd366b207a144708933fef1b96d4ed7f1e7a2bfd98f4b2aab3919af8192ed0b",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 19,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "e1d8cfc037134ad0b9ef8afdf42fd6029e3d944c30fe48a29e85c8b012dfff19",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 20,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "a7a458f287b94e5cb2365ac301561231140831dbb6424038ac4f5c5b5032ec13",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 21,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "f895d5f5a6034018a0940628398c65737b3a74604b0449fea0861ecb1d23d9bc",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 22,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "8f6b83447e8e400eb4172a3e42fcb3f4248c975462f84c14b69500a955fcae60",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 23,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "29e4af12a15d4b4b934899eef107278c7b14aed9eaf54659bb79c4d86ad8e0e0",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 24,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "88ae52734519484ab0409d650bb9b8d29a16bb45405c4c8298a81ca49a6ec1f4",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 25,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "7749e134013d4b35bc3e7a23c338e853ebb2b3019b994c41ae1ac6d2bde6ff8d",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 26,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "49aa351bd9404a40b75ecf926c09cd5c0744581e24ef4b94a7c0893ad95bbc98",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sequence": 27,
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "challenge": "fb2d7f55a0cf4a9383a621cb7bc7c6c6ef4394e98b6b4c33a582e4cb7dd094f1",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 28,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "3167768112de4d588da3e0b3bda0baeab8b9746b00f64f5ca1faca88623a8811",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 29,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "1be79927b36544bfb86aeca3d74bac0171a040467e4947d8952b503392489dd9",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 30,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "78938e014078483fa37d3926e1edccb9db497c2bd0ca4e7c8351ed904230be30",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 31,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "4df10a6de37348ca8d5a54ab24e62b5535228da34146487884dd5813d8fa7ff9",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 32,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "7583c8c1e2a44b968bdcc2f3e6760196bfe1344fef6a4af5b2e28c778d98ec06",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 33,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "0f12de4e80c642be99c024c525e3c2e06d3c57b85f8e415aaf1f344ee4533299",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 34,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "d48880194b674d58892398847877517001b603851b9d4ef9804f69b15ca28ab6",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 35,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "ec42dbe0326c45b580b966fee2c0e2fde45f6cbb40fd42d29412695aaf7c2626",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 36,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "39a5af2f27c74d2889fdfa48c59f84334a1b5abe6e014e59b1b6d81ca7a2f542",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 37,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "1765065742994ee8b2c3e0feb1783bc4a25ca6efdff74f7ba1e1ae3862f246cf",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 38,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "99c3533e35f84525a0f6653f66d8fc4827e172caf0a9437e84551b917a5a1a22",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 39,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "2e1b7701729347d698b25fea70d742698dd5bc110dce4a309f2aab67c5adfafe",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 40,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "2c80a4a65fa74c69965f883dcc66be63f721eeb3d8274db89916cb5b9c37006f",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 41,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "03d007bbe5024195bf89064fa2240223c84c1f3b51ea465eb771acc8e04ec18c",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 42,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "9cb7cf9e387a4049a8b63aebc608791a9e12f7e702a448c1981bf06627dcb991",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 43,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "c28b1f25f6064f13836eff8b0d6b58ea362da2b66e3e4bef8c94fd0ab9a2dfdc",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 44,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "1f6498918a1d47d4baa5444932447f02e3a23acea7344cb9b146d4af5e50109e",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 45,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "adf4e1a551bc43519f03a6ce5972e0e159ac06537f3b404eaa4afff5d957ab4c",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 46,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "30f1b563077249f3b22d30ad05dce6b8012ab3f9d0c547be83df78cf98370457",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 47,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "bb55bc697c4948a38aa2588922a716fcb04d019c222d455096f0b047c09fc73a",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 48,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "e69921e17b3f4ff4930e5ac548eaadc3f310681cd4f546d88b5161f3989a960b",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 49,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "07effbe9424847da9a98f7f834ad03393fd4cd4fe1184950bd7333e816c55d43",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 50,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "bbbc498e57bb48b9a606980f8db6fc7e1ec1fba836ee442aa22e734d2d0d912f",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 51,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "d334f1f8d58148da91b79e10c1e90da51cda1945f26745499727f34067a91595",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 52,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "91708b535cdf4c14b50e461cfaa9a227867d9b0aeaca41f582693d60ba3da5b7",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 53,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "05b751d4ac67476192d17a01f72050e1da26ea98e81d4726b987ce860efa121a",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 54,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    },
+    {
+      "challenge": "868ffda8abd94b2a92b021548977e11eff57c0f6496840ba9ea1b760841ed4e1",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sequence": 55,
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    }
+  ],
+  "policy": {
+    "background": {
+      "intervalMs": 5,
+      "operation": "x = ((x ^ i) * 1664525 + 1013904223) >>> 0",
+      "operationsPerTick": 2048,
+      "ownership": "qualification-mod-local-memory-and-clock-timers-only",
+      "start": "before-first-clock-reading",
+      "ticks": 256
+    },
+    "boundaryLowerMs": 400,
+    "boundaryUpperMs": 425,
+    "cleanupGraceSeconds": 3,
+    "clockScope": "awake-uninterrupted-same-runtime-epoch-boot",
+    "conditions": [
+      "quiet",
+      "background"
+    ],
+    "externalDeadlineSeconds": 20,
+    "instrument": "m2-http-unix-uptime-v2",
+    "maximumDurationMs": 400,
+    "maximumEnclosureMs": 10,
+    "maximumStepMs": 1,
+    "nativeAdditiveMs": 0.001,
+    "observerAdditiveMs": 10,
+    "outwardStepMs": 0.001,
+    "positiveAttempts": 1,
+    "requestedDelaysMs": [
+      0,
+      25,
+      50,
+      100,
+      200,
+      250,
+      405
+    ],
+    "residualGuardMs": 1,
+    "totalRows": 14,
+    "version": 2,
+    "zeroUpperMs": 20
+  },
+  "prerequisiteEvidence": {
+    "installedApiRecordSha256": "c3d73ce38f56f214fdc11609b2df457e3128dc7e871dbbfb66d6a0c744393038",
+    "oldConformanceRejected": true,
+    "positiveScannerRecordSha256": "15548a6c1c683721f2643d3b38e2085ec9336a747618e7aaca7d1374a8a8c5dd",
+    "readinessVerdictSha256": "980df1193def89b57a5127b6210074507cbb79e2458c090ae0088ea1c2229764",
+    "sourceGitBase": "cd7e9e165a2f4a7c67026376ce7fd7c1266d850a"
+  },
+  "runtimePlan": [
+    {
+      "condition": "quiet",
+      "runtimeId": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e",
+      "sourceEpoch": "3bcafc82-c4d7-4886-b96e-8b72e3a69c3e"
+    },
+    {
+      "condition": "background",
+      "runtimeId": "7f2a3a48-1771-470f-9772-49f0bb4cc160",
+      "sourceEpoch": "7f2a3a48-1771-470f-9772-49f0bb4cc160"
+    }
+  ]
+}
