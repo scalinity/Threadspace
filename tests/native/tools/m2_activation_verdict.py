@@ -61,11 +61,18 @@ def admit_source(binding, raw, reviewed_commit=REVIEWED_COMMIT):
                      "verdictTestSha256": "test_m2_activation_verdict.py", "activationSha256": "m2_activation_probe.ts",
                      "readinessControlsSha256": "m2_readiness_controls.js",
                      "readinessTestSha256": "test_m2_readiness.py",
+                     "processSourceSha256": "m2_activation_process.py",
+                     "cleanupSuiteSha256": "m2_readiness_cleanup.py", "cleanupTestSha256": "test_m2_activation_process.py",
                      "controlSourceSha256": "m2_activation_controls.js", "testSourceSha256": "test_m2_activation.py"}
     for key, name in fresh_sources.items():
         value = binding.get(key)
         if value != digest((REPO / "tests/native/tools" / name).read_bytes()):
             raise RuntimeError("missing or changed fresh controller/verifier identity")
+    from m2_activation_process import RESPONDER, RESPONDER_SHA, approved_image, PROVIDER
+    if (binding.get('pythonExecutable') != str(RESPONDER) or binding.get('pythonExecutableSha256') != RESPONDER_SHA
+            or binding.get('responderImagePolicy') != approved_image(RESPONDER)
+            or binding.get('providerImagePolicy') != approved_image(PROVIDER)):
+        raise RuntimeError('changed independently approved executable binding')
     return {"kind": "ACCEPTED_SOURCE_ADMISSION_ONLY", "reviewedGitCommit": REVIEWED_COMMIT,
             "reviewRecordSha256": REVIEW_RECORD_SHA, "binding": binding,
             "nativeActivation": "NOT_RUN", "sourceAdmission": "PASS"}
@@ -75,8 +82,9 @@ def reject_retired(freeze):
     if freeze.get("reviewedGitCommit") != REVIEWED_COMMIT:
         raise RuntimeError("stale activation review binding")
     ids = freeze.get("ids", {})
+    previous = json.loads((REPO / 'evidence/M2/replacement-activation-readiness/retired-identities.json').read_bytes())
     for key, value in RETIRED.items():
-        if not ids.get(key) or ids[key] == value:
+        if not ids.get(key) or ids[key] in (value, previous[key]):
             raise RuntimeError("missing or retired activation " + key)
 
 
@@ -142,9 +150,10 @@ def adjudicate(freeze, artifacts, execution, *, synthetic=False):
                 role + " image identity inconsistent")
         require(process.get("uid") == execution.get("controllerUid") and process.get("parentPid") == execution.get("controllerPid")
                 and type(process.get("startUsec")) is int and process.get("startUsec", 0) > 0, role + " ownership/incarnation inconsistent")
+        from m2_activation_process import verify_cleanup
         matches = [c for c in cleanup if c.get("role") == role]
         require(len(matches) == 1 and matches[0].get("identity") == process and matches[0].get("reaped") is True
-                and not matches[0].get("error"), role + " cleanup incomplete")
+                and verify_cleanup(matches[0], process, orderly=role == "responder"), role + " cleanup incomplete")
     require(len(cleanup) == 2 and execution.get("socketRemoved") is True, "cleanup accounting/socket incomplete")
     init = execution.get("initializer", {})
     response = init.get("response", {})
@@ -166,6 +175,14 @@ def adjudicate(freeze, artifacts, execution, *, synthetic=False):
     # not a newly required exhaustive post-admission receipt.
     require(all(name in ("threadspace-observer", "threadspace-socket-duration") and count == 1
                 for name, count in composition.get("loadedModuleCounts", {}).items()), "duplicate or unexpected module loading")
+    if not synthetic:
+        try:
+            from m2_readiness_cleanup import verify_qualification
+            from m2_socket_duration import canonical_hash
+            qualification = verify_qualification(Path(cfg['entryOutput']).parent.parent / 'cleanup-suite')
+            require(canonical_hash(qualification) == freeze.get('cleanupQualificationSha256'), 'cleanup qualification binding changed')
+        except (KeyError, ValueError, RuntimeError, OSError):
+            failures.append('native cleanup qualification missing')
     scan = execution.get("scanner", {})
     require(scan.get("activationSha256") == ids.get("activationSha256") and scan.get("providerSha256") == ids.get("providerSha256")
             and scan.get("success") is True and scan.get("exitCode") == 0 and scan.get("reaped") is True, "fresh scanner admission missing")

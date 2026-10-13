@@ -1,0 +1,1027 @@
+{
+  "cases": [
+    {
+      "assessment": {
+        "failures": [],
+        "verdict": "PASS"
+      },
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 22854,
+            "pid": 23021,
+            "startUsec": 1791864999356182,
+            "uid": 501
+          },
+          "childPid": 23021,
+          "events": [
+            "verified-child-SIGTERM"
+          ],
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "kernelVerified": true,
+            "parentPid": 22854,
+            "pid": 23021,
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "startUsec": 1791864999356182,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23021,
+                "startUsec": 1791864999356182,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23021,
+                "startUsec": 1791864999356182,
+                "uid": 501
+              },
+              "phase": "fixture-ready"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23021,
+                "startUsec": 1791864999356182,
+                "uid": 501
+              },
+              "phase": "pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23021,
+                "startUsec": 1791864999356182,
+                "uid": 501
+              },
+              "phase": "final-pre-SIGTERM"
+            },
+            {
+              "phase": "signal",
+              "pid": 23021,
+              "signal": "SIGTERM"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 23021,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "responder",
+          "signals": [
+            "SIGTERM"
+          ],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 23021,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "deadlineExceeded": false,
+      "name": "one-exchange",
+      "process": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "kernelVerified": true,
+        "parentPid": 22854,
+        "pid": 23021,
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "startUsec": 1791864999356182,
+        "uid": 501
+      },
+      "responses": [
+        {
+          "body": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "3418253acbfa40f19ce88f13fdebc71ab18588fc329c49b9b6f04c7d10d14a65",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "0520eb0e-06bb-4531-bc89-2a77279b622f",
+            "runId": "c75698f6-5659-445d-8659-aa7d3117b64b"
+          },
+          "status": 200
+        }
+      ],
+      "socketRemoved": true,
+      "transcript": [
+        {
+          "event": "start",
+          "identity": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "3418253acbfa40f19ce88f13fdebc71ab18588fc329c49b9b6f04c7d10d14a65",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "0520eb0e-06bb-4531-bc89-2a77279b622f",
+            "runId": "c75698f6-5659-445d-8659-aa7d3117b64b"
+          },
+          "pid": 23021,
+          "uid": 501
+        },
+        {
+          "attempt": 1,
+          "event": "received",
+          "nonceMatched": true,
+          "peerUid": 501,
+          "status": 200
+        },
+        {
+          "attempt": 1,
+          "body": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "3418253acbfa40f19ce88f13fdebc71ab18588fc329c49b9b6f04c7d10d14a65",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "0520eb0e-06bb-4531-bc89-2a77279b622f",
+            "runId": "c75698f6-5659-445d-8659-aa7d3117b64b"
+          },
+          "event": "generated",
+          "status": 200
+        },
+        {
+          "attempt": 1,
+          "event": "answered",
+          "status": 200
+        },
+        {
+          "accepted": 1,
+          "answered": 1,
+          "attempts": 1,
+          "event": "stop",
+          "generated": 1
+        }
+      ],
+      "transcriptSha256": "8fd13fa74d236ca3b720c5e62a12662b632c5fd810f45cc4f1357643547f314a"
+    },
+    {
+      "assessment": {
+        "failures": [],
+        "verdict": "PASS"
+      },
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 22854,
+            "pid": 23090,
+            "startUsec": 1791864999490831,
+            "uid": 501
+          },
+          "childPid": 23090,
+          "events": [
+            "verified-child-SIGTERM"
+          ],
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "kernelVerified": true,
+            "parentPid": 22854,
+            "pid": 23090,
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "startUsec": 1791864999490831,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23090,
+                "startUsec": 1791864999490831,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23090,
+                "startUsec": 1791864999490831,
+                "uid": 501
+              },
+              "phase": "fixture-ready"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23090,
+                "startUsec": 1791864999490831,
+                "uid": 501
+              },
+              "phase": "pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23090,
+                "startUsec": 1791864999490831,
+                "uid": 501
+              },
+              "phase": "final-pre-SIGTERM"
+            },
+            {
+              "phase": "signal",
+              "pid": 23090,
+              "signal": "SIGTERM"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 23090,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "responder",
+          "signals": [
+            "SIGTERM"
+          ],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 23090,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "deadlineExceeded": false,
+      "name": "no-request",
+      "process": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "kernelVerified": true,
+        "parentPid": 22854,
+        "pid": 23090,
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "startUsec": 1791864999490831,
+        "uid": 501
+      },
+      "responses": [],
+      "socketRemoved": true,
+      "transcript": [
+        {
+          "event": "start",
+          "identity": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "a0c55d25994944ea9761276b6b58b5d136d1fa30ffa64606af453e214bc5553a",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "84979e4d-f2b4-49f7-9c77-a32ae80fa0d0",
+            "runId": "a1136ad0-0130-4b27-a377-da1f35ae0701"
+          },
+          "pid": 23090,
+          "uid": 501
+        },
+        {
+          "accepted": 0,
+          "answered": 0,
+          "attempts": 0,
+          "event": "stop",
+          "generated": 0
+        }
+      ],
+      "transcriptSha256": "db99517ec8b89d574b97c9faf2b7144d17ffbcc38e348bf658b1338c03768e9a"
+    },
+    {
+      "assessment": {
+        "failures": [],
+        "verdict": "PASS"
+      },
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 22854,
+            "pid": 23177,
+            "startUsec": 1791864999625194,
+            "uid": 501
+          },
+          "childPid": 23177,
+          "events": [
+            "verified-child-SIGTERM"
+          ],
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "kernelVerified": true,
+            "parentPid": 22854,
+            "pid": 23177,
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "startUsec": 1791864999625194,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23177,
+                "startUsec": 1791864999625194,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23177,
+                "startUsec": 1791864999625194,
+                "uid": 501
+              },
+              "phase": "fixture-ready"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23177,
+                "startUsec": 1791864999625194,
+                "uid": 501
+              },
+              "phase": "pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-pre-SIGTERM"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23177,
+                "startUsec": 1791864999625194,
+                "uid": 501
+              },
+              "phase": "final-pre-SIGTERM"
+            },
+            {
+              "phase": "signal",
+              "pid": 23177,
+              "signal": "SIGTERM"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 23177,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "responder",
+          "signals": [
+            "SIGTERM"
+          ],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 23177,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "deadlineExceeded": false,
+      "name": "partial-header",
+      "process": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "kernelVerified": true,
+        "parentPid": 22854,
+        "pid": 23177,
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "startUsec": 1791864999625194,
+        "uid": 501
+      },
+      "responses": [],
+      "socketRemoved": true,
+      "transcript": [
+        {
+          "event": "start",
+          "identity": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "f2c9763a767346f1b4cddc0e92036667515b05c27e094d0b948b2b05e924af25",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "71ca0017-106c-4842-8533-bab6bd528a2a",
+            "runId": "f7ea9cfd-7e02-498e-b591-8953a5f6963c"
+          },
+          "pid": 23177,
+          "uid": 501
+        },
+        {
+          "attempt": 1,
+          "event": "incomplete",
+          "reason": "TimeoutError"
+        },
+        {
+          "accepted": 0,
+          "answered": 0,
+          "attempts": 1,
+          "event": "stop",
+          "generated": 0
+        }
+      ],
+      "transcriptSha256": "4c8f1a3465497e0a3dcc1edf4d38eb3b96a002201db895f0d7fce99c91d2a53c"
+    },
+    {
+      "assessment": {
+        "failures": [],
+        "verdict": "PASS"
+      },
+      "cleanup": [
+        {
+          "approvedImage": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "baseline": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 22854,
+            "pid": 23596,
+            "startUsec": 1791865000762041,
+            "uid": 501
+          },
+          "childPid": 23596,
+          "events": [
+            "already-exited"
+          ],
+          "exitCode": 0,
+          "identity": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "kernelVerified": true,
+            "parentPid": 22854,
+            "pid": 23596,
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "startUsec": 1791865000762041,
+            "uid": 501
+          },
+          "observations": [
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "file-before-spawn"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23596,
+                "startUsec": 1791865000762041,
+                "uid": 501
+              },
+              "phase": "launch-baseline"
+            },
+            {
+              "admitted": true,
+              "file": {
+                "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+                "st_ctime_ns": 1790931100571543546,
+                "st_dev": 16777231,
+                "st_ino": 126234682,
+                "st_mode": 33261,
+                "st_mtime_ns": 1790931100571543546,
+                "st_size": 33568,
+                "st_uid": 501
+              },
+              "phase": "full-image"
+            },
+            {
+              "admitted": true,
+              "kernel": {
+                "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+                "parentPid": 22854,
+                "pid": 23596,
+                "startUsec": 1791865000762041,
+                "uid": 501
+              },
+              "phase": "fixture-ready"
+            },
+            {
+              "exitCode": 0,
+              "phase": "terminal-wait",
+              "pid": 23596,
+              "reaped": true,
+              "waitStatus": 0
+            }
+          ],
+          "reaped": true,
+          "role": "responder",
+          "signals": [],
+          "spawned": true,
+          "wait": {
+            "exitCode": 0,
+            "pid": 23596,
+            "reaped": true,
+            "waitStatus": 0
+          }
+        }
+      ],
+      "deadlineExceeded": false,
+      "name": "four-request",
+      "process": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "kernelVerified": true,
+        "parentPid": 22854,
+        "pid": 23596,
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "startUsec": 1791865000762041,
+        "uid": 501
+      },
+      "responses": [
+        {
+          "body": {
+            "kind": "READINESS_REJECTED"
+          },
+          "status": 403
+        },
+        {
+          "body": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "b4eba849adf44008bed1a8c74e8ef0ec4db50bda746947459f3016d6840846d0",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "eb5fe812-1e4a-4439-bfde-3df59cca32aa",
+            "runId": "02133a65-39a5-439d-a14b-2a24be1cf4fd"
+          },
+          "status": 200
+        },
+        {
+          "body": {
+            "kind": "READINESS_REPLAY_REJECTED"
+          },
+          "status": 409
+        },
+        {
+          "body": {
+            "kind": "READINESS_REJECTED"
+          },
+          "status": 403
+        }
+      ],
+      "socketRemoved": true,
+      "transcript": [
+        {
+          "event": "start",
+          "identity": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "b4eba849adf44008bed1a8c74e8ef0ec4db50bda746947459f3016d6840846d0",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "eb5fe812-1e4a-4439-bfde-3df59cca32aa",
+            "runId": "02133a65-39a5-439d-a14b-2a24be1cf4fd"
+          },
+          "pid": 23596,
+          "uid": 501
+        },
+        {
+          "attempt": 1,
+          "event": "received",
+          "nonceMatched": false,
+          "peerUid": 501,
+          "status": 403
+        },
+        {
+          "attempt": 1,
+          "body": {
+            "kind": "READINESS_REJECTED"
+          },
+          "event": "generated",
+          "status": 403
+        },
+        {
+          "attempt": 1,
+          "event": "answered",
+          "status": 403
+        },
+        {
+          "attempt": 2,
+          "event": "received",
+          "nonceMatched": true,
+          "peerUid": 501,
+          "status": 200
+        },
+        {
+          "attempt": 2,
+          "body": {
+            "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+            "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+            "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+            "kind": "ACTIVATION_ONLY_READY",
+            "nonce": "b4eba849adf44008bed1a8c74e8ef0ec4db50bda746947459f3016d6840846d0",
+            "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+            "responderId": "eb5fe812-1e4a-4439-bfde-3df59cca32aa",
+            "runId": "02133a65-39a5-439d-a14b-2a24be1cf4fd"
+          },
+          "event": "generated",
+          "status": 200
+        },
+        {
+          "attempt": 2,
+          "event": "answered",
+          "status": 200
+        },
+        {
+          "attempt": 3,
+          "event": "received",
+          "nonceMatched": false,
+          "peerUid": 501,
+          "status": 409
+        },
+        {
+          "attempt": 3,
+          "body": {
+            "kind": "READINESS_REPLAY_REJECTED"
+          },
+          "event": "generated",
+          "status": 409
+        },
+        {
+          "attempt": 3,
+          "event": "answered",
+          "status": 409
+        },
+        {
+          "attempt": 4,
+          "event": "received",
+          "nonceMatched": false,
+          "peerUid": 501,
+          "status": 403
+        },
+        {
+          "attempt": 4,
+          "body": {
+            "kind": "READINESS_REJECTED"
+          },
+          "event": "generated",
+          "status": 403
+        },
+        {
+          "attempt": 4,
+          "event": "answered",
+          "status": 403
+        },
+        {
+          "accepted": 1,
+          "answered": 4,
+          "attempts": 4,
+          "event": "stop",
+          "generated": 4
+        }
+      ],
+      "transcriptSha256": "94686442aaf1dd40ba5c1fd2cbd37d26d00cb191acc3befe5dea8ae2138f732f"
+    }
+  ],
+  "freezeSha256": "5d8a3cfdcb0c0b69a80a0e5225c29e75edcdbdfe6f5889cca7678a3c401ba67c",
+  "kind": "DIRECT_IMAGE_CLEANUP_QUALIFICATION_V1",
+  "providerLaunches": 0,
+  "sources": {
+    "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+    "admittedStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+    "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+    "cleanupSuiteSha256": "22530caab7d7a9f062bf3bd9aa943f98332f6f6128cab5ae1a3fa17156c1a8d5",
+    "cleanupTestSha256": "a4a68e66b6fd06156bbdc97de7c4b140973ee045b60d3303f723d6fce84feb28",
+    "conformanceSourceIdentities": {
+      "adapterSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+      "backgroundSha256": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+      "calculatorSha256": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+      "collectorSha256": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      "evaluatorSha256": "40ced6953f53bc2e0f5042e092c7757779f9ce978d967c791fbbb9039cc77c5f",
+      "pluginComposition": {
+        "observer": {
+          "files": {
+            ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+            "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+            "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+            "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+            "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+            "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+            "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+          },
+          "modules": [
+            "./register.ts"
+          ],
+          "name": "threadspace-observer",
+          "version": "0.1.0"
+        },
+        "qualification": {
+          "files": {
+            ".claude-plugin/plugin.json": "79851416ee92839b3ec96e826f8a0a93842aaacd3bd61f0b495260bf7e1da0e7",
+            "hooks/background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+            "hooks/hooks.json": "a9414e9fe26002943cfd416bc53b2bbe66a0226f3ee344b901cc3ad191b8f914",
+            "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+            "hooks/register.ts": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa"
+          },
+          "modules": [
+            "./register.ts"
+          ],
+          "name": "threadspace-socket-duration",
+          "version": "2.0.0"
+        },
+        "schemaVersion": 1
+      },
+      "pluginStagerSha256": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+      "policyFileSha256": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+      "policySha256": "ab51d8b1d3f04950e123b4dc6a16858e51f8cc522ce1155032602352931f7c3a",
+      "probeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "providerVersion": "2.1.295",
+      "responderSourceSha256": "5840862316271b69fcc0a548d641d411ef25110ca5b895ca9dafea98497acad2",
+      "runnerSha256": "abf36c70117f98dc5d5debe8c1cd57614920e14d291cfbc355ba22d3a64e348c"
+    },
+    "controlSourceSha256": "f9847603a82d6dc9d784df5428b52e623b9c1459f789f20ecc43dcbbb5bd1bff",
+    "controllerPythonExecutable": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+    "controllerSha256": "09d22b2b0fa4da083b2487a33cc07b3dd9418c85260044c7b6c2988a2b523d99",
+    "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+    "observerFiles": {
+      ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+      "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+      "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+      "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+      "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+      "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+    },
+    "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+    "originalActivationSha256": "ea54a1cbe9253388f6e4a0e2575ee31470746e0c236e2d99ad4e5fc56c273136",
+    "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+    "processSourceSha256": "edfd1dcce52aa5645d525fbc9368b3b7f953968b5f9bb582e844783b492b0cbc",
+    "providerImagePolicy": {
+      "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+      "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "st_ctime_ns": 1791490378985162496,
+      "st_dev": 16777231,
+      "st_ino": 152193867,
+      "st_mode": 33261,
+      "st_mtime_ns": 1791490378797501260,
+      "st_size": 239695888,
+      "st_uid": 501
+    },
+    "providerPath": "/Users/danny/.local/share/claude/versions/2.1.295",
+    "providerSha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+    "providerVersion": "2.1.295",
+    "pythonExecutable": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+    "pythonExecutableSha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+    "readinessControlsSha256": "b59536e9e491dc956b5f79be5858e57edfecd0e18a0e2919f330bd2b26efef56",
+    "readinessTestSha256": "f889548f66cbce0b902bacde562c0958b326bba2d4b6f090d793f481404ea4d4",
+    "responderImagePolicy": {
+      "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+      "st_ctime_ns": 1790931100571543546,
+      "st_dev": 16777231,
+      "st_ino": 126234682,
+      "st_mode": 33261,
+      "st_mtime_ns": 1790931100571543546,
+      "st_size": 33568,
+      "st_uid": 501
+    },
+    "reviewedControllerSha256": "d2e91fa5e0cdb2feffa0d118a000b853f0bc677f5e56e65bc1d7254a4208f7e0",
+    "reviewedDependencyHashes": {
+      "m2_activation_readiness.py": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+      "m2_composed_duration.py": "db43797b23d356ea6da5db93899d9846fcdf5a7eb20c0745c8be7f0d9bf72502",
+      "m2_positive_scanner.py": "f972c11b26448c35949f0ea655db9a682318f2a5d36f662bd73da3d277733e79",
+      "m2_positive_scanner_controls.js": "3a894d3e5b77fbfa3f66bfe0819214625b5f8bd748d5ed7e0bd2ada924be27f1",
+      "m2_socket_background.ts": "9379a83f4f6f009d989856697379f541596c8dfa451cf4885327f5310b9feb58",
+      "m2_socket_duration.py": "40ced6953f53bc2e0f5042e092c7757779f9ce978d967c791fbbb9039cc77c5f",
+      "m2_socket_plugins.py": "6992a39e6eed42fba187de24481c5a107006e58840273a28fcee27adc1d82c07",
+      "m2_socket_policy.json": "f508bc59905ab5a3bd045875f36fd4447ab3712706413a478dd09999028b7bbf",
+      "m2_socket_probe.ts": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+      "m2_socket_runner.py": "abf36c70117f98dc5d5debe8c1cd57614920e14d291cfbc355ba22d3a64e348c",
+      "test_m2_positive_scanner.py": "0e1d941834e0c581e566f64cb6069902e77754aac7d73164ad007b589c213f01"
+    },
+    "testSourceSha256": "792258d98129f389689415409dbb81381ad52646d16cccb83dee95505c19521f",
+    "verdictSha256": "4c89968d7130e71b82e55977a3daa3d31d2622e71c6c2dac22f03d1dca1fda4b",
+    "verdictTestSha256": "3df1818e501fd9a846a6d491b5ab5afff2f181d5f6b83b3fa5f7161a0921fa48"
+  },
+  "verdict": "PASS"
+}

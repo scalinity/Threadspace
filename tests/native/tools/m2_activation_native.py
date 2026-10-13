@@ -16,7 +16,8 @@ import time
 import uuid
 from pathlib import Path
 from m2_socket_plugins import OBSERVER_FILES, OBSERVER, write_private, json_bytes, package_files
-from m2_socket_runner import PROVIDER, PROVIDER_VERSION, PROVIDER_SHA, image_identity, cleanup, provider_argv
+from m2_socket_runner import PROVIDER, PROVIDER_VERSION, PROVIDER_SHA, provider_argv
+from m2_activation_process import RESPONDER, approved_image, owned_process, wait_exact, observe, verify_cleanup
 from m2_socket_duration import HERE, canonical_hash, source_identities, file_hash
 from m2_activation_readiness import acknowledgement
 from m2_activation_verdict import (REVIEWED_COMMIT, REVIEW_RECORD_SHA, read_review, admit_source,
@@ -37,7 +38,13 @@ def source_binding():
         "observerSha256": source_identities()["adapterSha256"],
         "positiveProbeSha256": file_hash(HERE / "m2_socket_probe.ts"),
         "activationSha256": file_hash(ACTIVATION), "originalActivationSha256": ACTIVATION_SHA, "fixtureSha256": file_hash(FIXTURE),
-        "controllerSha256": file_hash(__file__), "pythonExecutableSha256": file_hash(Path(sys.executable).resolve()), "pythonExecutable": str(Path(sys.executable).resolve()),
+        "controllerSha256": file_hash(__file__), "pythonExecutableSha256": file_hash(RESPONDER), "pythonExecutable": str(RESPONDER),
+        "responderImagePolicy": approved_image(RESPONDER),
+        "providerImagePolicy": approved_image(PROVIDER),
+        "controllerPythonExecutable": str(Path(sys.executable).resolve()),
+        "processSourceSha256": file_hash(HERE / "m2_activation_process.py"),
+        "cleanupSuiteSha256": file_hash(HERE / "m2_readiness_cleanup.py"),
+        "cleanupTestSha256": file_hash(HERE / "test_m2_activation_process.py"),
         "controlSourceSha256": file_hash(HERE / "m2_activation_controls.js"),
         "testSourceSha256": file_hash(HERE / "test_m2_activation.py"),
         "admittedStagerSha256": file_hash(HERE / "m2_socket_plugins.py"),
@@ -112,65 +119,6 @@ def environment(root):
 
 
 
-def kernel_child(child, executable):
-    """Independent signal ownership even if full image/hash acquisition fails."""
-    if child.poll() is not None: return None
-    lib = ctypes.CDLL('/usr/lib/libproc.dylib')
-    path, data = ctypes.create_string_buffer(4096), ctypes.create_string_buffer(136)
-    if lib.proc_pidpath(child.pid, path, len(path)) <= 0 or lib.proc_pidinfo(child.pid, 3, 0, data, 136) != 136:
-        raise RuntimeError("kernel child ownership unavailable")
-    raw = data.raw
-    identity = {"pid": child.pid, "uid": int.from_bytes(raw[20:24], 'little'),
-        "parentPid": int.from_bytes(raw[16:20], 'little'),
-        "startUsec": int.from_bytes(raw[120:128], 'little') * 1000000 + int.from_bytes(raw[128:136], 'little'),
-        "imagePath": str(Path(os.fsdecode(path.value)).resolve())}
-    if identity['uid'] != os.getuid() or identity['parentPid'] != os.getpid() or identity['imagePath'] != str(Path(executable).resolve()):
-        raise RuntimeError("foreign child ownership")
-    return identity
-
-
-def reap_owned(child, identity, executable):
-    events = []
-    current = kernel_child(child, executable)
-    baseline = {k: identity[k] for k in current} if identity and current else current
-    if current:
-        if current != baseline or kernel_child(child, executable) != baseline:
-            raise RuntimeError("cleanup refused changed child incarnation")
-        child.send_signal(signal.SIGTERM); events.append('verified-child-SIGTERM')
-        try: child.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            if kernel_child(child, executable) != baseline: raise RuntimeError("cleanup refused reused child")
-            child.kill(); events.append('verified-child-SIGKILL'); child.wait(timeout=3)
-    else:
-        child.wait(timeout=0); events.append('already-exited')
-    if child.stdin is not None: child.stdin.close()
-    return {"identity": identity, "signalOwnership": baseline, "events": events,
-            "exitCode": child.returncode, "reaped": child.poll() is not None}
-
-
-@contextmanager
-def owned_process(role, argv, executable, records, version=None, **kwargs):
-    """Every successfully spawned direct child reaches the cleanup guard."""
-    child = None; identity = None
-    receipt = {"role": role, "spawned": False, "reaped": False}
-    records.append(receipt)
-    try:
-        child = subprocess.Popen(argv, **kwargs); receipt['spawned'] = True
-        try: identity = image_identity(child, executable, version)
-        except Exception as error:
-            receipt['identityError'] = type(error).__name__ + ': ' + str(error)
-            raise
-        receipt['identity'] = identity
-        yield child, identity
-    finally:
-        if child is not None:
-            try: receipt.update(reap_owned(child, identity, executable))
-            except Exception as error:
-                receipt['error'] = type(error).__name__ + ': ' + str(error)
-                receipt['reaped'] = child.poll() is not None
-        if receipt.get('error'): raise RuntimeError('owned cleanup incomplete')
-
-
 def validate(root, entry, env):
     """One supported non-executing scanner; guard starts at process creation."""
     root = Path(root); verify_staging([entry])
@@ -186,8 +134,7 @@ def validate(root, entry, env):
         try:
             with owned_process('validator', argv, PROVIDER, records, PROVIDER_VERSION, cwd=root, env=env,
                                stdin=subprocess.DEVNULL, stdout=out, stderr=err, start_new_session=True) as (child, identity):
-                try: child.wait(timeout=max(0, until - time.monotonic()))
-                except subprocess.TimeoutExpired: expired = True
+                expired = wait_exact(child, records[-1], max(0, until - time.monotonic())) is None
         except Exception as failure: error = str(failure)
     try: parsed = json.loads(stdout.read_bytes())
     except ValueError: parsed = None
@@ -237,6 +184,8 @@ def verify_isolation(owned, entries, config, argv, env):
 def prepare(root, scanner):
     """Freeze only after final portable controls and exact activation scan."""
     root = Path(root).resolve(strict=True); require_controls(root)
+    from m2_readiness_cleanup import verify_qualification
+    qualification = verify_qualification(root / 'cleanup-suite')
     if file_hash(PROVIDER) != PROVIDER_SHA: raise RuntimeError('provider changed')
     binding = source_binding(); admit_source(binding, read_review())
     if scanner.get('exitCode') != 0 or scanner.get('deadlineExceeded') or scanner.get('controllerError') or scanner.get('report', {}).get('success') is not True or not all(c.get('reaped') for c in scanner['cleanup']):
@@ -256,6 +205,7 @@ def prepare(root, scanner):
     freeze = {'kind': CONTRACT, 'baseSha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
         'reviewedGitCommit': REVIEWED_COMMIT, 'reviewRecordSha256': REVIEW_RECORD_SHA, 'deadlineSeconds': DEADLINE,
         'ids': ids, 'config': config, 'smokeEntries': entries, 'argv': argv, 'initializeRequestId': str(uuid.uuid4()),
+        'cleanupQualificationSha256': canonical_hash(qualification),
         'scanner': {'activationSha256': binding['activationSha256'], 'providerSha256': PROVIDER_SHA,
             'success': True, 'exitCode': 0, 'reaped': True, 'resultSha256': canonical_hash(scanner)},
         'osBuild': subprocess.check_output(['/usr/bin/sw_vers', '-buildVersion'], text=True).strip(),
@@ -280,6 +230,9 @@ def read_outputs(owned):
 
 def smoke(root, freeze, env):
     root = Path(root); require_controls(root); reject_retired(freeze)
+    from m2_readiness_cleanup import verify_qualification
+    if canonical_hash(verify_qualification(root / 'cleanup-suite')) != freeze['cleanupQualificationSha256']:
+        raise RuntimeError('changed cleanup qualification')
     if freeze['ids'] != {**source_binding(), **{k: freeze['ids'][k] for k in ('runId', 'responderId', 'nonce', 'bootId')}}:
         raise RuntimeError('changed frozen source binding')
     if (root / 'activation-freeze.json').read_bytes() != json_bytes(freeze): raise RuntimeError('changed frozen run')
@@ -294,18 +247,19 @@ def smoke(root, freeze, env):
         'deadlineExceeded': False, 'timingRows': 0, 'positiveTimingModuleExecuted': False}
     try:
         with owned_process('responder', [freeze['ids']['pythonExecutable'], str(FIXTURE), str(fixture)],
-                           freeze['ids']['pythonExecutable'], record['cleanup'], cwd=fixture,
+                           freeze['ids']['pythonExecutable'], record['cleanup'], image_policy=freeze['ids']['responderImagePolicy'], cwd=fixture,
                            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) as (responder, identity):
             record['processes']['responder'] = identity
             until = time.monotonic() + 3
-            while not (fixture / 's.sock').exists() and responder.poll() is None and time.monotonic() < until: time.sleep(.01)
+            while not (fixture / 's.sock').exists() and not wait_exact(responder, record['cleanup'][0]) and time.monotonic() < until: time.sleep(.01)
             if not (fixture / 's.sock').exists() or (fixture / 's.sock').stat().st_mode & 0o777 != 0o600:
                 raise RuntimeError('owned readiness bind failed')
+            observe(responder, freeze['ids']['responderImagePolicy'], record['cleanup'][0], 'fixture-ready', record['cleanup'][0]['baseline'])
             with (owned / 'provider-stdout.log').open('xb') as out, (owned / 'provider-stderr.log').open('xb') as err:
                 os.chmod(owned / 'provider-stdout.log', 0o600); os.chmod(owned / 'provider-stderr.log', 0o600)
                 deadline = time.monotonic() + DEADLINE
                 with owned_process('provider', freeze['argv'], PROVIDER, record['cleanup'], PROVIDER_VERSION,
-                                   cwd=owned, env=env, stdin=subprocess.PIPE, stdout=out, stderr=err, start_new_session=True) as (child, identity):
+                                   image_policy=freeze['ids']['providerImagePolicy'], cwd=owned, env=env, stdin=subprocess.PIPE, stdout=out, stderr=err, start_new_session=True) as (child, identity):
                     record['processes']['provider'] = identity
                     child.stdin.write((json.dumps({'type': 'control_request', 'request_id': freeze['initializeRequestId'], 'request': {'subtype': 'initialize'}}) + '\n').encode()); child.stdin.flush()
                     while time.monotonic() < deadline:
@@ -315,7 +269,7 @@ def smoke(root, freeze, env):
                                 value = json.loads((owned / (label + '.json')).read_bytes())
                                 complete |= isinstance(value, dict) and value.get('runId') == freeze['ids']['runId'] and bool(value.get('stage'))
                             except (OSError, ValueError): pass
-                        if complete or child.poll() is not None: break
+                        if complete or wait_exact(child, record['cleanup'][-1]): break
                         time.sleep(.02)
                     else: record['deadlineExceeded'] = True
     except Exception as error: record['controllerError'] = type(error).__name__ + ': ' + str(error)

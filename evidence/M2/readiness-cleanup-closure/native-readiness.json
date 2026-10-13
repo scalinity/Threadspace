@@ -1,0 +1,527 @@
+{
+  "attemptRunId": "011aea4f-c478-47e4-8578-de37ee34149b",
+  "attempts": 1,
+  "callbackReadbacks": [
+    {
+      "bytes": 750,
+      "label": "entry",
+      "privateOriginalHmacSha256": "9699752526d7ef56f0e6107897ac4465d694e7d0b99b57418e497df35c935221",
+      "summary": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "event": "session.start",
+        "kind": "ACTIVATION_READINESS_V1",
+        "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+        "origin": {
+          "plugin": "engine",
+          "tier": "core"
+        },
+        "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+        "runId": "011aea4f-c478-47e4-8578-de37ee34149b",
+        "sequence": 1,
+        "stage": "CALLBACK_ENTERED"
+      }
+    },
+    {
+      "bytes": 1241,
+      "label": "forward",
+      "privateOriginalHmacSha256": "89413838757513858afa2b864f6d81e48649dff0d6db8f606a73ece650df08c9",
+      "summary": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "event": "session.start",
+        "kind": "ACTIVATION_READINESS_V1",
+        "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+        "origin": {
+          "plugin": "engine",
+          "tier": "core"
+        },
+        "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+        "runId": "011aea4f-c478-47e4-8578-de37ee34149b",
+        "sequence": 2,
+        "stage": "DOWNSTREAM_SETTLED",
+        "trace": [
+          {
+            "event": "session.start",
+            "index": 2,
+            "outcome": "returned",
+            "plugin": "engine",
+            "tier": "core"
+          }
+        ]
+      }
+    },
+    {
+      "bytes": 918,
+      "label": "result",
+      "privateOriginalHmacSha256": "e12eb49a14e8edfe7b1fb03a0be8a3828ca39560584f5d1e0b5ab7c5934afdfd",
+      "summary": {
+        "acknowledgement": {
+          "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+          "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+          "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+          "kind": "ACTIVATION_ONLY_READY",
+          "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+          "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+          "responderId": "41c852e4-fbc9-421e-ba79-5832ab856222",
+          "runId": "011aea4f-c478-47e4-8578-de37ee34149b"
+        },
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "httpStatus": 200,
+        "kind": "ACTIVATION_READINESS_V1",
+        "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+        "positiveProbeSha256": "0e5f94b669ec2936323a9056a545886ee60333d110db2a63cbacf68772d41cfa",
+        "runId": "011aea4f-c478-47e4-8578-de37ee34149b",
+        "sequence": 3,
+        "stage": "READINESS_READ_BACK"
+      }
+    }
+  ],
+  "childConfiguration": {
+    "CLAUDE_CONFIG_DIR": "<owned-closeout-root>/positive/config"
+  },
+  "cleanup": [
+    {
+      "approvedImage": {
+        "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "st_ctime_ns": 1790931100571543546,
+        "st_dev": 16777231,
+        "st_ino": 126234682,
+        "st_mode": 33261,
+        "st_mtime_ns": 1790931100571543546,
+        "st_size": 33568,
+        "st_uid": 501
+      },
+      "baseline": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "parentPid": 31488,
+        "pid": 31500,
+        "startUsec": 1791865029921279,
+        "uid": 501
+      },
+      "childPid": 31500,
+      "events": [
+        "verified-child-SIGTERM"
+      ],
+      "exitCode": 0,
+      "identity": {
+        "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "kernelVerified": true,
+        "parentPid": 31488,
+        "pid": 31500,
+        "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+        "startUsec": 1791865029921279,
+        "uid": 501
+      },
+      "observations": [
+        {
+          "admitted": true,
+          "file": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "phase": "file-before-spawn"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 31488,
+            "pid": 31500,
+            "startUsec": 1791865029921279,
+            "uid": 501
+          },
+          "phase": "launch-baseline"
+        },
+        {
+          "admitted": true,
+          "file": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "phase": "full-image"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 31488,
+            "pid": 31500,
+            "startUsec": 1791865029921279,
+            "uid": 501
+          },
+          "phase": "fixture-ready"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 31488,
+            "pid": 31500,
+            "startUsec": 1791865029921279,
+            "uid": 501
+          },
+          "phase": "pre-SIGTERM"
+        },
+        {
+          "admitted": true,
+          "file": {
+            "path": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+            "st_ctime_ns": 1790931100571543546,
+            "st_dev": 16777231,
+            "st_ino": 126234682,
+            "st_mode": 33261,
+            "st_mtime_ns": 1790931100571543546,
+            "st_size": 33568,
+            "st_uid": 501
+          },
+          "phase": "file-pre-SIGTERM"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+            "parentPid": 31488,
+            "pid": 31500,
+            "startUsec": 1791865029921279,
+            "uid": 501
+          },
+          "phase": "final-pre-SIGTERM"
+        },
+        {
+          "phase": "signal",
+          "pid": 31500,
+          "signal": "SIGTERM"
+        },
+        {
+          "exitCode": 0,
+          "phase": "terminal-wait",
+          "pid": 31500,
+          "reaped": true,
+          "waitStatus": 0
+        }
+      ],
+      "reaped": true,
+      "role": "responder",
+      "signals": [
+        "SIGTERM"
+      ],
+      "spawned": true,
+      "wait": {
+        "exitCode": 0,
+        "pid": 31500,
+        "reaped": true,
+        "waitStatus": 0
+      }
+    },
+    {
+      "approvedImage": {
+        "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "st_ctime_ns": 1791490378985162496,
+        "st_dev": 16777231,
+        "st_ino": 152193867,
+        "st_mode": 33261,
+        "st_mtime_ns": 1791490378797501260,
+        "st_size": 239695888,
+        "st_uid": 501
+      },
+      "baseline": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "parentPid": 31488,
+        "pid": 31501,
+        "startUsec": 1791865030040653,
+        "uid": 501
+      },
+      "childPid": 31501,
+      "events": [
+        "verified-child-SIGTERM"
+      ],
+      "exitCode": 143,
+      "identity": {
+        "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+        "kernelVerified": true,
+        "parentPid": 31488,
+        "pid": 31501,
+        "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+        "startUsec": 1791865030040653,
+        "uid": 501,
+        "version": "2.1.295"
+      },
+      "observations": [
+        {
+          "admitted": true,
+          "file": {
+            "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+            "st_ctime_ns": 1791490378985162496,
+            "st_dev": 16777231,
+            "st_ino": 152193867,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791490378797501260,
+            "st_size": 239695888,
+            "st_uid": 501
+          },
+          "phase": "file-before-spawn"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "parentPid": 31488,
+            "pid": 31501,
+            "startUsec": 1791865030040653,
+            "uid": 501
+          },
+          "phase": "launch-baseline"
+        },
+        {
+          "admitted": true,
+          "file": {
+            "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+            "st_ctime_ns": 1791490378985162496,
+            "st_dev": 16777231,
+            "st_ino": 152193867,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791490378797501260,
+            "st_size": 239695888,
+            "st_uid": 501
+          },
+          "phase": "full-image"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "parentPid": 31488,
+            "pid": 31501,
+            "startUsec": 1791865030040653,
+            "uid": 501
+          },
+          "phase": "pre-SIGTERM"
+        },
+        {
+          "admitted": true,
+          "file": {
+            "path": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+            "st_ctime_ns": 1791490378985162496,
+            "st_dev": 16777231,
+            "st_ino": 152193867,
+            "st_mode": 33261,
+            "st_mtime_ns": 1791490378797501260,
+            "st_size": 239695888,
+            "st_uid": 501
+          },
+          "phase": "file-pre-SIGTERM"
+        },
+        {
+          "admitted": true,
+          "kernel": {
+            "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+            "parentPid": 31488,
+            "pid": 31501,
+            "startUsec": 1791865030040653,
+            "uid": 501
+          },
+          "phase": "final-pre-SIGTERM"
+        },
+        {
+          "phase": "signal",
+          "pid": 31501,
+          "signal": "SIGTERM"
+        },
+        {
+          "exitCode": 143,
+          "phase": "terminal-wait",
+          "pid": 31501,
+          "reaped": true,
+          "waitStatus": 36608
+        }
+      ],
+      "reaped": true,
+      "role": "provider",
+      "signals": [
+        "SIGTERM"
+      ],
+      "spawned": true,
+      "wait": {
+        "exitCode": 143,
+        "pid": 31501,
+        "reaped": true,
+        "waitStatus": 36608
+      }
+    }
+  ],
+  "composition": {
+    "argv": [
+      "/Users/danny/.local/share/claude/versions/2.1.295",
+      "--print",
+      "--input-format",
+      "stream-json",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--no-session-persistence",
+      "--plugin-dir",
+      "<owned-closeout-root>/positive/observer-plugin",
+      "--plugin-dir",
+      "<owned-closeout-root>/positive/activation-plugin",
+      "--settings",
+      "<owned-closeout-root>/positive/config/settings.json",
+      "--setting-sources",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--debug-file",
+      "<owned-closeout-root>/positive/provider-debug.log"
+    ],
+    "configurationVerified": true,
+    "entries": [
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc",
+          "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+          "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+          "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+          "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+          "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+          "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79"
+        },
+        "modules": [
+          "./register.ts"
+        ],
+        "name": "threadspace-observer",
+        "role": "observer",
+        "root": "<owned-closeout-root>/positive/observer-plugin"
+      },
+      {
+        "files": {
+          ".claude-plugin/plugin.json": "721b71c035737b14c8947bd0c7bb3ae1a2818ea4acddf1e1ca4b04b82cb911c6",
+          "hooks/activation.ts": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+          "hooks/config.ts": {
+            "privateHmacSha256": "49aa0f483eb01c1882f1a2c380b39d3a6094098a44f31653cd8d71744ef05411"
+          },
+          "hooks/hooks.json": "35624f28d047f31469ece29a6fd7fc61918cc55f0c8d779ed2d9ecb145a61569"
+        },
+        "modules": [
+          "./activation.ts"
+        ],
+        "name": "threadspace-socket-duration",
+        "role": "activation",
+        "root": "<owned-closeout-root>/positive/activation-plugin"
+      }
+    ],
+    "loadedModuleCounts": {
+      "threadspace-observer": 1,
+      "threadspace-socket-duration": 1
+    },
+    "loadingSourcesBounded": true,
+    "runtimeLoadedNames": [
+      "threadspace-observer",
+      "threadspace-socket-duration"
+    ],
+    "unexpectedContributors": []
+  },
+  "controllerPid": 31488,
+  "controllerUid": 501,
+  "deadlineExceeded": false,
+  "domain": "NATIVE",
+  "failureBoundary": "ACTIVATION_OUTPUT_AND_HTTP_RETURNED",
+  "initializer": {
+    "requestIdMatched": true,
+    "subtype": "success",
+    "type": "control_response"
+  },
+  "positiveTimingModuleExecuted": false,
+  "processes": {
+    "provider": {
+      "imagePath": "/Users/danny/.local/share/claude/versions/2.1.295",
+      "kernelVerified": true,
+      "parentPid": 31488,
+      "pid": 31501,
+      "sha256": "0116ee2e0a513900b633d9951367f18747686478e2b462805b8c31609f047f70",
+      "startUsec": 1791865030040653,
+      "uid": 501,
+      "version": "2.1.295"
+    },
+    "responder": {
+      "imagePath": "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+      "kernelVerified": true,
+      "parentPid": 31488,
+      "pid": 31500,
+      "sha256": "b80d260a48404da13a32dd44d7283aadc80f6a6e56ed6e03ed5597ec6f46d48d",
+      "startUsec": 1791865029921279,
+      "uid": 501
+    }
+  },
+  "socketRemoved": true,
+  "timingRows": 0,
+  "transcript": [
+    {
+      "event": "start",
+      "identity": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "41c852e4-fbc9-421e-ba79-5832ab856222",
+        "runId": "011aea4f-c478-47e4-8578-de37ee34149b"
+      },
+      "pid": 31500,
+      "uid": 501
+    },
+    {
+      "attempt": 1,
+      "event": "received",
+      "nonceMatched": true,
+      "peerUid": 501,
+      "status": 200
+    },
+    {
+      "attempt": 1,
+      "body": {
+        "activationSha256": "6aedc5505cc9ea3e76e64d976e1ea30f1863768c5b37652db1f161597b6eabd8",
+        "bootId": "b25ee6bf-6973-4b99-9543-e37ef1a59c87",
+        "fixtureSha256": "5ef0f66026d38fc8a6ce50bd81858c28310759602dd89ca4c25b81d9b19f3ba9",
+        "kind": "ACTIVATION_ONLY_READY",
+        "nonce": "64402d75f8a645589057e5e3504797f3cec4c526fe044a9e801dcb817e2d17e6",
+        "observerSha256": "d461d6d6cb8769dbe65d3e229212f052f5ba0c45a936f92ba76d18b18e88214b",
+        "responderId": "41c852e4-fbc9-421e-ba79-5832ab856222",
+        "runId": "011aea4f-c478-47e4-8578-de37ee34149b"
+      },
+      "event": "generated",
+      "status": 200
+    },
+    {
+      "attempt": 1,
+      "event": "answered",
+      "status": 200
+    },
+    {
+      "accepted": 1,
+      "answered": 1,
+      "attempts": 1,
+      "event": "stop",
+      "generated": 1
+    }
+  ]
+}

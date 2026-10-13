@@ -60,7 +60,9 @@ class ReadinessControls(unittest.TestCase):
                         'kernelVerified': True, 'imagePath': self.ids['providerPath'] if role == 'provider' else self.ids['pythonExecutable'],
                         'sha256': self.ids['providerSha256'] if role == 'provider' else self.ids['pythonExecutableSha256']}
             self.record['processes'][role] = identity
-            self.record['cleanup'].append({'role': role, 'identity': copy.deepcopy(identity), 'reaped': True})
+            from test_m2_activation_process import synthetic_receipt
+            policy = self.ids['providerImagePolicy'] if role == 'provider' else self.ids['responderImagePolicy']
+            self.record['cleanup'].append({**synthetic_receipt(copy.deepcopy(identity), policy), 'role': role})
         self.record['transcript'] = [
             {'event': 'start', 'pid': 101, 'uid': os.getuid(), 'identity': acknowledgement(self.ids)},
             {'event': 'received', 'attempt': 1, 'peerUid': os.getuid(), 'status': 200, 'nonceMatched': True},
@@ -205,32 +207,6 @@ class ReadinessControls(unittest.TestCase):
                 stale = copy.deepcopy(self.freeze); stale['kind'] = 'ACTIVATION_ONLY_ONE_POSITIVE'
                 self.assertNotEqual(verdict.adjudicate(stale, self.artifacts, self.record, synthetic=True)['verdict'], 'PASS')
 
-
-class CleanupControls(unittest.TestCase):
-    def test_identity_acquisition_failure_after_spawn_reaches_guard(self):
-        from unittest.mock import MagicMock
-        child = MagicMock(); child.pid = 99; child.poll.return_value = None
-        records = []
-        with patch.object(native.subprocess, 'Popen', return_value=child), \
-             patch.object(native, 'image_identity', side_effect=RuntimeError('controlled identity failure')), \
-             patch.object(native, 'reap_owned', return_value={'identity': None, 'reaped': True}) as cleanup:
-            with self.assertRaisesRegex(RuntimeError, 'controlled identity failure'):
-                with native.owned_process('provider', [], native.PROVIDER, records): pass
-            cleanup.assert_called_once_with(child, None, native.PROVIDER)
-            self.assertTrue(records[0]['reaped'])
-
-    def test_fallback_revalidates_before_signals_and_refuses_foreign(self):
-        from unittest.mock import MagicMock
-        child = MagicMock(); child.stdin = None; child.returncode = -15
-        child.poll.return_value = -15
-        identity = {'pid': 99, 'uid': os.getuid(), 'parentPid': os.getpid(), 'startUsec': 999, 'imagePath': str(native.PROVIDER)}
-        with patch.object(native, 'kernel_child', side_effect=[identity, copy.deepcopy(identity)]):
-            result = native.reap_owned(child, None, native.PROVIDER)
-        self.assertTrue(result['reaped']); child.send_signal.assert_called_once()
-        child = MagicMock()
-        with patch.object(native, 'kernel_child', side_effect=[identity, {**identity, 'startUsec': 1000}]):
-            with self.assertRaises(RuntimeError): native.reap_owned(child, None, native.PROVIDER)
-        child.send_signal.assert_not_called()
 
 
 if __name__ == '__main__': unittest.main(verbosity=2)
