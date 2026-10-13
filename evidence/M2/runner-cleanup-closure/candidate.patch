@@ -1,0 +1,69 @@
+diff --git a/tests/native/tools/m2_socket_runner.py b/tests/native/tools/m2_socket_runner.py
+index cbb7bed..4eba38b 100644
+--- a/tests/native/tools/m2_socket_runner.py
++++ b/tests/native/tools/m2_socket_runner.py
+@@ -229,2 +228,0 @@ def run(root, executable, freeze):
+-            report['identities']['runtimes'].append({**runtime,'process':pid})
+-            save(root/'process-identities.json',report['identities'])
+@@ -231,0 +230,2 @@ def run(root, executable, freeze):
++                report['identities']['runtimes'].append({**runtime,'process':pid})
++                save(root/'process-identities.json',report['identities'])
+diff --git a/tests/native/tools/test_m2_socket_lifecycle.py b/tests/native/tools/test_m2_socket_lifecycle.py
+index ac8af6f..d90a303 100644
+--- a/tests/native/tools/test_m2_socket_lifecycle.py
++++ b/tests/native/tools/test_m2_socket_lifecycle.py
+@@ -2,0 +3 @@ import copy
++import io
+@@ -56,0 +58,52 @@ class LifecycleControls(unittest.TestCase):
++    def test_identity_write_failure_reaps_provider_before_any_initialize(self):
++        freeze = fixture()['freeze']
++        policies = {role: freeze['identities'][role+'ImagePolicy'] for role in ('provider','responder')}
++        children = {role: SimpleNamespace(pid=pid, returncode=None, stdin=io.BytesIO())
++                    for role, pid in (('responder',444),('provider',445))}
++        kernels = {child.pid: {'pid':child.pid, 'uid':os.getuid(), 'parentPid':os.getpid(),
++            'startUsec':child.pid, 'imagePath':policies[role]['path']} for role,child in children.items()}
++        stopped = set(); logs = [io.BytesIO(), io.BytesIO()]; original_save = runner.save
++        initialized = []
++        def failed_save(path, value):
++            if Path(path).name == 'process-identities.json':
++                initialized.append(children['provider'].stdin.getvalue())
++                raise OSError('controlled identity-write failure')
++            original_save(path, value)
++        def spawn(argv, **kwargs):
++            return children['provider' if argv[0] == policies['provider']['path'] else 'responder']
++        def start(root, executable, frozen, records):
++            socket = root/'s.sock'; socket.touch(mode=0o600)
++            return runner.launch_owned([str(executable)], executable, records, 'responder', policies['responder'])
++        def provider(root, config, prepared, records, policy):
++            child, identity = runner.launch_owned([policy['path']], Path(policy['path']), records, 'provider', policy)
++            return child, identity, *logs
++        with tempfile.TemporaryDirectory() as directory, \
++             patch.object(runner, 'new_freeze', return_value=freeze), \
++             patch.object(runner, 'approved_image', return_value=policies['provider']), \
++             patch.object(runner, 'image_file', side_effect=lambda path: next(p for p in policies.values() if p['path']==str(path))), \
++             patch.object(runner, 'sysctl', return_value=freeze['identities']['bootId']), \
++             patch.object(runner, 'start_responder', side_effect=start), \
++             patch.object(runner, 'start_provider', side_effect=provider) as start_mock, \
++             patch.object(runner, 'save', side_effect=failed_save), \
++             patch.object(process.subprocess, 'Popen', side_effect=spawn) as spawn_mock, \
++             patch.object(process, 'kernel_snapshot', side_effect=lambda pid: kernels[pid]), \
++             patch.object(process.os, 'waitpid', side_effect=lambda pid, flags: (pid,0) if pid in stopped else (0,0)), \
++             patch.object(process.os, 'kill', side_effect=lambda pid, signal: stopped.add(pid)):
++            try:
++                report = runner.run(Path(directory).resolve()/'attempt', Path(policies['responder']['path']), freeze)
++                self.assertFalse(report['complete'])
++                self.assertEqual(report['controllerError'], 'controlled identity-write failure')
++                self.assertEqual(initialized, [b'']); self.assertEqual(report['rows'], [])
++                self.assertEqual(start_mock.call_count, 1); self.assertEqual(spawn_mock.call_count, 2)
++                self.assertEqual([r['role'] for r in report['cleanup']], ['provider','responder'])
++                for receipt in report['cleanup']:
++                    self.assertTrue(process.verify_cleanup(receipt, receipt['identity']))
++                    self.assertEqual(receipt['wait']['pid'], receipt['childPid'])
++                self.assertTrue(all(stream.closed for stream in logs))
++            finally:
++                # Also close simulated guards when exercising the old leaking mutation.
++                for child in children.values():
++                    if getattr(child, '_owned_guard', None) is not None:
++                        runner.cleanup(child, child._owned_receipt['identity'])
++                for stream in logs: stream.close()
++

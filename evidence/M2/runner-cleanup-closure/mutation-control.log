@@ -1,0 +1,15 @@
+test_identity_write_failure_reaps_provider_before_any_initialize (test_m2_socket_lifecycle.LifecycleControls.test_identity_write_failure_reaps_provider_before_any_initialize) ... FAIL
+
+======================================================================
+FAIL: test_identity_write_failure_reaps_provider_before_any_initialize (test_m2_socket_lifecycle.LifecycleControls.test_identity_write_failure_reaps_provider_before_any_initialize)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danny/Documents/Tools/Threadspace/tests/native/tools/test_m2_socket_lifecycle.py", line 100, in test_identity_write_failure_reaps_provider_before_any_initialize
+    self.assertTrue(process.verify_cleanup(receipt, receipt['identity']))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.026s
+
+FAILED (failures=1)

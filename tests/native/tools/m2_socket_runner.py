@@ -226,9 +226,9 @@ def run(root, executable, freeze):
             owned,config,inputs=prepared[index]; output=owned/'host-result.json'
             deadline=time.monotonic()+POLICY['externalDeadlineSeconds']
             child,pid,out,err=start_provider(owned,config,inputs,receipts,freeze['identities']['providerImagePolicy'])
-            report['identities']['runtimes'].append({**runtime,'process':pid})
-            save(root/'process-identities.json',report['identities'])
             try:
+                report['identities']['runtimes'].append({**runtime,'process':pid})
+                save(root/'process-identities.json',report['identities'])
                 child.stdin.write((json.dumps({'type':'control_request','request_id':str(uuid.uuid4()),'request':{'subtype':'initialize'}})+'\n').encode()); child.stdin.flush()
                 result,expired,lost=await_result(child,output,deadline=deadline)
                 report['rows'].extend(result.get('rows',[]))
