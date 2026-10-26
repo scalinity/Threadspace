@@ -9,7 +9,8 @@ const header = (seq: number, cursor: string) => ({ protocolVersion: 1, ...contex
 const row = sessionView({ revision: "8" });
 const patch = (invalidations: ProjectionPatch["pageInvalidations"] = []): ProjectionPatch => ({ fromCursor: "7", toCursor: "8", viewRevision: "8", sessionUpserts: invalidations.length ? [] : [row], attentionUpserts: [], tombstones: [], counts: { needsAttention: 0, awaitingAction: 0 }, pageInvalidations: invalidations });
 const state = (partial: Partial<ViewState> = {}) => ({ phase: "live", connection: context, cursor: "8", sessions: [row], attention: [], counts: { needsAttention: 0, awaitingAction: 0 }, ...partial }) as ViewState;
-const rendered = [{ entity: "SESSION" as const, id: row.sessionId, revision: "8", absent: false }];
+const renderedRow = { entity: "SESSION" as const, id: row.sessionId, revision: "8", absent: false };
+const rendered = [renderedRow];
 const reply = (witness: DomWitness, ns = "1000000000") => ({ kind: "composed-dom-receipt", schemaVersion: 3, context: witness.context, witness, clock: "CLOCK_UPTIME_RAW", bootId: "boot", monotonicNs: ns });
 function started() { const store = new ComposedDomStore(); store.start(context, "7", 3); store.issuedContext(context); return store; }
 
@@ -33,7 +34,7 @@ describe("composed DOM qualification controls (controlled renderer fixtures)", (
   it("requires actual operational readback rather than a diagnostic cursor", () => {
     const store = started(); store.frame(header(4, "8"), patch());
     expect(store.witness(state(), null, true)).toBeNull();
-    expect(store.witness(state(), [{ ...rendered[0], revision: "7" }], true)).toBeNull();
+    expect(store.witness(state(), [{ ...renderedRow, revision: "7" }], true)).toBeNull();
     expect(store.witness(state(), rendered, false)).toBeNull();
     const cursorOnly = { querySelectorAll: () => [], querySelector: () => ({ textContent: "8", dataset: {} }) } as unknown as ParentNode;
     expect(renderedRevisions(state(), cursorOnly)).toBeNull();
