@@ -238,6 +238,13 @@ fn materialize_output(
     for row in materialize::changed_rows(state, &output.changed) {
         materialize::upsert(tx, &row)?;
     }
+    for id in state.activation_bindings.keys().filter(|id|!state.bindings.contains_key(*id)) {
+        tx.execute("DELETE FROM surface_bindings WHERE id = ?1", [id])?;
+    }
+    for id in state.activation_candidates.keys().filter(|id|!state.executions.contains_key(*id)) {
+        tx.execute("DELETE FROM execution_processes WHERE execution_id = ?1", [id])?;
+        tx.execute("DELETE FROM executions WHERE id = ?1", [id])?;
+    }
     Ok(())
 }
 

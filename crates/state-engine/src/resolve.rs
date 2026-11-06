@@ -250,7 +250,9 @@ impl<'a> Resolver<'a> {
             }
             match self.refs(state, draft) {
                 Ok(refs) => {
-                    if let Some(name) = needs(kind).iter().find(|name| !present(&refs, name)) {
+                    if let Some(name) = needs(kind).iter().find(|name| !present(&refs, name)
+                        && !(**name == "execution" && kind == CanonicalFactKind::ExecutionEnded
+                            && draft.refs.activation.is_some() && refs.session_id.is_some() && refs.process_id.is_some())) {
                         unresolved.push(Unresolved {
                             fact_index: index,
                             kind,
@@ -347,6 +349,7 @@ impl<'a> Resolver<'a> {
                 let execution = state
                     .executions
                     .get(execution_id)
+                    .or_else(|| state.activation_candidates.get(execution_id))
                     .ok_or("UNKNOWN_EXECUTION")?;
                 if refs
                     .session_id

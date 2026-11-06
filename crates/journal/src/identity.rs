@@ -14,7 +14,7 @@ use rusqlite::{OptionalExtension, TransactionBehavior, params};
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::causal::CausalPoint;
 use threadspace_contracts::canonical::fact::{
-    AttachedPresence, BindingMethod, BindingProof, CanonicalRefs, Delivery, EvidenceClass,
+    ActivationEvidenceKind, NativeActivation, AttachedPresence, BindingMethod, BindingProof, CanonicalRefs, Delivery, EvidenceClass,
     ExecutionMode, FactPayload, NativeFactDraft, NativeRefs, SnapshotInterval, SnapshotRow,
     WaitCategory, WaitSignal,
 };
@@ -479,6 +479,7 @@ impl Journal {
                     });
                     drafts.push(NativeFactDraft {
                         refs: NativeRefs {
+                            activation: Some(NativeActivation { kind: ActivationEvidenceKind::Inventory, entry_sequence: None, start_source: None, generation: None }),
                             execution: Some(execution.clone()),
                             process: Some(key),
                             ..session_refs.clone()

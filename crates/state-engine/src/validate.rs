@@ -68,6 +68,12 @@ fn ids(draft: &NativeFactDraft) -> bool {
                 && parse_cursor(&p.start_seconds).is_some()
                 && p.pid > 0
         })
+        && refs.activation.as_ref().is_none_or(|a| {
+            opt(a.generation.as_ref(), ID_MAX_CHARS)
+                && opt(a.start_source.as_ref(), CATEGORY_MAX_CHARS)
+                && a.entry_sequence.as_deref().is_none_or(|s|parse_cursor(s).is_some())
+                && refs.session.is_some() && refs.process.is_some()
+        })
         && refs.observer_ownership.as_ref().is_none_or(|o| {
             !o.source_epoch.is_empty()
                 && bounded(&o.source_epoch, ID_MAX_CHARS)

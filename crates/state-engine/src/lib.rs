@@ -6,6 +6,7 @@
 //! facts (`Engine::apply`); `semantic` normalizes a state by native keys for
 //! permutation equality; `hash` gives the exact replay digest.
 
+mod activations;
 pub mod causal;
 pub mod command;
 pub mod engine;

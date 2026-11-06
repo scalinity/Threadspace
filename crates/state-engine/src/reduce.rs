@@ -70,6 +70,7 @@ pub(crate) fn apply(engine: &mut Engine, entry: &JournalEntry) -> ReduceOutput {
         notes: Vec::new(),
         new_outbox: Vec::new(),
     };
+    tx.restore_activations();
     tx.coverage();
     for fact in &entry.facts {
         tx.fact(fact);
@@ -133,6 +134,7 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, deli
     for id in ids(tx.state.sessions.keys().collect()) {
         tx.touch_session(&id);
     }
+    tx.restore_activations();
     tx.derive();
     tx.state.through_cursor = tx.state.through_cursor.max(cursor);
     tx.finish()
@@ -955,6 +957,13 @@ impl Tx<'_> {
 
     #[allow(clippy::too_many_lines)]
     fn fact(&mut self, fact: &ResolvedFact) {
+        if fact.native.activation.is_some() {
+            self.state.activation_facts.insert(format!("{}:{}", fact.observation_id, fact.fact_index), fact.clone());
+        }
+        if !self.state.activation_facts.is_empty()
+            && let (Some(binding), Some(execution)) = (&fact.refs.binding_id, &fact.refs.execution_id) {
+            self.state.binding_executions.insert(binding.clone(), execution.clone());
+        }
         self.ensure_records(fact);
         let refs = &fact.refs;
         let cursor = self.cursor();
@@ -1465,8 +1474,36 @@ impl Tx<'_> {
 
     // ------------------------------------------------------------ deriving
 
+    fn restore_activations(&mut self) {
+        let ids: Vec<_> = self.state.activation_candidates.keys().cloned().collect();
+        for id in ids { self.touch_execution(&id); }
+        let bindings:Vec<_>=self.state.activation_bindings.keys().cloned().collect();
+        for id in bindings { self.touch_binding(&id); }
+        crate::activations::restore(self.state);
+        *self.index = Index::build(self.state);
+    }
+
     fn derive(&mut self) {
         let cursor = self.cursor();
+        if !self.state.activation_facts.is_empty() {
+            crate::activations::promote_inventory(self.state);
+            let ids: Vec<_> = self.state.activation_facts.values().filter_map(|f| f.refs.execution_id.clone()).collect();
+            for id in ids {
+                self.touch_execution(&id);
+                if let Some(record) = self.state.executions.get(&id) {
+                    self.state.activation_candidates.insert(id, record.clone());
+                }
+            }
+            let turns: Vec<_> = self.state.activation_facts.values().filter_map(|f| f.refs.turn_id.clone()).collect();
+            for id in turns { self.touch_turn(&id); }
+            let bindings: Vec<_> = self.state.binding_executions.keys().cloned().collect();
+            for id in bindings {
+                self.touch_binding(&id);
+                if let Some(binding)=self.state.bindings.get(&id) { self.state.activation_bindings.insert(id,binding.clone()); }
+            }
+            crate::activations::derive(self.state);
+            *self.index = Index::build(self.state);
+        }
 
         // Processes reach their executions.
         let processes: Vec<String> = self.before.processes.keys().cloned().collect();

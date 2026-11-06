@@ -7,6 +7,8 @@
 #[path = "../../provider-claude/src/profiles.rs"]
 mod profiles;
 #[allow(dead_code)]
+#[path = "../../provider-claude/src/activation.rs"]
+mod activation;
 #[path = "../../provider-claude/src/observer.rs"]
 mod observer;
 #[allow(dead_code)]
