@@ -148,6 +148,7 @@ impl Fixture {
             let _ = procs::signal(app.pid, libc::SIGTERM);
             return Err("the copy's dictionary lacks TTY or focus support".into());
         }
+        std::fs::create_dir(root.join("zdotdir")).map_err(|error| error.to_string())?;
         let fixture = Self {
             root: root.to_path_buf(),
             bundle,
@@ -228,16 +229,26 @@ impl Fixture {
         }
     }
 
+    /// Fixture shells read no owner shell configuration: `ZDOTDIR` names an
+    /// empty fixture directory, so the owner's startup files (and the shell
+    /// history they configure) are neither read nor written.
+    fn environment(&self) -> String {
+        json!([format!("ZDOTDIR={}", self.root.join("zdotdir").display())]).to_string()
+    }
+
     pub fn window(&self, dir: &Path) -> Result<Pane, String> {
-        self.create("window", &[&dir.display().to_string()], dir)
+        let env = self.environment();
+        self.create("window", &[&dir.display().to_string(), &env], dir)
     }
 
     pub fn tab(&self, beside: &Pane, dir: &Path) -> Result<Pane, String> {
-        self.create("tab", &[&beside.window_id, &dir.display().to_string()], dir)
+        let env = self.environment();
+        self.create("tab", &[&beside.window_id, &dir.display().to_string(), &env], dir)
     }
 
     pub fn split(&self, of: &Pane, direction: &str, dir: &Path) -> Result<Pane, String> {
-        self.create("split", &[&of.terminal_id, direction, &dir.display().to_string()], dir)
+        let env = self.environment();
+        self.create("split", &[&of.terminal_id, direction, &dir.display().to_string(), &env], dir)
     }
 
     /// The pane's current window and tab.
@@ -269,6 +280,40 @@ impl Fixture {
     /// A Ghostty keybinding action (`toggle_fullscreen`, `move_tab:1`).
     pub fn action(&self, pane: &Pane, action: &str) -> Result<Value, String> {
         self.call("action", &[&pane.terminal_id, action])
+    }
+
+    /// Runs `tool args` (a native helper emitting JSON) in `control`, an owned
+    /// pane. Processes the agent CLI starts are not credited to the terminal
+    /// that hosts it, so they lack its Accessibility grant; a command started
+    /// by the copy's own shell is credited to the copy, which shares the
+    /// installed Ghostty's signed identity and grant.
+    pub fn native(&self, control: &Pane, tool: &Path, args: &[&str]) -> Result<Value, String> {
+        let stem = self.root.join(format!("native-{}", uuid::Uuid::new_v4()));
+        let output = stem.with_extension("json");
+        let done = stem.with_extension("done");
+        let quote = crate::terminal::shell_quote;
+        let mut command = quote(&tool.display().to_string());
+        for arg in args {
+            command.push(' ');
+            command.push_str(&quote(arg));
+        }
+        command.push_str(&format!(
+            " > {} 2>&1; : > {}",
+            quote(&output.display().to_string()),
+            quote(&done.display().to_string())
+        ));
+        self.submit(control, &command)?;
+        let started = Instant::now();
+        while !done.exists() {
+            if started.elapsed() > Duration::from_secs(20) {
+                return Err("native helper did not finish in the control pane".into());
+            }
+            crate::pause_ms(100);
+        }
+        let text = std::fs::read_to_string(&output).map_err(|error| error.to_string())?;
+        let _ = std::fs::remove_file(&output);
+        let _ = std::fs::remove_file(&done);
+        serde_json::from_str(text.trim()).map_err(|_| format!("native helper: {}", text.trim()))
     }
 
     /// Gives the pane's tab a unique title, so Accessibility can find its window.

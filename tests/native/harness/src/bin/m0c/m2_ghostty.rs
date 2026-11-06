@@ -551,7 +551,18 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
         let _ = run_dir.append("scenarios.jsonl", &json!({ "case": name, "ok": ok, "setupOk": setup_ok, "setup": setup, "return": returned }));
         cases.push(json!({ "case": name, "ok": ok, "setupOk": setup_ok }));
     };
-    let pid = fixture.app.pid as u32;
+    let pid = fixture.app.pid.to_string();
+    let tool = ctx.repo.join("target/native-tools/ts-native");
+    // Accessibility actions run in an owned control window of the copy.
+    let control_dir = disposable("ghostty-control").unwrap_or_else(|_| fixture.root.clone());
+    let control = fixture.window(&control_dir);
+    let ax = |args: &[&str]| -> Value {
+        match &control {
+            Ok(control) => fixture.native(control, &tool, args).unwrap_or_else(|error| json!({ "error": error })),
+            Err(error) => json!({ "error": error }),
+        }
+    };
+    threadspace_harness::pause_ms(1500);
 
     // A tab moves within its window.
     let target = &sessions[2];
@@ -576,9 +587,9 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
     let titled = fixture.title(&full.pane, &marker);
     owner_idle(ctx);
     let _ = fixture.focus(&full.pane);
-    let entered = ctx.native.ax_action(pid, "fullscreen", Some(&marker));
+    let entered = ax(&["ax-action", &pid, "fullscreen", &marker]);
     threadspace_harness::pause_ms(1500);
-    let state = ctx.native.ax_window(pid, Some(&marker));
+    let state = ax(&["ax-window", &pid, &marker]);
     let fronted = front_other(ctx, fixture, &sessions[2].pane);
     let setup_ok = titled.is_ok() && state["fullScreen"] == json!(true) && fronted["ok"] == json!(true);
     let returned = {
@@ -586,7 +597,7 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
         companion_return(ctx, fixture, full)
     };
     let ok = route_ok(&returned);
-    let exited = ctx.native.ax_action(pid, "exit-fullscreen", Some(&marker));
+    let exited = ax(&["ax-action", &pid, "exit-fullscreen", &marker]);
     threadspace_harness::pause_ms(1500);
     record("fullscreen", setup_ok, json!({ "titled": titled.is_ok(), "entered": entered, "state": state, "exited": exited, "fronted": fronted }), returned, ok);
 
@@ -596,15 +607,15 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
     let titled = fixture.title(&mini.pane, &marker);
     owner_idle(ctx);
     let _ = fixture.focus(&mini.pane);
-    let minimized = ctx.native.ax_action(pid, "minimize", Some(&marker));
+    let minimized = ax(&["ax-action", &pid, "minimize", &marker]);
     threadspace_harness::pause_ms(1000);
-    let state = ctx.native.ax_window(pid, Some(&marker));
+    let state = ax(&["ax-window", &pid, &marker]);
     let setup_ok = titled.is_ok() && state["minimized"] == json!(true);
     let returned = {
         let _gui = ctx.gui("m2 ghostty minimized");
         companion_return(ctx, fixture, mini)
     };
-    let restored = ctx.native.ax_window(pid, Some(&marker));
+    let restored = ax(&["ax-window", &pid, &marker]);
     let ok = route_ok(&returned) && restored["minimized"] == json!(false);
     record("minimized", setup_ok, json!({ "titled": titled.is_ok(), "minimized": minimized, "state": state, "restored": restored }), returned, ok);
 
@@ -626,5 +637,6 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
     let setup_ok = ended.is_ok() && closed.is_ok() && fronted["ok"] == json!(true);
     let ok = returned["exact"] == json!(false) && returned["route"]["focusPerformed"] == json!(false) && unmoved;
     record("closed-pane", setup_ok, json!({ "ended": ended.is_ok(), "closed": closed.as_ref().ok(), "fronted": fronted, "before": before.as_ref().ok(), "after": after.as_ref().ok() }), returned, ok);
-    json!({ "pass": pass, "cases": cases })
+    let _ = std::fs::remove_dir_all(&control_dir);
+    json!({ "pass": pass, "control": control.as_ref().ok().map(|c| c.terminal_id.clone()), "cases": cases })
 }

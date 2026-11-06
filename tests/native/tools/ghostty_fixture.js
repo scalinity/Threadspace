@@ -16,6 +16,9 @@ function run(argv) {
       }))
     };
   }
+  // Creating operations take a trailing JSON list of KEY=VALUE environment
+  // entries for the new surface (the caller isolates the fixture shell).
+  function environment() { return JSON.parse(argv[argv.length - 1]); }
   function terminal(id) {
     const matches = app.terminals().filter(s => s.id() === id);
     if (matches.length !== 1) throw Error("terminal not found");
@@ -79,17 +82,17 @@ function run(argv) {
     // a PID through its bundle path) and proved it empty before creating.
     case "count": return JSON.stringify({version: app.version(), windows: app.windows().length, terminals: app.terminals().length});
     case "window": {
-      const w = app.newWindow({withConfiguration: {initialWorkingDirectory: argv[2]}});
+      const w = app.newWindow({withConfiguration: {initialWorkingDirectory: argv[2], environmentVariables: environment()}});
       return JSON.stringify(pane(w, w.tabs()[0].terminals()[0]));
     }
     case "tab": {
       const w = app.windows().filter(x => x.id() === argv[2]);
       if (w.length !== 1) throw Error("window not found");
-      const t = app.newTab({in: w[0], withConfiguration: {initialWorkingDirectory: argv[3]}});
+      const t = app.newTab({in: w[0], withConfiguration: {initialWorkingDirectory: argv[3], environmentVariables: environment()}});
       return JSON.stringify(pane(w[0], t.terminals()[0]));
     }
     case "split": {
-      const created = app.split(terminal(argv[2]), {direction: argv[3], withConfiguration: {initialWorkingDirectory: argv[4]}});
+      const created = app.split(terminal(argv[2]), {direction: argv[3], withConfiguration: {initialWorkingDirectory: argv[4], environmentVariables: environment()}});
       return JSON.stringify(locate(created.id()));
     }
     case "locate": return JSON.stringify(locate(argv[2]));
