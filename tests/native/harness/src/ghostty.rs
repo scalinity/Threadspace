@@ -17,7 +17,7 @@ use std::time::{Duration, Instant};
 
 use serde::Serialize;
 use serde_json::{Value, json};
-use threadspace_surfaces_macos::process;
+use threadspace_surfaces_macos::{ghostty, process};
 
 use crate::procs::{self, Incarnation};
 use crate::run::run;
@@ -54,6 +54,8 @@ pub struct Fixture {
     pub app: Incarnation,
     /// `dev:ino` of the mapped executable image.
     pub image: String,
+    /// SHA-256 of the copy's dictionary, qualified before the first event.
+    pub dictionary_sha256: String,
     script: PathBuf,
     owned: Mutex<Vec<String>>,
     closed: Mutex<bool>,
@@ -133,12 +135,23 @@ impl Fixture {
         if process::path_file_id(&path).as_deref() != Some(image.as_str()) {
             return Err("the acquired process does not run the copy".into());
         }
+        // The copy's own dictionary, read with its executable unchanged, must
+        // support the terms the fixture scripts (including terminal TTYs).
+        let dictionary = ghostty::probe_dictionary(&bundle).map_err(|error| error.to_string())?;
+        if process::path_file_id(&path).as_deref() != Some(image.as_str()) {
+            return Err("the copy changed while its dictionary was read".into());
+        }
+        if !dictionary.supports_focus() || !dictionary.has_tty_property {
+            let _ = procs::signal(app.pid, libc::SIGTERM);
+            return Err("the copy's dictionary lacks TTY or focus support".into());
+        }
         let fixture = Self {
             root: root.to_path_buf(),
             bundle,
             executable,
             app,
             image,
+            dictionary_sha256: dictionary.sha256,
             script: script.to_path_buf(),
             owned: Mutex::new(Vec::new()),
             closed: Mutex::new(false),
@@ -163,6 +176,9 @@ impl Fixture {
         if procs::with_executable(&self.executable).len() != 1 {
             return Err("the copy is no longer run by exactly one process".into());
         }
+        if process::mapped_image_file_id(self.app.pid).ok().flatten().as_deref() != Some(self.image.as_str()) {
+            return Err("the fixture process no longer maps the copy's image".into());
+        }
         let pid = self.app.pid.to_string();
         let script = self.script.display().to_string();
         let mut argv = vec!["-l", "JavaScript", script.as_str(), pid.as_str(), op];
@@ -183,19 +199,42 @@ impl Fixture {
         Ok(pane)
     }
 
+    /// A creating call that failed may still have created a terminal. The
+    /// process was proven empty and is used only by this fixture, so every
+    /// terminal it holds is the fixture's: record any not yet owned.
+    fn adopt_strays(&self) {
+        let Ok(ids) = self.call("ids", &[]) else {
+            return;
+        };
+        if let (Ok(mut owned), Some(ids)) = (self.owned.lock(), ids["ids"].as_array()) {
+            for id in ids.iter().filter_map(Value::as_str) {
+                if !owned.iter().any(|known| known == id) {
+                    owned.push(id.to_owned());
+                }
+            }
+        }
+    }
+
+    fn create(&self, op: &str, args: &[&str], dir: &Path) -> Result<Pane, String> {
+        match self.call(op, args) {
+            Ok(value) => self.adopt(&value, dir),
+            Err(error) => {
+                self.adopt_strays();
+                Err(error)
+            }
+        }
+    }
+
     pub fn window(&self, dir: &Path) -> Result<Pane, String> {
-        let value = self.call("window", &[&dir.display().to_string()])?;
-        self.adopt(&value, dir)
+        self.create("window", &[&dir.display().to_string()], dir)
     }
 
     pub fn tab(&self, beside: &Pane, dir: &Path) -> Result<Pane, String> {
-        let value = self.call("tab", &[&beside.window_id, &dir.display().to_string()])?;
-        self.adopt(&value, dir)
+        self.create("tab", &[&beside.window_id, &dir.display().to_string()], dir)
     }
 
     pub fn split(&self, of: &Pane, direction: &str, dir: &Path) -> Result<Pane, String> {
-        let value = self.call("split", &[&of.terminal_id, direction, &dir.display().to_string()])?;
-        self.adopt(&value, dir)
+        self.create("split", &[&of.terminal_id, direction, &dir.display().to_string()], dir)
     }
 
     /// The pane's current window and tab.
