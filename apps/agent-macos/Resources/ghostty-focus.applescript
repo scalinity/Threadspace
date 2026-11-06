@@ -11,21 +11,26 @@ function uniqueIds(ids) {
     return new Set(ids).size === ids.length;
 }
 
-function sameIds(a, b) {
-    return a.length === b.length && a.every((id, index) => id === b[index]);
-}
-
-function nativeId(object) {
-    const id = object.id();
+function checkId(id) {
     if (typeof id !== 'string' || !id.length || id.length > 256 || /[\x00-\x1f\x7f]/.test(id)) {
         throw Error('Invalid Ghostty native ID');
     }
     return id;
 }
 
-function idsOf(objects, maximum) {
-    if (objects.length > maximum) throw Error('Ghostty inventory exceeds limit');
-    return objects.map(nativeId);
+function nativeId(object) {
+    return checkId(object.id());
+}
+
+// One Apple event per level: every window's, tab's and terminal's ID, each
+// read answered from one state of the application.
+function structure(app) {
+    return {
+        windows: app.windows.id(),
+        tabs: app.windows.tabs.id(),
+        terminals: app.windows.tabs.terminals.id(),
+        appTerminals: app.terminals.id(),
+    };
 }
 
 function run(argv) {
@@ -42,37 +47,39 @@ function run(argv) {
     const maxTerminals = Number(argv[8]);
     const app = Application(appPid);
     if (!app.running()) return 'GONE';
-    const windowIds = idsOf(app.windows(), maxWindows);
-    const appTerminalIds = idsOf(app.terminals(), maxTerminals);
+    const s = structure(app);
+    const windowIds = s.windows;
+    const appTerminalIds = s.appTerminals;
+    if (windowIds.length > maxWindows || appTerminalIds.length > maxTerminals) throw Error('Ghostty inventory exceeds limit');
+    windowIds.forEach(checkId);
+    appTerminalIds.forEach(checkId);
     if (!uniqueIds(windowIds) || !uniqueIds(appTerminalIds)) return 'CHANGED';
+    // Window, tab and terminal lists read in separate events line up only if
+    // nothing changed between them.
+    if (!Array.isArray(s.tabs) || s.tabs.length !== windowIds.length ||
+        !Array.isArray(s.terminals) || s.terminals.length !== windowIds.length ||
+        !s.tabs.every((tabIds, w) => Array.isArray(tabIds) && Array.isArray(s.terminals[w]) &&
+            s.terminals[w].length === tabIds.length && s.terminals[w].every(Array.isArray))) return 'CHANGED';
     const seenTabs = [];
     const seenTerminals = [];
-    const windows = [];
-    const tabs = [];
     const matches = [];
-    windowIds.forEach(windowId => {
-        const window = app.windows.byId(windowId);
-        const tabIds = idsOf(window.tabs(), maxTabs - seenTabs.length);
-        windows.push({ id: windowId, tabIds });
-        tabIds.forEach(tabId => {
-            seenTabs.push(tabId);
-            const terminalIds = idsOf(window.tabs.byId(tabId).terminals(), maxTerminals - seenTerminals.length);
-            tabs.push({ windowId, id: tabId, terminalIds });
-            terminalIds.forEach(terminalId => {
-                seenTerminals.push(terminalId);
+    windowIds.forEach((windowId, w) => {
+        s.tabs[w].forEach((tabId, t) => {
+            seenTabs.push(checkId(tabId));
+            s.terminals[w][t].forEach(terminalId => {
+                seenTerminals.push(checkId(terminalId));
                 if (terminalId === targetTerminalId) matches.push({ windowId, tabId });
             });
         });
     });
+    if (seenTabs.length > maxTabs || seenTerminals.length > maxTerminals) throw Error('Ghostty inventory exceeds limit');
     if (!matches.length) return 'GONE';
     if (matches.length > 1) return ['AMBIGUOUS', matches.length].join('\t');
     if (!uniqueIds(seenTabs) || !uniqueIds(seenTerminals) ||
-        !sameIds(idsOf(app.windows(), maxWindows), windowIds) ||
-        !sameIds(idsOf(app.terminals(), maxTerminals), appTerminalIds) ||
         seenTerminals.length !== appTerminalIds.length ||
         !appTerminalIds.every(id => seenTerminals.includes(id))) return 'CHANGED';
-    if (!windows.every(snapshot => sameIds(idsOf(app.windows.byId(snapshot.id).tabs(), maxTabs), snapshot.tabIds)) ||
-        !tabs.every(snapshot => sameIds(idsOf(app.windows.byId(snapshot.windowId).tabs.byId(snapshot.id).terminals(), maxTerminals), snapshot.terminalIds))) return 'CHANGED';
+    // A change between any two reads invalidates the snapshot.
+    if (JSON.stringify(structure(app)) !== JSON.stringify(s)) return 'CHANGED';
     if (matches[0].windowId !== targetWindowId || matches[0].tabId !== targetTabId) return 'CHANGED';
 
     const targetWindow = app.windows.byId(targetWindowId);

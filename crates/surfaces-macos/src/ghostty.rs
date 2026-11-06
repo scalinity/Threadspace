@@ -993,7 +993,7 @@ mod tests {
         // Execute the bundled helpers without entering the live inventory or
         // sending any Apple events. An absent property must return immediately.
         let source = format!(
-            "{helpers}function run(argv) {{ return JSON.stringify([uniqueIds(['same','same']), uniqueIds(['same','Same']), optionalProperty(null, '-')]); }}"
+            "{helpers}function run(argv) {{ return JSON.stringify([uniqueIds(['same','same']), uniqueIds(['same','Same']), optionalValue(null, '-', 0, 0, 0)]); }}"
         );
         let mut command = BoundedCommand::new("/usr/bin/osascript", Duration::from_secs(5), 4096)
             .arg("-l")
@@ -1045,11 +1045,19 @@ mod tests {
     fn bundled_scripts_keep_inventory_optional_queries_and_focus_on_the_numeric_pid() {
         // Lexically replace Application with two inert same-bundle stand-ins.
         // The bundled entry points run unchanged; no real app receives events.
+        // Like JXA, a collection answers a property of every element at once
+        // (`windows.tabs.id()` is one list of tab IDs per window).
         let fixture = r#"
+          function every(read, target = function () { return read(); }) {
+            const map = (value, f) => Array.isArray(value) ? value.map(item => map(item, f)) : f(value);
+            return new Proxy(target, {
+              get: (own, name) => name in own ? own[name] : every(() => map(read(), element => element[name]())),
+            });
+          }
           function collection(objects) {
             const get = () => objects;
             get.byId = id => objects.find(object => object.id() === id);
-            return get;
+            return every(get, get);
           }
           const focused = [];
           const activated = [];
