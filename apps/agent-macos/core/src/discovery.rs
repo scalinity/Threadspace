@@ -288,6 +288,18 @@ pub fn ghostty_applications(probe: bool) -> Result<Vec<GhosttyApplication>, Stri
     Ok(apps)
 }
 
+/// `app` sampled again immediately before an event: the same process and
+/// image with no limitation now, or why not.
+pub fn ghostty_still_scriptable(app: &GhosttyApplication) -> Result<(), String> {
+    let now = ghostty_applications(false)?
+        .into_iter()
+        .find(|now| now.generation == app.generation && now.image == app.image && now.image.is_some());
+    match now {
+        Some(now) => now.limitation.map_or(Ok(()), Err),
+        None => Err("GHOSTTY_GENERATION_CHANGED".to_owned()),
+    }
+}
+
 /// Unavailable-surface reasons that can change only with an application
 /// generation or image, so a no-match answer under them is final for the
 /// same fingerprint.
@@ -444,6 +456,7 @@ fn ghostty_surfaces(state: &State, app: &GhosttyApplication) -> Result<Vec<Surfa
         .context
         .resources_dir
         .join("ghostty-inventory.applescript");
+    ghostty_still_scriptable(app)?;
     let started = log::now_ms();
     let inventory = ghostty::enumerate(
         &script,
@@ -452,10 +465,7 @@ fn ghostty_surfaces(state: &State, app: &GhosttyApplication) -> Result<Vec<Surfa
         ENUMERATION_TIMEOUT,
     );
     let ended = log::now_ms();
-    let unchanged = ghostty_applications(false).is_ok_and(|apps| {
-        apps.iter()
-            .any(|now| now.generation == app.generation && now.image == app.image)
-    });
+    let unchanged = ghostty_still_scriptable(app);
     let inventory = inventory.map_err(|error| {
         log::warn(
             "GHOSTTY_ENUMERATION_FAILED",
@@ -463,9 +473,7 @@ fn ghostty_surfaces(state: &State, app: &GhosttyApplication) -> Result<Vec<Surfa
         );
         "GHOSTTY_ENUMERATION_FAILED".to_owned()
     })?;
-    if !unchanged {
-        return Err("GHOSTTY_GENERATION_CHANGED".to_owned());
-    }
+    unchanged?;
     Ok(inventory
         .terminals
         .iter()

@@ -126,6 +126,13 @@ fn same_image(now: &GhosttyApplication, then: &GhosttyApplication) -> bool {
     now.generation == then.generation && now.image.is_some() && now.image == then.image
 }
 
+/// The same process and image, and still addressable: a limitation reported
+/// at any later sample (for example a second process now running the same
+/// executable path) withdraws the right to send it events.
+fn still_scriptable(now: &GhosttyApplication, then: &GhosttyApplication) -> bool {
+    same_image(now, then) && now.limitation.is_none()
+}
+
 /// What the store knows about the requested session.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SessionTarget {
@@ -1120,7 +1127,13 @@ fn join_ghostty<N: RouteNative>(
     let matches = evidence.matches.clone();
     run.evidence.ghostty = Some(evidence);
     run.phase("surface join");
-    let unchanged = matches!(&scan.after, Ok(Some(after)) if same_image(after, &app))
+    if let Ok(Some(after)) = &scan.after
+        && same_image(after, &app)
+        && let Some(limitation) = &after.limitation
+    {
+        return Err(refusal(S::Unavailable, V::CurrentNativeRevalidated, limitation));
+    }
+    let unchanged = matches!(&scan.after, Ok(Some(after)) if still_scriptable(after, &app))
         && app.generation.canonical() == target.terminal_generation;
     if !unchanged {
         return Err(refusal(
@@ -1174,6 +1187,21 @@ fn focus_ghostty<N: RouteNative>(
 ) -> Result<(bool, bool), Refusal> {
     use SessionVerification as V;
     use SurfaceResult as S;
+    // The recipient is sampled again immediately before any event is sent.
+    match native.ghostty_app(&target.terminal_generation) {
+        Ok(Some(now)) if still_scriptable(&now, app) => {}
+        Ok(Some(now)) if same_image(&now, app) => {
+            let reason = now.limitation.unwrap_or_default();
+            return Err(refusal(S::Unavailable, V::CurrentNativeRevalidated, &reason));
+        }
+        _ => {
+            return Err(refusal(
+                S::Unavailable,
+                V::CurrentNativeRevalidated,
+                "GHOSTTY_GENERATION_CHANGED",
+            ));
+        }
+    }
     let started = native.now_ms();
     let focus = native.ghostty_focus(app, ghostty_target, deadline);
     run.phase("focus + native readback");
@@ -1260,7 +1288,7 @@ fn focus_ghostty<N: RouteNative>(
     // `Focused` already required the exact window, tab and terminal at every
     // level and the script's frontmost PID; the process and its image must
     // also be unchanged and the TTY must still be the provider's device.
-    let readback_ok = matches!(&after, Ok(Some(now)) if same_image(now, app))
+    let readback_ok = matches!(&after, Ok(Some(now)) if still_scriptable(now, app))
         && readback_rdev == Some(target.device)
         && readback.terminal_id == ghostty_target.terminal_id
         && readback.focused_terminal_id == ghostty_target.terminal_id;

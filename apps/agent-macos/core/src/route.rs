@@ -138,6 +138,7 @@ impl RouteNative for Native<'_> {
         app: &GhosttyApplication,
         deadline: &RouteDeadline,
     ) -> Result<GhosttyInventory, String> {
+        discovery::ghostty_still_scriptable(app)?;
         let dictionary = app
             .image
             .as_deref()

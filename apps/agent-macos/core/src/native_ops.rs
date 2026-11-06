@@ -171,6 +171,14 @@ fn ghostty_integration(context: &OpsContext) -> Result<GhosttyIntegration, Contr
             else {
                 continue;
             };
+            // The recipient is sampled again immediately before the event.
+            if let Err(reason) = discovery::ghostty_still_scriptable(process) {
+                log::warn(
+                    "GHOSTTY_INVENTORY_SKIPPED",
+                    json!({ "pid": process.generation.pid, "reason": reason }),
+                );
+                continue;
+            }
             match ghostty::enumerate(
                 &script,
                 &dictionary,

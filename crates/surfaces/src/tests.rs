@@ -1178,6 +1178,7 @@ fn ghostty_image_replaced_during_focus_is_not_exact() {
     mock.ghostty_apps = Seq::of(vec![
         Ok(Some(ghostty_app(None))),
         Ok(Some(ghostty_app(None))),
+        Ok(Some(ghostty_app(None))),
         Ok(Some(replaced)),
     ]);
     let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
@@ -1185,3 +1186,34 @@ fn ghostty_image_replaced_during_focus_is_not_exact() {
     assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
 }
 
+
+#[test]
+fn a_limitation_reported_after_the_first_sample_stops_the_route() {
+    let ambiguous = ghostty_app(Some("GHOSTTY_AMBIGUOUS_PROCESSES"));
+    // Reported by the sample after enumeration: no focus, specific reason.
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_apps = Seq::of(vec![Ok(Some(ghostty_app(None))), Ok(Some(ambiguous.clone()))]);
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    refused(&result, &mock, "GHOSTTY_AMBIGUOUS_PROCESSES");
+    // Reported only by the sample immediately before focus: still no focus.
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_apps = Seq::of(vec![
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ambiguous.clone())),
+    ]);
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    refused(&result, &mock, "GHOSTTY_AMBIGUOUS_PROCESSES");
+    // Reported after focus: the effect is recorded, the result is not exact.
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_apps = Seq::of(vec![
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ambiguous)),
+    ]);
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "READBACK_FAILED", "{result:#?}");
+    assert!(result.focus_performed);
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
