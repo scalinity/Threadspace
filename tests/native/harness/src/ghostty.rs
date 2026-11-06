@@ -203,9 +203,10 @@ impl Fixture {
         Ok(pane)
     }
 
-    /// A creating call that failed may still have created a terminal. The
-    /// process was proven empty and is used only by this fixture, so every
-    /// terminal it holds is the fixture's: record any not yet owned.
+    /// A creating call that failed, or whose answer named no complete pane,
+    /// may still have created a terminal. The process was proven empty and is
+    /// used only by this fixture, so every terminal it holds is the fixture's:
+    /// record any not yet owned.
     fn adopt_strays(&self) {
         let Ok(ids) = self.call("ids", &[]) else {
             return;
@@ -220,13 +221,11 @@ impl Fixture {
     }
 
     fn create(&self, op: &str, args: &[&str], dir: &Path) -> Result<Pane, String> {
-        match self.call(op, args) {
-            Ok(value) => self.adopt(&value, dir),
-            Err(error) => {
-                self.adopt_strays();
-                Err(error)
-            }
+        let created = self.call(op, args).and_then(|value| self.adopt(&value, dir));
+        if created.is_err() {
+            self.adopt_strays();
         }
+        created
     }
 
     /// Fixture shells read no owner shell configuration: `ZDOTDIR` names an
