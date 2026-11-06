@@ -1,0 +1,609 @@
+{
+  "fixture": {
+    "executable": "~/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+    "image": "16777232:225008541",
+    "pid": 24559
+  },
+  "fixtureClosed": {
+    "copyRemoved": true,
+    "error": null,
+    "exitedMs": 0,
+    "ok": true,
+    "result": {
+      "closed": [
+        "238070F1-14C8-4765-AE8C-EF1B17EDC94E",
+        "346140D0-573A-45F0-BA61-11A607E180B2"
+      ]
+    }
+  },
+  "integration": {
+    "applicationPath": "/Applications/Ghostty.app",
+    "applicationVersion": "1.4.0",
+    "automation": "AUTHORIZED",
+    "automationStatusCode": 0,
+    "dictionary": {
+      "byteLength": 17275,
+      "focus": true,
+      "inventory": true,
+      "pid": true,
+      "sha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+      "tty": true
+    },
+    "inventories": [],
+    "processes": [
+      {
+        "dictionarySha256": null,
+        "executable": "/Applications/Ghostty.app/Contents/MacOS/ghostty",
+        "generation": {
+          "pid": 38304,
+          "startMicroseconds": 685293,
+          "startSeconds": "1793221913"
+        },
+        "image": "16777232:154487566",
+        "installed": "16777232:217025475",
+        "limitation": "GHOSTTY_RESTART_REQUIRED"
+      }
+    ]
+  },
+  "integrationRemoved": true,
+  "nativeSessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+  "pass": true,
+  "returns": [
+    {
+      "fronted": {
+        "error": null,
+        "focused": {
+          "focused": true,
+          "frontmost": true,
+          "tabId": "tab-7785092c00",
+          "tabSelected": true,
+          "terminalId": "238070F1-14C8-4765-AE8C-EF1B17EDC94E",
+          "windowId": "tab-group-7785f3cc80"
+        }
+      },
+      "index": 0,
+      "ownerIdle": {
+        "idleAtStart": 0.051199166,
+        "requiredSeconds": 10.0,
+        "satisfied": true,
+        "waitedMs": 162246
+      },
+      "return": {
+        "exact": true,
+        "expectedTerminal": "346140D0-573A-45F0-BA61-11A607E180B2",
+        "fixturePid": 24559,
+        "frontmostPid": 24559,
+        "harnessElapsedMs": 1085,
+        "independent": {
+          "frontmost": true,
+          "tabId": "tab-7785091400",
+          "tabSelected": true,
+          "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+          "windowId": "tab-group-7785f3cc80"
+        },
+        "independentError": null,
+        "readbackMatches": true,
+        "route": {
+          "bindingId": "c7609e84-fad3-4c66-8a82-d8c7e138fed2",
+          "choices": [],
+          "evidence": {
+            "bindingId": "c7609e84-fad3-4c66-8a82-d8c7e138fed2",
+            "bindingRevisionAfterFocus": "2017",
+            "bindingRevisionBeforeFocus": "2017",
+            "bindingRevisionLoaded": "2017",
+            "boundDevice": 268435456,
+            "boundExecutable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+            "focus": null,
+            "ghostty": {
+              "applicationAfter": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "applicationBefore": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "endedMs": 1793933110465,
+              "error": null,
+              "matches": [
+                {
+                  "rdev": 268435456,
+                  "tabId": "tab-7785091400",
+                  "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+                  "tty": "/dev/ttys000",
+                  "windowId": "tab-group-7785f3cc80"
+                }
+              ],
+              "senderPid": 34725,
+              "startedMs": 1793933110005,
+              "tabCount": 2,
+              "terminalCount": 2,
+              "windowCount": 1
+            },
+            "ghosttyFocus": {
+              "appFrontmost": true,
+              "applicationAfter": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "elapsedMs": 464,
+              "error": null,
+              "focusedTerminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+              "frontWindowId": "tab-group-7785f3cc80",
+              "frontmostApplication": {
+                "bundleIdentifier": "com.mitchellh.ghostty",
+                "pid": 24559
+              },
+              "outcome": "FOCUSED",
+              "readbackRdev": 268435456,
+              "scriptFrontmostPid": 24559,
+              "selectedTabId": "tab-7785091400",
+              "senderPid": 34768,
+              "startedMs": 1793933110469,
+              "target": {
+                "rdev": 268435456,
+                "tabId": "tab-7785091400",
+                "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+                "tty": "/dev/ttys000",
+                "windowId": "tab-group-7785f3cc80"
+              },
+              "targetTabSelected": true
+            },
+            "lookup": {
+              "binary": "/Users/danny/.local/share/claude/versions/2.1.318",
+              "error": null,
+              "pidRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ],
+              "requestEndedMs": 1793933110139,
+              "requestStartedMs": 1793933110000,
+              "rowCount": 8,
+              "sessionRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ]
+            },
+            "nativeSessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+            "phases": [
+              {
+                "elapsedMs": 0,
+                "phase": "pre-lookup sample"
+              },
+              {
+                "elapsedMs": 478,
+                "phase": "provider lookup + ghostty enumeration"
+              },
+              {
+                "elapsedMs": 0,
+                "phase": "post-lookup sample"
+              },
+              {
+                "elapsedMs": 0,
+                "phase": "surface join"
+              },
+              {
+                "elapsedMs": 465,
+                "phase": "focus + native readback"
+              },
+              {
+                "elapsedMs": 5,
+                "phase": "frontmost + readback stat"
+              },
+              {
+                "elapsedMs": 126,
+                "phase": "post-focus revalidation"
+              }
+            ],
+            "postFocusLookup": {
+              "binary": "/Users/danny/.local/share/claude/versions/2.1.318",
+              "error": null,
+              "pidRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ],
+              "requestEndedMs": 1793933111065,
+              "requestStartedMs": 1793933110939,
+              "rowCount": 8,
+              "sessionRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ]
+            },
+            "postFocusSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933110939,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "postLookupSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933110469,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "preLookupSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933109991,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "processKey": {
+              "bootId": "5A0C6A5F-B89B-477B-9287-96EB435984B7",
+              "endpointId": "83d3e1ab-566a-4bc3-89c3-17805d3913c5",
+              "pid": 24735,
+              "startMicroseconds": 394601,
+              "startSeconds": "1793932933"
+            },
+            "surfaceKind": "ghostty",
+            "terminal": null
+          },
+          "focusPerformed": true,
+          "inputReadiness": "FOREGROUND_COMPATIBLE",
+          "latencyMs": 1074,
+          "reasonCode": "OK",
+          "requestId": "5ab3cf95-b846-4a24-a4e4-170dc8fa2bb3",
+          "sessionId": "787cba6c-9770-4fcc-80c9-b7abe785b866",
+          "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+          "startedAtMs": 1793933109991,
+          "surfaceResult": "EXACT_NATIVE_SURFACE",
+          "validatedBindingRevision": "2017"
+        },
+        "wrongTarget": false
+      }
+    },
+    {
+      "fronted": {
+        "error": null,
+        "focused": {
+          "focused": true,
+          "frontmost": true,
+          "tabId": "tab-7785092c00",
+          "tabSelected": true,
+          "terminalId": "238070F1-14C8-4765-AE8C-EF1B17EDC94E",
+          "windowId": "tab-group-7785f3cc80"
+        }
+      },
+      "index": 1,
+      "ownerIdle": {
+        "idleAtStart": 13.089870958,
+        "requiredSeconds": 10.0,
+        "satisfied": true,
+        "waitedMs": 12
+      },
+      "return": {
+        "exact": true,
+        "expectedTerminal": "346140D0-573A-45F0-BA61-11A607E180B2",
+        "fixturePid": 24559,
+        "frontmostPid": 24559,
+        "harnessElapsedMs": 1056,
+        "independent": {
+          "frontmost": true,
+          "tabId": "tab-7785091400",
+          "tabSelected": true,
+          "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+          "windowId": "tab-group-7785f3cc80"
+        },
+        "independentError": null,
+        "readbackMatches": true,
+        "route": {
+          "bindingId": "c7609e84-fad3-4c66-8a82-d8c7e138fed2",
+          "choices": [],
+          "evidence": {
+            "bindingId": "c7609e84-fad3-4c66-8a82-d8c7e138fed2",
+            "bindingRevisionAfterFocus": "2017",
+            "bindingRevisionBeforeFocus": "2017",
+            "bindingRevisionLoaded": "2017",
+            "boundDevice": 268435456,
+            "boundExecutable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+            "focus": null,
+            "ghostty": {
+              "applicationAfter": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "applicationBefore": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "endedMs": 1793933112655,
+              "error": null,
+              "matches": [
+                {
+                  "rdev": 268435456,
+                  "tabId": "tab-7785091400",
+                  "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+                  "tty": "/dev/ttys000",
+                  "windowId": "tab-group-7785f3cc80"
+                }
+              ],
+              "senderPid": 34850,
+              "startedMs": 1793933112198,
+              "tabCount": 2,
+              "terminalCount": 2,
+              "windowCount": 1
+            },
+            "ghosttyFocus": {
+              "appFrontmost": true,
+              "applicationAfter": {
+                "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+                "executable": "/Users/danny/Documents/Tools/Threadspace/artifacts/qualification/ghostty-smoke-20261106T024209Z/Ghostty.app/Contents/MacOS/ghostty",
+                "generation": {
+                  "pid": 24559,
+                  "startMicroseconds": 988995,
+                  "startSeconds": "1793932929"
+                },
+                "image": "16777232:225008541",
+                "installed": "16777232:225008541",
+                "limitation": null
+              },
+              "elapsedMs": 448,
+              "error": null,
+              "focusedTerminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+              "frontWindowId": "tab-group-7785f3cc80",
+              "frontmostApplication": {
+                "bundleIdentifier": "com.mitchellh.ghostty",
+                "pid": 24559
+              },
+              "outcome": "FOCUSED",
+              "readbackRdev": 268435456,
+              "scriptFrontmostPid": 24559,
+              "selectedTabId": "tab-7785091400",
+              "senderPid": 34868,
+              "startedMs": 1793933112660,
+              "target": {
+                "rdev": 268435456,
+                "tabId": "tab-7785091400",
+                "terminalId": "346140D0-573A-45F0-BA61-11A607E180B2",
+                "tty": "/dev/ttys000",
+                "windowId": "tab-group-7785f3cc80"
+              },
+              "targetTabSelected": true
+            },
+            "lookup": {
+              "binary": "/Users/danny/.local/share/claude/versions/2.1.318",
+              "error": null,
+              "pidRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ],
+              "requestEndedMs": 1793933112326,
+              "requestStartedMs": 1793933112193,
+              "rowCount": 8,
+              "sessionRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ]
+            },
+            "nativeSessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+            "phases": [
+              {
+                "elapsedMs": 0,
+                "phase": "pre-lookup sample"
+              },
+              {
+                "elapsedMs": 473,
+                "phase": "provider lookup + ghostty enumeration"
+              },
+              {
+                "elapsedMs": 0,
+                "phase": "post-lookup sample"
+              },
+              {
+                "elapsedMs": 0,
+                "phase": "surface join"
+              },
+              {
+                "elapsedMs": 449,
+                "phase": "focus + native readback"
+              },
+              {
+                "elapsedMs": 5,
+                "phase": "frontmost + readback stat"
+              },
+              {
+                "elapsedMs": 128,
+                "phase": "post-focus revalidation"
+              }
+            ],
+            "postFocusLookup": {
+              "binary": "/Users/danny/.local/share/claude/versions/2.1.318",
+              "error": null,
+              "pidRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ],
+              "requestEndedMs": 1793933113242,
+              "requestStartedMs": 1793933113114,
+              "rowCount": 8,
+              "sessionRows": [
+                {
+                  "kind": "interactive",
+                  "pid": 24735,
+                  "sessionId": "91290a45-d3a0-49e7-88c5-d8b162c15f4b",
+                  "status": "idle",
+                  "waitingFor": null
+                }
+              ]
+            },
+            "postFocusSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933113114,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "postLookupSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933112660,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "preLookupSample": {
+              "outcome": "Sampled",
+              "sample": {
+                "comm": "2.1.318",
+                "controllingDevice": 268435456,
+                "executable": "/Users/danny/.local/share/claude/versions/2.1.318#16777232:222209086",
+                "pgid": 24735,
+                "pid": 24735,
+                "ppid": 24581,
+                "sampledAtMs": 1793933112187,
+                "startMicroseconds": 394601,
+                "startSeconds": "1793932933",
+                "status": 2,
+                "tpgid": 24735
+              }
+            },
+            "processKey": {
+              "bootId": "5A0C6A5F-B89B-477B-9287-96EB435984B7",
+              "endpointId": "83d3e1ab-566a-4bc3-89c3-17805d3913c5",
+              "pid": 24735,
+              "startMicroseconds": 394601,
+              "startSeconds": "1793932933"
+            },
+            "surfaceKind": "ghostty",
+            "terminal": null
+          },
+          "focusPerformed": true,
+          "inputReadiness": "FOREGROUND_COMPATIBLE",
+          "latencyMs": 1055,
+          "reasonCode": "OK",
+          "requestId": "8715f268-6d12-412a-b956-c0d0a0c2cb8c",
+          "sessionId": "787cba6c-9770-4fcc-80c9-b7abe785b866",
+          "sessionVerification": "CURRENT_NATIVE_REVALIDATED",
+          "startedAtMs": 1793933112187,
+          "surfaceResult": "EXACT_NATIVE_SURFACE",
+          "validatedBindingRevision": "2017"
+        },
+        "wrongTarget": false
+      }
+    }
+  ],
+  "sessionId": "787cba6c-9770-4fcc-80c9-b7abe785b866",
+  "startError": null
+}

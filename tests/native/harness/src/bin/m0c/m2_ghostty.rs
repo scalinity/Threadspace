@@ -159,15 +159,20 @@ pub fn prompt_and_complete(ctx: &Ctx, fixture: &Fixture, observed: &Observed, te
 }
 
 /// Independent readback after a Return, compared with the expected pane.
+/// A wrong target is focus on any other terminal; a front application other
+/// than the fixture's after the route is a separate disagreement (another
+/// application took the front), never counted as a pass.
 fn readback(fixture: &Fixture, expected: &Pane, route: &Value) -> Value {
     threadspace_harness::pause_ms(250);
     let native = fixture.readback();
     let front_pid = frontmost_pid();
     let exact = route["surfaceResult"] == "EXACT_NATIVE_SURFACE"
         && route["sessionVerification"] == "CURRENT_NATIVE_REVALIDATED";
-    let matches = native.as_ref().is_ok_and(|r| {
-        r["terminalId"] == json!(expected.terminal_id) && r["tabSelected"] == json!(true) && r["frontmost"] == json!(true)
-    }) && front_pid == Some(fixture.app.pid);
+    let focus_matches = native.as_ref().is_ok_and(|r| {
+        r["terminalId"] == json!(expected.terminal_id) && r["tabSelected"] == json!(true)
+    });
+    let front_matches = native.as_ref().is_ok_and(|r| r["frontmost"] == json!(true))
+        && front_pid == Some(fixture.app.pid);
     json!({
         "expectedTerminal": expected.terminal_id,
         "route": route,
@@ -176,9 +181,20 @@ fn readback(fixture: &Fixture, expected: &Pane, route: &Value) -> Value {
         "independentError": native.as_ref().err(),
         "frontmostPid": front_pid,
         "fixturePid": fixture.app.pid,
-        "readbackMatches": matches,
-        "wrongTarget": exact && native.is_ok() && !matches,
+        "focusMatches": focus_matches,
+        "frontMatches": front_matches,
+        "readbackMatches": focus_matches && front_matches,
+        "wrongTarget": exact && native.is_ok() && !focus_matches,
     })
+}
+
+/// Owner keyboard/pointer input since `gate`: an idle time shorter than the
+/// time since the idle gate passed means someone used the Mac during the
+/// measured window, so the sample is disturbed (retained, never counted).
+fn disturbed(ctx: &Ctx, gate: Instant) -> Value {
+    let idle = ctx.native.idle_seconds();
+    let window = gate.elapsed().as_secs_f64();
+    json!({ "idleSeconds": idle, "windowSeconds": window, "disturbed": idle + 0.05 < window })
 }
 
 /// One Return through the companion's control interface.
@@ -319,12 +335,27 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
         let turn_ms = prompt_and_complete(ctx, &fixture, &observed, &prompt, completed);
         let after = session_view(ctx, &observed.native_session_id);
         let fleet = ui(ctx, "m2-fleet", json!({ "sessionId": observed.session_id }));
-        let idle = owner_idle(ctx);
-        let fronted = front_other(ctx, &fixture, &other);
-        let returned = {
-            let _gui = ctx.gui("m2 ghostty vertical Return");
-            press_return(ctx, &fixture, &observed)
-        };
+        // A Return disturbed by owner input is retried within its cycle; every
+        // attempt is retained and only an undisturbed exact one counts.
+        let mut return_attempts = Vec::new();
+        let (mut idle, mut fronted, mut returned) = (Value::Null, Value::Null, Value::Null);
+        for _ in 0..3 {
+            idle = owner_idle(ctx);
+            let gate = Instant::now();
+            fronted = front_other(ctx, &fixture, &other);
+            returned = {
+                let _gui = ctx.gui("m2 ghostty vertical Return");
+                press_return(ctx, &fixture, &observed)
+            };
+            let owner = disturbed(ctx, gate);
+            let retry = !(fronted["ok"] == json!(true) && route_ok(&returned))
+                && owner["disturbed"] == json!(true)
+                && returned["wrongTarget"] != json!(true);
+            return_attempts.push(json!({ "ownerIdle": idle, "owner": owner, "fronted": fronted, "return": returned }));
+            if !retry {
+                break;
+            }
+        }
         completed += 1;
         let follow_ms = prompt_and_complete(ctx, &fixture, &observed, "Reply with only the word again.", completed);
         let again = session_view(ctx, &observed.native_session_id);
@@ -350,7 +381,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
                 "followUpMs": follow_ms.as_ref().ok(), "followUpError": follow_ms.as_ref().err(),
                 "sessionViews": sessions, "workers": workers, "fleetError": fleet.as_ref().err(),
                 "afterTurn": after.as_ref().ok().map(|v| json!({ "turnState": v.turn_state, "observation": v.observation, "observerTier": v.observer_tier, "observerVersion": v.observer_version, "presence": v.execution_presence })),
-                "ownerIdle": idle, "fronted": fronted, "return": returned,
+                "ownerIdle": idle, "fronted": fronted, "return": returned, "returnAttempts": return_attempts,
             }))
             .map_err(|e| e.to_string())?;
     }
@@ -430,29 +461,50 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let mut pass = start_errors.is_empty() && sessions.len() == 3;
     let mut exact = 0u32;
     let mut wrong = 0u32;
+    let mut disturbed_attempts = 0u32;
+    let mut attempts = 0u32;
     if pass {
-        for index in 0..count {
+        // Owner input during a route window disturbs only that sample: it is
+        // retained and not counted, and another attempt is made, at most ten
+        // times over. Any undisturbed miss fails the run.
+        while exact < count && attempts < count + 10 {
+            let index = attempts;
+            attempts += 1;
             let target = &sessions[index as usize % sessions.len()];
             let other = if index % 2 == 0 { spare.clone() } else { sessions[(index as usize + 1) % sessions.len()].pane.clone() };
             let idle = owner_idle(ctx);
+            let gate = Instant::now();
             let fronted = front_other(ctx, &fixture, &other);
             let returned = {
                 let _gui = ctx.gui("m2 ghostty route");
                 if index % 3 == 0 { press_return(ctx, &fixture, target) } else { companion_return(ctx, &fixture, target) }
             };
-            if fronted["ok"] == json!(true) && route_ok(&returned) {
-                exact += 1;
-            }
+            let owner = disturbed(ctx, gate);
+            let clean = fronted["ok"] == json!(true) && route_ok(&returned);
             if returned["wrongTarget"] == json!(true) {
                 wrong += 1;
             }
+            let outcome = if clean {
+                exact += 1;
+                "EXACT"
+            } else if owner["disturbed"] == json!(true) && returned["wrongTarget"] != json!(true) {
+                disturbed_attempts += 1;
+                "DISTURBED"
+            } else {
+                pass = false;
+                "FAILED"
+            };
             run_dir
-                .append("routes.jsonl", &json!({ "index": index, "via": if index % 3 == 0 { "ui" } else { "companion" }, "ownerIdle": idle, "fronted": fronted, "return": returned }))
+                .append("routes.jsonl", &json!({ "index": index, "via": if index % 3 == 0 { "ui" } else { "companion" }, "outcome": outcome, "ownerIdle": idle, "owner": owner, "fronted": fronted, "return": returned }))
                 .map_err(|e| e.to_string())?;
+            if !pass {
+                break;
+            }
         }
         pass &= exact == count && wrong == 0;
     }
-    let scenarios = if pass { rearrangements(ctx, &fixture, &sessions, &spare, &run_dir) } else { json!(null) };
+    // Independent evidence: run whenever the three sessions started.
+    let scenarios = if sessions.len() == 3 { rearrangements(ctx, &fixture, &sessions, &spare, &run_dir) } else { json!(null) };
     pass &= scenarios["pass"] == json!(true);
     for observed in &sessions {
         let _ = fixture.submit(&observed.pane, "/exit");
@@ -470,6 +522,8 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
         "pass": pass,
         "count": count,
         "exact": exact,
+        "attempts": attempts,
+        "disturbedAttempts": disturbed_attempts,
         "wrongTargets": wrong,
         "integration": integration,
         "ui": ui_state,
