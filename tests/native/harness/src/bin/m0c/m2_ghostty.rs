@@ -409,6 +409,8 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let integration = ghostty_authorized(ctx)?;
     let mut scratch = Scratch::new(ctx, "ghostty-routes")?;
     let activation = activate(ctx, &mut scratch)?;
+    // Every third Return is the packaged UI's own button.
+    let ui_state = ensure_ui(ctx)?;
     let fixture = fixture(ctx, "routes")?;
     let dirs: Vec<PathBuf> = (0..4).map(|i| disposable(&format!("ghostty-routes-{i}"))).collect::<Result<_, _>>()?;
     let left = fixture.window(&dirs[0])?;
@@ -470,6 +472,7 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
         "exact": exact,
         "wrongTargets": wrong,
         "integration": integration,
+        "ui": ui_state,
         "fixture": { "pid": fixture.app.pid, "image": fixture.image, "dictionarySha256": fixture.dictionary_sha256 },
         "sessions": sessions.iter().map(|o| json!({ "sessionId": o.session_id, "nativeSessionId": o.native_session_id, "terminalId": o.pane.terminal_id, "tty": o.pane.tty })).collect::<Vec<_>>(),
         "startErrors": start_errors,
