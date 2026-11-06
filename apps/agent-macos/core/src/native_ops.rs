@@ -11,10 +11,12 @@ use threadspace_contracts::control::{
     ControlError, ControlErrorCode, ControlRequestBody, ControlResponseBody,
 };
 use threadspace_contracts::diagnostics::{
-    AutomationPermission, CompanionDiagnostics, CompanionIntegration, ProcessIdentity,
-    TerminalIntegration,
+    AutomationPermission, CompanionDiagnostics, CompanionIntegration, GhosttyDictionaryReport,
+    GhosttyIntegration, GhosttyInventorySummary, ProcessIdentity, TerminalIntegration,
 };
 use threadspace_relay::paths::redact_home;
+use threadspace_surfaces_macos::ghostty::{self, GHOSTTY_APP_PATH, GHOSTTY_BUNDLE_ID};
+use threadspace_surfaces_macos::process;
 use threadspace_surfaces_macos::terminal::{self, TERMINAL_APP_PATH, TERMINAL_BUNDLE_ID};
 
 use crate::bridge::{self, BridgeEvent, BridgeRequest};
@@ -134,6 +136,74 @@ fn diagnostics(
     })
 }
 
+/// Ghostty's installed dictionary, every running process with any limitation
+/// on Return, and read-only inventories of the scriptable ones.
+fn ghostty_integration(context: &OpsContext) -> Result<GhosttyIntegration, ControlError> {
+    let app = PathBuf::from(GHOSTTY_APP_PATH);
+    let installed = app.exists();
+    let processes = discovery::ghostty_applications(installed).unwrap_or_else(|error| {
+        log::warn("GHOSTTY_PROCESSES_FAILED", json!({ "error": error }));
+        vec![]
+    });
+    let dictionary = process::path_file_id(ghostty::GHOSTTY_EXECUTABLE)
+        .and_then(|id| discovery::ghostty_dictionary(&id))
+        .map(|dictionary| GhosttyDictionaryReport {
+            sha256: dictionary.sha256.clone(),
+            byte_length: dictionary.byte_length,
+            inventory: dictionary.supports_inventory(),
+            focus: dictionary.supports_focus(),
+            tty: dictionary.has_tty_property,
+            pid: dictionary.has_pid_property,
+        });
+    // Asking without prompting; no running process reports procNotFound.
+    let status = if processes.is_empty() {
+        PROC_NOT_FOUND
+    } else {
+        bridge::automation_permission(GHOSTTY_BUNDLE_ID, false, QUICK)
+            .map_err(|error| internal(error.to_string()))?
+    };
+    let automation = classify_automation(status);
+    let mut inventories = Vec::new();
+    if automation == AutomationPermission::Authorized {
+        let script = context.resources_dir.join("ghostty-inventory.applescript");
+        for process in processes.iter().filter(|process| process.limitation.is_none()) {
+            let Some(dictionary) = process.image.as_deref().and_then(discovery::ghostty_dictionary)
+            else {
+                continue;
+            };
+            match ghostty::enumerate(
+                &script,
+                &dictionary,
+                process.generation.pid as i32,
+                discovery::ENUMERATION_TIMEOUT,
+            ) {
+                Ok(inventory) => inventories.push(GhosttyInventorySummary {
+                    pid: process.generation.pid,
+                    window_count: inventory.windows.len() as u32,
+                    tab_count: inventory.tabs.len() as u32,
+                    terminal_count: inventory.terminals.len() as u32,
+                    elapsed_ms: inventory.elapsed_ms,
+                }),
+                Err(error) => log::warn(
+                    "GHOSTTY_INVENTORY_FAILED",
+                    json!({ "pid": process.generation.pid, "error": error.to_string() }),
+                ),
+            }
+        }
+    }
+    Ok(GhosttyIntegration {
+        application_path: installed.then(|| GHOSTTY_APP_PATH.to_owned()),
+        application_version: installed
+            .then(|| terminal::application_version(&app))
+            .flatten(),
+        dictionary,
+        processes,
+        automation,
+        automation_status_code: status,
+        inventories,
+    })
+}
+
 fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError> {
     let app = PathBuf::from(TERMINAL_APP_PATH);
     let installed = app.exists();
@@ -174,9 +244,12 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
     } else {
         None
     };
+    let ghostty = ghostty_integration(context)?;
     log::info(
         "INTEGRATION_STATUS",
         json!({
+            "ghosttyProcesses": ghostty.processes,
+            "ghosttyAutomation": ghostty.automation,
             "terminalRunning": running,
             "automation": automation,
             "automationStatus": status,
@@ -198,6 +271,7 @@ fn integration(context: &OpsContext) -> Result<ControlResponseBody, ControlError
                 automation_status_code: status,
                 inventory,
             },
+            ghostty: Some(ghostty),
         },
     })
 }
@@ -221,11 +295,11 @@ fn request_notification_authorization() -> Result<ControlResponseBody, ControlEr
     }
 }
 
-fn request_terminal_automation() -> Result<ControlResponseBody, ControlError> {
-    let running = bridge::application_running(TERMINAL_BUNDLE_ID, QUICK)
+fn request_terminal_automation(bundle_identifier: &str) -> Result<ControlResponseBody, ControlError> {
+    let running = bridge::application_running(bundle_identifier, QUICK)
         .map_err(|error| internal(error.to_string()))?;
     let status = if running {
-        bridge::automation_permission(TERMINAL_BUNDLE_ID, true, PROMPT)
+        bridge::automation_permission(bundle_identifier, true, PROMPT)
             .map_err(|error| internal(error.to_string()))?
     } else {
         PROC_NOT_FOUND
@@ -233,7 +307,7 @@ fn request_terminal_automation() -> Result<ControlResponseBody, ControlError> {
     let automation = classify_automation(status);
     log::info(
         "TERMINAL_AUTOMATION_RESULT",
-        json!({ "automation": automation, "status": status }),
+        json!({ "bundleIdentifier": bundle_identifier, "automation": automation, "status": status }),
     );
     Ok(ControlResponseBody::TerminalAutomation {
         automation,
@@ -252,7 +326,8 @@ pub fn run(
         ControlRequestBody::RequestNotificationAuthorization => {
             request_notification_authorization()
         }
-        ControlRequestBody::RequestTerminalAutomation => request_terminal_automation(),
+        ControlRequestBody::RequestTerminalAutomation => request_terminal_automation(TERMINAL_BUNDLE_ID),
+        ControlRequestBody::RequestGhosttyAutomation => request_terminal_automation(GHOSTTY_BUNDLE_ID),
         ControlRequestBody::ReturnToSession { route } => route::return_to_session(
             route,
             &context.claude,

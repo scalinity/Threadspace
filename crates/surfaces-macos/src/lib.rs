@@ -6,6 +6,7 @@
 
 pub mod ancestry;
 pub mod exec;
+pub mod ghostty;
 pub mod process;
 pub mod terminal;
 pub mod tty;

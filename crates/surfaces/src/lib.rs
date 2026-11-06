@@ -1,5 +1,5 @@
-//! Return-to-Agent route model (SPEC §13.1–§13.3) for direct interactive
-//! Claude in Terminal.app.
+//! Return-to-Agent route model (SPEC §13.1–§13.4) for direct interactive
+//! Claude in Ghostty or Terminal.app.
 //!
 //! `route` revalidates a stored binding against fresh native evidence and
 //! focuses only a target proven on every axis:
@@ -8,8 +8,10 @@
 //!    and controlling device (sampled before and after the provider lookup);
 //! 2. a fresh provider inventory maps that PID to the requested full session
 //!    ID as a direct interactive client;
-//! 3. a fresh Terminal enumeration, bracketed by an unchanged Terminal
-//!    incarnation, has exactly one tab whose TTY `st_rdev` equals `e_tdev`;
+//! 3. a fresh enumeration of the bound application, bracketed by an
+//!    unchanged incarnation (and, for Ghostty, an unchanged executable image
+//!    whose dictionary is known), has exactly one tab or terminal whose TTY
+//!    `st_rdev` equals `e_tdev` (for Ghostty, the bound native terminal ID);
 //! 4. the binding revision is unchanged and the request is still within its
 //!    two-second budget immediately before focus.
 //!
@@ -25,17 +27,23 @@
 use std::time::{Duration, Instant};
 
 use threadspace_contracts::route::{
-    AppGeneration, BindingChoice, FocusEvidence, FrontmostApplication, InputReadiness,
+    AppGeneration, BindingChoice, FocusEvidence, FrontmostApplication, GhosttyApplication,
+    GhosttyEvidence, GhosttyFocusEvidence, GhosttyTerminalEvidence, InputReadiness,
     InventoryEvidence, PhaseTiming, ProcessEvidence, ProcessKey, RouteEvidence, RouteRequest,
     RouteResult, SampleEvidence, SessionVerification, SurfaceResult, TerminalEvidence,
     TerminalTabEvidence,
 };
 use threadspace_provider_claude::inventory::{InventoryError, InventorySnapshot};
+use threadspace_surfaces_macos::ghostty::{self, GhosttyInventory, GhosttyTarget};
 use threadspace_surfaces_macos::process::{Incarnation, ProcessError};
 use threadspace_surfaces_macos::terminal::{FocusOutcome, TerminalTabs};
 use threadspace_surfaces_macos::tty::TtyError;
 
 pub const TERMINAL_BUNDLE_ID: &str = "com.apple.Terminal";
+pub use threadspace_surfaces_macos::ghostty::GHOSTTY_BUNDLE_ID;
+/// Surface kinds of stored bindings.
+pub const SURFACE_TERMINAL: &str = "terminal.app";
+pub const SURFACE_GHOSTTY: &str = "ghostty";
 /// SPEC §13.2: hard per-attempt budget.
 pub const ROUTE_BUDGET: Duration = Duration::from_secs(2);
 /// Reason code of an attempt that ran out of its budget.
@@ -91,9 +99,13 @@ impl RoutePoint {
     }
 }
 
-/// A stored, valid binding of one live activation to a Terminal surface.
+/// A stored, valid binding of one live activation to a native surface.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BoundTarget {
+    /// [`SURFACE_TERMINAL`] or [`SURFACE_GHOSTTY`].
+    pub surface_kind: String,
+    /// The TTY path for Terminal.app; the native terminal ID for Ghostty.
+    pub locator: String,
     pub binding_id: String,
     pub revision: i64,
     pub execution_id: String,
@@ -105,8 +117,13 @@ pub struct BoundTarget {
     pub device: u32,
     /// TTY path when bound: a hint, never what focus is aimed at.
     pub tty_hint: String,
-    /// Terminal.app incarnation when bound.
+    /// The surface application's incarnation when bound.
     pub terminal_generation: String,
+}
+
+/// The same Ghostty process still running the same mapped image.
+fn same_image(now: &GhosttyApplication, then: &GhosttyApplication) -> bool {
+    now.generation == then.generation && now.image.is_some() && now.image == then.image
 }
 
 /// What the store knows about the requested session.
@@ -149,7 +166,27 @@ pub trait RouteNative: Sync {
         tty: &str,
         deadline: &RouteDeadline,
     ) -> Result<(FocusOutcome, u32, u32), String>;
-    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication>;
+    /// The native frontmost application, given time to settle on `bundle`.
+    fn frontmost(&self, bundle: &str, deadline: &RouteDeadline) -> Option<FrontmostApplication>;
+    /// The running Ghostty process with this canonical generation; its
+    /// `limitation` is `None` only when its dictionary is known and sufficient.
+    fn ghostty_app(&self, generation: &str) -> Result<Option<GhosttyApplication>, String>;
+    /// Apple-event authorization for Ghostty, checked without prompting.
+    fn ghostty_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String>;
+    /// Read-only inventory of exactly `app`'s process.
+    fn ghostty_enumerate(
+        &self,
+        app: &GhosttyApplication,
+        deadline: &RouteDeadline,
+    ) -> Result<GhosttyInventory, String>;
+    /// Activates exactly `app`'s process and focuses `target`, with readback:
+    /// (outcome, sender PID, elapsed ms). An error may follow a performed focus.
+    fn ghostty_focus(
+        &self,
+        app: &GhosttyApplication,
+        target: &GhosttyTarget,
+        deadline: &RouteDeadline,
+    ) -> Result<(ghostty::FocusOutcome, u32, u32), String>;
     /// The binding's current revision if it is still valid.
     fn binding_revision(&self, binding_id: &str, deadline: &RouteDeadline) -> Option<i64>;
     /// The attempt reached `point`; only qualification builds act on it.
@@ -494,28 +531,39 @@ pub fn route<N: RouteNative>(
         );
     }
 
-    // 2. Fresh provider lookup ∥ fresh Terminal enumeration, both inside the
-    //    process bracket.
-    let authorized = native.automation_authorized(&deadline);
-    let (lookup, terminal) = std::thread::scope(|scope| {
+    // 2. Fresh provider lookup ∥ fresh enumeration of the bound surface
+    //    application, both inside the process bracket.
+    let is_ghostty = target.surface_kind == SURFACE_GHOSTTY;
+    run.evidence.surface_kind = Some(target.surface_kind.clone());
+    let authorized = if is_ghostty {
+        native.ghostty_authorized(&deadline)
+    } else {
+        native.automation_authorized(&deadline)
+    };
+    let (lookup, terminal, ghostty_scan) = std::thread::scope(|scope| {
         let lookup = scope.spawn(|| native.inventory(&deadline));
-        let terminal = match &authorized {
-            Ok(true) => {
+        let (terminal, ghostty_scan) = match (&authorized, is_ghostty) {
+            (Ok(true), false) => {
                 let before = native.terminal_generation();
                 let started = native.now_ms();
                 let tabs = native.enumerate(&deadline);
                 let ended = native.now_ms();
                 let after = native.terminal_generation();
-                Some((before, started, tabs, ended, after))
+                (Some((before, started, tabs, ended, after)), None)
             }
-            _ => None,
+            (Ok(true), true) => (None, Some(scan_ghostty(native, target, &deadline))),
+            _ => (None, None),
         };
         let lookup = lookup
             .join()
             .unwrap_or(Err(InventoryError::Spawn("lookup thread panicked".into())));
-        (lookup, terminal)
+        (lookup, terminal, ghostty_scan)
     });
-    run.phase("provider lookup + terminal enumeration");
+    run.phase(if is_ghostty {
+        "provider lookup + ghostty enumeration"
+    } else {
+        "provider lookup + terminal enumeration"
+    });
 
     // 3. Post-lookup sample.
     let post = native.sample(pid);
@@ -600,101 +648,118 @@ pub fn route<N: RouteNative>(
         }
     }
 
-    // Terminal surface join.
-    let Some((gen_before, enum_started, tabs, enum_ended, gen_after)) = terminal else {
-        return run.finish(
-            request,
-            (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-            "AUTOMATION_UNKNOWN",
-            Some(target),
-            vec![],
-        );
-    };
-    let mut terminal_evidence = TerminalEvidence {
-        generation_before: gen_before.clone().ok().flatten(),
-        generation_after: gen_after.clone().ok().flatten(),
-        started_ms: enum_started,
-        ended_ms: enum_ended,
-        sender_pid: None,
-        window_count: 0,
-        tab_count: 0,
-        matches: vec![],
-        error: None,
-    };
-    let tabs = match tabs {
-        Ok(tabs) => tabs,
-        Err(error) => {
-            terminal_evidence.error = Some(error);
-            run.evidence.terminal = Some(terminal_evidence);
+    let joined = if let Some(scan) = ghostty_scan {
+        match join_ghostty(&mut run, native, target, scan) {
+            Ok((app, ghostty_target, tty)) => Joined::Ghostty {
+                app,
+                target: ghostty_target,
+                tty,
+            },
+            Err((outcome, reason)) => {
+                return run.finish(request, outcome, &reason, Some(target), vec![]);
+            }
+        }
+    } else {
+        // Terminal surface join.
+        let Some((gen_before, enum_started, tabs, enum_ended, gen_after)) = terminal else {
             return run.finish(
                 request,
                 (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-                "TERMINAL_ENUMERATION_FAILED",
+                "AUTOMATION_UNKNOWN",
                 Some(target),
                 vec![],
             );
-        }
-    };
-    terminal_evidence.sender_pid = Some(tabs.sender_pid);
-    terminal_evidence.window_count = tabs.windows;
-    terminal_evidence.tab_count = tabs.tabs.len() as u32;
-    let generation_ok = match (&gen_before, &gen_after) {
-        (Ok(Some(before)), Ok(Some(after))) => {
-            before == after && before.canonical() == target.terminal_generation
-        }
-        _ => false,
-    };
-    let matches: Vec<TerminalTabEvidence> = tabs
-        .tabs
-        .iter()
-        .filter_map(|tab| {
-            let rdev = native.device_of(&tab.tty).ok();
-            (rdev == Some(target.device)).then(|| TerminalTabEvidence {
-                window_id: tab.window_id,
-                window_index: tab.window_index,
-                tab_index: tab.tab_index,
-                selected: tab.selected,
-                tty: tab.tty.clone(),
-                rdev,
+        };
+        let mut terminal_evidence = TerminalEvidence {
+            generation_before: gen_before.clone().ok().flatten(),
+            generation_after: gen_after.clone().ok().flatten(),
+            started_ms: enum_started,
+            ended_ms: enum_ended,
+            sender_pid: None,
+            window_count: 0,
+            tab_count: 0,
+            matches: vec![],
+            error: None,
+        };
+        let tabs = match tabs {
+            Ok(tabs) => tabs,
+            Err(error) => {
+                terminal_evidence.error = Some(error);
+                run.evidence.terminal = Some(terminal_evidence);
+                return run.finish(
+                    request,
+                    (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
+                    "TERMINAL_ENUMERATION_FAILED",
+                    Some(target),
+                    vec![],
+                );
+            }
+        };
+        terminal_evidence.sender_pid = Some(tabs.sender_pid);
+        terminal_evidence.window_count = tabs.windows;
+        terminal_evidence.tab_count = tabs.tabs.len() as u32;
+        let generation_ok = match (&gen_before, &gen_after) {
+            (Ok(Some(before)), Ok(Some(after))) => {
+                before == after && before.canonical() == target.terminal_generation
+            }
+            _ => false,
+        };
+        let matches: Vec<TerminalTabEvidence> = tabs
+            .tabs
+            .iter()
+            .filter_map(|tab| {
+                let rdev = native.device_of(&tab.tty).ok();
+                (rdev == Some(target.device)).then(|| TerminalTabEvidence {
+                    window_id: tab.window_id,
+                    window_index: tab.window_index,
+                    tab_index: tab.tab_index,
+                    selected: tab.selected,
+                    tty: tab.tty.clone(),
+                    rdev,
+                })
             })
-        })
-        .collect();
-    terminal_evidence.matches = matches.clone();
-    run.evidence.terminal = Some(terminal_evidence);
-    run.phase("surface join");
-    if !generation_ok {
-        return run.finish(
-            request,
-            (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-            "TERMINAL_GENERATION_CHANGED",
-            Some(target),
-            vec![],
-        );
-    }
-    let terminal_pid = match &gen_before {
-        Ok(Some(generation)) => Some(generation.pid),
-        _ => None,
-    };
-    let surface_tty = match matches.as_slice() {
-        [] => {
+            .collect();
+        terminal_evidence.matches = matches.clone();
+        run.evidence.terminal = Some(terminal_evidence);
+        run.phase("surface join");
+        if !generation_ok {
             return run.finish(
                 request,
                 (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-                "NO_MATCHING_TAB",
+                "TERMINAL_GENERATION_CHANGED",
                 Some(target),
                 vec![],
             );
         }
-        [only] => only.tty.clone(),
-        _ => {
-            return run.finish(
-                request,
-                (S::Ambiguous, V::CurrentNativeRevalidated, NotReady),
-                "MULTIPLE_MATCHING_TABS",
-                Some(target),
-                vec![],
-            );
-        }
+        let terminal_pid = match &gen_before {
+            Ok(Some(generation)) => Some(generation.pid),
+            _ => None,
+        };
+        let tty = match matches.as_slice() {
+            [] => {
+                return run.finish(
+                    request,
+                    (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
+                    "NO_MATCHING_TAB",
+                    Some(target),
+                    vec![],
+                );
+            }
+            [only] => only.tty.clone(),
+            _ => {
+                return run.finish(
+                    request,
+                    (S::Ambiguous, V::CurrentNativeRevalidated, NotReady),
+                    "MULTIPLE_MATCHING_TABS",
+                    Some(target),
+                    vec![],
+                );
+            }
+        };
+        Joined::Terminal { tty, terminal_pid }
+    };
+    let surface_tty = match &joined {
+        Joined::Terminal { tty, .. } | Joined::Ghostty { tty, .. } => tty.clone(),
     };
 
     // 4. Binding still current and request still within budget.
@@ -714,103 +779,131 @@ pub fn route<N: RouteNative>(
         return run.finish_timed_out(request, target);
     }
 
-    // 5. Focus the one proven tab and read back.
-    let focus_started = native.now_ms();
-    let focus = native.focus(&surface_tty, &deadline);
-    run.phase("focus + readback");
-    let mut focus_evidence = FocusEvidence {
-        outcome: "FAILED".into(),
-        sender_pid: None,
-        started_ms: focus_started,
-        elapsed_ms: 0,
-        target_window_id: None,
-        target_tab_index: None,
-        front_window_id: None,
-        readback_tty: None,
-        readback_rdev: None,
-        target_window_frontmost: None,
-        target_tab_selected: None,
-        frontmost_application: None,
-        error: None,
-    };
-    let readback = match focus {
-        Err(error) => {
-            let denied = error.contains("-1743");
-            focus_evidence.error = Some(error);
-            run.evidence.focus = Some(focus_evidence);
-            // A timed-out or failed script may have acted: uncertain, not success.
-            run.focus_performed = !denied;
-            let reason = if denied {
-                "AUTOMATION_DENIED"
-            } else {
-                "READBACK_FAILED"
-            };
-            return run.finish(
-                request,
-                (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-                reason,
-                Some(target),
-                vec![],
-            );
-        }
-        Ok((outcome, sender, elapsed)) => {
-            focus_evidence.sender_pid = Some(sender);
-            focus_evidence.elapsed_ms = elapsed;
-            match outcome {
-                FocusOutcome::Gone => {
-                    focus_evidence.outcome = "GONE".into();
-                    run.evidence.focus = Some(focus_evidence);
-                    return run.finish(
-                        request,
-                        (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-                        "TARGET_GONE",
-                        Some(target),
-                        vec![],
-                    );
-                }
-                FocusOutcome::Ambiguous { .. } => {
-                    focus_evidence.outcome = "AMBIGUOUS".into();
-                    run.evidence.focus = Some(focus_evidence);
-                    return run.finish(
-                        request,
-                        (S::Ambiguous, V::CurrentNativeRevalidated, NotReady),
-                        "MULTIPLE_MATCHING_TABS",
-                        Some(target),
-                        vec![],
-                    );
-                }
-                FocusOutcome::Changed => {
-                    focus_evidence.outcome = "CHANGED".into();
-                    run.evidence.focus = Some(focus_evidence);
-                    return run.finish(
-                        request,
-                        (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
-                        "SURFACE_CHANGED",
-                        Some(target),
-                        vec![],
-                    );
-                }
-                FocusOutcome::Focused(readback) => {
-                    run.focus_performed = true;
-                    focus_evidence.outcome = "FOCUSED".into();
-                    readback
-                }
+    // 5. Focus the one proven surface and read back.
+    let (readback_ok, frontmost_ok) = match &joined {
+        Joined::Ghostty {
+            app,
+            target: ghostty_target,
+            tty,
+        } => match focus_ghostty(&mut run, native, target, app, ghostty_target, tty, &deadline) {
+            Ok(checks) => checks,
+            Err((outcome, reason)) => {
+                return run.finish(request, outcome, &reason, Some(target), vec![]);
             }
+        },
+        Joined::Terminal { tty: _, terminal_pid } => {
+            let focus_started = native.now_ms();
+            let focus = native.focus(&surface_tty, &deadline);
+            run.phase("focus + readback");
+            let mut focus_evidence = FocusEvidence {
+                outcome: "FAILED".into(),
+                sender_pid: None,
+                started_ms: focus_started,
+                elapsed_ms: 0,
+                target_window_id: None,
+                target_tab_index: None,
+                front_window_id: None,
+                readback_tty: None,
+                readback_rdev: None,
+                target_window_frontmost: None,
+                target_tab_selected: None,
+                frontmost_application: None,
+                error: None,
+            };
+            let readback = match focus {
+                Err(error) => {
+                    let denied = error.contains("-1743");
+                    focus_evidence.error = Some(error);
+                    run.evidence.focus = Some(focus_evidence);
+                    // A timed-out or failed script may have acted: uncertain, not success.
+                    run.focus_performed = !denied;
+                    let reason = if denied {
+                        "AUTOMATION_DENIED"
+                    } else {
+                        "READBACK_FAILED"
+                    };
+                    return run.finish(
+                        request,
+                        (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
+                        reason,
+                        Some(target),
+                        vec![],
+                    );
+                }
+                Ok((outcome, sender, elapsed)) => {
+                    focus_evidence.sender_pid = Some(sender);
+                    focus_evidence.elapsed_ms = elapsed;
+                    match outcome {
+                        FocusOutcome::Gone => {
+                            focus_evidence.outcome = "GONE".into();
+                            run.evidence.focus = Some(focus_evidence);
+                            return run.finish(
+                                request,
+                                (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
+                                "TARGET_GONE",
+                                Some(target),
+                                vec![],
+                            );
+                        }
+                        FocusOutcome::Ambiguous { .. } => {
+                            focus_evidence.outcome = "AMBIGUOUS".into();
+                            run.evidence.focus = Some(focus_evidence);
+                            return run.finish(
+                                request,
+                                (S::Ambiguous, V::CurrentNativeRevalidated, NotReady),
+                                "MULTIPLE_MATCHING_TABS",
+                                Some(target),
+                                vec![],
+                            );
+                        }
+                        FocusOutcome::Changed => {
+                            focus_evidence.outcome = "CHANGED".into();
+                            run.evidence.focus = Some(focus_evidence);
+                            return run.finish(
+                                request,
+                                (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
+                                "SURFACE_CHANGED",
+                                Some(target),
+                                vec![],
+                            );
+                        }
+                        FocusOutcome::Focused(readback) => {
+                            run.focus_performed = true;
+                            focus_evidence.outcome = "FOCUSED".into();
+                            readback
+                        }
+                    }
+                }
+            };
+            native.reached(RoutePoint::BeforeReadback, &surface_tty, &deadline);
+            let frontmost = native.frontmost(TERMINAL_BUNDLE_ID, &deadline);
+            let readback_rdev = native.device_of(&readback.front_selected_tty).ok();
+            focus_evidence.target_window_id = Some(readback.window_id);
+            focus_evidence.target_tab_index = Some(readback.tab_index);
+            focus_evidence.front_window_id = Some(readback.front_window_id);
+            focus_evidence.readback_tty = Some(readback.front_selected_tty.clone());
+            focus_evidence.readback_rdev = readback_rdev;
+            focus_evidence.target_window_frontmost = Some(readback.target_window_frontmost);
+            focus_evidence.target_tab_selected = Some(readback.target_tab_selected);
+            focus_evidence.frontmost_application = frontmost.clone();
+            run.evidence.focus = Some(focus_evidence);
+            run.phase("frontmost + readback stat");
+            // Every readback signal must agree: the selected tab's device, the
+            // tab's selection, the target as AppleScript's front window, and
+            // Terminal's own view that the target is its frontmost window.
+            let readback_ok = readback_rdev == Some(target.device)
+                && readback.target_tab_selected
+                && readback.front_window_id == readback.window_id
+                && readback.target_window_frontmost;
+            // The frontmost application must be Terminal's proven incarnation,
+            // not merely something carrying Terminal's bundle identifier.
+            let frontmost_ok = frontmost.as_ref().is_some_and(|app| {
+                app.bundle_identifier.as_deref() == Some(TERMINAL_BUNDLE_ID)
+                    && Some(app.pid.max(0) as u32) == *terminal_pid
+            });
+            (readback_ok, frontmost_ok)
         }
     };
-    native.reached(RoutePoint::BeforeReadback, &surface_tty, &deadline);
-    let frontmost = native.frontmost(&deadline);
-    let readback_rdev = native.device_of(&readback.front_selected_tty).ok();
-    focus_evidence.target_window_id = Some(readback.window_id);
-    focus_evidence.target_tab_index = Some(readback.tab_index);
-    focus_evidence.front_window_id = Some(readback.front_window_id);
-    focus_evidence.readback_tty = Some(readback.front_selected_tty.clone());
-    focus_evidence.readback_rdev = readback_rdev;
-    focus_evidence.target_window_frontmost = Some(readback.target_window_frontmost);
-    focus_evidence.target_tab_selected = Some(readback.target_tab_selected);
-    focus_evidence.frontmost_application = frontmost.clone();
-    run.evidence.focus = Some(focus_evidence);
-    run.phase("frontmost + readback stat");
     // Focus may have happened; it is recorded above. A spent budget starts
     // no further lookup and cannot become an exact result.
     if deadline.expired() {
@@ -827,13 +920,6 @@ pub fn route<N: RouteNative>(
     run.phase("post-focus revalidation");
     native.reached(RoutePoint::BeforeDecision, &surface_tty, &deadline);
 
-    // Every readback signal must agree: the selected tab's device, the tab's
-    // selection, the target as AppleScript's front window, and Terminal's own
-    // view that the target is its frontmost window.
-    let readback_ok = readback_rdev == Some(target.device)
-        && readback.target_tab_selected
-        && readback.front_window_id == readback.window_id
-        && readback.target_window_frontmost;
     if !readback_ok {
         return run.finish(
             request,
@@ -843,13 +929,7 @@ pub fn route<N: RouteNative>(
             vec![],
         );
     }
-    // The frontmost application must be Terminal's proven incarnation, not
-    // merely something carrying Terminal's bundle identifier.
-    let terminal_frontmost = frontmost.as_ref().is_some_and(|app| {
-        app.bundle_identifier.as_deref() == Some(TERMINAL_BUNDLE_ID)
-            && Some(app.pid.max(0) as u32) == terminal_pid
-    });
-    if !terminal_frontmost {
+    if !frontmost_ok {
         return run.finish(
             request,
             (S::Unavailable, V::CurrentNativeRevalidated, NotReady),
@@ -913,6 +993,282 @@ pub fn route<N: RouteNative>(
         Some(target),
         vec![],
     )
+}
+
+/// The one surface a route focuses.
+enum Joined {
+    Terminal {
+        tty: String,
+        terminal_pid: Option<u32>,
+    },
+    Ghostty {
+        app: GhosttyApplication,
+        target: GhosttyTarget,
+        tty: String,
+    },
+}
+
+/// A typed refusal from a route step; the caller records it.
+type Refusal = ((SurfaceResult, SessionVerification, InputReadiness), String);
+
+fn refusal(surface: SurfaceResult, verification: SessionVerification, reason: &str) -> Refusal {
+    ((surface, verification, InputReadiness::Unknown), reason.to_owned())
+}
+
+/// The bound Ghostty process, its inventory and the process again.
+struct GhosttyScan {
+    before: Result<Option<GhosttyApplication>, String>,
+    started_ms: i64,
+    inventory: Result<GhosttyInventory, String>,
+    ended_ms: i64,
+    after: Result<Option<GhosttyApplication>, String>,
+}
+
+fn scan_ghostty<N: RouteNative>(
+    native: &N,
+    target: &BoundTarget,
+    deadline: &RouteDeadline,
+) -> GhosttyScan {
+    let before = native.ghostty_app(&target.terminal_generation);
+    let started_ms = native.now_ms();
+    // Only a process whose dictionary is known is ever scripted.
+    let inventory = match &before {
+        Ok(Some(app)) => match &app.limitation {
+            None => native.ghostty_enumerate(app, deadline),
+            Some(limitation) => Err(limitation.clone()),
+        },
+        Ok(None) => Err("GHOSTTY_GENERATION_CHANGED".into()),
+        Err(error) => Err(error.clone()),
+    };
+    let ended_ms = native.now_ms();
+    let after = native.ghostty_app(&target.terminal_generation);
+    GhosttyScan {
+        before,
+        started_ms,
+        inventory,
+        ended_ms,
+        after,
+    }
+}
+
+/// Exactly one terminal of the bound, unchanged Ghostty process has the
+/// provider's device, and it is the bound native terminal.
+fn join_ghostty<N: RouteNative>(
+    run: &mut Run<'_, N>,
+    native: &N,
+    target: &BoundTarget,
+    scan: GhosttyScan,
+) -> Result<(GhosttyApplication, GhosttyTarget, String), Refusal> {
+    use SessionVerification as V;
+    use SurfaceResult as S;
+    let mut evidence = GhosttyEvidence {
+        application_before: scan.before.as_ref().ok().and_then(Option::as_ref).cloned(),
+        application_after: scan.after.as_ref().ok().and_then(Option::as_ref).cloned(),
+        started_ms: scan.started_ms,
+        ended_ms: scan.ended_ms,
+        sender_pid: None,
+        window_count: 0,
+        tab_count: 0,
+        terminal_count: 0,
+        matches: vec![],
+        error: None,
+    };
+    let unavailable = |run: &mut Run<'_, N>, mut evidence: GhosttyEvidence, reason: &str| {
+        evidence.error = Some(reason.to_owned());
+        run.evidence.ghostty = Some(evidence);
+        refusal(S::Unavailable, V::CurrentNativeRevalidated, reason)
+    };
+    let app = match &scan.before {
+        Ok(Some(app)) => app.clone(),
+        Ok(None) => return Err(unavailable(run, evidence, "GHOSTTY_GENERATION_CHANGED")),
+        Err(_) => return Err(unavailable(run, evidence, "GHOSTTY_STATE_UNKNOWN")),
+    };
+    if let Some(limitation) = app.limitation.clone() {
+        return Err(unavailable(run, evidence, &limitation));
+    }
+    let inventory = match scan.inventory {
+        Ok(inventory) => inventory,
+        Err(error) => {
+            evidence.error = Some(error);
+            run.evidence.ghostty = Some(evidence);
+            return Err(refusal(
+                S::Unavailable,
+                V::CurrentNativeRevalidated,
+                "GHOSTTY_ENUMERATION_FAILED",
+            ));
+        }
+    };
+    evidence.sender_pid = Some(inventory.sender_pid);
+    evidence.window_count = inventory.windows.len() as u32;
+    evidence.tab_count = inventory.tabs.len() as u32;
+    evidence.terminal_count = inventory.terminals.len() as u32;
+    evidence.matches = inventory
+        .terminals
+        .iter()
+        .filter_map(|terminal| {
+            let tty = terminal.tty.as_deref()?;
+            let rdev = native.device_of(tty).ok();
+            (rdev == Some(target.device)).then(|| GhosttyTerminalEvidence {
+                window_id: terminal.window_id.clone(),
+                tab_id: terminal.tab_id.clone(),
+                terminal_id: terminal.id.clone(),
+                tty: terminal.tty.clone(),
+                rdev,
+            })
+        })
+        .collect();
+    let matches = evidence.matches.clone();
+    run.evidence.ghostty = Some(evidence);
+    run.phase("surface join");
+    let unchanged = matches!(&scan.after, Ok(Some(after)) if same_image(after, &app))
+        && app.generation.canonical() == target.terminal_generation;
+    if !unchanged {
+        return Err(refusal(
+            S::Unavailable,
+            V::CurrentNativeRevalidated,
+            "GHOSTTY_GENERATION_CHANGED",
+        ));
+    }
+    let only = match matches.as_slice() {
+        [] => {
+            return Err(refusal(
+                S::Unavailable,
+                V::CurrentNativeRevalidated,
+                "NO_MATCHING_TERMINAL",
+            ));
+        }
+        [only] => only,
+        _ => {
+            return Err(refusal(
+                S::Ambiguous,
+                V::CurrentNativeRevalidated,
+                "MULTIPLE_MATCHING_TERMINALS",
+            ));
+        }
+    };
+    // The device now belongs to another native terminal: the bound one is gone.
+    if only.terminal_id != target.locator {
+        return Err(refusal(S::Unavailable, V::Conflict, "GHOSTTY_TERMINAL_CHANGED"));
+    }
+    Ok((
+        app,
+        GhosttyTarget {
+            window_id: only.window_id.clone(),
+            tab_id: only.tab_id.clone(),
+            terminal_id: only.terminal_id.clone(),
+        },
+        only.tty.clone().unwrap_or_default(),
+    ))
+}
+
+/// Activates the proven process, focuses the terminal and reads every level
+/// back. Returns (readback agrees, the proven process is frontmost).
+fn focus_ghostty<N: RouteNative>(
+    run: &mut Run<'_, N>,
+    native: &N,
+    target: &BoundTarget,
+    app: &GhosttyApplication,
+    ghostty_target: &GhosttyTarget,
+    tty: &str,
+    deadline: &RouteDeadline,
+) -> Result<(bool, bool), Refusal> {
+    use SessionVerification as V;
+    use SurfaceResult as S;
+    let started = native.now_ms();
+    let focus = native.ghostty_focus(app, ghostty_target, deadline);
+    run.phase("focus + native readback");
+    let mut evidence = GhosttyFocusEvidence {
+        outcome: "FAILED".into(),
+        sender_pid: None,
+        started_ms: started,
+        elapsed_ms: 0,
+        target: GhosttyTerminalEvidence {
+            window_id: ghostty_target.window_id.clone(),
+            tab_id: ghostty_target.tab_id.clone(),
+            terminal_id: ghostty_target.terminal_id.clone(),
+            tty: Some(tty.to_owned()),
+            rdev: Some(target.device),
+        },
+        front_window_id: None,
+        selected_tab_id: None,
+        focused_terminal_id: None,
+        target_tab_selected: None,
+        app_frontmost: None,
+        script_frontmost_pid: None,
+        readback_rdev: None,
+        frontmost_application: None,
+        application_after: None,
+        error: None,
+    };
+    let readback = match focus {
+        Err(error) => {
+            let denied = error.contains("-1743");
+            evidence.error = Some(error);
+            run.evidence.ghostty_focus = Some(evidence);
+            // A timed-out or failed script may have acted: uncertain, not success.
+            run.focus_performed = !denied;
+            let reason = if denied {
+                "AUTOMATION_DENIED"
+            } else {
+                "READBACK_FAILED"
+            };
+            return Err(refusal(S::Unavailable, V::CurrentNativeRevalidated, reason));
+        }
+        Ok((outcome, sender, elapsed)) => {
+            evidence.sender_pid = Some(sender);
+            evidence.elapsed_ms = elapsed;
+            match outcome {
+                ghostty::FocusOutcome::Focused(readback) => {
+                    run.focus_performed = true;
+                    evidence.outcome = "FOCUSED".into();
+                    readback
+                }
+                other => {
+                    let (outcome, surface, reason) = match other {
+                        ghostty::FocusOutcome::Gone => ("GONE", S::Unavailable, "TARGET_GONE"),
+                        ghostty::FocusOutcome::Ambiguous { .. } => {
+                            ("AMBIGUOUS", S::Ambiguous, "MULTIPLE_MATCHING_TERMINALS")
+                        }
+                        // CHANGED can follow an issued focus whose readback disagreed.
+                        _ => {
+                            run.focus_performed = true;
+                            ("CHANGED", S::Unavailable, "SURFACE_CHANGED")
+                        }
+                    };
+                    evidence.outcome = outcome.into();
+                    run.evidence.ghostty_focus = Some(evidence);
+                    return Err(refusal(surface, V::CurrentNativeRevalidated, reason));
+                }
+            }
+        }
+    };
+    native.reached(RoutePoint::BeforeReadback, tty, deadline);
+    let frontmost = native.frontmost(GHOSTTY_BUNDLE_ID, deadline);
+    let readback_rdev = native.device_of(tty).ok();
+    let after = native.ghostty_app(&target.terminal_generation);
+    evidence.front_window_id = Some(readback.front_window_id.clone());
+    evidence.selected_tab_id = Some(readback.selected_tab_id.clone());
+    evidence.focused_terminal_id = Some(readback.focused_terminal_id.clone());
+    evidence.target_tab_selected = Some(readback.target_tab_selected);
+    evidence.app_frontmost = readback.app_frontmost;
+    evidence.script_frontmost_pid = Some(readback.frontmost_app_pid);
+    evidence.readback_rdev = readback_rdev;
+    evidence.frontmost_application = frontmost.clone();
+    evidence.application_after = after.as_ref().ok().and_then(Option::as_ref).cloned();
+    run.evidence.ghostty_focus = Some(evidence);
+    run.phase("frontmost + readback stat");
+    // `Focused` already required the exact window, tab and terminal at every
+    // level and the script's frontmost PID; the process and its image must
+    // also be unchanged and the TTY must still be the provider's device.
+    let readback_ok = matches!(&after, Ok(Some(now)) if same_image(now, app))
+        && readback_rdev == Some(target.device)
+        && readback.terminal_id == ghostty_target.terminal_id
+        && readback.focused_terminal_id == ghostty_target.terminal_id;
+    let pid = app.generation.pid as i32;
+    let frontmost_ok = frontmost.as_ref().is_some_and(|front| {
+        front.bundle_identifier.as_deref() == Some(GHOSTTY_BUNDLE_ID) && front.pid == pid
+    });
+    Ok((readback_ok, frontmost_ok))
 }
 
 #[cfg(test)]

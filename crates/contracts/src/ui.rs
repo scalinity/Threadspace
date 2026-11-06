@@ -297,6 +297,8 @@ pub enum UiAction {
     /// Explicit setup step (SPEC §19.1): ask the companion to request
     /// Apple-event automation consent for Terminal under its own identity.
     RequestTerminalAutomation {},
+    /// Ask the companion to request Ghostty automation consent under its own identity.
+    RequestGhosttyAutomation {},
     /// Qualification builds only: persist a renderer-produced report (for
     /// example backend attestation) as native evidence.
     RecordQualificationReport {

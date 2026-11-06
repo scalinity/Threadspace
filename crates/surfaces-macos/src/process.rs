@@ -223,11 +223,9 @@ pub fn executable_path(pid: i32) -> Result<PathBuf, ProcessError> {
     Ok(PathBuf::from(String::from_utf8_lossy(&buffer).into_owned()))
 }
 
-/// Every live PID whose kernel executable path is exactly `path`. This is how
-/// an application's process is found for incarnation sampling: LaunchServices'
-/// running-application list can also attribute transient helper processes to
-/// an application's bundle identifier, so it is not identity evidence.
-pub fn pids_with_executable(path: &str) -> Result<Vec<i32>, ProcessError> {
+/// Every live process (PID > 1) and its kernel executable path. Processes
+/// whose path cannot be read are omitted.
+pub fn executables() -> Result<Vec<(i32, PathBuf)>, ProcessError> {
     // SAFETY: a null buffer asks only for the current count.
     let estimate = unsafe { libc::proc_listallpids(std::ptr::null_mut(), 0) };
     if estimate <= 0 {
@@ -254,9 +252,19 @@ pub fn pids_with_executable(path: &str) -> Result<Vec<i32>, ProcessError> {
     Ok(pids
         .into_iter()
         .filter(|pid| *pid > 1)
-        .filter(|pid| {
-            executable_path(*pid).is_ok_and(|exe| exe.as_os_str() == std::ffi::OsStr::new(path))
-        })
+        .filter_map(|pid| executable_path(pid).ok().map(|path| (pid, path)))
+        .collect())
+}
+
+/// Every live PID whose kernel executable path is exactly `path`. This is how
+/// an application's process is found for incarnation sampling: LaunchServices'
+/// running-application list can also attribute transient helper processes to
+/// an application's bundle identifier, so it is not identity evidence.
+pub fn pids_with_executable(path: &str) -> Result<Vec<i32>, ProcessError> {
+    Ok(executables()?
+        .into_iter()
+        .filter(|(_, exe)| exe.as_os_str() == std::ffi::OsStr::new(path))
+        .map(|(pid, _)| pid)
         .collect())
 }
 
@@ -278,6 +286,104 @@ pub fn executable_identity(pid: i32) -> Result<ExecutableIdentity, ProcessError>
     let path = executable_path(pid)?.display().to_string();
     let file_id = file_id(&path);
     Ok(ExecutableIdentity { path, file_id })
+}
+
+/// `dev:ino` of the file currently at `path`, for comparison with a mapped image.
+pub fn path_file_id(path: &str) -> Option<String> {
+    file_id(path)
+}
+
+/// Kernel `struct proc_regioninfo` (`sys/proc_info.h`), absent from `libc`.
+#[repr(C)]
+#[derive(Clone, Copy)]
+struct RegionInfo {
+    protection: u32,
+    max_protection: u32,
+    inheritance: u32,
+    flags: u32,
+    offset: u64,
+    behavior: u32,
+    user_wired_count: u32,
+    user_tag: u32,
+    pages_resident: u32,
+    pages_shared_now_private: u32,
+    pages_swapped_out: u32,
+    pages_dirtied: u32,
+    ref_count: u32,
+    shadow_depth: u32,
+    share_mode: u32,
+    private_pages_resident: u32,
+    shared_pages_resident: u32,
+    obj_id: u32,
+    depth: u32,
+    address: u64,
+    size: u64,
+}
+
+/// Kernel `struct proc_regionwithpathinfo`.
+#[repr(C)]
+struct RegionWithPath {
+    info: RegionInfo,
+    vnode: libc::vnode_info_path,
+}
+
+const PROC_PIDREGIONPATHINFO: i32 = 8;
+const MAX_REGIONS: usize = 4096;
+
+/// `dev:ino` of the file the kernel has mapped as `pid`'s executable (the
+/// region whose vnode path is the kernel's executable path), or `None` when
+/// no mapped region names it.
+///
+/// [`executable_identity`] stats the path now, so a bundle replaced in place
+/// while the process runs reports the new file. A running application keeps
+/// the unlinked old image; this reads the vnode actually mapped.
+pub fn mapped_image_file_id(pid: i32) -> Result<Option<String>, ProcessError> {
+    if pid <= 0 {
+        return Err(ProcessError::Vanished { pid });
+    }
+    let path = executable_path(pid)?.display().to_string();
+    let expected = size_of::<RegionWithPath>() as i32;
+    let mut address: u64 = 0;
+    for _ in 0..MAX_REGIONS {
+        let mut region = MaybeUninit::<RegionWithPath>::zeroed();
+        // SAFETY: the buffer is a properly aligned, zeroed structure of the
+        // size passed; the kernel returns the region at or after `address`.
+        let bytes = unsafe {
+            libc::proc_pidinfo(
+                pid,
+                PROC_PIDREGIONPATHINFO,
+                address,
+                region.as_mut_ptr().cast(),
+                expected,
+            )
+        };
+        if bytes <= 0 {
+            let errno = errno();
+            // EINVAL: no region at or after `address`.
+            return if errno == libc::EINVAL {
+                Ok(None)
+            } else {
+                Err(read_error(pid, errno))
+            };
+        }
+        if bytes != expected {
+            return Err(ProcessError::ShortRead { pid, bytes });
+        }
+        // SAFETY: the kernel filled exactly `expected` bytes.
+        let region = unsafe { region.assume_init() };
+        // SAFETY: `vip_path` is a NUL-terminated (or zero-padded) fixed array.
+        let mapped = unsafe { CStr::from_ptr(region.vnode.vip_path.as_ptr().cast()) };
+        let stat = region.vnode.vip_vi.vi_stat;
+        if stat.vst_ino != 0 && mapped.to_bytes() == path.as_bytes() {
+            return Ok(Some(format!("{}:{}", stat.vst_dev, stat.vst_ino)));
+        }
+        let next = region.info.address.saturating_add(region.info.size);
+        if next <= address {
+            return Ok(None);
+        }
+        address = next;
+    }
+    Ok(None)
 }
 
 /// Samples one incarnation: BSD info, executable, BSD info again. A changed
@@ -488,5 +594,73 @@ mod tests {
     #[test]
     fn target_mac_meets_floor() {
         assert!(meets_minimum_macos());
+    }
+
+    /// The kernel's path for `pid` once it runs `expected` (temporary
+    /// directories resolve through `/private`).
+    fn executable_path_eventually(pid: i32, expected: &std::path::Path) -> String {
+        let real = std::fs::canonicalize(expected).expect("canonical path");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            if let Ok(path) = executable_path(pid)
+                && path == real
+            {
+                return path.display().to_string();
+            }
+            assert!(Instant::now() < deadline, "child never ran {real:?}");
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+
+    /// An in-place replacement while running leaves the process on its old
+    /// image: the path's file identity changes, the mapped image does not.
+    #[test]
+    fn mapped_image_survives_in_place_replacement_of_its_path() {
+        let dir = std::env::temp_dir().join(format!("threadspace-image-{}", std::process::id()));
+        std::fs::create_dir(&dir).expect("own temporary directory");
+        let path = dir.join("sleeper");
+        // Copied platform binaries are killed outside system paths; build an
+        // ordinary ad-hoc-signed one instead.
+        let build = |out: &std::path::Path| {
+            let mut cc = Command::new("/usr/bin/cc")
+                .args(["-x", "c", "-", "-o"])
+                .arg(out)
+                .stdin(Stdio::piped())
+                .spawn()
+                .expect("cc");
+            {
+                use std::io::Write;
+                cc.stdin
+                    .take()
+                    .expect("stdin")
+                    .write_all(b"#include <unistd.h>\nint main(void){sleep(5);return 0;}\n")
+                    .expect("source");
+            }
+            assert!(cc.wait().expect("cc status").success(), "cc built");
+        };
+        build(&path);
+        let mut child = Command::new(&path).spawn().expect("spawn copy");
+        let pid = child.id() as i32;
+        let path_text = executable_path_eventually(pid, &path);
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let before = loop {
+            match mapped_image_file_id(pid) {
+                Ok(Some(id)) => break id,
+                _ if Instant::now() < deadline => std::thread::sleep(Duration::from_millis(5)),
+                other => panic!("mapped image not found: {other:?}"),
+            }
+        };
+        assert_eq!(Some(before.clone()), path_file_id(&path_text), "running the file at its path");
+        let staged = dir.join("sleeper.new");
+        build(&staged);
+        std::fs::rename(&staged, &path).expect("replace in place");
+        let after = mapped_image_file_id(pid).expect("mapped image read");
+        let current = path_file_id(&path_text);
+        let _ = child.kill();
+        let _ = child.wait();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(after.as_deref(), Some(before.as_str()), "old image still mapped");
+        assert_ne!(current.as_deref(), Some(before.as_str()), "path now names a new file");
+        assert!(mapped_image_file_id(pid).is_err(), "reaped process has no image");
     }
 }

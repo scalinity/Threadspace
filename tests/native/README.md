@@ -1,5 +1,17 @@
 # Native qualification harness
 
+`python3 tests/native/tools/ghostty_native.py --app /absolute/Ghostty.app
+--output /absolute/new/private-directory` qualifies an exact signed Ghostty
+candidate without adopting an existing process. It launches an empty separate
+app with default configuration, saved-state restoration and updates disabled,
+creates two windows/three tabs/four panes, joins native TTYs to owned fixture
+processes by kernel device number, exercises native focus/readback, and closes
+only acquired resources. PID-addressed JXA avoids same-bundle ambiguity. The
+runner checks existing Ghostty process identities and terminal-ID sets before
+and after the run. Its signature/capability results do not qualify provider
+Session identity, Threadspace Return, packaged permissions, or an installed
+release. See [D-0011](../../docs/decisions/D-0011-ghostty-primary-terminal.md).
+
 `tools/m2_f4_startup.py --helper <exact retained helper> --provider <Claude
 2.1.295 executable> --private-output <new private directory>` performs the
 bounded F4 first/repeat comparison. It acquires two helper inodes for direct

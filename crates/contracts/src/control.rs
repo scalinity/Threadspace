@@ -78,6 +78,7 @@ pub enum ControlRequestBody {
     },
     RequestNotificationAuthorization,
     RequestTerminalAutomation,
+    RequestGhosttyAutomation,
     /// Return-to-Agent (SPEC §13.2): the companion revalidates the target
     /// against fresh native evidence, focuses it and reads it back.
     ReturnToSession {

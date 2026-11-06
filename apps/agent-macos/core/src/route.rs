@@ -10,15 +10,15 @@ use std::time::{Duration, Instant};
 use serde_json::json;
 use threadspace_contracts::control::{ControlError, ControlErrorCode};
 use threadspace_contracts::route::{
-    AppGeneration, FrontmostApplication, ProcessKey, RouteRequest, RouteResult,
+    AppGeneration, FrontmostApplication, GhosttyApplication, ProcessKey, RouteRequest,
+    RouteResult,
 };
 use threadspace_journal::RouteTargetRow;
 use threadspace_provider_claude::inventory::{
     ClaudeInstall, Inventory, InventoryError, InventorySnapshot,
 };
-use threadspace_surfaces::{
-    BoundTarget, RouteDeadline, RouteNative, SessionTarget, TERMINAL_BUNDLE_ID, route,
-};
+use threadspace_surfaces::{BoundTarget, RouteDeadline, RouteNative, SessionTarget, route};
+use threadspace_surfaces_macos::ghostty::{self, GhosttyInventory, GhosttyTarget};
 use threadspace_surfaces_macos::process::{self, Incarnation, ProcessError};
 use threadspace_surfaces_macos::terminal::{self, FocusOutcome, TerminalTabs};
 use threadspace_surfaces_macos::tty::{self, TtyError};
@@ -107,19 +107,73 @@ impl RouteNative for Native<'_> {
         .map_err(|error| error.to_string())
     }
 
-    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
+    fn frontmost(&self, bundle: &str, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
         let settled = Instant::now() + FRONTMOST_SETTLE.min(deadline.remaining());
         loop {
             let front = bridge::frontmost_application(deadline.remaining());
-            let is_terminal = front
+            let is_bundle = front
                 .as_ref()
                 .and_then(|app| app.bundle_identifier.as_deref())
-                == Some(TERMINAL_BUNDLE_ID);
-            if is_terminal || Instant::now() >= settled {
+                == Some(bundle);
+            if is_bundle || Instant::now() >= settled {
                 return front;
             }
             std::thread::sleep(Duration::from_millis(25));
         }
+    }
+
+    fn ghostty_app(&self, generation: &str) -> Result<Option<GhosttyApplication>, String> {
+        // A route never probes the dictionary: discovery and diagnostics do.
+        Ok(discovery::ghostty_applications(false)?
+            .into_iter()
+            .find(|app| app.generation.canonical() == generation))
+    }
+
+    fn ghostty_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String> {
+        discovery::ghostty_automation_authorized(deadline.remaining())
+    }
+
+    fn ghostty_enumerate(
+        &self,
+        app: &GhosttyApplication,
+        deadline: &RouteDeadline,
+    ) -> Result<GhosttyInventory, String> {
+        let dictionary = app
+            .image
+            .as_deref()
+            .and_then(discovery::ghostty_dictionary)
+            .ok_or("GHOSTTY_DICTIONARY_UNAVAILABLE")?;
+        ghostty::enumerate(
+            &self
+                .context
+                .resources_dir
+                .join("ghostty-inventory.applescript"),
+            &dictionary,
+            app.generation.pid as i32,
+            deadline.remaining(),
+        )
+        .map_err(|error| error.to_string())
+    }
+
+    fn ghostty_focus(
+        &self,
+        app: &GhosttyApplication,
+        target: &GhosttyTarget,
+        deadline: &RouteDeadline,
+    ) -> Result<(ghostty::FocusOutcome, u32, u32), String> {
+        let dictionary = app
+            .image
+            .as_deref()
+            .and_then(discovery::ghostty_dictionary)
+            .ok_or("GHOSTTY_DICTIONARY_UNAVAILABLE")?;
+        ghostty::focus(
+            &self.context.resources_dir.join("ghostty-focus.applescript"),
+            &dictionary,
+            app.generation.pid as i32,
+            target,
+            deadline.remaining(),
+        )
+        .map_err(|error| error.to_string())
     }
 
     fn binding_revision(&self, binding_id: &str, deadline: &RouteDeadline) -> Option<i64> {
@@ -162,6 +216,8 @@ fn session_target(row: RouteTargetRow) -> SessionTarget {
             bindings: bindings
                 .into_iter()
                 .map(|binding| BoundTarget {
+                    surface_kind: binding.surface_kind,
+                    locator: binding.locator,
                     binding_id: binding.binding_id,
                     revision: binding.revision,
                     execution_id: binding.execution_id,
@@ -269,7 +325,9 @@ pub fn return_to_session(
             "reasonCode": result.reason_code,
             "focusPerformed": result.focus_performed,
             "latencyMs": result.latency_ms,
-            "focusSenderPid": result.evidence.focus.as_ref().and_then(|focus| focus.sender_pid),
+            "surfaceKind": result.evidence.surface_kind,
+            "focusSenderPid": result.evidence.focus.as_ref().and_then(|focus| focus.sender_pid)
+                .or_else(|| result.evidence.ghostty_focus.as_ref().and_then(|focus| focus.sender_pid)),
         }),
     );
     if result.reason_code != "OK" {

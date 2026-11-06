@@ -18,7 +18,7 @@ const REFUSAL_TEXT: Record<string, string> = {
   BINDING_CHANGED_DURING_ROUTE: "The binding changed while the Return was running, so the result is not treated as current.",
 
   // Process revalidation.
-  TARGET_GONE: "The session's process or Terminal tab no longer exists.",
+  TARGET_GONE: "The session's process or terminal surface no longer exists.",
   PROCESS_UNREADABLE: "The session's process could not be read, so it could not be revalidated.",
   EXECUTABLE_CHANGED: "The process is running a different executable from the one bound.",
   DEVICE_CHANGED: "The process's controlling terminal changed after it was bound.",
@@ -29,8 +29,8 @@ const REFUSAL_TEXT: Record<string, string> = {
   POST_FOCUS_LOOKUP_FAILED: "The tab was focused, but the provider's inventory could not confirm the session afterwards.",
 
   // Terminal automation and tab join.
-  AUTOMATION_DENIED: "Terminal automation is not allowed. Allow it in System Settings › Privacy & Security › Automation.",
-  AUTOMATION_UNKNOWN: "Terminal automation permission could not be determined.",
+  AUTOMATION_DENIED: "Automation of the session's terminal application is not allowed. Allow it in System Settings › Privacy & Security › Automation.",
+  AUTOMATION_UNKNOWN: "Automation permission for the session's terminal application could not be determined.",
   TERMINAL_ENUMERATION_FAILED: "Terminal's windows and tabs could not be listed.",
   TERMINAL_GENERATION_CHANGED: "Terminal restarted during the Return, so its earlier tab evidence no longer applies.",
   NO_MATCHING_TAB: "No Terminal tab currently uses this session's terminal device.",
@@ -38,6 +38,20 @@ const REFUSAL_TEXT: Record<string, string> = {
   SURFACE_CHANGED: "The Terminal tab changed while it was being focused.",
   READBACK_FAILED: "Focus was attempted, but the front tab read back afterwards was not this session's.",
   ACTIVATION_REFUSED: "The tab was selected, but Terminal did not become the frontmost application.",
+
+  // Ghostty process and terminal join (each Ghostty process is addressed by PID).
+  GHOSTTY_GENERATION_CHANGED: "Ghostty restarted or changed its running image during the Return, so its earlier evidence no longer applies.",
+  GHOSTTY_STATE_UNKNOWN: "The running Ghostty processes could not be read.",
+  GHOSTTY_ENUMERATION_FAILED: "Ghostty's windows, tabs and terminals could not be listed.",
+  NO_MATCHING_TERMINAL: "No Ghostty terminal currently uses this session's terminal device.",
+  MULTIPLE_MATCHING_TERMINALS: "More than one Ghostty terminal matches this session's terminal device.",
+  GHOSTTY_TERMINAL_CHANGED: "This session's terminal device now belongs to a different Ghostty terminal than the one bound.",
+  GHOSTTY_RESTART_REQUIRED: "Ghostty was updated on disk, but the running Ghostty is the earlier version. Quit and reopen Ghostty to enable Return.",
+  GHOSTTY_IMAGE_UNKNOWN: "The executable this Ghostty process runs could not be identified, so its capabilities are unknown.",
+  GHOSTTY_DICTIONARY_UNAVAILABLE: "Ghostty's scripting dictionary has not been read yet, so its capabilities are unknown.",
+  GHOSTTY_DICTIONARY_UNSUPPORTED: "This Ghostty version's scripting dictionary lacks the window, tab, terminal or focus terms Return needs.",
+  GHOSTTY_AMBIGUOUS_PROCESSES: "Two Ghostty processes run from the same application path, so scripting could reach the wrong one. Quit one of them to enable Return.",
+  GHOSTTY_TTY_UNAVAILABLE: "This Ghostty version does not report terminal TTYs, so a session cannot be matched to its pane.",
 
   // Budget.
   TIMEOUT: "The Return ran out of its two-second budget; a late result is never treated as verified.",
@@ -58,7 +72,12 @@ const REFUSAL_TEXT: Record<string, string> = {
   TERMINAL_STATE_UNKNOWN: "Whether Terminal is running could not be determined.",
   AUTOMATION_NOT_AUTHORIZED: "Terminal automation is not allowed, so the session's tab could not be proven.",
   AUTOMATION_STATE_UNKNOWN: "Terminal automation permission could not be determined, so the session's tab could not be proven.",
-  PROCESS_CHANGED_DURING_SURFACE_JOIN: "The process changed while its Terminal tab was being matched.",
+  PROCESS_CHANGED_DURING_SURFACE_JOIN: "The process changed while its terminal surface was being matched.",
+  NO_SURFACE_APPLICATION: "Neither Ghostty nor Terminal is running.",
+  NO_MATCHING_SURFACE: "No Ghostty terminal or Terminal tab currently uses this session's terminal device.",
+  MULTIPLE_MATCHING_SURFACES: "More than one terminal surface matches this session's terminal device.",
+  GHOSTTY_AUTOMATION_NOT_AUTHORIZED: "Ghostty automation is not allowed, so the session's pane could not be proven. Use Allow Ghostty access.",
+  GHOSTTY_AUTOMATION_STATE_UNKNOWN: "Ghostty automation permission could not be determined, so the session's pane could not be proven.",
 };
 
 /** Every code with dedicated text. */

@@ -180,12 +180,53 @@ pub struct TerminalIntegration {
     pub inventory: Option<TerminalInventorySummary>,
 }
 
+/// What the installed Ghostty dictionary supports.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyDictionaryReport {
+    pub sha256: String,
+    pub byte_length: u32,
+    pub inventory: bool,
+    pub focus: bool,
+    pub tty: bool,
+    pub pid: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyInventorySummary {
+    pub pid: u32,
+    pub window_count: u32,
+    pub tab_count: u32,
+    pub terminal_count: u32,
+    pub elapsed_ms: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyIntegration {
+    pub application_path: Option<String>,
+    pub application_version: Option<String>,
+    pub dictionary: Option<GhosttyDictionaryReport>,
+    /// Every running Ghostty process, with any limitation on Return.
+    pub processes: Vec<crate::route::GhosttyApplication>,
+    pub automation: AutomationPermission,
+    pub automation_status_code: i32,
+    /// Read-only inventories of the processes whose dictionary is known.
+    pub inventories: Vec<GhosttyInventorySummary>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct CompanionIntegration {
     pub notification_settings: Option<NotificationSettings>,
     pub terminal: TerminalIntegration,
+    #[serde(default)]
+    pub ghostty: Option<GhosttyIntegration>,
 }
 
 /// `SMAppService.Status` for the companion login item, as reported to the

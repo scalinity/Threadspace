@@ -8,6 +8,7 @@
 //!   threadspace-qualify <dev|prod> raise-attention <label>
 //!   threadspace-qualify <dev|prod> request-notifications
 //!   threadspace-qualify <dev|prod> request-terminal
+//!   threadspace-qualify <dev|prod> request-ghostty
 //!   threadspace-qualify <dev|prod> refresh
 //!   threadspace-qualify <dev|prod> return <session-id> [binding-id]
 //!   threadspace-qualify <dev|prod> export <after-cursor> [limit]
@@ -39,7 +40,7 @@ use threadspace_surfaces_macos::{process, tty};
 
 fn usage() -> ExitCode {
     eprintln!(
-        "usage: threadspace-qualify <dev|prod> <diagnostics|integration|snapshot|raise-attention LABEL|request-notifications|request-terminal|refresh|return SESSION [BINDING]|export CURSOR [LIMIT]|route-loop COUNT OUT SESSION...|independent-check NATIVE_SESSION>"
+        "usage: threadspace-qualify <dev|prod> <diagnostics|integration|snapshot|raise-attention LABEL|request-notifications|request-terminal|request-ghostty|refresh|return SESSION [BINDING]|export CURSOR [LIMIT]|route-loop COUNT OUT SESSION...|independent-check NATIVE_SESSION>"
     );
     ExitCode::from(64)
 }
@@ -432,6 +433,7 @@ fn main() -> ExitCode {
         },
         "request-notifications" => ControlRequestBody::RequestNotificationAuthorization,
         "request-terminal" => ControlRequestBody::RequestTerminalAutomation,
+        "request-ghostty" => ControlRequestBody::RequestGhosttyAutomation,
         "refresh" => ControlRequestBody::RefreshEvidence,
         "return" => {
             let Some(session_id) = args.get(2) else {
@@ -459,6 +461,7 @@ fn main() -> ExitCode {
         request,
         ControlRequestBody::RequestNotificationAuthorization
             | ControlRequestBody::RequestTerminalAutomation
+            | ControlRequestBody::RequestGhosttyAutomation
     ) {
         // Waits for the owner to answer a native prompt.
         let _ = client.set_read_timeout(Duration::from_secs(200));

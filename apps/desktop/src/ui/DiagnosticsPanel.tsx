@@ -1,5 +1,6 @@
 import type { BridgeClient, ViewState } from "../bridge/client";
 import type { CompanionDiagnostics } from "../contracts/generated/CompanionDiagnostics";
+import type { GhosttyIntegration } from "../contracts/generated/GhosttyIntegration";
 
 /** The saved preference and whether this companion may act on it are separate facts (SPEC §18.9). */
 function observationText(companion: CompanionDiagnostics): string {
@@ -21,6 +22,7 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
   const desktop = state.diagnostics?.desktop;
   const companion = state.diagnostics?.companion;
   const terminal = state.integration?.companion?.terminal;
+  const ghostty = state.integration?.companion?.ghostty ?? null;
   const notifications = companion?.notificationSettings ?? state.integration?.companion?.notificationSettings;
   const renderer = state.renderer;
   return (
@@ -35,6 +37,9 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
         </button>
         <button type="button" className="button button--quiet" onClick={() => void client.setObservation(!(companion?.observationEnabled ?? false))}>
           {companion?.observationEnabled === false || companion === undefined || companion === null ? "Enable observation" : "Stop observation"}
+        </button>
+        <button type="button" className="button button--quiet" onClick={() => void client.requestSetup("RequestGhosttyAutomation")} disabled={state.phase !== "live"}>
+          Allow Ghostty access
         </button>
         <button type="button" className="button button--quiet" onClick={() => void client.requestSetup("RequestTerminalAutomation")} disabled={state.phase !== "live"}>
           Allow Terminal access
@@ -71,6 +76,7 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
         <Row label="Maintenance" value={companion?.maintenancePhase} />
         <Row label="Sleep / wake" value={companion ? `${companion.power.sleeps} / ${companion.power.wakes}` : null} />
         <Row label="Login item" value={state.integration?.service.status} />
+        <Row label="Ghostty" value={ghostty ? ghosttyText(ghostty) : null} />
         <Row label="Terminal" value={terminal ? `${terminal.applicationVersion ?? "?"} · ${terminal.automation} · ${terminal.inventory ? `${terminal.inventory.tabCount} tabs` : "no inventory"}` : null} />
       </dl>
       <h3 className="section-title">Shell</h3>
@@ -89,4 +95,19 @@ export function DiagnosticsPanel({ state, client }: { state: ViewState; client: 
       ) : null}
     </section>
   );
+}
+
+/** Version, consent and each running process's Return capability. */
+function ghosttyText(ghostty: GhosttyIntegration): string {
+  const processes = ghostty.processes.length === 0
+    ? "not running"
+    : ghostty.processes
+        .map((process) => {
+          const inventory = ghostty.inventories.find((summary) => summary.pid === process.generation.pid);
+          const state = process.limitation ?? (inventory ? `${inventory.terminalCount} terminals` : "ready");
+          return `pid ${process.generation.pid}: ${state}`;
+        })
+        .join(", ");
+  const dictionary = ghostty.dictionary ? (ghostty.dictionary.tty ? "tty" : "no tty") : "dictionary unknown";
+  return `${ghostty.applicationVersion ?? "?"} · ${ghostty.automation} · ${dictionary} · ${processes}`;
 }

@@ -3,26 +3,32 @@
 //! 1. bracketed native inventory join (provider-claude);
 //! 2. fresh kernel samples of every stored live activation;
 //! 3. a reconciliation plan that ends activations only on proven evidence;
-//! 4. a Terminal surface join for activations without a binding: exactly one
-//!    live tab whose TTY `st_rdev` equals the provider's `e_tdev`, inside an
-//!    unchanged Terminal incarnation, with the process re-sampled afterwards;
+//! 4. a surface join for activations without a binding: exactly one live
+//!    Ghostty terminal or Terminal tab whose TTY `st_rdev` equals the
+//!    provider's `e_tdev`, inside an unchanged application incarnation (and,
+//!    for Ghostty, an unchanged executable image with a known dictionary),
+//!    with the process re-sampled afterwards;
 //! 5. one registration transaction through the single writer.
 //!
 //! The first pass runs at startup, so sessions launched before Threadspace are
 //! discovered without any new provider hook. Passes are serialized on this
-//! thread; inventory requests never overlap. Terminal is enumerated only when
-//! an activation needs a surface, only while it runs, and only when Apple-event
-//! automation is already authorized (never prompting).
+//! thread; inventory requests never overlap. A surface application is
+//! enumerated only when an activation needs a surface, only while it runs,
+//! and only when Apple-event automation is already authorized (never
+//! prompting). Each Ghostty process is addressed by its own PID.
 
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender, SyncSender};
 use std::thread;
 use std::time::Duration;
 
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::fact::SnapshotRow;
-use threadspace_contracts::route::{AppGeneration, DiscoverySummary, ProvisionalCandidate};
+use threadspace_contracts::route::{
+    AppGeneration, DiscoverySummary, GhosttyApplication, ProvisionalCandidate,
+};
 use threadspace_journal::{
     ActivationChange, DiscoveryApplication, LiveExecutionRow, ObservedSessionRecord, ProcessRecord,
     SessionWait, SurfaceRecord,
@@ -32,7 +38,9 @@ use threadspace_provider_claude::inventory::{
     ClaudeCli, ClaudeInstall, InventoryRow, InventoryWait, interpret_status,
 };
 use threadspace_provider_claude::reconcile::{self, LiveExecution};
+use threadspace_surfaces::{SURFACE_GHOSTTY, SURFACE_TERMINAL};
 use threadspace_surfaces_macos::ancestry::KernelSampler;
+use threadspace_surfaces_macos::ghostty::{self, GHOSTTY_BUNDLE_ID, GhosttyDictionary};
 use threadspace_surfaces_macos::process::{self, Incarnation};
 use threadspace_surfaces_macos::terminal::{self, TERMINAL_BUNDLE_ID};
 use threadspace_surfaces_macos::tty;
@@ -116,10 +124,180 @@ pub fn automation_authorized(timeout: Duration) -> Result<bool, String> {
         .map_err(|error| error.to_string())
 }
 
+/// Apple-event authorization for Ghostty, asked without prompting.
+pub fn ghostty_automation_authorized(timeout: Duration) -> Result<bool, String> {
+    bridge::automation_permission(GHOSTTY_BUNDLE_ID, false, timeout)
+        .map(|status| status == NO_ERR)
+        .map_err(|error| error.to_string())
+}
+
+/// Ghostty dictionaries probed from the installed bundle, keyed by the
+/// executable image (`dev:ino`) each describes. A process keeps the
+/// dictionary probed while its image was installed even after the bundle is
+/// replaced on disk; an image never seen installed has no known dictionary.
+static GHOSTTY_DICTIONARIES: Mutex<Vec<(String, GhosttyDictionary)>> = Mutex::new(Vec::new());
+const MAX_GHOSTTY_DICTIONARIES: usize = 8;
+
+/// The known dictionary of a mapped Ghostty image.
+pub fn ghostty_dictionary(image: &str) -> Option<GhosttyDictionary> {
+    GHOSTTY_DICTIONARIES
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .iter()
+        .find(|(known, _)| known == image)
+        .map(|(_, dictionary)| dictionary.clone())
+}
+
+/// Probes an installation's dictionary once per installed executable file.
+/// The file identity must be unchanged across the probe, so the dictionary
+/// belongs to it.
+fn probe_installed_ghostty(bundle: &Path, executable: &str, installed: &str) -> Result<(), String> {
+    if ghostty_dictionary(installed).is_some() {
+        return Ok(());
+    }
+    let dictionary = ghostty::probe_dictionary(bundle)
+        .map_err(|error| format!("GHOSTTY_DICTIONARY_FAILED: {error}"))?;
+    if process::path_file_id(executable).as_deref() != Some(installed) {
+        return Err("GHOSTTY_INSTALL_CHANGED".into());
+    }
+    let mut cache = GHOSTTY_DICTIONARIES
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    if cache.len() >= MAX_GHOSTTY_DICTIONARIES {
+        cache.remove(0);
+    }
+    cache.push((installed.to_owned(), dictionary));
+    Ok(())
+}
+
+/// Installed executables (`path`, `dev:ino`) already checked to belong to a
+/// bundle whose identifier is Ghostty's.
+static GHOSTTY_BUNDLES: Mutex<Vec<(String, String, bool)>> = Mutex::new(Vec::new());
+
+fn is_ghostty_bundle(bundle: &Path, executable: &str, installed: Option<&str>) -> bool {
+    let Some(installed) = installed else {
+        return false;
+    };
+    let mut known = GHOSTTY_BUNDLES
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    if let Some((_, _, ghostty)) = known
+        .iter()
+        .find(|(path, id, _)| path == executable && id == installed)
+    {
+        return *ghostty;
+    }
+    let ghostty = terminal::plist_string(&bundle.join("Contents/Info.plist"), "CFBundleIdentifier")
+        .as_deref()
+        == Some(GHOSTTY_BUNDLE_ID);
+    if known.len() >= 32 {
+        known.remove(0);
+    }
+    known.push((executable.to_owned(), installed.to_owned(), ghostty));
+    ghostty
+}
+
+/// Why a Ghostty process cannot support automatic Return, if it cannot.
+fn ghostty_limitation(
+    image: Option<&str>,
+    installed: Option<&str>,
+    dictionary: Option<&GhosttyDictionary>,
+) -> Option<&'static str> {
+    match (image, dictionary) {
+        (None, _) => Some("GHOSTTY_IMAGE_UNKNOWN"),
+        // Updating the bundle on disk does not upgrade a running process.
+        (Some(image), None) if installed != Some(image) => Some("GHOSTTY_RESTART_REQUIRED"),
+        (Some(_), None) => Some("GHOSTTY_DICTIONARY_UNAVAILABLE"),
+        (_, Some(dictionary)) if !dictionary.supports_focus() => {
+            Some("GHOSTTY_DICTIONARY_UNSUPPORTED")
+        }
+        (_, Some(dictionary)) if !dictionary.has_tty_property => Some("GHOSTTY_TTY_UNAVAILABLE"),
+        _ => None,
+    }
+}
+
+/// Every running Ghostty process from kernel evidence, at any installation
+/// path: its incarnation, the executable image it actually maps, and whether
+/// that image's dictionary is known and sufficient. `probe` allows reading an
+/// installation's dictionary.
+///
+/// Apple events addressed to a PID reach the application registered at that
+/// PID's bundle path, so two processes running from one path cannot be told
+/// apart: neither is ever scripted.
+pub fn ghostty_applications(probe: bool) -> Result<Vec<GhosttyApplication>, String> {
+    let candidates: Vec<(i32, String, PathBuf, Option<String>)> = process::executables()
+        .map_err(|error| error.to_string())?
+        .into_iter()
+        .filter_map(|(pid, executable)| {
+            let bundle = ghostty::bundle_of(&executable)?;
+            let executable = executable.display().to_string();
+            let installed = process::path_file_id(&executable);
+            is_ghostty_bundle(&bundle, &executable, installed.as_deref())
+                .then_some((pid, executable, bundle, installed))
+        })
+        .collect();
+    let mut apps = Vec::with_capacity(candidates.len());
+    for (pid, executable, bundle, installed) in &candidates {
+        let shared = candidates
+            .iter()
+            .filter(|(_, other, _, _)| other == executable)
+            .count()
+            > 1;
+        if probe
+            && !shared
+            && let Some(installed) = installed
+            && let Err(error) = probe_installed_ghostty(bundle, executable, installed)
+        {
+            log::warn("GHOSTTY_DICTIONARY_UNAVAILABLE", json!({ "error": error }));
+        }
+        let first = match process::sample(*pid) {
+            Ok(sample) => sample,
+            Err(process::ProcessError::Vanished { .. }) => continue,
+            Err(error) => return Err(error.to_string()),
+        };
+        let image = process::mapped_image_file_id(*pid).ok().flatten();
+        match process::sample(*pid) {
+            Ok(second) if second.same_incarnation(&first) => {}
+            // Exited or reused while it was read: not a running process now.
+            _ => continue,
+        }
+        let dictionary = image.as_deref().and_then(ghostty_dictionary);
+        let limitation = if shared {
+            Some("GHOSTTY_AMBIGUOUS_PROCESSES")
+        } else {
+            ghostty_limitation(image.as_deref(), installed.as_deref(), dictionary.as_ref())
+        };
+        apps.push(GhosttyApplication {
+            generation: AppGeneration {
+                pid: *pid as u32,
+                start_seconds: first.start_seconds.to_string(),
+                start_microseconds: first.start_microseconds,
+            },
+            executable: executable.clone(),
+            image,
+            installed: installed.clone(),
+            dictionary_sha256: dictionary.map(|dictionary| dictionary.sha256),
+            limitation: limitation.map(str::to_owned),
+        });
+    }
+    Ok(apps)
+}
+
+/// Unavailable-surface reasons that can change only with an application
+/// generation or image, so a no-match answer under them is final for the
+/// same fingerprint.
+const STABLE_LIMITATIONS: [&str; 5] = [
+    "GHOSTTY_RESTART_REQUIRED",
+    "GHOSTTY_AMBIGUOUS_PROCESSES",
+    "GHOSTTY_IMAGE_UNKNOWN",
+    "GHOSTTY_DICTIONARY_UNSUPPORTED",
+    "GHOSTTY_TTY_UNAVAILABLE",
+];
+
 struct State {
     context: DiscoveryContext,
-    /// (pid, birth s, birth µs, Terminal generation) whose surface join gave
-    /// a final answer (no tab / several tabs); retried only on a forced pass.
+    /// (pid, birth s, birth µs, surface-application fingerprint) whose
+    /// surface join gave a final answer; retried only on a forced pass.
     attempted: HashSet<(i32, u64, u32, String)>,
     versions: HashMap<PathBuf, Option<String>>,
     /// Passes applied by this companion incarnation; the sequence of each
@@ -190,7 +368,139 @@ fn process_record(boot_id: &str, join: &Join) -> ProcessRecord {
     }
 }
 
-/// Joins each listed activation to exactly one Terminal tab, or says why not.
+/// Terminal.app's current tabs as surface candidates.
+fn terminal_surfaces(
+    state: &State,
+    generation: &AppGeneration,
+) -> Result<Vec<SurfaceRecord>, String> {
+    match automation_authorized(QUICK) {
+        Ok(true) => {}
+        Ok(false) => return Err("AUTOMATION_NOT_AUTHORIZED".to_owned()),
+        Err(_) => return Err("AUTOMATION_STATE_UNKNOWN".to_owned()),
+    }
+    let script = state
+        .context
+        .resources_dir
+        .join("terminal-inventory.applescript");
+    let started = log::now_ms();
+    let tabs = terminal::enumerate(&script, ENUMERATION_TIMEOUT);
+    let ended = log::now_ms();
+    let after = terminal_generation().ok().flatten();
+    let tabs = tabs.map_err(|error| {
+        log::warn(
+            "TERMINAL_ENUMERATION_FAILED",
+            json!({ "error": error.to_string() }),
+        );
+        "TERMINAL_ENUMERATION_FAILED".to_owned()
+    })?;
+    if after.as_ref() != Some(generation) {
+        return Err("TERMINAL_GENERATION_CHANGED".to_owned());
+    }
+    Ok(tabs
+        .tabs
+        .iter()
+        .filter_map(|tab| {
+            let device = tty::character_device(&tab.tty).ok()?;
+            Some(SurfaceRecord {
+                surface_kind: SURFACE_TERMINAL.to_owned(),
+                locator: tab.tty.clone(),
+                tty: tab.tty.clone(),
+                device,
+                terminal_generation: generation.canonical(),
+                window_hint: Some(tab.window_id),
+                tab_hint: Some(tab.tab_index),
+                proof: json!({
+                    "method": "TTY_ST_RDEV_EQ_E_TDEV",
+                    "tty": tab.tty,
+                    "rdev": device,
+                    "windowIdHint": tab.window_id,
+                    "tabIndexHint": tab.tab_index,
+                    "terminalGeneration": generation,
+                    "enumeration": {
+                        "startedMs": started,
+                        "endedMs": ended,
+                        "windows": tabs.windows,
+                        "tabs": tabs.tabs.len(),
+                        "senderPid": tabs.sender_pid,
+                    },
+                }),
+            })
+        })
+        .collect())
+}
+
+/// One scriptable Ghostty process's terminals as surface candidates, inside
+/// an unchanged process and image.
+fn ghostty_surfaces(state: &State, app: &GhosttyApplication) -> Result<Vec<SurfaceRecord>, String> {
+    let Some(dictionary) = app.image.as_deref().and_then(ghostty_dictionary) else {
+        return Err("GHOSTTY_DICTIONARY_UNAVAILABLE".to_owned());
+    };
+    let script = state
+        .context
+        .resources_dir
+        .join("ghostty-inventory.applescript");
+    let started = log::now_ms();
+    let inventory = ghostty::enumerate(
+        &script,
+        &dictionary,
+        app.generation.pid as i32,
+        ENUMERATION_TIMEOUT,
+    );
+    let ended = log::now_ms();
+    let unchanged = ghostty_applications(false).is_ok_and(|apps| {
+        apps.iter()
+            .any(|now| now.generation == app.generation && now.image == app.image)
+    });
+    let inventory = inventory.map_err(|error| {
+        log::warn(
+            "GHOSTTY_ENUMERATION_FAILED",
+            json!({ "pid": app.generation.pid, "error": error.to_string() }),
+        );
+        "GHOSTTY_ENUMERATION_FAILED".to_owned()
+    })?;
+    if !unchanged {
+        return Err("GHOSTTY_GENERATION_CHANGED".to_owned());
+    }
+    Ok(inventory
+        .terminals
+        .iter()
+        .filter_map(|terminal| {
+            let path = terminal.tty.as_deref()?;
+            let device = tty::character_device(path).ok()?;
+            Some(SurfaceRecord {
+                surface_kind: SURFACE_GHOSTTY.to_owned(),
+                locator: terminal.id.clone(),
+                tty: path.to_owned(),
+                device,
+                terminal_generation: app.generation.canonical(),
+                window_hint: None,
+                tab_hint: None,
+                proof: json!({
+                    "method": "TTY_ST_RDEV_EQ_E_TDEV",
+                    "tty": path,
+                    "rdev": device,
+                    "windowId": terminal.window_id,
+                    "tabId": terminal.tab_id,
+                    "terminalId": terminal.id,
+                    "application": app,
+                    "enumeration": {
+                        "startedMs": started,
+                        "endedMs": ended,
+                        "windows": inventory.windows.len(),
+                        "tabs": inventory.tabs.len(),
+                        "terminals": inventory.terminals.len(),
+                        "senderPid": inventory.sender_pid,
+                    },
+                }),
+            })
+        })
+        .collect())
+}
+
+/// Joins each listed activation to exactly one live Ghostty terminal or
+/// Terminal tab, or says why not. A pty has one controlling emulator, so a
+/// single device match is the answer even if another application could not
+/// be inspected; with no match, the uninspected application is the reason.
 fn surface_join(
     state: &mut State,
     joins: &[&Join],
@@ -201,99 +511,100 @@ fn surface_join(
     if joins.is_empty() {
         return out;
     }
-    let generation = match terminal_generation() {
-        Ok(Some(generation)) => generation,
-        Ok(None) => {
-            for join in joins {
-                out.insert(join.pid, Err("TERMINAL_NOT_RUNNING".to_owned()));
-            }
-            return out;
-        }
-        Err(error) => {
-            for join in joins {
-                out.insert(join.pid, Err("TERMINAL_STATE_UNKNOWN".to_owned()));
-            }
-            ledger.push(json!({ "terminalError": error }));
-            return out;
-        }
+    let terminal = terminal_generation();
+    let ghostty_apps = ghostty_applications(true);
+    let mut fingerprint = Vec::new();
+    match &terminal {
+        Ok(Some(generation)) => fingerprint.push(format!("terminal:{}", generation.canonical())),
+        Ok(None) => {}
+        Err(error) => fingerprint.push(format!("terminal-error:{error}")),
+    }
+    match &ghostty_apps {
+        Ok(apps) => fingerprint.extend(apps.iter().map(|app| {
+            format!(
+                "ghostty:{}:{}:{}",
+                app.generation.canonical(),
+                app.image.as_deref().unwrap_or("-"),
+                app.limitation.as_deref().unwrap_or("OK")
+            )
+        })),
+        Err(error) => fingerprint.push(format!("ghostty-error:{error}")),
+    }
+    let fingerprint = fingerprint.join(",");
+    let key = |join: &Join| {
+        (
+            join.pid,
+            join.after.sample.start_seconds,
+            join.after.sample.start_microseconds,
+            fingerprint.clone(),
+        )
     };
     let pending: Vec<&Join> = joins
         .iter()
         .copied()
-        .filter(|join| {
-            force
-                || !state.attempted.contains(&(
-                    join.pid,
-                    join.after.sample.start_seconds,
-                    join.after.sample.start_microseconds,
-                    generation.canonical(),
-                ))
-        })
+        .filter(|join| force || !state.attempted.contains(&key(join)))
         .collect();
     if pending.is_empty() {
         return out;
     }
-    match automation_authorized(QUICK) {
-        Ok(true) => {}
-        Ok(false) => {
-            for join in pending {
-                out.insert(join.pid, Err("AUTOMATION_NOT_AUTHORIZED".to_owned()));
-            }
-            return out;
-        }
-        Err(_) => {
-            for join in pending {
-                out.insert(join.pid, Err("AUTOMATION_STATE_UNKNOWN".to_owned()));
-            }
-            return out;
-        }
-    }
-    let script = state
-        .context
-        .resources_dir
-        .join("terminal-inventory.applescript");
-    let started = log::now_ms();
-    let tabs = terminal::enumerate(&script, ENUMERATION_TIMEOUT);
-    let ended = log::now_ms();
-    let after = terminal_generation().ok().flatten();
-    let tabs = match tabs {
-        Ok(tabs) => tabs,
-        Err(error) => {
-            log::warn(
-                "TERMINAL_ENUMERATION_FAILED",
-                json!({ "error": error.to_string() }),
-            );
-            for join in pending {
-                out.insert(join.pid, Err("TERMINAL_ENUMERATION_FAILED".to_owned()));
-            }
-            return out;
-        }
-    };
-    if after.as_ref() != Some(&generation) {
+    if matches!(terminal, Ok(None)) && matches!(&ghostty_apps, Ok(apps) if apps.is_empty()) {
         for join in pending {
-            out.insert(join.pid, Err("TERMINAL_GENERATION_CHANGED".to_owned()));
+            out.insert(join.pid, Err("NO_SURFACE_APPLICATION".to_owned()));
         }
         return out;
     }
-    // stat every tab once: tty path → st_rdev of a character device.
-    let devices: Vec<(usize, Option<u32>)> = tabs
-        .tabs
+
+    let mut candidates: Vec<SurfaceRecord> = Vec::new();
+    let mut unavailable: Vec<String> = Vec::new();
+    match &ghostty_apps {
+        Err(error) => {
+            ledger.push(json!({ "ghosttyError": error }));
+            unavailable.push("GHOSTTY_STATE_UNKNOWN".to_owned());
+        }
+        Ok(apps) => {
+            unavailable.extend(apps.iter().filter_map(|app| app.limitation.clone()));
+            let usable: Vec<&GhosttyApplication> =
+                apps.iter().filter(|app| app.limitation.is_none()).collect();
+            if !usable.is_empty() {
+                match ghostty_automation_authorized(QUICK) {
+                    Ok(true) => {
+                        for app in usable {
+                            match ghostty_surfaces(state, app) {
+                                Ok(list) => candidates.extend(list),
+                                Err(reason) => unavailable.push(reason),
+                            }
+                        }
+                    }
+                    Ok(false) => unavailable.push("GHOSTTY_AUTOMATION_NOT_AUTHORIZED".to_owned()),
+                    Err(_) => unavailable.push("GHOSTTY_AUTOMATION_STATE_UNKNOWN".to_owned()),
+                }
+            }
+        }
+    }
+    match &terminal {
+        Ok(None) => {}
+        Ok(Some(generation)) => match terminal_surfaces(state, generation) {
+            Ok(list) => candidates.extend(list),
+            Err(reason) => unavailable.push(reason),
+        },
+        Err(error) => {
+            ledger.push(json!({ "terminalError": error }));
+            unavailable.push(if error == "MULTIPLE_TERMINAL_PROCESSES" {
+                error.clone()
+            } else {
+                "TERMINAL_STATE_UNKNOWN".to_owned()
+            });
+        }
+    }
+    let stable = unavailable
         .iter()
-        .enumerate()
-        .map(|(index, tab)| (index, tty::character_device(&tab.tty).ok()))
-        .collect();
+        .all(|reason| STABLE_LIMITATIONS.contains(&reason.as_str()));
+
     for join in pending {
-        let matches: Vec<usize> = devices
+        let matches: Vec<&SurfaceRecord> = candidates
             .iter()
-            .filter(|(_, rdev)| *rdev == Some(join.device))
-            .map(|(index, _)| *index)
+            .filter(|surface| surface.device == join.device)
             .collect();
-        let key = (
-            join.pid,
-            join.after.sample.start_seconds,
-            join.after.sample.start_microseconds,
-            generation.canonical(),
-        );
         let resampled = process::sample_incarnation(join.pid);
         let process_ok = resampled.as_ref().is_ok_and(|now| {
             now.same_process_and_image(&join.after)
@@ -301,51 +612,37 @@ fn surface_join(
         });
         let outcome = match (matches.as_slice(), process_ok) {
             (_, false) => Err("PROCESS_CHANGED_DURING_SURFACE_JOIN".to_owned()),
-            ([], true) => {
-                state.attempted.insert(key);
-                Err("NO_MATCHING_TAB".to_owned())
+            ([only], true) => {
+                let mut surface = (*only).clone();
+                surface.proof["eTdev"] = json!(join.device);
+                surface.proof["processAfterJoin"] =
+                    resampled.as_ref().ok().map(incarnation_json).into();
+                Ok(surface)
             }
-            ([index], true) => {
-                let tab = &tabs.tabs[*index];
-                Ok(SurfaceRecord {
-                    tty: tab.tty.clone(),
-                    device: join.device,
-                    terminal_generation: generation.canonical(),
-                    window_hint: tab.window_id,
-                    tab_hint: tab.tab_index,
-                    proof: json!({
-                        "method": "TTY_ST_RDEV_EQ_E_TDEV",
-                        "tty": tab.tty,
-                        "rdev": join.device,
-                        "eTdev": join.device,
-                        "windowIdHint": tab.window_id,
-                        "tabIndexHint": tab.tab_index,
-                        "terminalGeneration": generation,
-                        "enumeration": {
-                            "startedMs": started,
-                            "endedMs": ended,
-                            "windows": tabs.windows,
-                            "tabs": tabs.tabs.len(),
-                            "senderPid": tabs.sender_pid,
-                        },
-                        "processAfterJoin": resampled.as_ref().ok().map(incarnation_json),
-                    }),
-                })
+            ([], true) => {
+                if stable {
+                    state.attempted.insert(key(join));
+                }
+                Err(unavailable
+                    .first()
+                    .cloned()
+                    .unwrap_or_else(|| "NO_MATCHING_SURFACE".to_owned()))
             }
             (_, true) => {
-                state.attempted.insert(key);
-                Err("MULTIPLE_MATCHING_TABS".to_owned())
+                state.attempted.insert(key(join));
+                Err("MULTIPLE_MATCHING_SURFACES".to_owned())
             }
         };
         ledger.push(json!({
             "pid": join.pid,
             "sessionId": join.native_session_id,
             "device": join.device,
-            "matches": matches.iter().map(|index| json!({
-                "tty": tabs.tabs[*index].tty,
-                "windowId": tabs.tabs[*index].window_id,
-                "tabIndex": tabs.tabs[*index].tab_index,
+            "matches": matches.iter().map(|surface| json!({
+                "kind": surface.surface_kind,
+                "locator": surface.locator,
+                "tty": surface.tty,
             })).collect::<Vec<_>>(),
+            "unavailable": unavailable,
             "outcome": outcome.as_ref().map(|_| "BOUND").unwrap_or_else(|reason| reason.as_str()),
         }));
         out.insert(join.pid, outcome);

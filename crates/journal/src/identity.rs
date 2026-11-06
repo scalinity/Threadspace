@@ -36,9 +36,9 @@ fn surface_draft(
         Ok(surface) => NativeFactDraft {
             refs: NativeRefs {
                 surface: Some(NativeSurfaceRef {
-                    surface_kind: SURFACE_TERMINAL.into(),
+                    surface_kind: surface.surface_kind.clone(),
                     app_generation: surface.terminal_generation.clone(),
-                    locator: surface.tty.clone(),
+                    locator: surface.locator.clone(),
                     device_number: Some(surface.device),
                     surface_generation: generation.to_owned(),
                 }),
@@ -50,8 +50,8 @@ fn surface_draft(
                 proof: BindingProof {
                     method: BindingMethod::NativeInventory,
                     executable_identity: Some(executable.to_owned()),
-                    window_hint: Some(surface.window_hint),
-                    tab_hint: Some(surface.tab_hint),
+                    window_hint: surface.window_hint,
+                    tab_hint: surface.tab_hint,
                     evidence: surface.proof.clone(),
                 },
             },
@@ -83,15 +83,30 @@ pub struct ProcessRecord {
     pub executable: String,
 }
 
-/// A Terminal surface proven for an activation: exactly one live tab whose
-/// TTY's `st_rdev` equals the provider's `e_tdev`.
+/// The TTY recorded in a Ghostty binding's proof evidence; empty when absent,
+/// which no route can match.
+fn binding_tty(proof_json: &str) -> String {
+    serde_json::from_str::<Value>(proof_json)
+        .ok()
+        .and_then(|proof| proof.get("tty").and_then(Value::as_str).map(str::to_owned))
+        .unwrap_or_default()
+}
+
+/// A native surface proven for an activation: exactly one live Terminal tab
+/// or Ghostty terminal whose TTY's `st_rdev` equals the provider's `e_tdev`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SurfaceRecord {
+    /// [`SURFACE_TERMINAL`] or `ghostty`.
+    pub surface_kind: String,
+    /// The TTY path for Terminal.app; the native terminal ID for Ghostty.
+    pub locator: String,
     pub tty: String,
     pub device: u32,
+    /// The surface application's incarnation.
     pub terminal_generation: String,
-    pub window_hint: i64,
-    pub tab_hint: i64,
+    /// Terminal.app window ID and tab index; Ghostty keeps its IDs in `proof`.
+    pub window_hint: Option<i64>,
+    pub tab_hint: Option<i64>,
     pub proof: Value,
 }
 
@@ -180,6 +195,9 @@ pub struct LiveExecutionRow {
 /// A valid binding of a live activation, with everything a route revalidates.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BindingRow {
+    pub surface_kind: String,
+    /// The TTY path for Terminal.app; the native terminal ID for Ghostty.
+    pub locator: String,
     pub binding_id: String,
     pub revision: i64,
     pub execution_id: String,
@@ -568,7 +586,7 @@ impl Journal {
         let mut statement = tx.prepare(
             "SELECT b.id, b.revision, b.execution_id, p.endpoint_id, p.boot_id, p.pid, p.start_seconds,
                     p.start_microseconds, b.executable_identity, b.device_number, b.native_locator,
-                    b.terminal_generation
+                    b.terminal_generation, b.surface_kind, b.proof_json
                FROM surface_bindings b
                JOIN executions e ON e.id = b.execution_id
                JOIN process_incarnations p ON p.id = b.process_id
@@ -577,7 +595,17 @@ impl Journal {
         )?;
         let bindings = statement
             .query_map(params![session_id], |row| {
+                let surface_kind: String = row.get(12)?;
+                let locator: String = row.get(10)?;
+                // A Ghostty locator is the native terminal ID; its TTY is in the proof.
+                let tty = if surface_kind == SURFACE_TERMINAL {
+                    locator.clone()
+                } else {
+                    binding_tty(&row.get::<_, String>(13)?)
+                };
                 Ok(BindingRow {
+                    surface_kind,
+                    locator,
                     binding_id: row.get(0)?,
                     revision: row.get(1)?,
                     execution_id: row.get(2)?,
@@ -588,7 +616,7 @@ impl Journal {
                     start_microseconds: row.get(7)?,
                     executable: row.get(8)?,
                     device: row.get(9)?,
-                    tty: row.get(10)?,
+                    tty,
                     terminal_generation: row.get(11)?,
                 })
             })?

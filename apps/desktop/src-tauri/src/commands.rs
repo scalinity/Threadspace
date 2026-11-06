@@ -356,9 +356,14 @@ pub async fn ui_action<R: Runtime>(
                 }
             }
         }
-        UiAction::RequestTerminalAutomation {} => {
+        action @ (UiAction::RequestTerminalAutomation {} | UiAction::RequestGhosttyAutomation {}) => {
+            let request = if matches!(action, UiAction::RequestGhosttyAutomation {}) {
+                ControlRequestBody::RequestGhosttyAutomation
+            } else {
+                ControlRequestBody::RequestTerminalAutomation
+            };
             match link
-                .request(ControlRequestBody::RequestTerminalAutomation, PROMPT)
+                .request(request, PROMPT)
                 .await
                 .map_err(link_error)?
             {

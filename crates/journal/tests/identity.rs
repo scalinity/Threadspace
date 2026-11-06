@@ -53,11 +53,13 @@ fn process(pid: u32, birth: u64) -> ProcessRecord {
 
 fn surface(tty: &str, device: u32) -> SurfaceRecord {
     SurfaceRecord {
+        surface_kind: "terminal.app".into(),
+        locator: tty.into(),
         tty: tty.into(),
         device,
         terminal_generation: TERMINAL.into(),
-        window_hint: 7508,
-        tab_hint: 1,
+        window_hint: Some(7508),
+        tab_hint: Some(1),
         proof: serde_json::json!({ "matches": 1 }),
     }
 }

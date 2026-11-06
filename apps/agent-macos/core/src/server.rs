@@ -857,6 +857,7 @@ fn dispatch(
         | ControlRequestBody::IntegrationStatus
         | ControlRequestBody::RequestNotificationAuthorization
         | ControlRequestBody::RequestTerminalAutomation
+        | ControlRequestBody::RequestGhosttyAutomation
         | ControlRequestBody::ReturnToSession { .. }
         | ControlRequestBody::RefreshEvidence) => {
             if slow.fetch_add(1, Ordering::AcqRel) >= MAX_SLOW_IN_FLIGHT {

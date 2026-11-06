@@ -11,7 +11,7 @@ function surfaceLine(session: SessionView): string {
   if (session.fixture) return "fixture — no native surface";
   const parts: string[] = [];
   if (session.binding) {
-    parts.push(`Terminal ${session.binding.locator} · binding rev ${session.binding.revision}`);
+    parts.push(`${session.binding.surfaceKind === "ghostty" ? "Ghostty terminal" : "Terminal"} ${session.binding.locator} · binding rev ${session.binding.revision}`);
   } else {
     parts.push(session.lastInvalidation ? `unbound — ${session.lastInvalidation.toLowerCase().replaceAll("_", " ")}` : "unbound");
   }

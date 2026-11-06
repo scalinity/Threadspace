@@ -8,6 +8,9 @@ use std::time::{Duration, Instant};
 
 use threadspace_provider_claude::inventory::InventoryRow;
 use threadspace_surfaces_macos::process::{ExecutableIdentity, ProcessSample};
+use threadspace_surfaces_macos::ghostty::{
+    FocusReadback as GhosttyReadback, GhosttyTab, GhosttyTerminal, GhosttyWindow,
+};
 use threadspace_surfaces_macos::terminal::{FocusReadback, TerminalTab};
 
 use super::*;
@@ -123,6 +126,10 @@ struct Mock {
     focus_takes: Duration,
     /// Each waiting call and the budget it was given.
     budgets: Mutex<Vec<(&'static str, Duration)>>,
+    ghostty_apps: Seq<Result<Option<GhosttyApplication>, String>>,
+    ghostty_authorized: Result<bool, String>,
+    ghostty_inventory: Seq<Result<GhosttyInventory, String>>,
+    ghostty_focus_result: Option<Result<(ghostty::FocusOutcome, u32, u32), String>>,
 }
 
 impl Mock {
@@ -156,7 +163,27 @@ impl Mock {
             hold: None,
             focus_takes: Duration::ZERO,
             budgets: Mutex::new(Vec::new()),
+            ghostty_apps: Seq::of(vec![Ok(Some(ghostty_app(None)))]),
+            ghostty_authorized: Ok(true),
+            ghostty_inventory: Seq::of(vec![Ok(ghostty_inventory(vec![
+                ("term-a", "/dev/ttys004", "tab-1"),
+                ("term-b", TTY, "tab-2"),
+                ("term-c", "/dev/ttys006", "tab-2"),
+            ]))]),
+            ghostty_focus_result: None,
         }
+    }
+
+    /// A healthy session in a split Ghostty pane of a running, scriptable
+    /// Ghostty process.
+    fn healthy_ghostty() -> Self {
+        let mut mock = Self::healthy();
+        mock.devices.insert("/dev/ttys006".into(), 0x1000006);
+        mock.frontmost = Some(FrontmostApplication {
+            bundle_identifier: Some(GHOSTTY_BUNDLE_ID.into()),
+            pid: GHOSTTY_PID as i32,
+        });
+        mock
     }
 
     fn with_samples(self, pid: i32, samples: Vec<Result<Incarnation, ProcessError>>) -> Self {
@@ -245,9 +272,61 @@ impl RouteNative for Mock {
             ))
         })
     }
-    fn frontmost(&self, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
+    fn frontmost(&self, _bundle: &str, deadline: &RouteDeadline) -> Option<FrontmostApplication> {
         self.given("frontmost", deadline);
         self.frontmost.clone()
+    }
+    fn ghostty_app(&self, generation: &str) -> Result<Option<GhosttyApplication>, String> {
+        self.budgets
+            .lock()
+            .expect("lock")
+            .push(("ghostty_app", Duration::ZERO));
+        self.ghostty_apps.next().map(|app| {
+            app.filter(|app| app.generation.canonical() == generation)
+        })
+    }
+    fn ghostty_authorized(&self, deadline: &RouteDeadline) -> Result<bool, String> {
+        self.given("ghostty_automation", deadline);
+        self.ghostty_authorized.clone()
+    }
+    fn ghostty_enumerate(
+        &self,
+        app: &GhosttyApplication,
+        deadline: &RouteDeadline,
+    ) -> Result<GhosttyInventory, String> {
+        assert!(app.limitation.is_none(), "a limited process is never scripted");
+        self.given("ghostty_enumerate", deadline);
+        self.ghostty_inventory.next()
+    }
+    fn ghostty_focus(
+        &self,
+        app: &GhosttyApplication,
+        target: &GhosttyTarget,
+        deadline: &RouteDeadline,
+    ) -> Result<(ghostty::FocusOutcome, u32, u32), String> {
+        assert!(app.limitation.is_none(), "a limited process is never scripted");
+        self.given("ghostty_focus", deadline);
+        self.focus_calls
+            .lock()
+            .expect("lock")
+            .push(target.terminal_id.clone());
+        self.ghostty_focus_result.clone().unwrap_or_else(|| {
+            Ok((
+                ghostty::FocusOutcome::Focused(GhosttyReadback {
+                    window_id: target.window_id.clone(),
+                    tab_id: target.tab_id.clone(),
+                    terminal_id: target.terminal_id.clone(),
+                    front_window_id: target.window_id.clone(),
+                    selected_tab_id: target.tab_id.clone(),
+                    focused_terminal_id: target.terminal_id.clone(),
+                    target_tab_selected: true,
+                    app_frontmost: Some(true),
+                    frontmost_app_pid: app.generation.pid as i32,
+                }),
+                9003,
+                45,
+            ))
+        })
     }
     fn binding_revision(&self, _binding_id: &str, deadline: &RouteDeadline) -> Option<i64> {
         self.given("revision", deadline);
@@ -264,6 +343,8 @@ impl RouteNative for Mock {
 
 fn bound(pid: i32, binding: &str) -> BoundTarget {
     BoundTarget {
+        surface_kind: SURFACE_TERMINAL.into(),
+        locator: TTY.into(),
         binding_id: binding.into(),
         revision: 42,
         execution_id: "exec-1".into(),
@@ -279,6 +360,71 @@ fn bound(pid: i32, binding: &str) -> BoundTarget {
         device: DEVICE,
         tty_hint: "/dev/ttys999".into(),
         terminal_generation: generation(300).canonical(),
+    }
+}
+
+const GHOSTTY_PID: u32 = 600;
+
+fn ghostty_generation() -> AppGeneration {
+    AppGeneration {
+        pid: GHOSTTY_PID,
+        start_seconds: "60".into(),
+        start_microseconds: 2,
+    }
+}
+
+fn ghostty_app(limitation: Option<&str>) -> GhosttyApplication {
+    GhosttyApplication {
+        generation: ghostty_generation(),
+        executable: "/Applications/Ghostty.app/Contents/MacOS/ghostty".into(),
+        image: Some("1:900".into()),
+        installed: Some("1:900".into()),
+        dictionary_sha256: Some("d".repeat(64)),
+        limitation: limitation.map(str::to_owned),
+    }
+}
+
+/// One window with two tabs; the second tab is split. Rows are
+/// (terminal ID, TTY, tab ID).
+fn ghostty_inventory(rows: Vec<(&str, &str, &str)>) -> GhosttyInventory {
+    let mut tabs: Vec<GhosttyTab> = Vec::new();
+    for (id, _, tab) in &rows {
+        if !tabs.iter().any(|known| known.id == *tab) {
+            tabs.push(GhosttyTab {
+                window_id: "win-1".into(),
+                id: (*tab).into(),
+                selected: false,
+                focused_terminal_id: (*id).into(),
+            });
+        }
+    }
+    GhosttyInventory {
+        windows: vec![GhosttyWindow {
+            id: "win-1".into(),
+            selected_tab_id: tabs[0].id.clone(),
+        }],
+        tabs,
+        terminals: rows
+            .iter()
+            .map(|(id, tty, tab)| GhosttyTerminal {
+                window_id: "win-1".into(),
+                tab_id: (*tab).into(),
+                id: (*id).into(),
+                tty: Some((*tty).into()),
+                pid: Some(77),
+            })
+            .collect(),
+        sender_pid: 9004,
+        elapsed_ms: 30,
+    }
+}
+
+fn bound_ghostty(locator: &str) -> BoundTarget {
+    BoundTarget {
+        surface_kind: SURFACE_GHOSTTY.into(),
+        locator: locator.into(),
+        terminal_generation: ghostty_generation().canonical(),
+        ..bound(PID, "binding-g")
     }
 }
 
@@ -890,3 +1036,152 @@ fn a_request_that_waited_gets_only_what_remains_of_its_budget() {
         "{budgets:?}"
     );
 }
+
+#[test]
+fn ghostty_route_focuses_exactly_the_bound_split_terminal() {
+    let mock = Mock::healthy_ghostty();
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "OK", "{result:#?}");
+    assert_eq!(result.surface_result, SurfaceResult::ExactNativeSurface);
+    assert_eq!(result.session_verification, SessionVerification::CurrentNativeRevalidated);
+    assert!(result.focus_performed);
+    assert_eq!(*mock.focus_calls.lock().expect("lock"), vec!["term-b".to_owned()]);
+    let evidence = result.evidence.ghostty.as_ref().expect("ghostty evidence");
+    assert_eq!(evidence.matches.len(), 1);
+    assert_eq!(evidence.matches[0].tab_id, "tab-2");
+    assert_eq!(evidence.terminal_count, 3);
+    let focus = result.evidence.ghostty_focus.as_ref().expect("focus evidence");
+    assert_eq!(focus.outcome, "FOCUSED");
+    assert_eq!(focus.readback_rdev, Some(DEVICE));
+    assert_eq!(result.evidence.surface_kind.as_deref(), Some(SURFACE_GHOSTTY));
+    // A Ghostty binding never touches Terminal.app.
+    assert_eq!(mock.calls("enumerate") + mock.calls("automation") + mock.calls("focus"), 0);
+}
+
+#[test]
+fn terminal_binding_never_scripts_ghostty() {
+    let mock = Mock::healthy();
+    let result = go(&mock, &target(vec![bound(PID, "binding-1")]));
+    assert_eq!(result.reason_code, "OK", "{result:#?}");
+    for call in ["ghostty_app", "ghostty_automation", "ghostty_enumerate", "ghostty_focus"] {
+        assert_eq!(mock.calls(call), 0, "{call}");
+    }
+}
+
+#[test]
+fn a_limited_ghostty_process_is_never_scripted() {
+    for limitation in ["GHOSTTY_RESTART_REQUIRED", "GHOSTTY_TTY_UNAVAILABLE"] {
+        let mut mock = Mock::healthy_ghostty();
+        mock.ghostty_apps = Seq::of(vec![Ok(Some(ghostty_app(Some(limitation))))]);
+        let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+        refused(&result, &mock, limitation);
+        assert_eq!(mock.calls("ghostty_enumerate"), 0);
+    }
+}
+
+#[test]
+fn ghostty_join_refuses_missing_ambiguous_and_reassigned_devices() {
+    for (rows, reason, surface) in [
+        (vec![("term-a", "/dev/ttys004", "tab-1")], "NO_MATCHING_TERMINAL", SurfaceResult::Unavailable),
+        (
+            vec![("term-b", TTY, "tab-2"), ("term-x", TTY, "tab-1")],
+            "MULTIPLE_MATCHING_TERMINALS",
+            SurfaceResult::Ambiguous,
+        ),
+        (vec![("term-z", TTY, "tab-2")], "GHOSTTY_TERMINAL_CHANGED", SurfaceResult::Unavailable),
+    ] {
+        let mut mock = Mock::healthy_ghostty();
+        mock.ghostty_inventory = Seq::of(vec![Ok(ghostty_inventory(rows))]);
+        let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+        refused(&result, &mock, reason);
+        assert_eq!(result.surface_result, surface);
+    }
+}
+
+#[test]
+fn ghostty_process_or_image_change_around_enumeration_is_refused() {
+    let replaced = GhosttyApplication {
+        image: Some("1:901".into()),
+        ..ghostty_app(None)
+    };
+    let restarted = GhosttyApplication {
+        generation: AppGeneration {
+            start_seconds: "61".into(),
+            ..ghostty_generation()
+        },
+        ..ghostty_app(None)
+    };
+    for apps in [
+        vec![Ok(Some(ghostty_app(None))), Ok(Some(replaced))],
+        vec![Ok(Some(ghostty_app(None))), Ok(Some(restarted))],
+        vec![Ok(Some(ghostty_app(None))), Ok(None)],
+        vec![Ok(None)],
+    ] {
+        let mut mock = Mock::healthy_ghostty();
+        mock.ghostty_apps = Seq::of(apps);
+        let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+        refused(&result, &mock, "GHOSTTY_GENERATION_CHANGED");
+    }
+}
+
+#[test]
+fn ghostty_permission_denial_sends_no_events() {
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_authorized = Ok(false);
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    refused(&result, &mock, "AUTOMATION_DENIED");
+    assert_eq!(mock.calls("ghostty_enumerate"), 0);
+
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_focus_result = Some(Err("osascript failed: -1743 not authorized".into()));
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "AUTOMATION_DENIED");
+    assert!(!result.focus_performed);
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
+
+#[test]
+fn ghostty_readback_disagreement_is_never_exact() {
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_focus_result = Some(Ok((ghostty::FocusOutcome::Changed, 9003, 40)));
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "SURFACE_CHANGED");
+    assert!(result.focus_performed, "CHANGED may follow an issued focus");
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+
+    let mut mock = Mock::healthy_ghostty();
+    mock.ghostty_focus_result = Some(Ok((ghostty::FocusOutcome::Gone, 9003, 40)));
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "TARGET_GONE");
+    assert!(!result.focus_performed);
+}
+
+#[test]
+fn another_same_bundle_ghostty_process_in_front_is_not_activation() {
+    let mut mock = Mock::healthy_ghostty();
+    mock.frontmost = Some(FrontmostApplication {
+        bundle_identifier: Some(GHOSTTY_BUNDLE_ID.into()),
+        pid: GHOSTTY_PID as i32 + 1,
+    });
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "ACTIVATION_REFUSED", "{result:#?}");
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
+
+#[test]
+fn ghostty_image_replaced_during_focus_is_not_exact() {
+    let mut mock = Mock::healthy_ghostty();
+    let replaced = GhosttyApplication {
+        image: Some("1:901".into()),
+        ..ghostty_app(None)
+    };
+    mock.ghostty_apps = Seq::of(vec![
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(ghostty_app(None))),
+        Ok(Some(replaced)),
+    ]);
+    let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
+    assert_eq!(result.reason_code, "READBACK_FAILED", "{result:#?}");
+    assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
+}
+

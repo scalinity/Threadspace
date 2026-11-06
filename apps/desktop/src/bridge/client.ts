@@ -860,13 +860,13 @@ export class BridgeClient {
     }
   }
 
-  async requestSetup(kind: "RequestNotificationAuthorization" | "RequestTerminalAutomation"): Promise<void> {
+  async requestSetup(kind: "RequestNotificationAuthorization" | "RequestTerminalAutomation" | "RequestGhosttyAutomation"): Promise<void> {
     try {
       const result = await this.action({ kind });
       if (result.kind === "NotificationAuthorization") {
         this.notice(`Notifications ${result.granted ? "granted" : "not granted"} (${result.settings.authorizationStatus})`);
       } else if (result.kind === "TerminalAutomation") {
-        this.notice(`Terminal automation: ${result.automation} (${result.statusCode})`);
+        this.notice(`${kind === "RequestGhosttyAutomation" ? "Ghostty" : "Terminal"} automation: ${result.automation} (${result.statusCode})`);
       }
       await this.refreshDiagnostics();
     } catch (error) {

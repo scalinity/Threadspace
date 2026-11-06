@@ -212,6 +212,84 @@ pub struct FocusEvidence {
     pub error: Option<String>,
 }
 
+/// One running Ghostty process and the executable image it actually runs.
+/// Its scripting dictionary is known only while that image is the installed
+/// executable whose dictionary was probed (SPEC §13.4).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyApplication {
+    pub generation: AppGeneration,
+    /// Kernel executable path; each installation is its own path.
+    pub executable: String,
+    /// `dev:ino` of the mapped executable image.
+    pub image: Option<String>,
+    /// `dev:ino` of the executable installed at the application path now.
+    pub installed: Option<String>,
+    /// SHA-256 of the dictionary describing this image, when it is known.
+    pub dictionary_sha256: Option<String>,
+    /// Why this process cannot support automatic Return, if it cannot.
+    pub limitation: Option<String>,
+}
+
+/// A Ghostty terminal whose TTY's character device matched. IDs are opaque
+/// strings from the native dictionary; `GHOSTTY_SURFACE_ID` is unrelated.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyTerminalEvidence {
+    pub window_id: String,
+    pub tab_id: String,
+    pub terminal_id: String,
+    pub tty: Option<String>,
+    pub rdev: Option<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyEvidence {
+    pub application_before: Option<GhosttyApplication>,
+    pub application_after: Option<GhosttyApplication>,
+    pub started_ms: i64,
+    pub ended_ms: i64,
+    /// PID of the `osascript` worker that sent the Apple events.
+    pub sender_pid: Option<u32>,
+    pub window_count: u32,
+    pub tab_count: u32,
+    pub terminal_count: u32,
+    /// Terminals whose `st_rdev` equals the provider's `e_tdev`.
+    pub matches: Vec<GhosttyTerminalEvidence>,
+    pub error: Option<String>,
+}
+
+/// The Ghostty focus operation and its native readback.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GhosttyFocusEvidence {
+    /// `FOCUSED`, `GONE`, `AMBIGUOUS`, `CHANGED` or `FAILED`.
+    pub outcome: String,
+    pub sender_pid: Option<u32>,
+    pub started_ms: i64,
+    pub elapsed_ms: u32,
+    pub target: GhosttyTerminalEvidence,
+    pub front_window_id: Option<String>,
+    pub selected_tab_id: Option<String>,
+    pub focused_terminal_id: Option<String>,
+    pub target_tab_selected: Option<bool>,
+    /// The dictionary's `frontmost`, when it has one.
+    pub app_frontmost: Option<bool>,
+    /// Frontmost application PID the focus script read back.
+    pub script_frontmost_pid: Option<i32>,
+    /// `st_rdev` of the target TTY after focus.
+    pub readback_rdev: Option<u32>,
+    /// Native frontmost application after focus (NSWorkspace, companion).
+    pub frontmost_application: Option<FrontmostApplication>,
+    pub application_after: Option<GhosttyApplication>,
+    pub error: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
@@ -242,6 +320,13 @@ pub struct RouteEvidence {
     pub post_lookup_sample: Option<SampleEvidence>,
     pub terminal: Option<TerminalEvidence>,
     pub focus: Option<FocusEvidence>,
+    /// Surface kind of the bound target (`terminal.app` or `ghostty`).
+    #[serde(default)]
+    pub surface_kind: Option<String>,
+    #[serde(default)]
+    pub ghostty: Option<GhosttyEvidence>,
+    #[serde(default)]
+    pub ghostty_focus: Option<GhosttyFocusEvidence>,
     pub post_focus_sample: Option<SampleEvidence>,
     pub post_focus_lookup: Option<InventoryEvidence>,
     pub phases: Vec<PhaseTiming>,
