@@ -1,7 +1,7 @@
 # THREADSPACE — Engineering and Product Specification
 
 **Architecture date:** October 5, 2026, America/New_York  
-**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`; G01–G17 PASS under their accepted scopes. **M1 ACCEPTED** by the final timestamp-only independent review of `01a215ddb55c3214a7d669b040f84886ede0be58`, with production repair `7fe5539` qualified at `80df8b0` ([acceptance](../evidence/M1/acceptance/README.md), [manifest](../evidence/M1/manifest.json), [D-0007](decisions/D-0007-m1-canonical-engine.md)). M1 remains unmerged on `m1`; M2 is authorized and unstarted, pending integration and a separately controlled reducer-2 installation. [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md) remains ACCEPTED and version-scoped. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls platform gate status.
+**Status:** M0A/M0B accepted on `8558854`; **M0C ACCEPTED** by the final independent review of `7cc386f240eb56403fdd3326566bda816f5c2f6d` on application build `fd02d6a` and merged to `main` at `cd9e376`; G01–G17 PASS under their accepted scopes. **M1 ACCEPTED** by the final timestamp-only independent review of `01a215ddb55c3214a7d669b040f84886ede0be58`, with production repair `7fe5539` qualified at `80df8b0` ([acceptance](../evidence/M1/acceptance/README.md), [manifest](../evidence/M1/manifest.json), [D-0007](decisions/D-0007-m1-canonical-engine.md)). M1 is merged into `main` at `af9b285da529890bc441ea00f1a92e73e39902a8`; M2 is implemented on `m2` with acceptance work open. Ghostty is the primary terminal under [D-0011](decisions/D-0011-ghostty-primary-terminal.md). [STATUS.md](STATUS.md) records current implementation and qualification gaps. [D-0008](decisions/D-0008-tao-0.37.0-window-release-containment.md) remains ACCEPTED and version-scoped. Accepted qualification decisions remain normative; the [M0C checklist](../evidence/M0C/gate-checklist.md) controls platform gate status.
 
 **Companion plan:** [MILESTONES.md](MILESTONES.md)  
 **Primary target:** Daniel's Apple Silicon Mac, macOS 26 or later.
@@ -41,7 +41,7 @@ The original research was not native certification. Committed M0A/M0B evidence e
 
 ### 0.2 Scope and release boundary
 
-**The first usable local MVP is M0A → M0B → M0C → M1–M6.** It observes ordinary externally launched Claude CLI sessions in Terminal.app after one explicit integration setup, keeps workers through completed turns, represents subagents, preserves attention, returns to verified current Claude surfaces, survives restarts, and integrates Codex with truthful coverage and routing tiers.
+**The first usable local MVP is M0A → M0B → M0C → M1–M6.** It observes ordinary externally launched Claude CLI sessions in Ghostty after one explicit integration setup, retains Terminal.app support, keeps workers through completed turns, represents subagents, preserves attention, returns to verified current Claude surfaces, survives restarts, and integrates Codex with truthful coverage and routing tiers.
 
 M7–M15 complete the project/worktree world, terminal extensions, semantic MCP, remote/browser groundwork, ChatGPT experiment, visual polish, stress qualification, full acceptance, and packaging.
 
@@ -1343,7 +1343,7 @@ Routes are idempotent with respect to stored attention acknowledgement; repeatin
 
 ### 13.3 Terminal.app
 
-The selected MVP adapter uses the installed Terminal AppleScript dictionary and a fixed, bundled AppleScript invoked by a bounded native process worker. Apple documents Terminal scripting; the actual macOS dictionary is the qualification contract for tab properties and selection. [Terminal scripting][A2]
+The Terminal.app adapter uses the installed Terminal AppleScript dictionary and a fixed, bundled AppleScript invoked by a bounded native process worker. Apple documents Terminal scripting; the actual macOS dictionary is the qualification contract for tab properties and selection. [Terminal scripting][A2]
 
 For a route, re-enumerate every live window and tab and obtain its current `tty` pathname from the installed dictionary. `stat` that path, require a character device, and compare normalized `st_rdev` with the provider's `e_tdev`; `st_dev` identifies the containing filesystem and is not this join. Do not open/read the terminal device. Require exactly one eligible tab and unchanged provider/Terminal application incarnations around enumeration. [Apple device metadata][A_STAT] Select that live tab object, unminimize and raise its current containing window, activate Terminal, then read back the selected tab's TTY and native frontmost application. Showing a window in another Space, such as its own fullscreen Space, completes asynchronously, so readback may wait read-only, for no longer than the route's remaining budget, for the target to lead Terminal's window order; it must then still match exactly. Revalidate the provider process and session around these steps.
 
@@ -1362,14 +1362,25 @@ While any screen video capture runs (full-display or region; still screenshots d
 | Adapter | Selected native identity and focus strategy | Qualification boundary |
 | --- | --- | --- |
 | iTerm2 | Native session unique ID plus TTY; enumerate window/tab/session, select the session and its tab/window, activate and read back. | The split pane is the surface. Select every containing level; a pane-only selection does not imply frontmost window. |
-| Ghostty | AppleScript terminal UUID and native focus command. If the installed dictionary exposes `tty`, use it for the passive process-to-surface join. | Shipped 1.3.1 is the researched stable build; TTY/PID additions are merged for the open 1.4.0 milestone. Probe the actual dictionary. |
+| Ghostty (primary) | Native terminal UUID, current containing window/tab IDs, and TTY-to-provider controlling-device proof; activate the exact app process, focus the terminal and read back every level. | Probe the actual running build and dictionary for readable TTY support and qualify its native behavior. Builds without TTY support cannot establish an automatic session binding. |
 | tmux | Server generation/socket, pane ID/TTY, and a specifically identified attached client/outer TTY; select the pane/window for that client and then focus its outer terminal. | Multiple attached clients require selection; detached panes have no current outer surface. |
 | Native Codex/Claude desktop | App activation and only documented, build-qualified surface selectors. | A provider thread ID or model-facing `window_id` does not establish a native window ID. |
 | Browser | Opted-in extension's browser profile/tab identity plus actual conversation URL, otherwise native URL dispatch. | Runtime tab IDs are ephemeral; current tab URL and conversation must be revalidated. |
 
 iTerm's AppleScript and Python APIs support separate pane, tab and window operations. The first adapter uses AppleScript to avoid a Python dependency. The documented `iterm2:reveal?sessionid=...` route can dispatch a full valid identifier, but without native readback it is only `URL_DISPATCHED`. [iTerm scripting][A3] [iTerm Python activation][A8] [iTerm URL scheme][A9]
 
-Ghostty AppleScript has existed since 1.3.0. The merged TTY/PID change is real, but merged main source is not proof it ships in the installed application. `GHOSTTY_SURFACE_ID` is not interchangeable with the AppleScript terminal UUID. An older installation without a passive reverse mapping uses explicitly linked native UUIDs or app-only routing. No guessed UUID conversion or frontmost-window correlation is allowed. [Ghostty scripting][A4] [TTY/PID change][A5] [Current download][A10]
+Ghostty is the required primary terminal in M2 and the personal release. Its installed dictionary and exact running application generation determine capability. The automatic join requires a readable native `tty`, a character-device `st_rdev` equal to the independently verified provider process `e_tdev`, and exactly one eligible surface. The native terminal UUID is the persisted locator; opaque window/tab IDs and the TTY remain separate evidence. `GHOSTTY_SURFACE_ID` is a different namespace, and the scripting `pid` may name a login wrapper rather than the provider. Neither is a substitute for this join. A build without TTY support displays the missing capability and leaves automatic Return unavailable. [Ghostty scripting][A4] [TTY/PID change][A5] [D-0011](decisions/D-0011-ghostty-primary-terminal.md)
+
+Ghostty is found by kernel evidence at any installation path
+(`<bundle>.app/Contents/MacOS/ghostty`, bundle identifier
+`com.mitchellh.ghostty`). Apple events addressed to a PID reach the application
+registered at that PID's bundle path, so a process is scripted only while it
+is the sole process running its executable path; two processes from one path
+are both refused. A process's dictionary is the one probed for the executable
+image it actually maps; a process left running on an image replaced in place
+reports that a restart is required and is never scripted.
+
+Every Ghostty Return re-enumerates and requires the stored terminal UUID and a unique current device match under the same application incarnation. Native events target the proven app process; two installations sharing a bundle identifier cannot redirect them. Activate that process, invoke native terminal focus, then read back front window, selected tab, focused terminal and native frontmost PID. Recheck provider/session identity, process birth/executable/device and binding revision around focus, within the existing two-second deadline. A changed native ID, lost target, failed permission or incomplete readback never becomes exact success. No input injection, terminal-output parsing, name/cwd matching, guessed ID conversion or automatic app-only fallback is allowed.
 
 tmux pane IDs are meaningful inside their server generation. `pane_pid` names the initial pane process, not necessarily the current provider or foreground process group. A detached pane, multiple outer clients and a nested mux are explicit routing states. MVP does not qualify nested mux chains; M8 must either prove the complete chain or leave it unresolved. [tmux manual][A6]
 
@@ -2034,7 +2045,7 @@ Property tests permute only causally permissible relations; they do not pretend 
 
 M0A proves the substrate, M0B proves exact direct-Claude return early, and M0C completes platform reliability before broad application implementation. M2–M6 prove the first meaningful end-to-end workflow as the capabilities arrive. M14 repeats all 31 original workflow steps against the integrated installed artifact, with Codex's documented routing ceiling.
 
-Native routing scenarios use real manually launched Terminal.app sessions: same cwd, tab moves, window rearrangement, minimized/fullscreen/Spaces, resume elsewhere, in-place conversation switch, target close during focus and permissions denial. A script returning exit code zero without selected-TTY/provider readback cannot pass.
+Native routing scenarios use ordinary Claude sessions in harness-owned Ghostty surfaces and regress Terminal.app support: same cwd, tab moves, window rearrangement, minimized/fullscreen/Spaces, resume elsewhere, in-place conversation switch, target close during focus and permissions denial. A script returning exit code zero without selected-TTY/provider readback cannot pass.
 
 Notification acceptance includes actual delivery while the office is unfocused/closed, default interaction into Threadspace, eligible Return to the current target and an old notification after the tab's conversation changes. Focus/notification permission denial must preserve attention.
 
@@ -2087,7 +2098,7 @@ The following decisions control implementation at the failure boundaries:
 - **Tauri prerelease drift:** current source supports the architecture, but later alphas may change APIs. Exact locks and the native boundary contain that risk; changes require deliberate regression.
 - **Claude mod compatibility:** the public snapshot and exact installed runtime may differ. Generate/pin installed declarations and qualify callback semantics. Original human-input acceptance and positive original causal order are different capabilities; absent a sufficient order witness, automatic follow-up resolution stays disabled and explicit Mark handled remains available without blocking otherwise qualified native observation.
 - **Codex shared-daemon routing:** the researched public interface lacks a live TUI-client→thread→TTY registry. Preserve lifecycle visibility and explicit pairing/last-known routes; do not claim current-session verification.
-- **Ghostty release boundary:** native TTY reverse mapping depends on the installed dictionary containing the merged properties. Earlier versions retain native-ID/manual/app routing without automatic TTY joins.
+- **Ghostty release boundary:** automatic routing requires a qualified running build with native TTY reverse mapping. Earlier builds show the limitation and leave automatic Return unavailable. Updating the on-disk app does not upgrade an already-running process or its existing sessions.
 - **Consumer ChatGPT lifecycle:** no verified equivalent public stream was found for arbitrary Chat conversations/personal cloud Work. Manual original-URL workers and optional semantic/UI experiments are the selected scope.
 - **OS permissions/distribution:** native permissions and a trusted distribution signing identity are external to the specification. Their denial/unavailability has defined behavior and explicit package gates.
 
