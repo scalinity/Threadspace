@@ -232,7 +232,9 @@ fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     let Some((older, version)) = unqualified_claude()? else {
         return Ok(verdict("incompatible-profile", false, json!({ "blocked": "no unqualified Claude build installed" })));
     };
-    let observed = start_case(ctx, a, "incompatible", None, Some(older.clone()), &[], &[])?;
+    // A build run from outside its installer's layout must not update or
+    // retarget the owner's installation.
+    let observed = start_case(ctx, a, "incompatible", None, Some(older.clone()), &[("DISABLE_AUTOUPDATER", "1")], &[])?;
     let limited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
         v.observer_version.as_deref() == Some(version.as_str())
     });
