@@ -391,6 +391,8 @@ The native provider can refuse concurrent transcript writers. A refused resume c
 
 An old `SessionEnd` must close its matched activation only. When a legacy event cannot distinguish two rapid same-process activations, retain it as ambiguous; do not close the newer one.
 
+Claude principal startup/resume/clear hooks and qualified engine-dispatched observer openings carry kernel ProcessKey evidence. Opening callbacks, frozen generations and original callback-entry order establish activations and originating turn ownership; compaction and bootstrap/reload reports establish no opening. Inventory and native evidence for a uniquely matched opening share one execution. A join that could describe several openings stays pending without another live attachment; the next normal reconciliation can bind the exact live execution. Cross-source timestamps do not resolve that ambiguity. [D-0014](decisions/D-0014-native-activation-transitions.md)
+
 ### 4.10 Source-surface proof has independent axes
 
 ~~~typescript
