@@ -20,7 +20,7 @@ use serde_json::Value;
 use threadspace_contracts::canonical::causal::CausalPoint;
 use threadspace_contracts::canonical::envelope::{ObservationEnvelope, ProcessRole};
 use threadspace_contracts::canonical::fact::{
-    AcceptanceProof, ActivityResult, ActorRelationKind, ActorRole, EvidenceClass, FactPayload,
+    ActivationEvidenceKind, AcceptanceProof, ActivityResult, ActorRelationKind, ActorRole, EvidenceClass, FactPayload,
     InputOrigin, NativeFactDraft, NativeRefs, ObserverOwnership, TurnOutcome,
 };
 use threadspace_contracts::canonical::keys::NativeActorRef;
@@ -175,6 +175,8 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
         settled: detail.get("core").and_then(|c| c.get("coreSettled")).and_then(Value::as_bool) == Some(true),
         engine_identity: text(payload, "sessionIdSource") == Some("classic.SessionStart"),
     };
+    let generation = payload.get("ownershipGeneration").or_else(|| payload.get("sessionGeneration"))
+        .and_then(Value::as_u64).filter(|g| *g > 0).map(|g| format!("{}:{g}", envelope.source_epoch));
     let refs = NativeRefs {
         session: Some(session),
         actor: envelope
@@ -344,6 +346,31 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
         // are no outcome.
         _ => Vec::new(),
     };
+    let mut drafts = drafts;
+    if record.qualified && record.engine && provider.is_some() && envelope.actor_native_id.is_none() {
+        let starts = (event == "classic.SessionStart" && record.phase == "entry"
+            && crate::activation::source_starts(text(detail, "source")))
+            || (event == "session.start" && record.phase == "result" && record.settled && record.engine_identity);
+        if starts && record.engine_identity && generation.is_some() {
+            let mut attached = crate::activation::attach(envelope, refs.clone(), generation.clone());
+            for fact in &mut attached { fact.causal = record.point(envelope.callback_entry_sequence.as_ref(), None); }
+            drafts.extend(attached);
+        }
+        if event == "session.end" && record.phase == "entry" && generation.is_some()
+            && text(detail, "reason") != Some("compact") {
+            drafts.push(draft(NativeRefs {
+                activation: Some(crate::activation::evidence(envelope, ActivationEvidenceKind::End, generation.clone())),
+                turn: None, ..refs.clone()
+            }, record.provenance(), FactPayload::ExecutionEnded { reason: "SESSION_END".into() }));
+        }
+    }
+    // Only a verified start owns a turn. Result callbacks keep their original
+    // native turn identity and never attach to the current activation.
+    for fact in &mut drafts {
+        if matches!(fact.payload, FactPayload::TurnStarted {}) && generation.is_some() {
+            fact.refs.activation = Some(crate::activation::evidence(envelope, ActivationEvidenceKind::Turn, generation.clone()));
+        }
+    }
     done(drafts, None)
 }
 
@@ -569,7 +596,10 @@ mod tests {
     fn session_end_disconnects_except_for_logical_changes() {
         let exit = drafts(rec("session.end", "entry", json!({ "reason": "prompt_input_exit" })));
         assert!(matches!(exit[0].payload, FactPayload::ObservationLinkChanged { link: ObservationState::Disconnected, .. }));
-        assert!(drafts(rec("session.end", "entry", json!({ "reason": "clear" }))).is_empty());
+        let clear = drafts(rec("session.end", "entry", json!({ "reason": "clear" })));
+        assert!(clear.iter().any(|d|matches!(d.payload, FactPayload::ExecutionEnded { .. })));
+        assert!(!clear.iter().any(|d|matches!(d.payload, FactPayload::ObservationLinkChanged { .. })));
+        assert!(drafts(rec("session.end", "entry", json!({ "reason": "compact" }))).is_empty());
     }
 
     #[test]

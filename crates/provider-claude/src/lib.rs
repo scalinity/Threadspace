@@ -6,6 +6,7 @@
 //! integration installer (SPEC §19.2), the one part that writes files.
 
 pub mod discovery;
+mod activation;
 pub mod hooks;
 pub mod inventory;
 pub mod observer;

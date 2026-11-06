@@ -8,7 +8,7 @@
 use serde_json::Value;
 use threadspace_contracts::canonical::envelope::ObservationEnvelope;
 use threadspace_contracts::canonical::fact::{
-    ActivityResult, ActorRole, EvidenceClass, FactPayload, InputOrigin, NativeFactDraft,
+    ActivationEvidenceKind, ActivityResult, ActorRole, EvidenceClass, FactPayload, InputOrigin, NativeFactDraft,
     NativeRefs,
 };
 use threadspace_contracts::canonical::keys::NativeActorRef;
@@ -30,7 +30,6 @@ pub const RETAINED_KEYS: &[&str] = &[
 
 /// Hooks this profile records as session identity only.
 const IDENTITY_ONLY: &[&str] = &[
-    "SessionEnd",
     "StopFailure",
     "Notification",
     "PermissionDenied",
@@ -93,7 +92,25 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
         ..refs.clone()
     };
     let drafts = match envelope.native_event.as_str() {
-        "SessionStart" => vec![identified(text(&retained, "source"))],
+        "SessionStart" => {
+            let source = text(&retained, "source");
+            let mut facts = vec![identified(source.clone())];
+            if actor.is_none() && crate::activation::source_starts(source.as_deref()) {
+                facts.extend(crate::activation::attach(envelope, refs.clone(), None));
+            }
+            facts
+        }
+        "SessionEnd" => {
+            let mut facts = vec![identified(None)];
+            if actor.is_none() && let Some(provider) = envelope.evidence.iter().find(|p| p.role == threadspace_contracts::canonical::envelope::ProcessRole::Provider) {
+                facts.push(draft(NativeRefs {
+                    process: Some(provider.key.clone()),
+                    activation: Some(crate::activation::evidence(envelope, ActivationEvidenceKind::End, None)),
+                    ..refs.clone()
+                }, FactPayload::ExecutionEnded { reason: "SESSION_END".into() }));
+            }
+            facts
+        },
         "UserPromptSubmit" => vec![
             identified(None),
             draft(

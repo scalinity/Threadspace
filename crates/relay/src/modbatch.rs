@@ -219,7 +219,7 @@ pub fn envelope(record: &Value, batch_epoch: &str, context: &BatchContext) -> Re
         // and the result record shares that entry.
         native_prompt_id: (event == "prompt.submit").then(|| format!("observer:{source_epoch}:{entry}")),
         native_occurrence_id: optional_identifier(record, "nativeOccurrenceId")?,
-        activation_ref: None,
+        activation_ref: Some(format!("observer:{source_epoch}:{generation}:{entry}")),
         captured_at: record_clock(record, context),
         evidence: context.evidence.clone(),
         payload,
