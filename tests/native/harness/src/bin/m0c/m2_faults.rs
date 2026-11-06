@@ -208,15 +208,33 @@ fn relay_unavailable(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     Ok(verdict("relay-unavailable", pass, json!({ "spooledWhileStopped": spooled, "drainedAfterRestart": drained, "duplicateObservations": duplicates, "stop": stopped["ok"], "enable": enabled["ok"] })))
 }
 
-fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
-    let home = threadspace_relay::paths::home_dir().ok_or("home")?;
-    let older = home.join(".local/share/claude/versions/2.1.292");
-    if !older.exists() {
-        return Ok(verdict("incompatible-profile", false, json!({ "blocked": "no unqualified Claude build installed" })));
+/// An unqualified build: `THREADSPACE_UNQUALIFIED_CLAUDE` names an executable
+/// at `…/claude/versions/<version>` whose version is not a qualified observer
+/// build (Threadspace reads the version from that kernel path, never from the
+/// mod). Without it, an installed 2.1.292 is used.
+fn unqualified_claude() -> Result<Option<(PathBuf, String)>, String> {
+    let path = match std::env::var_os("THREADSPACE_UNQUALIFIED_CLAUDE") {
+        Some(path) => PathBuf::from(path),
+        None => threadspace_relay::paths::home_dir().ok_or("home")?.join(".local/share/claude/versions/2.1.292"),
+    };
+    if !path.is_file() {
+        return Ok(None);
     }
-    let observed = start_case(ctx, a, "incompatible", None, Some(older), &[], &[])?;
+    let version = threadspace_provider_claude::profiles::version_from_executable(&path.display().to_string())
+        .ok_or("the unqualified build is not at …/claude/versions/<version>")?;
+    if threadspace_provider_claude::profiles::observer_profile(&version).is_some() {
+        return Err(format!("{version} is a qualified observer build"));
+    }
+    Ok(Some((path, version)))
+}
+
+fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
+    let Some((older, version)) = unqualified_claude()? else {
+        return Ok(verdict("incompatible-profile", false, json!({ "blocked": "no unqualified Claude build installed" })));
+    };
+    let observed = start_case(ctx, a, "incompatible", None, Some(older.clone()), &[], &[])?;
     let limited = wait_view(ctx, &observed.native_session_id, Duration::from_secs(60), |v| {
-        v.observer_version.as_deref() == Some("2.1.292")
+        v.observer_version.as_deref() == Some(version.as_str())
     });
     submit_unconfirmed(&observed, "Reply with exactly the word: ok");
     threadspace_harness::pause_ms(30_000);
@@ -225,7 +243,7 @@ fn incompatible(ctx: &Ctx, a: &Activation) -> Result<Value, String> {
     finish(&observed);
     let tier = view.as_ref().ok().and_then(|v| v.observer_tier);
     let pass = limited.is_ok() && format!("{tier:?}") == "Some(LowerTier)" && !states.iter().any(|s| s == "COMPLETED");
-    Ok(verdict("incompatible-profile", pass, json!({ "observerTier": tier, "observerVersion": view.as_ref().ok().and_then(|v| v.observer_version.clone()), "turnStates": states })))
+    Ok(verdict("incompatible-profile", pass, json!({ "unqualifiedVersion": version, "executable": redact_home(&older.display().to_string()), "observerTier": tier, "observerVersion": view.as_ref().ok().and_then(|v| v.observer_version.clone()), "turnStates": states })))
 }
 
 fn mod_reload(ctx: &Ctx, a: &Activation) -> Result<Value, String> {

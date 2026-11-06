@@ -183,8 +183,14 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
             &["--version"],
             Duration::from_secs(3),
         );
-        if !version.ok || !version.stdout.contains("2.1.295") {
-            return Err("exact Claude 2.1.295 executable required".into());
+        // The observer profile table, not this runner, decides which builds
+        // are observer builds; the version comes from the executable path.
+        let qualified = threadspace_provider_claude::profiles::version_from_executable(
+            &binary.canonicalize().unwrap_or_else(|_| binary.clone()).display().to_string(),
+        )
+        .filter(|v| threadspace_provider_claude::profiles::observer_profile(v).is_some());
+        if !version.ok || qualified.as_deref().is_none_or(|v| !version.stdout.contains(v)) {
+            return Err("a Claude build in the observer profile table is required".into());
         }
         let command = m2::claude_command(
             &dir,
