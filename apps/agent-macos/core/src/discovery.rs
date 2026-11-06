@@ -198,6 +198,11 @@ fn is_ghostty_bundle(bundle: &Path, executable: &str, installed: Option<&str>) -
 }
 
 /// Why a Ghostty process cannot support automatic Return, if it cannot.
+///
+/// A process must run the executable now installed at its path: Apple-event
+/// terminology is read from the bundle on disk, so a process left on an image
+/// replaced in place would be sent events built from another build's
+/// dictionary, even when its own dictionary was probed earlier.
 fn ghostty_limitation(
     image: Option<&str>,
     installed: Option<&str>,
@@ -206,7 +211,7 @@ fn ghostty_limitation(
     match (image, dictionary) {
         (None, _) => Some("GHOSTTY_IMAGE_UNKNOWN"),
         // Updating the bundle on disk does not upgrade a running process.
-        (Some(image), None) if installed != Some(image) => Some("GHOSTTY_RESTART_REQUIRED"),
+        (Some(image), _) if installed != Some(image) => Some("GHOSTTY_RESTART_REQUIRED"),
         (Some(_), None) => Some("GHOSTTY_DICTIONARY_UNAVAILABLE"),
         (_, Some(dictionary)) if !dictionary.supports_focus() => {
             Some("GHOSTTY_DICTIONARY_UNSUPPORTED")
@@ -935,5 +940,29 @@ mod tests {
         assert_eq!(row_wait(&row("background", None, None, Some("blocked"))), wait(WaitCategory::JobBlocked, ""));
         assert_eq!(row_wait(&row("background", None, None, Some("done"))), None);
         assert_eq!(row_wait(&row("interactive", Some("idle"), None, None)), None);
+    }
+}
+
+#[cfg(test)]
+mod ghostty_limitation_tests {
+    use super::ghostty_limitation;
+    use threadspace_surfaces_macos::ghostty;
+
+    #[test]
+    fn a_replaced_image_requires_restart_even_with_its_dictionary_known() {
+        // The installed dictionary stands in for one probed earlier for the
+        // process's own image (the adapter's tests read it the same way).
+        let known = ghostty::probe_dictionary(std::path::Path::new(ghostty::GHOSTTY_APP_PATH))
+            .expect("installed Ghostty dictionary");
+        assert!(known.supports_focus() && known.has_tty_property);
+        assert_eq!(
+            ghostty_limitation(Some("1:1"), Some("1:2"), Some(&known)),
+            Some("GHOSTTY_RESTART_REQUIRED"),
+            "a cached dictionary must not make an outdated image scriptable"
+        );
+        assert_eq!(ghostty_limitation(Some("1:2"), Some("1:2"), Some(&known)), None);
+        assert_eq!(ghostty_limitation(Some("1:1"), None, Some(&known)), Some("GHOSTTY_RESTART_REQUIRED"));
+        assert_eq!(ghostty_limitation(None, Some("1:2"), Some(&known)), Some("GHOSTTY_IMAGE_UNKNOWN"));
+        assert_eq!(ghostty_limitation(Some("1:2"), Some("1:2"), None), Some("GHOSTTY_DICTIONARY_UNAVAILABLE"));
     }
 }
