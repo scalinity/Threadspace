@@ -1,0 +1,464 @@
+{
+ "kind": "diagnostic (not acceptance): first versus repeat execution of fresh executable inodes",
+ "source": "commit 2f67f9f; installed Dev helper from build 9b6ac8d",
+ "osBuild": "26B123",
+ "method": "python3 -I cold.py SRC ROOT LABEL N: copy SRC to N new paths (same bytes and signature, new inodes); for each, three sequential executions with no arguments, timed launch-through-exit with perf_counter_ns in the parent; 300 ms pause between copies. No helper input, companion, provider or spool is involved.",
+ "runs": {
+  "cold-dev": {
+   "label": "dev",
+   "src": "installed Dev helper (Apple Development, hardened runtime, 1.7 MB)",
+   "rows": [
+    {
+     "copy": 0,
+     "ms": [
+      83.093,
+      3.055,
+      2.382
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 1,
+     "ms": [
+      331.999,
+      3.372,
+      2.931
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 2,
+     "ms": [
+      216.264,
+      3.135,
+      3.264
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 3,
+     "ms": [
+      67.43,
+      4.07,
+      4.661
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 4,
+     "ms": [
+      65.264,
+      3.209,
+      3.391
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 5,
+     "ms": [
+      59.087,
+      3.971,
+      3.629
+     ],
+     "exit": 0
+    }
+   ]
+  },
+  "cold-adhoc": {
+   "label": "adhoc",
+   "src": "target release helper (ad-hoc linker-signed, 1.7 MB)",
+   "rows": [
+    {
+     "copy": 0,
+     "ms": [
+      54.316,
+      4.08,
+      4.101
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 1,
+     "ms": [
+      69.309,
+      3.232,
+      3.0
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 2,
+     "ms": [
+      74.142,
+      3.26,
+      3.382
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 3,
+     "ms": [
+      71.205,
+      2.906,
+      3.166
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 4,
+     "ms": [
+      71.68,
+      3.389,
+      3.229
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 5,
+     "ms": [
+      71.409,
+      3.015,
+      3.203
+     ],
+     "exit": 0
+    }
+   ]
+  },
+  "cold-tiny": {
+   "label": "tiny",
+   "src": "trivial C program int main(){return 0;} (ad-hoc linker-signed)",
+   "rows": [
+    {
+     "copy": 0,
+     "ms": [
+      62.507,
+      2.725,
+      2.693
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 1,
+     "ms": [
+      36.079,
+      2.7,
+      2.404
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 2,
+     "ms": [
+      35.025,
+      2.847,
+      3.508
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 3,
+     "ms": [
+      33.061,
+      2.649,
+      2.477
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 4,
+     "ms": [
+      35.252,
+      3.279,
+      2.555
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 5,
+     "ms": [
+      35.892,
+      2.67,
+      2.264
+     ],
+     "exit": 0
+    }
+   ]
+  },
+  "cold-dev30": {
+   "label": "dev30",
+   "src": "installed Dev helper (Apple Development, hardened runtime, 1.7 MB)",
+   "rows": [
+    {
+     "copy": 0,
+     "ms": [
+      77.415,
+      3.843,
+      3.328
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 1,
+     "ms": [
+      72.735,
+      3.138,
+      3.36
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 2,
+     "ms": [
+      83.975,
+      3.539,
+      3.205
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 3,
+     "ms": [
+      76.237,
+      2.927,
+      2.889
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 4,
+     "ms": [
+      83.888,
+      3.853,
+      3.47
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 5,
+     "ms": [
+      78.28,
+      3.355,
+      3.05
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 6,
+     "ms": [
+      84.1,
+      3.682,
+      3.587
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 7,
+     "ms": [
+      88.09,
+      3.395,
+      3.227
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 8,
+     "ms": [
+      77.542,
+      3.256,
+      3.3
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 9,
+     "ms": [
+      82.991,
+      3.662,
+      3.145
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 10,
+     "ms": [
+      79.503,
+      4.243,
+      3.454
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 11,
+     "ms": [
+      77.11,
+      3.27,
+      3.445
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 12,
+     "ms": [
+      80.681,
+      4.288,
+      3.619
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 13,
+     "ms": [
+      79.909,
+      4.092,
+      3.763
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 14,
+     "ms": [
+      77.861,
+      4.305,
+      4.01
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 15,
+     "ms": [
+      84.531,
+      3.728,
+      3.725
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 16,
+     "ms": [
+      75.308,
+      3.642,
+      3.229
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 17,
+     "ms": [
+      88.295,
+      3.455,
+      3.499
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 18,
+     "ms": [
+      78.848,
+      3.213,
+      3.177
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 19,
+     "ms": [
+      76.221,
+      2.822,
+      3.136
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 20,
+     "ms": [
+      78.985,
+      3.757,
+      3.253
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 21,
+     "ms": [
+      79.419,
+      3.119,
+      2.937
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 22,
+     "ms": [
+      86.159,
+      3.616,
+      3.423
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 23,
+     "ms": [
+      76.436,
+      3.61,
+      2.984
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 24,
+     "ms": [
+      78.869,
+      2.953,
+      3.095
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 25,
+     "ms": [
+      87.439,
+      3.305,
+      3.617
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 26,
+     "ms": [
+      77.434,
+      3.097,
+      2.917
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 27,
+     "ms": [
+      87.066,
+      3.288,
+      3.444
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 28,
+     "ms": [
+      78.726,
+      3.207,
+      3.092
+     ],
+     "exit": 0
+    },
+    {
+     "copy": 29,
+     "ms": [
+      82.318,
+      3.733,
+      3.843
+     ],
+     "exit": 0
+    }
+   ]
+  }
+ }
+}

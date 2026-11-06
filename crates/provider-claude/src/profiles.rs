@@ -1,5 +1,5 @@
 //! Claude Code builds whose observer-mod semantics are qualified (D-0005 for
-//! 2.1.291, D-0009 for 2.1.295). The version is the one the kernel reports
+//! 2.1.291, D-0009 for 2.1.295, D-0012 for 2.1.318). The version is the one the kernel reports
 //! for the calling process's executable, never the mod's own claim: the
 //! mod's `$.session.version()` is middleware-interceptable. Every other build
 //! is LIMITED: its observations are kept at a lower evidence tier.
@@ -23,9 +23,13 @@ const QUALIFIED: &[ObserverProfile] = &[
         version: "2.1.295",
         profile_ref: "docs/compatibility/claude-observer-2.1.295.json",
     },
+    ObserverProfile {
+        version: "2.1.318",
+        profile_ref: "docs/compatibility/claude-observer-2.1.318.json",
+    },
 ];
 
-pub const QUALIFIED_OBSERVER_VERSIONS: &[&str] = &["2.1.291", "2.1.295"];
+pub const QUALIFIED_OBSERVER_VERSIONS: &[&str] = &["2.1.291", "2.1.295", "2.1.318"];
 
 /// `Some` only for a qualified build.
 pub fn observer_profile(version: &str) -> Option<ObserverProfile> {
@@ -75,7 +79,11 @@ mod tests {
             observer_profile("2.1.291").map(|p| p.version),
             Some("2.1.291")
         );
-        for version in ["2.1.292", "2.1.294", "2.1.296", "", "2.1.295 "] {
+        assert_eq!(
+            observer_profile("2.1.318").map(|p| p.version),
+            Some("2.1.318")
+        );
+        for version in ["2.1.292", "2.1.294", "2.1.296", "2.1.310", "2.1.317", "2.1.319", "", "2.1.295 "] {
             assert_eq!(observer_profile(version), None, "{version:?}");
         }
         for version in QUALIFIED_OBSERVER_VERSIONS {
