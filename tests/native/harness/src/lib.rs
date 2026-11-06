@@ -12,6 +12,7 @@ pub mod app;
 pub mod companion;
 pub mod evidence;
 pub mod identity;
+pub mod ghostty;
 pub mod idle;
 pub mod native;
 pub mod procs;

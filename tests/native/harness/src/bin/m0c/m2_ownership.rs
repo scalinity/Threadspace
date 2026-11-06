@@ -40,7 +40,7 @@ impl<'a> Scratch<'a> {
         })
     }
 
-    pub(super) fn install_session(&mut self) -> Result<Value, String> {
+    pub(crate) fn install_session(&mut self) -> Result<Value, String> {
         self.install_scope("session")
     }
 

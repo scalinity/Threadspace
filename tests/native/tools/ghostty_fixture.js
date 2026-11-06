@@ -61,13 +61,17 @@ function run(argv) {
       return JSON.stringify(result);
     }
     case "close": {
-      const expected = JSON.parse(argv[2]).sort();
+      // Every remaining terminal must be one the caller created; panes the
+      // caller already closed are simply absent.
+      const expected = JSON.parse(argv[2]);
       const actual = app.terminals().map(s => s.id()).sort();
-      if (JSON.stringify(actual) !== JSON.stringify(expected)) throw Error("fixture terminal ownership changed");
+      if (actual.some(id => !expected.includes(id))) throw Error("fixture terminal ownership changed");
       app.windows().forEach(w => app.closeWindow(w));
+      // Window close completes asynchronously.
+      for (let i = 0; i < 100 && (app.windows().length || app.terminals().length); i++) delay(0.05);
       if (app.windows().length || app.terminals().length) throw Error("fixture did not close");
       app.quit();
-      return JSON.stringify({closed: expected});
+      return JSON.stringify({closed: actual});
     }
     // Pane operations for M2 session qualification. The caller launched this
     // process from a bundle path no other process uses (Apple events resolve

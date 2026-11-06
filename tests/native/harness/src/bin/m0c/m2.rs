@@ -176,7 +176,7 @@ fn prompt_ready(screen: &str) -> bool {
 }
 
 /// The interactive inventory row whose cwd is `dir`.
-fn wait_inventory(dir: &Path, timeout: Duration) -> Result<String, String> {
+pub(crate) fn wait_inventory(dir: &Path, timeout: Duration) -> Result<String, String> {
     let home = threadspace_relay::paths::home_dir().ok_or("no home")?;
     let install = threadspace_provider_claude::inventory::ClaudeInstall::resolve(&home.join(".local/bin/claude"))
         .ok_or("claude not installed")?;
@@ -242,7 +242,7 @@ pub fn completed_turns(ctx: &Ctx, session_id: &str) -> usize {
 }
 
 /// Inputs the companion recorded for a session.
-fn submitted_inputs(ctx: &Ctx, session_id: &str) -> usize {
+pub(crate) fn submitted_inputs(ctx: &Ctx, session_id: &str) -> usize {
     let sql = format!("SELECT COUNT(*) AS n FROM inputs WHERE session_id = '{}'", session_id.replace('\'', ""));
     journal_query(ctx, &sql)
         .ok()
@@ -611,7 +611,7 @@ pub fn refusals() -> Value {
 /// digest. A video recording cannot be used: while any screen video
 /// capture runs, Terminal refuses every scripting element query, which
 /// both the harness and the companion's Return need. Stills do not.
-struct Recording {
+pub(crate) struct Recording {
     dir: PathBuf,
     movie: PathBuf,
     stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
@@ -622,7 +622,7 @@ struct Recording {
 const FRAME_INTERVAL: Duration = Duration::from_secs(1);
 
 impl Recording {
-    fn start() -> Result<Option<Self>, String> {
+    pub(crate) fn start() -> Result<Option<Self>, String> {
         let Some(root) = std::env::var_os("THREADSPACE_M2_RECORDING_DIR").map(PathBuf::from) else {
             return Ok(None);
         };
@@ -657,7 +657,7 @@ impl Recording {
 
     /// Stops the frames, assembles them at one frame per second, keeps the
     /// movie and removes the frames once the movie exists.
-    fn stop(&mut self) -> Value {
+    pub(crate) fn stop(&mut self) -> Value {
         self.stop.store(true, std::sync::atomic::Ordering::Relaxed);
         let frames = self.worker.take().and_then(|w| w.join().ok()).unwrap_or(0);
         let wall_ms = self.started.elapsed().as_millis() as u64;
@@ -702,7 +702,7 @@ impl Drop for Recording {
 /// in ingest order, each with the canonical fact kinds it produced: the
 /// journal IDs that join the native trace to canonical state. Payloads are
 /// not copied.
-fn trace(ctx: &Ctx, native: &str, session_id: &str, after: u64) -> Value {
+pub(crate) fn trace(ctx: &Ctx, native: &str, session_id: &str, after: u64) -> Value {
     let (native, session) = (native.replace('\'', ""), session_id.replace('\'', ""));
     journal_query(ctx, &format!(
         "SELECT o.ingest_seq AS cursor, o.observation_id AS observationId, o.source_id AS source, o.native_event AS nativeEvent,
@@ -747,7 +747,7 @@ pub(crate) fn journal_cursor(ctx: &Ctx) -> u64 {
 /// Retain its observation count, but never turn pre-transaction receipt time
 /// into a durable-commit or DOM latency PASS. The focused F4 begin/end
 /// collector and `tests/native/tools/m2_latency.py` own those gates.
-fn latency(ctx: &Ctx, native: &str, after: u64) -> Value {
+pub(crate) fn latency(ctx: &Ctx, native: &str, after: u64) -> Value {
     let observed = journal_query(ctx, &format!(
         "SELECT source_id, COUNT(*) AS observations FROM observations
           WHERE ingest_seq > {after} AND source_id IN ('claude.hook', 'claude.observer')
@@ -769,7 +769,7 @@ fn latency(ctx: &Ctx, native: &str, after: u64) -> Value {
 /// Presses the inspector's Mark handled for each open attention item of a
 /// session and reads back, for each, the view's resolution, the journaled
 /// owner command and the item's resolution in canonical state.
-fn mark_handled(ctx: &Ctx, session_id: &str) -> Value {
+pub(crate) fn mark_handled(ctx: &Ctx, session_id: &str) -> Value {
     let sid = session_id.replace('\'', "");
     let open: Vec<Value> = journal_query(ctx, &format!(
         "SELECT id, category FROM attention_items WHERE session_id = '{sid}' AND resolved_at_ms IS NULL ORDER BY created_at_ms LIMIT 25"
