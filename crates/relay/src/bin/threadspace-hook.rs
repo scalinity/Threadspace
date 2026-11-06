@@ -531,6 +531,14 @@ fn main() {
             let mut stdout = std::io::stdout().lock();
             let _ = stdout.write_all(response).and_then(|()| stdout.flush());
         }
+        // Setup's check that the staged file runs (D-0013): a fixed answer,
+        // no input, no store, no other effect.
+        Some(threadspace_provider_claude::setup::HELPER_SELF_CHECK) => {
+            let mut stdout = std::io::stdout().lock();
+            let _ = stdout
+                .write_all(threadspace_provider_claude::setup::HELPER_SELF_CHECK_ANSWER.as_bytes())
+                .and_then(|()| stdout.flush());
+        }
         Some("observer-proof") => {
             let response = std::panic::catch_unwind(|| observer_proof(&args)).ok().flatten();
             if let Some(response) = response.filter(|text| text.len() <= RECEIPT_MAX_BYTES) {

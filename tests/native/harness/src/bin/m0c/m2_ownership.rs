@@ -206,7 +206,7 @@ mod scratch_tests {
             b"{\"untouched\":true}\n",
         )
         .expect("unrelated settings");
-        std::fs::write(source.join("helper"), b"#!/bin/sh\nexit 0\n").expect("helper fixture");
+        std::fs::write(source.join("helper"), b"#!/bin/sh\n[ \"$1\" = self-check ] && printf 'threadspace-hook self-check ok\\n'\nexit 0\n").expect("helper fixture");
         std::fs::write(source.join("mod/.claude-plugin/plugin.json"),
             br#"{"name":"fixture","userConfig":{"captureArgv":{"type":"string","multiple":true,"default":[]}}}"#).expect("mod fixture");
         let target = Target {

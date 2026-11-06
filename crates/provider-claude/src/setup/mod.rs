@@ -124,6 +124,10 @@ pub struct InstallRecord {
     /// they may still reference. It must never become an original-byte restore.
     #[serde(default)]
     pub partial_uninstall: bool,
+    /// Milliseconds the staged helper took to answer its self-check, which
+    /// also absorbs macOS's first-execution assessment of the new file.
+    #[serde(default)]
+    pub helper_check_ms: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -226,6 +230,12 @@ pub enum SetupError {
     UnresolvedConflicts {
         entries: Vec<OwnedEntry>,
     },
+    /// The staged capture helper did not answer its self-check, so no
+    /// provider configuration was written.
+    HelperUnusable {
+        path: PathBuf,
+        detail: String,
+    },
     Io {
         path: PathBuf,
         message: String,
@@ -282,6 +292,11 @@ impl fmt::Display for SetupError {
             ),
             Self::UnresolvedConflicts { .. } => formatter.write_str(
                 "resolve the retained integration conflicts before reinstalling",
+            ),
+            Self::HelperUnusable { path, detail } => write!(
+                formatter,
+                "the staged capture helper {} did not answer its self-check ({detail}); nothing was configured",
+                path.display()
             ),
             Self::Io { path, message } => write!(formatter, "{}: {message}", path.display()),
         }
@@ -355,11 +370,43 @@ pub fn plan(target: &Target) -> Result<Plan, SetupError> {
 
 /// Idempotent: a second install over an unchanged integration writes no
 /// settings and keeps one owned set.
+/// Argument of the capture helper's self-check, and its exact answer.
+pub const HELPER_SELF_CHECK: &str = "self-check";
+pub const HELPER_SELF_CHECK_ANSWER: &str = "threadspace-hook self-check ok\n";
+/// Generous: a never-seen executable's first run includes macOS's one-time
+/// assessment, measured at up to 0.62 s.
+const HELPER_CHECK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+
+/// Runs the staged helper once. The run proves the file is executable as
+/// staged, and it moves macOS's first-execution assessment of the new file
+/// into setup instead of the provider's first capture (D-0013).
+fn check_helper(helper: &std::path::Path) -> Result<u32, SetupError> {
+    use threadspace_surfaces_macos::exec::{BoundedCommand, run_bounded};
+    let unusable = |detail: String| SetupError::HelperUnusable {
+        path: helper.to_path_buf(),
+        detail,
+    };
+    let started = std::time::Instant::now();
+    let output = run_bounded(&BoundedCommand::new(helper, HELPER_CHECK_TIMEOUT, 256).arg(HELPER_SELF_CHECK))
+        .map_err(|error| unusable(error.to_string()))?;
+    if !output.succeeded() || output.stdout != HELPER_SELF_CHECK_ANSWER.as_bytes() {
+        return Err(unusable(format!(
+            "status {:?}, timed out {}, {} output bytes",
+            output.status,
+            output.timed_out,
+            output.stdout.len()
+        )));
+    }
+    Ok(started.elapsed().as_millis().min(u128::from(u32::MAX)) as u32)
+}
+
 pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
     let prepared = prepare(target)?;
     let layout = &prepared.layout;
     layout.create()?;
     owned::write_atomic(&layout.helper, &prepared.helper, 0o755)?;
+    // Before any provider configuration names the helper.
+    let helper_check_ms = check_helper(&layout.helper)?;
     prepared.mod_copy.stage(&prepared.plugin_dir)?;
     let base = &prepared.base;
     match target.scope {
@@ -407,6 +454,7 @@ pub fn install(target: &Target) -> Result<InstallRecord, SetupError> {
         created,
         installed_at_ms: now_ms(),
         partial_uninstall: false,
+        helper_check_ms: Some(helper_check_ms),
     };
     owned::write_json(&layout.record, &record)?;
     // Earlier mod copies are unreferenced once the settings are written.
@@ -926,6 +974,10 @@ fn now_ms() -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A staged helper that answers the self-check exactly.
+    pub(crate) const HELPER_FIXTURE: &[u8] =
+        b"#!/bin/sh\n[ \"$1\" = self-check ] && printf 'threadspace-hook self-check ok\\n'\nexit 0\n";
     use std::fs;
     use std::os::unix::fs::PermissionsExt;
     use std::sync::atomic::{AtomicU32, Ordering};
@@ -989,7 +1041,7 @@ mod tests {
             ));
             fs::create_dir_all(root.join("config")).expect("config dir");
             fs::create_dir_all(root.join("bundle")).expect("bundle dir");
-            fs::write(root.join("bundle/threadspace-hook"), b"#!/bin/sh\nexit 0\n")
+            fs::write(root.join("bundle/threadspace-hook"), HELPER_FIXTURE)
                 .expect("helper");
             for (relative, text) in MOD_FILES {
                 let path = root.join("bundle/provider-mod").join(relative);
@@ -1152,7 +1204,7 @@ mod tests {
         );
 
         let helper = target.owned_dir.join("bin/threadspace-hook");
-        assert_eq!(fs::read(&helper).expect("helper"), b"#!/bin/sh\nexit 0\n");
+        assert_eq!(fs::read(&helper).expect("helper"), HELPER_FIXTURE);
         assert_eq!(mode(&helper), 0o755);
         assert_eq!(mode(&target.owned_dir.join("record.json")), 0o600);
 
@@ -1291,6 +1343,26 @@ mod tests {
         );
         assert_eq!(listing(&target.owned_dir.join("observer")).len(), 1);
         assert_eq!(listing(&target.owned_dir.join("backups")).len(), 1);
+    }
+
+    #[test]
+    fn a_helper_that_fails_its_self_check_configures_nothing() {
+        let scratch = Scratch::with_settings(COMPLEX);
+        let original = fs::read(scratch.settings()).expect("read");
+        // Runs, but does not answer the self-check: like a damaged or
+        // refused helper, it must not be named by any provider setting.
+        fs::write(scratch.root.join("bundle/threadspace-hook"), b"#!/bin/sh\nexit 0\n").expect("helper");
+        let target = scratch.target(Scope::User);
+        match install(&target) {
+            Err(SetupError::HelperUnusable { .. }) => {}
+            other => panic!("expected HelperUnusable, got {other:?}"),
+        }
+        assert_eq!(fs::read(scratch.settings()).expect("read"), original, "settings untouched");
+        assert!(!target.owned_dir.join("record.json").exists(), "no install record");
+        // The same target installs once the helper answers.
+        fs::write(scratch.root.join("bundle/threadspace-hook"), HELPER_FIXTURE).expect("helper");
+        let record = install(&target).expect("install");
+        assert!(record.helper_check_ms.is_some());
     }
 
     #[test]

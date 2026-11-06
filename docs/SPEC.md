@@ -848,7 +848,7 @@ The control endpoint accepts typed application operations from the registered UI
 5. On unavailability/timeout, publish a spool record with the same observation UUID.
 6. For conventional hook invocation, exit 0 with no stdout/control JSON and no routine stderr, including on delivery failure. The private mod-batch receipt contract is separate (Section 8.3).
 
-The provider's configured hook timeout is an outer limit, not the ordinary operating budget. The capture helper's normal target is p95 ≤25 ms; its application-controlled wall budget is 250 ms, with a shorter 100 ms shutdown path. A healthy local socket operation uses a 20 ms connect budget and at most 75 ms waiting for durable receipt. Disk/kernel stalls cannot be given an absolute userspace scheduling guarantee; the provider's own outer timeout remains necessary.
+The provider's configured hook timeout is an outer limit, not the ordinary operating budget. The capture helper's normal target is p95 ≤25 ms; its application-controlled wall budget is 250 ms, with a shorter 100 ms shutdown path. Setup runs the staged helper's `self-check` once before any provider configuration names it, so macOS's first-execution assessment of a newly staged helper happens in setup rather than in a capture; a helper that does not answer fails setup and nothing is configured ([D-0013](decisions/D-0013-capture-helper-setup-check.md)). A healthy local socket operation uses a 20 ms connect budget and at most 75 ms waiting for durable receipt. Disk/kernel stalls cannot be given an absolute userspace scheduling guarantee; the provider's own outer timeout remains necessary.
 
 Capture failure never returns a deny/block/continue decision, never retries provider execution and never waits for UI readiness.
 

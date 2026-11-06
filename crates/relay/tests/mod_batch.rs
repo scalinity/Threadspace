@@ -73,8 +73,19 @@ fn batch() -> Vec<u8> {
     .expect("json")
 }
 
+/// Setup's self-check of the staged helper (D-0013): every capture follows it.
+fn setup_check() {
+    let output = Command::new(env!("CARGO_BIN_EXE_threadspace-hook"))
+        .arg(threadspace_provider_claude::setup::HELPER_SELF_CHECK)
+        .output()
+        .expect("self-check");
+    assert!(output.status.success());
+    assert_eq!(output.stdout, threadspace_provider_claude::setup::HELPER_SELF_CHECK_ANSWER.as_bytes());
+}
+
 #[test]
 fn a_batch_without_a_companion_is_spooled_and_answered_within_its_budget() {
+    setup_check();
     let (output, elapsed) = run(&batch(), 80);
     assert!(output.status.success());
     let receipt: ModBatchReceipt = serde_json::from_slice(&output.stdout).expect("a typed receipt on stdout");
