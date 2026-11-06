@@ -12,7 +12,7 @@ use threadspace_contracts::canonical::records::CanonicalState;
 use threadspace_contracts::ui::ReceiptStatus;
 use threadspace_journal::{EnvelopeAdmission, Journal, JournalError};
 use threadspace_state_engine::ids::SeededAllocator;
-use threadspace_state_engine::synthetic::normalize_envelope;
+use crate::native_activations::normalize as normalize_envelope;
 
 use crate::runner::{Admit, Receipt};
 

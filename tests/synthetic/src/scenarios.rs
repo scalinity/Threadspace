@@ -1401,7 +1401,7 @@ pub fn parent_completed_child_wait_reordered() -> Scenario {
 
 /// Every catalogued scenario.
 pub fn catalog() -> Vec<Scenario> {
-    vec![
+    let mut scenarios = vec![
         normal_session(),
         parallel_tools(),
         outcomes(),
@@ -1453,5 +1453,7 @@ pub fn catalog() -> Vec<Scenario> {
         parent_completed_child_waiting(),
         parent_completed_child_wait_cleared(),
         parent_completed_child_wait_reordered(),
-    ]
+    ];
+    scenarios.extend(crate::native_activations::catalog());
+    scenarios
 }

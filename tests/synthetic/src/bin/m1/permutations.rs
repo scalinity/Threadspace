@@ -35,6 +35,8 @@ const EXTRA_FAMILIES: &[&str] = &["duplicates", "robustness"];
 /// sets (D-0010), budgeted on its own so the M1 families keep their counts.
 const EVIDENCE_SET_FAMILY: &str = "evidence-sets";
 const EVIDENCE_SET_BUDGET: usize = 4_000;
+const NATIVE_ACTIVATION_FAMILY: &str = "native-activation-ownership";
+const NATIVE_ACTIVATION_BUDGET: usize = 7_000;
 const EXTRA_PER_FAMILY: usize = 200;
 const SQLITE_EVERY: usize = 10;
 
@@ -56,12 +58,13 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
     let mut failing = Vec::new();
     let mut grand_total = 0usize;
     let mut required_total = 0usize;
+    let mut stale_ownership_total = 0usize;
     let mut sqlite_checks = 0usize;
     let mut sequence = 0usize;
     for (family_index, family) in REQUIRED_FAMILIES
         .iter()
         .chain(EXTRA_FAMILIES)
-        .chain(&[EVIDENCE_SET_FAMILY])
+        .chain(&[EVIDENCE_SET_FAMILY, NATIVE_ACTIVATION_FAMILY])
         .enumerate()
     {
         let members = by_family.get(family).ok_or(format!("no scenarios in family {family}"))?;
@@ -69,6 +72,8 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
             per_required
         } else if *family == EVIDENCE_SET_FAMILY {
             EVIDENCE_SET_BUDGET
+        } else if *family == NATIVE_ACTIVATION_FAMILY {
+            NATIVE_ACTIVATION_BUDGET
         } else {
             EXTRA_PER_FAMILY
         };
@@ -80,6 +85,9 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
             let reference: Vec<usize> = (0..scenario.steps.len()).collect();
             let expected = run(scenario, &reference, &mut PureRunner::new(1)).semantic_hash;
             let share = budget / members.len() + usize::from(member < budget % members.len());
+            if *family == "delayed-callbacks" || *family == NATIVE_ACTIVATION_FAMILY || scenario.name == "host-read-outcome" {
+                stale_ownership_total += share;
+            }
             let first = seed(family_index, *scenario_index, 0);
             seeds.push(json!({ "scenario": scenario.name, "from": first, "to": first + share as u64 - 1 }));
             for index in 0..share {
@@ -153,6 +161,7 @@ pub fn run_all(root: &Path, total: usize) -> Result<Value, String> {
     let summary = json!({
         "area": "permutations",
         "pass": failing.is_empty() && required_total >= total,
+        "staleOwnershipPermutations": stale_ownership_total,
         "requestedRequiredPermutations": total,
         "requiredFamilyPermutations": required_total,
         "totalPermutations": grand_total,

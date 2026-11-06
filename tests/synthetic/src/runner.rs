@@ -20,7 +20,6 @@ use threadspace_state_engine::engine::Engine;
 use threadspace_state_engine::ids::{Allocator, SeededAllocator};
 use threadspace_state_engine::keys;
 use threadspace_state_engine::resolve::{IdentityIndex, Resolver};
-use threadspace_state_engine::synthetic::{self, NormalizeError};
 
 use crate::builder::{OwnerStep, Scenario, Step, Target};
 
@@ -185,13 +184,9 @@ impl Admit for PureRunner {
                 }
             };
         }
-        let drafts = match synthetic::normalize(envelope) {
-            Ok(drafts) => drafts,
-            Err(NormalizeError::Unsupported(_) | NormalizeError::Malformed(_)) => {
-                self.unsupported += 1;
-                Vec::new()
-            }
-        };
+        let normalized = crate::native_activations::normalize(envelope);
+        if normalized.unsupported.is_some() { self.unsupported += 1; }
+        let drafts = normalized.drafts;
         let mut resolver = Resolver::new(&self.index, &mut self.allocator, &self.endpoint);
         let (facts, unresolved) =
             resolver.resolve(&self.engine.state, &envelope.observation_id, &drafts);

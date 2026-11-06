@@ -1,0 +1,176 @@
+{
+  "reducerVersion": 4,
+  "throughCursor": 1,
+  "namespaces": {
+    "37e9671c-4537-4d5d-8cf6-35ee9e9e2fa4": {
+      "id": "37e9671c-4537-4d5d-8cf6-35ee9e9e2fa4",
+      "provider": "claude",
+      "endpointId": "47526757-130f-4f52-981c-e1ff0e4ae394",
+      "profileRef": "claude-cli:/qualification/.claude"
+    }
+  },
+  "sessions": {
+    "5705b877-0b3d-4dd5-9e54-d738297f77ae": {
+      "id": "5705b877-0b3d-4dd5-9e54-d738297f77ae",
+      "namespaceId": "37e9671c-4537-4d5d-8cf6-35ee9e9e2fa4",
+      "nativeSessionId": "A",
+      "recordState": "KNOWN",
+      "displayName": null,
+      "startSources": [],
+      "links": [],
+      "ownershipProofs": [],
+      "link": null,
+      "inventory": {
+        "present": true,
+        "row": {
+          "kind": "interactive",
+          "status": null,
+          "waitingFor": null,
+          "displayName": null,
+          "state": null
+        },
+        "interval": {
+          "startMs": 1020,
+          "endMs": 1020
+        },
+        "point": {
+          "sourceId": "claude.inventory",
+          "sourceEpoch": "pre-m3",
+          "orderDomain": "inventory",
+          "sequence": "1",
+          "nativeKey": null,
+          "nativePredecessorKeys": []
+        }
+      },
+      "lastRoute": null,
+      "fixture": false,
+      "executionPresence": "LIVE",
+      "observation": "CURRENT",
+      "turnState": "UNKNOWN",
+      "linkConflict": false,
+      "observerTier": null,
+      "observerVersion": null,
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "actors": {
+    "1a83d752-f35e-4a75-bed9-0003f67f9e1d": {
+      "id": "1a83d752-f35e-4a75-bed9-0003f67f9e1d",
+      "sessionId": "5705b877-0b3d-4dd5-9e54-d738297f77ae",
+      "native": {
+        "kind": "PRINCIPAL"
+      },
+      "role": "PRINCIPAL",
+      "agentTypes": [],
+      "runsEnded": 0,
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "relations": [],
+  "processes": {
+    "836ded89-7f3e-46e6-851f-977347ed6db7": {
+      "id": "836ded89-7f3e-46e6-851f-977347ed6db7",
+      "key": {
+        "endpointId": "47526757-130f-4f52-981c-e1ff0e4ae394",
+        "bootId": "boot-A",
+        "pid": 4100,
+        "startSeconds": "1000",
+        "startMicroseconds": 0
+      },
+      "images": [
+        {
+          "executable": "/opt/claude/versions/2.1.295#file-id",
+          "point": null
+        }
+      ],
+      "currentExecutable": "/opt/claude/versions/2.1.295#file-id",
+      "exited": false,
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "executions": {
+    "17eadff4-48a8-4a07-b05e-ca1a2972b860": {
+      "id": "17eadff4-48a8-4a07-b05e-ca1a2972b860",
+      "sessionId": "5705b877-0b3d-4dd5-9e54-d738297f77ae",
+      "actorId": "1a83d752-f35e-4a75-bed9-0003f67f9e1d",
+      "activationRef": "process:4100:1000.0#09bc585a-2448-43f2-9e44-31fa3c80db06",
+      "processId": "836ded89-7f3e-46e6-851f-977347ed6db7",
+      "activation": 1,
+      "attachments": [
+        {
+          "observationId": "09bc585a-2448-43f2-9e44-31fa3c80db06",
+          "factIndex": 2,
+          "point": null,
+          "provenance": "PROVIDER_SNAPSHOT",
+          "mode": "terminal_embedded",
+          "presence": "LIVE",
+          "nativeRuntimeId": null,
+          "controllingDevice": 77
+        }
+      ],
+      "mode": "terminal_embedded",
+      "attached": "LIVE",
+      "nativeRuntimeId": null,
+      "controllingDevice": 77,
+      "endReasons": [],
+      "surfaceStatus": null,
+      "attachmentConflict": false,
+      "presence": "LIVE",
+      "startedCursor": 1,
+      "endedCursor": null,
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "turns": {},
+  "inputs": {},
+  "activities": {},
+  "surfaces": {
+    "998d8fb1-00ca-45d5-9eac-75d45474c891": {
+      "id": "998d8fb1-00ca-45d5-9eac-75d45474c891",
+      "endpointId": "47526757-130f-4f52-981c-e1ff0e4ae394",
+      "native": {
+        "surfaceKind": "terminal.app",
+        "appGeneration": "terminal-test",
+        "locator": "/dev/ttys077",
+        "deviceNumber": 77,
+        "surfaceGeneration": "4100:1000.0"
+      },
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "bindings": {
+    "12fc33f2-29b7-4950-870e-a7e37990e511": {
+      "id": "12fc33f2-29b7-4950-870e-a7e37990e511",
+      "sessionId": "5705b877-0b3d-4dd5-9e54-d738297f77ae",
+      "executionId": "17eadff4-48a8-4a07-b05e-ca1a2972b860",
+      "surfaceId": "998d8fb1-00ca-45d5-9eac-75d45474c891",
+      "method": "NATIVE_INVENTORY",
+      "executableIdentity": "/opt/claude/versions/2.1.295#file-id",
+      "windowHint": 1,
+      "tabHint": 1,
+      "proof": {},
+      "evidenceObservation": "09bc585a-2448-43f2-9e44-31fa3c80db06",
+      "proofPoint": null,
+      "invalidations": [],
+      "valid": true,
+      "invalidationReason": null,
+      "recordedCursor": 1,
+      "invalidatedCursor": null,
+      "createdCursor": 1,
+      "revision": 1
+    }
+  },
+  "waits": {},
+  "requests": {},
+  "attention": {},
+  "attentionByScope": {},
+  "outbox": {},
+  "frontiers": {},
+  "coverage": {},
+  "commands": {}
+}

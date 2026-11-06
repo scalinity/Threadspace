@@ -4,6 +4,7 @@
 //! admission boundary (`runner`) in seeded valid orders (`permute`), with a
 //! virtual clock and seeded allocation (`rng`), and no model calls.
 
+pub mod native_activations;
 pub mod builder;
 pub mod permute;
 pub mod rng;
