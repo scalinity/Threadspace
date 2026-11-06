@@ -24,6 +24,15 @@
       ],
       "type": "object"
     },
+    "ActivationEvidenceKind": {
+      "enum": [
+        "START",
+        "INVENTORY",
+        "END",
+        "TURN"
+      ],
+      "type": "string"
+    },
     "ActivityResult": {
       "enum": [
         "SUCCESS",
@@ -917,6 +926,36 @@
       ],
       "type": "string"
     },
+    "NativeActivation": {
+      "description": "Native activation evidence. A generation is frozen at callback entry;\nentry sequence orders callbacks within that observer epoch. Missing\ngeneration on an end means a legacy claim.",
+      "properties": {
+        "entrySequence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "generation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ActivationEvidenceKind"
+        },
+        "startSource": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
     "NativeActorRef": {
       "description": "An Actor within its owning Session: the principal worker, or a\nsubordinate named by its native agent ID. `agent_type` is never a key.",
       "oneOf": [
@@ -992,6 +1031,17 @@
     "NativeRefs": {
       "description": "Native-keyed references of a draft. Only an explicit reconciler reference\n(`NativeExecutionRef::Canonical`, `attention`) names a canonical record.",
       "properties": {
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActivation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "activity": {
           "type": [
             "string",

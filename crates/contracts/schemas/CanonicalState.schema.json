@@ -24,6 +24,15 @@
       ],
       "type": "object"
     },
+    "ActivationEvidenceKind": {
+      "enum": [
+        "START",
+        "INVENTORY",
+        "END",
+        "TURN"
+      ],
+      "type": "string"
+    },
     "ActivityRecord": {
       "properties": {
         "actorId": {
@@ -462,6 +471,127 @@
       ],
       "type": "string"
     },
+    "BindingProof": {
+      "properties": {
+        "evidence": {
+          "description": "Bounded, sanitized native evidence (readbacks, samples)."
+        },
+        "executableIdentity": {
+          "description": "The executable image the binding was proven with.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "$ref": "#/$defs/BindingMethod"
+        },
+        "tabHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "windowHint": {
+          "format": "int64",
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "CanonicalRefs": {
+      "description": "Canonical references of a resolved fact.",
+      "properties": {
+        "activityId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attentionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bindingId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inputId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "namespaceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "processId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relatedActorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "request": {
+          "description": "The native request ID itself; requests are not allocated records.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sessionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "surfaceId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "turnId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
     "CausalPoint": {
       "properties": {
         "nativeKey": {
@@ -764,6 +894,721 @@
         "revision"
       ],
       "type": "object"
+    },
+    "FactPayload": {
+      "oneOf": [
+        {
+          "properties": {
+            "displayName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "SESSION_IDENTIFIED",
+              "type": "string"
+            },
+            "startSource": {
+              "description": "Native start source (startup, resume, clear, compact, fork).",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SESSION_RECORD_CHANGED",
+              "type": "string"
+            },
+            "recordState": {
+              "$ref": "#/$defs/SessionRecordState"
+            }
+          },
+          "required": [
+            "kind",
+            "recordState"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "controllingDevice": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "EXECUTION_ATTACHED",
+              "type": "string"
+            },
+            "mode": {
+              "$ref": "#/$defs/ExecutionMode"
+            },
+            "nativeRuntimeId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "presence": {
+              "$ref": "#/$defs/AttachedPresence"
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "presence"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "EXECUTION_ENDED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "executableIdentity": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "PROCESS_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "executableIdentity"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "PROCESS_EXIT_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "OBSERVATION_LINK_CHANGED",
+              "type": "string"
+            },
+            "link": {
+              "$ref": "#/$defs/ObservationState"
+            },
+            "qualified": {
+              "default": true,
+              "description": "The reporting observer runs a qualified profile. A report from\nbefore this field is read as its reducer treated every report:\nqualified.",
+              "type": "boolean"
+            },
+            "version": {
+              "default": null,
+              "description": "The observer's provider version, as the kernel read it.",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "link"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Independent native inventory/kernel corroboration. It establishes a\npoint inside the observer's challenge/seal bracket, not an open-ended\nprocess attachment or authority for an earlier Turn.",
+          "properties": {
+            "kind": {
+              "const": "OBSERVER_OWNERSHIP_CORROBORATED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_SUBMITTED",
+              "type": "string"
+            },
+            "origin": {
+              "$ref": "#/$defs/InputOrigin"
+            },
+            "submission": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/CausalPoint"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The original submission point when it differs from the capture\npoint (upstream-delayed submission)."
+            }
+          },
+          "required": [
+            "kind",
+            "origin"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_ACCEPTED",
+              "type": "string"
+            },
+            "proof": {
+              "$ref": "#/$defs/AcceptanceProof"
+            }
+          },
+          "required": [
+            "kind",
+            "proof"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "INPUT_REJECTED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_STARTED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_STEP_OBSERVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Stop: a response boundary that may be continued or vetoed. It never\nends an execution and never certifies an outcome (INV-07).",
+          "properties": {
+            "kind": {
+              "const": "RESPONSE_BOUNDARY_OBSERVED",
+              "type": "string"
+            },
+            "stopHookActive": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "stopHookActive"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "OUTPUT_READY",
+              "type": "string"
+            },
+            "summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "TURN_OUTCOME_OBSERVED",
+              "type": "string"
+            },
+            "outcome": {
+              "$ref": "#/$defs/TurnOutcome"
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "summary": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "outcome"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_PROPOSED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_STARTED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTIVITY_FINISHED",
+              "type": "string"
+            },
+            "result": {
+              "$ref": "#/$defs/ActivityResult"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory",
+            "result"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A permission preflight occurred; not proof that a human dialog is open.",
+          "properties": {
+            "kind": {
+              "const": "PERMISSION_CHECK_OBSERVED",
+              "type": "string"
+            },
+            "toolCategory": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "toolCategory"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "category": {
+              "$ref": "#/$defs/WaitCategory"
+            },
+            "generation": {
+              "description": "Native generation the wait belongs to, when the source names one.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "WAIT_STATE_OBSERVED",
+              "type": "string"
+            },
+            "signal": {
+              "$ref": "#/$defs/WaitSignal"
+            },
+            "subtype": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "category",
+            "signal"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "REQUEST_RESOLVED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "agentType": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "ACTOR_IDENTIFIED",
+              "type": "string"
+            },
+            "role": {
+              "$ref": "#/$defs/ActorRole"
+            }
+          },
+          "required": [
+            "kind",
+            "role"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTOR_RELATION_OBSERVED",
+              "type": "string"
+            },
+            "relation": {
+              "$ref": "#/$defs/ActorRelationKind"
+            }
+          },
+          "required": [
+            "kind",
+            "relation"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "ACTOR_RUN_ENDED",
+              "type": "string"
+            },
+            "outcome": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/TurnOutcome"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_RECORDED",
+              "type": "string"
+            },
+            "proof": {
+              "$ref": "#/$defs/BindingProof"
+            }
+          },
+          "required": [
+            "kind",
+            "proof"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_UNPROVEN",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "SURFACE_BINDING_INVALIDATED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "interval": {
+              "$ref": "#/$defs/SnapshotInterval"
+            },
+            "kind": {
+              "const": "PROVIDER_SNAPSHOT_OBSERVED",
+              "type": "string"
+            },
+            "present": {
+              "type": "boolean"
+            },
+            "row": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SnapshotRow"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "present",
+            "interval"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "detail": {
+              "type": "string"
+            },
+            "domain": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "OBSERVATION_GAP_DETECTED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "domain",
+            "detail"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "focusPerformed": {
+              "type": "boolean"
+            },
+            "inputReadiness": {
+              "$ref": "#/$defs/InputReadiness"
+            },
+            "kind": {
+              "const": "ROUTE_RESULT_RECORDED",
+              "type": "string"
+            },
+            "reasonCode": {
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "sessionVerification": {
+              "$ref": "#/$defs/SessionVerification"
+            },
+            "surfaceResult": {
+              "$ref": "#/$defs/SurfaceResult"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "surfaceResult",
+            "sessionVerification",
+            "inputReadiness",
+            "reasonCode",
+            "focusPerformed"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_ACKNOWLEDGED",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_RESOLVED",
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "atMs": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "commandId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ATTENTION_SNOOZED",
+              "type": "string"
+            },
+            "untilMs": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind",
+            "commandId",
+            "atMs",
+            "untilMs"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "detail": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "NOTIFICATION_DELIVERY_RECORDED",
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "state": {
+              "$ref": "#/$defs/NotificationState"
+            }
+          },
+          "required": [
+            "kind",
+            "requestId",
+            "state",
+            "detail"
+          ],
+          "type": "object"
+        }
+      ]
     },
     "HumanFrontier": {
       "description": "The compact accepted-human causal frontier of one comparable scope\n(SPEC §7.3): retained through checkpoints so reverse delivery resolves\nthe same outputs.",
@@ -1089,6 +1934,36 @@
       ],
       "type": "object"
     },
+    "NativeActivation": {
+      "description": "Native activation evidence. A generation is frozen at callback entry;\nentry sequence orders callbacks within that observer epoch. Missing\ngeneration on an end means a legacy claim.",
+      "properties": {
+        "entrySequence": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "generation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ActivationEvidenceKind"
+        },
+        "startSource": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
     "NativeActorRef": {
       "description": "An Actor within its owning Session: the principal worker, or a\nsubordinate named by its native agent ID. `agent_type` is never a key.",
       "oneOf": [
@@ -1121,6 +1996,187 @@
           "type": "object"
         }
       ]
+    },
+    "NativeExecutionRef": {
+      "description": "One logical activation of a Session/Actor in a runtime (SPEC §4.2). The\nactivation is keyed by what the native source proves, never by PID alone.",
+      "oneOf": [
+        {
+          "description": "A native activation reference (a runtime/thread activation ID, or the\nobservation that proved a new activation of a process).",
+          "properties": {
+            "activationRef": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "ACTIVATION",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "activationRef"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "A record a reconciler already holds; admission verifies it exists.",
+          "properties": {
+            "executionId": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "CANONICAL",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "executionId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "NativeRefs": {
+      "description": "Native-keyed references of a draft. Only an explicit reconciler reference\n(`NativeExecutionRef::Canonical`, `attention`) names a canonical record.",
+      "properties": {
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActivation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "activity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActorRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attention": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "execution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeExecutionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observerOwnership": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ObserverOwnership"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Original immutable ownership scope and independent probe token.\nAbsent in reducer-3 captures; absence can never restore HOST_READ."
+        },
+        "process": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProcessKey"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Endpoint may be empty for a local capture; admission fills it."
+        },
+        "relatedActor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeActorRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativeSurfaceRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turn": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "NativeSessionRef": {
+      "description": "A provider conversation as the provider names it, within one profile on\nthe local endpoint. The namespace UUID is resolved at admission.",
+      "properties": {
+        "nativeSessionId": {
+          "description": "Opaque, even when it looks like a UUID.",
+          "type": "string"
+        },
+        "profileRef": {
+          "description": "The provider profile/store authority (for example a config home).",
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "profileRef",
+        "nativeSessionId"
+      ],
+      "type": "object"
     },
     "NativeSurfaceRef": {
       "description": "A native surface (terminal tab, pane, window). The locator (a TTY path)\nis not identity: the application generation and the adapter's surface\ngeneration are part of the key, so a reused path is a new surface.",
@@ -1607,6 +2663,61 @@
           "type": "string"
         }
       ]
+    },
+    "ResolvedFact": {
+      "properties": {
+        "causal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CausalPoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "factId": {
+          "type": "string"
+        },
+        "factIndex": {
+          "description": "Position among the facts of one observation.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "native": {
+          "$ref": "#/$defs/NativeRefs",
+          "description": "The draft's native references, kept as relationship evidence: the\nreducer records native keys from them, never by re-resolving."
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/FactPayload"
+        },
+        "payloadVersion": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceClass"
+        },
+        "refs": {
+          "$ref": "#/$defs/CanonicalRefs"
+        }
+      },
+      "required": [
+        "factId",
+        "observationId",
+        "factIndex",
+        "refs",
+        "native",
+        "provenance",
+        "payloadVersion",
+        "payload"
+      ],
+      "type": "object"
     },
     "RouteRecord": {
       "properties": {
@@ -2444,11 +3555,40 @@
         "revision"
       ],
       "type": "object"
+    },
+    "WaitSignal": {
+      "enum": [
+        "POSITIVE",
+        "CLEARED"
+      ],
+      "type": "string"
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "The whole canonical state at one applied cursor.",
   "properties": {
+    "activationBindings": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SurfaceBindingRecord"
+      },
+      "default": {},
+      "type": "object"
+    },
+    "activationCandidates": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ExecutionRecord"
+      },
+      "default": {},
+      "description": "Uncombined execution evidence; aliases are derived, never guessed at admission.",
+      "type": "object"
+    },
+    "activationFacts": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ResolvedFact"
+      },
+      "default": {},
+      "type": "object"
+    },
     "activities": {
       "additionalProperties": {
         "$ref": "#/$defs/ActivityRecord"
@@ -2474,6 +3614,14 @@
       "description": "Scope key to attention ID, so a migrated or derived item is found by\nscope and never duplicated.",
       "type": "object"
     },
+    "bindingExecutions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {},
+      "description": "Original execution of a binding, before inventory/native convergence.",
+      "type": "object"
+    },
     "bindings": {
       "additionalProperties": {
         "$ref": "#/$defs/SurfaceBindingRecord"
@@ -2490,6 +3638,13 @@
       "additionalProperties": {
         "$ref": "#/$defs/SourceCoverage"
       },
+      "type": "object"
+    },
+    "executionAliases": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {},
       "type": "object"
     },
     "executions": {

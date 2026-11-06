@@ -497,12 +497,32 @@ impl FactPayload {
     }
 }
 
+/// Native activation evidence. A generation is frozen at callback entry;
+/// entry sequence orders callbacks within that observer epoch. Missing
+/// generation on an end means a legacy claim.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct NativeActivation {
+    pub kind: ActivationEvidenceKind,
+    pub entry_sequence: Option<String>,
+    pub start_source: Option<String>,
+    pub generation: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[ts(export)]
+pub enum ActivationEvidenceKind { Start, Inventory, End, Turn }
+
 /// Native-keyed references of a draft. Only an explicit reconciler reference
 /// (`NativeExecutionRef::Canonical`, `attention`) names a canonical record.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, TS, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct NativeRefs {
+    #[serde(default)]
+    pub activation: Option<NativeActivation>,
     pub session: Option<NativeSessionRef>,
     pub actor: Option<NativeActorRef>,
     pub related_actor: Option<NativeActorRef>,

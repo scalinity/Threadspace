@@ -11,6 +11,7 @@ import type { InputRecord } from "./InputRecord";
 import type { NamespaceRecord } from "./NamespaceRecord";
 import type { OutboxRecord } from "./OutboxRecord";
 import type { ProcessRecord } from "./ProcessRecord";
+import type { ResolvedFact } from "./ResolvedFact";
 import type { SessionRecord } from "./SessionRecord";
 import type { SourceCoverage } from "./SourceCoverage";
 import type { SourceSurfaceRecord } from "./SourceSurfaceRecord";
@@ -21,7 +22,15 @@ import type { WaitScopeRecord } from "./WaitScopeRecord";
 /**
  * The whole canonical state at one applied cursor.
  */
-export type CanonicalState = { reducerVersion: number, throughCursor: number, namespaces: { [key in string]: NamespaceRecord }, sessions: { [key in string]: SessionRecord }, actors: { [key in string]: ActorRecord }, relations: Array<ActorRelationRecord>, processes: { [key in string]: ProcessRecord }, executions: { [key in string]: ExecutionRecord }, turns: { [key in string]: TurnRecord }, inputs: { [key in string]: InputRecord }, activities: { [key in string]: ActivityRecord }, surfaces: { [key in string]: SourceSurfaceRecord }, bindings: { [key in string]: SurfaceBindingRecord }, waits: { [key in string]: WaitScopeRecord }, requests: { [key in string]: ExactRequestRecord }, attention: { [key in string]: AttentionRecord }, 
+export type CanonicalState = { 
+/**
+ * Uncombined execution evidence; aliases are derived, never guessed at admission.
+ */
+activationCandidates: { [key in string]: ExecutionRecord }, activationFacts: { [key in string]: ResolvedFact }, executionAliases: { [key in string]: string }, 
+/**
+ * Original execution of a binding, before inventory/native convergence.
+ */
+bindingExecutions: { [key in string]: string }, activationBindings: { [key in string]: SurfaceBindingRecord }, reducerVersion: number, throughCursor: number, namespaces: { [key in string]: NamespaceRecord }, sessions: { [key in string]: SessionRecord }, actors: { [key in string]: ActorRecord }, relations: Array<ActorRelationRecord>, processes: { [key in string]: ProcessRecord }, executions: { [key in string]: ExecutionRecord }, turns: { [key in string]: TurnRecord }, inputs: { [key in string]: InputRecord }, activities: { [key in string]: ActivityRecord }, surfaces: { [key in string]: SourceSurfaceRecord }, bindings: { [key in string]: SurfaceBindingRecord }, waits: { [key in string]: WaitScopeRecord }, requests: { [key in string]: ExactRequestRecord }, attention: { [key in string]: AttentionRecord }, 
 /**
  * Scope key to attention ID, so a migrated or derived item is found by
  * scope and never duplicated.

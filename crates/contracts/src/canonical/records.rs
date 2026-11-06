@@ -726,6 +726,18 @@ pub struct CommandEffect {
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct CanonicalState {
+    /// Uncombined execution evidence; aliases are derived, never guessed at admission.
+    #[serde(default)]
+    pub activation_candidates: BTreeMap<String, ExecutionRecord>,
+    #[serde(default)]
+    pub activation_facts: BTreeMap<String, super::fact::ResolvedFact>,
+    #[serde(default)]
+    pub execution_aliases: BTreeMap<String, String>,
+    /// Original execution of a binding, before inventory/native convergence.
+    #[serde(default)]
+    pub binding_executions: BTreeMap<String, String>,
+    #[serde(default)]
+    pub activation_bindings: BTreeMap<String, SurfaceBindingRecord>,
     pub reducer_version: u32,
     pub through_cursor: i64,
     pub namespaces: BTreeMap<String, NamespaceRecord>,
