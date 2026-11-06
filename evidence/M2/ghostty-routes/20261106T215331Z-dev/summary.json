@@ -1,0 +1,83 @@
+{
+  "attempts": 3,
+  "count": 3,
+  "disturbedAttempts": 0,
+  "exact": 3,
+  "fixture": {
+    "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+    "image": "16777232:231812722",
+    "pid": 27283
+  },
+  "fixtureClosed": {
+    "copyRemoved": true,
+    "error": null,
+    "exitedMs": 0,
+    "ok": true,
+    "result": {
+      "closed": [
+        "5AE0048F-8D46-4417-84F1-39B72BD39E97",
+        "9756964B-A703-4606-8F4B-4E466EE581C8",
+        "E4A52702-FB4B-4808-BF3A-CE109293BD67",
+        "FABC8B72-F60D-4E61-A5F9-DF68B1BA0986"
+      ]
+    }
+  },
+  "integration": {
+    "automation": "AUTHORIZED",
+    "statusCode": 0
+  },
+  "integrationRemoved": true,
+  "pass": false,
+  "scenarios": {
+    "cases": [
+      {
+        "case": "tab-moved",
+        "ok": false,
+        "setupOk": false
+      },
+      {
+        "case": "fullscreen",
+        "ok": false,
+        "setupOk": false
+      },
+      {
+        "case": "minimized",
+        "ok": false,
+        "setupOk": false
+      },
+      {
+        "case": "closed-pane",
+        "ok": true,
+        "setupOk": true
+      }
+    ],
+    "control": "E4A52702-FB4B-4808-BF3A-CE109293BD67",
+    "pass": false
+  },
+  "sessions": [
+    {
+      "nativeSessionId": "b112d5bd-37e2-4780-bc3a-389b4e7f7218",
+      "sessionId": "b1cfcaea-f818-457c-9cfe-ea131206345f",
+      "terminalId": "FABC8B72-F60D-4E61-A5F9-DF68B1BA0986",
+      "tty": "/dev/ttys019"
+    },
+    {
+      "nativeSessionId": "18132a8b-062d-4800-a962-553ebf4d8cd0",
+      "sessionId": "a33e7395-07b4-428f-a450-8fee97ee2d56",
+      "terminalId": "F04B13AD-C192-42C8-B850-23D94A0F1CA5",
+      "tty": "/dev/ttys020"
+    },
+    {
+      "nativeSessionId": "1a0a85a8-4841-447e-b7f1-2276d323517c",
+      "sessionId": "1107ac2b-c4a3-4fe1-b8c1-ea9a112930f1",
+      "terminalId": "9756964B-A703-4606-8F4B-4E466EE581C8",
+      "tty": "/dev/ttys021"
+    }
+  ],
+  "startErrors": [],
+  "ui": {
+    "hydrated": true,
+    "uiPid": 27101
+  },
+  "wrongTargets": 0
+}
