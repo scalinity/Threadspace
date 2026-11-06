@@ -1,0 +1,208 @@
+
+tests/delivery.test.ts:
+(fail) mod delivery > mod batch receipts: a valid receipt removes the records [37.22ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 6
+  Received: 12
+(fail) mod delivery > partial commit followed by timeout retries with the original UUIDs [21.31ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 8
+  Received: 16
+(pass) mod delivery > malformed receipt is not acceptance [31.99ms]
+(pass) mod delivery > stable UUID replay of unaccepted records [23.68ms]
+(fail) mod delivery > queue bounds (2,048 records) and batch bounds (128 records, 64 KiB) [610.13ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 2352
+  Received: 6752
+(fail) mod delivery > batches are as full as both bounds allow (128 records, 64 KiB) [45.30ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 600
+  Received: 1200
+(fail) mod delivery > queue byte bound (8 MiB) with long escaped identifiers [159.17ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 383
+  Received: 2383
+(pass) mod delivery > retry backoff runs 250 ms to 5 s and resets on success [29.01ms]
+(pass) mod delivery > one pending retry timer during backoff [35.07ms]
+(pass) mod delivery > no timer while idle [28.84ms]
+(fail) mod delivery > one in-flight drain per module [151.73ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 84
+  Received: 168
+(pass) mod delivery > module load runs register afresh with a new source epoch [14.67ms]
+(pass) mod delivery > module load in a second test has another source epoch and sequence restarts [17.88ms]
+(pass) mod delivery > module retirement/reload: the kit cannot hot-reload a module (config.set) [18.73ms]
+(pass) mod delivery > budget argv is appended [22.45ms]
+
+tests/kit-behavior.test.ts:
+(fail) tool call preflight is one nested check in one observer epoch [39.00ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [
+    ["tool.call", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "result"],
+    ["tool.call", "result"]
+  ]
+  Received: [
+    ["tool.call", "entry"],
+    ["tool.call", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "result"],
+    ["tool.check", "result"],
+    ["tool.call", "result"],
+    ["tool.call", "result"]
+  ]
+(pass) ask preflight prevents the mocked call, allow reaches it [19.64ms]
+(pass) mocked tool bottom has a core trace; generic mock has a test trace [28.49ms]
+
+tests/middleware.test.ts:
+(fail) middleware contract > observer calls next(e) exactly once [43.11ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [
+    "session.start",
+    "classic.SessionStart",
+    "session.attach",
+    "prompt.submit",
+    "turn.start",
+    "turn.step",
+    "tool.check",
+    "tool.call",
+    "tool.check",
+    "agent.spawn",
+    "turn.complete",
+    "session.detach",
+    "session.end"
+  ]
+  Received: [
+    "session.start",
+    "session.start",
+    "classic.SessionStart",
+    "classic.SessionStart",
+    "session.attach",
+    "session.attach",
+    "prompt.submit",
+    "prompt.submit",
+    "turn.start",
+    "turn.start",
+    "turn.step",
+    "turn.step",
+    "tool.check",
+    "tool.check",
+    "tool.call",
+    "tool.call",
+    "tool.check",
+    "tool.check",
+    "agent.spawn",
+    "agent.spawn",
+    "turn.complete",
+    "turn.complete",
+    "session.detach",
+    "session.detach",
+    "session.end",
+    "session.end"
+  ]
+(pass) middleware contract > result records carry what an adapter needs on their own [21.78ms]
+(pass) middleware contract > event passed unchanged [25.76ms]
+(pass) middleware contract > provider result returned unchanged [25.33ms]
+(fail) middleware contract > provider exceptions propagate [42.68ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: ["entry", "provider-error"]
+  Received: ["entry", "entry", "provider-error", "provider-error"]
+  
+  the engine reported:
+    test's turn.complete hook was skipped: test: provider failure at core
+(fail) middleware contract > async-generator chunks forwarded correctly (order, count, final value) [45.74ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: ["entry", "result"]
+  Received: ["entry", "entry", "result", "result"]
+(fail) middleware contract > async-generator early close is forwarded and recorded as abandoned [18.87ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: ["entry", "abandoned"]
+  Received: ["entry", "entry", "abandoned", "abandoned"]
+(pass) middleware contract > observations carry no prompt text, tool input or output, or assistant text [21.09ms]
+
+tests/provenance.test.ts:
+(pass) provenance and identity > callback-entry context frozen [52.94ms]
+(fail) provenance and identity > delayed result uses original identity across a logical session change [43.01ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: ["entry", "result"]
+  Received: ["entry", "entry", "result", "result"]
+(pass) provenance and identity > plugin-raised lifecycle-shaped events cannot forge a native outcome [37.54ms]
+(fail) provenance and identity > engine dispatch origin alone does not prove downstream core execution [61.61ms]
+  AssertionError: expect(received).toBe()
+  
+  Expected: 4
+  Received: 8
+(pass) provenance and identity > short-circuiting downstream middleware is passed through unchanged [24.12ms]
+(fail) provenance and identity > accepted-human core-acceptance proof for prompt.submit [35.46ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: { kind: "bridge" }
+  Received: { kind: "composer" }
+(fail) provenance and identity > upstream middleware cannot rewrite prompt origin [22.40ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [{ kind: "scheduled-trigger" }]
+  Received: [
+    { kind: "scheduled-trigger" },
+    { kind: "scheduled-trigger" }
+  ]
+  
+  the engine reported:
+    rewriter's prompt.submit hook was skipped: rewriter: next() passed an argument with an origin other than the engine set (next(e) passes e.origin on)
+(pass) provenance and identity > agent.spawn provenance requires a settled core trace [22.29ms]
+(pass) provenance and identity > host reads $.agent.list() and $.session.id() are middleware-interceptable [37.84ms]
+(pass) provenance and identity > first load records a null predecessor epoch and leaves its own in session state [31.07ms]
+(pass) provenance and identity > reload records predecessor epoch [23.70ms]
+(fail) provenance and identity > a failed session state read or write records a null predecessor epoch [27.48ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [null, null]
+  Received: [null, null, null, null]
+(fail) provenance and identity > logical session changes (session.end clear, classic.SessionStart clear and resume) [29.12ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [["S1", "clear", "S1"], ["S2", "resume", "S2"]]
+  Received: [
+    ["S1", "clear", "S1"],
+    ["S1", "clear", "S1"],
+    ["S2", "resume", "S2"],
+    ["S2", "resume", "S2"]
+  ]
+(pass) provenance and identity > a normal session end runs one bounded drain; a clear does not [20.10ms]
+(fail) provenance and identity > no worktree handlers or worktree tool interception [21.34ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: [
+    ["tool.call", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "result"],
+    ["tool.call", "result"]
+  ]
+  Received: [
+    ["tool.call", "entry"],
+    ["tool.call", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "entry"],
+    ["tool.check", "result"],
+    ["tool.check", "result"],
+    ["tool.call", "result"],
+    ["tool.call", "result"]
+  ]
+
+ 23 pass
+ 18 fail
+Ran 41 tests across 4 files. [1.37s]

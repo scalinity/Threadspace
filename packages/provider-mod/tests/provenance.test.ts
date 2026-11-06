@@ -170,8 +170,11 @@ describe('provenance and identity', () => {
     await clock.settle()
 
     const records = helper.records()
-    const slow = records.filter(record => record.nativeOccurrenceId === 'tu-slow')
-    const after = records.find(record => record.nativeOccurrenceId === 'tu-after-clear' && record.phase === 'entry')
+    // The kit also emits a tool.check with the same occurrence ID. This
+    // assertion concerns the delayed tool.call callback, not its preflight
+    // (whose separate entry/result pair is pinned by kit-behavior.test.ts).
+    const slow = records.filter(record => record.nativeEvent === 'tool.call' && record.nativeOccurrenceId === 'tu-slow')
+    const after = records.find(record => record.nativeEvent === 'tool.call' && record.nativeOccurrenceId === 'tu-after-clear' && record.phase === 'entry')
     expect(slow.map(record => record.phase)).toEqual(['entry', 'result'])
     expect(slow.map(record => record.sessionId)).toEqual(['S1', 'S1'])
     expect(slow[1].sessionGeneration).toBe(slow[0].sessionGeneration)
@@ -230,7 +233,12 @@ describe('provenance and identity', () => {
     await clock.settle()
 
     const results = helper.records().filter(record => record.phase === 'result')
-    const shorted = results.filter(record => record.nativeEvent !== 'tool.call' || record.nativeOccurrenceId === 'short-tool')
+    // Exclude the control call's permission preflight, which is answered
+    // by the test bottom rather than the shortcut. Keep exactly four
+    // targeted events and their exact shortcut provenance assertions.
+    const shorted = results.filter(record =>
+      ['prompt.submit', 'agent.spawn', 'turn.complete'].includes(record.nativeEvent)
+      || (record.nativeEvent === 'tool.call' && record.nativeOccurrenceId === 'short-tool'))
     expect(shorted.length).toBe(4)
     for (const record of shorted) {
       expect(record.engineDispatch, record.nativeEvent).toBe(true)
@@ -242,8 +250,12 @@ describe('provenance and identity', () => {
         coreSettled: false,
       })
     }
-    const control = results.find(record => record.nativeOccurrenceId === 'tu-control')
-    expect(control.payload.core).toEqual({ links: 2, endPlugin: 'test', endTier: 'builtin', endOutcome: 'returned', coreSettled: false })
+    const control = results.find(record => record.nativeEvent === 'tool.call' && record.nativeOccurrenceId === 'tu-control')
+    // 2.1.318 places the mocked tool bottom in its real tool pipeline and
+    // stamps the terminal trace engine/core. The independent trace probe
+    // in kit-behavior.test.ts proves this with and without the observer;
+    // the four shortcut results above must still stay non-core.
+    expect(control.payload.core).toEqual({ links: 2, endPlugin: 'engine', endTier: 'core', endOutcome: 'returned', coreSettled: true })
   })
 
   test('short-circuiting downstream middleware is passed through unchanged', { ...OPTIONS, plugins: [shortcut] }, async ($, on) => {
@@ -552,6 +564,10 @@ describe('provenance and identity', () => {
     const records = helper.records()
     expect(records.filter(record => /Worktree/.test(String(record.nativeEvent)))).toEqual([])
     expect(records.filter(record => /wt$/.test(String(record.nativeOccurrenceId)))).toEqual([])
-    expect(records.filter(record => record.nativeOccurrenceId === 'tu-control-read').length).toBe(2)
+    // Read is observed once as a call and once as its permission preflight;
+    // both worktree tool families must still produce no observations.
+    expect(records.filter(record => record.nativeOccurrenceId === 'tu-control-read').map(record => [record.nativeEvent, record.phase])).toEqual([
+      ['tool.call', 'entry'], ['tool.check', 'entry'], ['tool.check', 'result'], ['tool.call', 'result'],
+    ])
   })
 })

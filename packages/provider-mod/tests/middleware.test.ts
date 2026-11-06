@@ -66,7 +66,6 @@ describe('middleware contract', () => {
       'session.attach',
       'prompt.submit',
       'turn.start',
-      'tool.check',
       'tool.call',
       'agent.spawn',
       'turn.complete',
@@ -75,6 +74,9 @@ describe('middleware contract', () => {
     ]) {
       expect(core.count(name), name).toBe(1)
     }
+    // One explicit check, plus the kit's preflight inside tool.call. Check
+    // exact occurrence IDs so a repeated next(e) cannot satisfy the count.
+    expect(core.calls['tool.check']?.map(e => e.tool_use_id)).toEqual(['tu-check', 'tu-1'])
     expect(steps).toBe(1)
 
     await clock.settle()
@@ -88,6 +90,7 @@ describe('middleware contract', () => {
       'turn.step',
       'tool.check',
       'tool.call',
+      'tool.check',
       'agent.spawn',
       'turn.complete',
       'session.detach',
@@ -145,7 +148,10 @@ describe('middleware contract', () => {
     on('tool.call', () => answers.tool)
     on('turn.complete', () => answers.complete)
     on('agent.spawn', () => answers.spawn)
-    on('tool.check', () => answers.check)
+    // An ask is denied before the mocked tool bottom in 2.1.318. Allow the
+    // call's preflight; retain the ask unchanged for the explicit check.
+    // kit-behavior.test.ts proves ask never reaches that mocked bottom.
+    on('tool.check', (_$: any, e: any) => e.tool_use_id === 'tu-r' ? { decision: 'allow' } : answers.check)
 
     expect(await $.prompt.submit(promptInput() as any)).toEqual(answers.prompt as any)
     expect(await $.tool.call(toolCallInput('tu-r') as any)).toEqual(answers.tool as any)

@@ -13,6 +13,11 @@ const ids = (batch: Batch | undefined) => (batch?.records ?? []).map((record: an
 const captureSequence = (record: any) => Number(record.callbackResultSequence ?? record.callbackEntrySequence)
 const timeout = { reject: 'timed out after 250 ms' }
 
+// The 2.1.318 kit raises tool.check inside each tool.call, even with a
+// mocked tool bottom: two entry/result pairs. kit-behavior.test.ts pins
+// their order and one source epoch, and rejects duplicate registration.
+const TOOL_CALL_RECORDS = 4
+
 // Beneath the observer: counts the observer's `$.clock.after` dispatches and
 // reports the running count through `$.store.set`, which the test captures.
 const timerCounter = {
@@ -60,9 +65,9 @@ describe('mod delivery', () => {
     expect(batch?.envelope).toEqual(
       expect.objectContaining({ receiptVersion: 1, kind: 'mod-batch', sourceEpoch: expect.stringMatching(UUID), droppedRecords: 0 }),
     )
-    expect(batch?.records.length).toBe(4)
+    expect(batch?.records.length).toBe(2 + TOOL_CALL_RECORDS) // SessionStart plus call/check.
     for (const record of batch?.records ?? []) expect(record.observationId).toMatch(UUID)
-    expect(new Set(ids(batch)).size).toBe(4)
+    expect(new Set(ids(batch)).size).toBe(2 + TOOL_CALL_RECORDS)
   })
 
   test('partial commit followed by timeout retries with the original UUIDs', OPTIONS, async ($, on) => {
@@ -97,7 +102,7 @@ describe('mod delivery', () => {
     expect(second?.at).toBe(250)
     expect(ids(second)).toEqual(ids(first))
     expect(second?.records).toEqual(first?.records)
-    expect(journal.size).toBe(4)
+    expect(journal.size).toBe(2 * TOOL_CALL_RECORDS)
   })
 
   test('malformed receipt is not acceptance', { ...OPTIONS, timeoutMs: 20_000 }, async ($, on) => {
@@ -176,7 +181,7 @@ describe('mod delivery', () => {
     await clock.settle()
     for (let step = 0; step < 40; step += 1) await clock.advance(250)
 
-    const produced = calls * 2
+    const produced = calls * TOOL_CALL_RECORDS
     const delivered = helper.batches.flatMap(batch => batch.records)
     expect(new Set(delivered.map((record: any) => record.observationId)).size).toBe(2048)
     expect(delivered.length).toBe(2048)
@@ -331,7 +336,7 @@ describe('mod delivery', () => {
     for (let step = 0; step < 20; step += 1) await clock.advance(100)
 
     expect(helper.maxActive()).toBe(1)
-    expect(helper.records().length).toBe(42)
+    expect(helper.records().length).toBe(21 * TOOL_CALL_RECORDS)
     const starts = helper.batches.map(batch => batch.at)
     for (let index = 1; index < starts.length; index += 1) expect((starts[index] as number) - (starts[index - 1] as number)).toBeGreaterThanOrEqual(100)
   })

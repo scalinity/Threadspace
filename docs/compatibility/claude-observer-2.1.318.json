@@ -1,0 +1,498 @@
+{
+  "schema": 1,
+  "milestone": "M2",
+  "status": "DRAFT \u2014 declaration/loading/test-kit qualification only. Native interactive acceptance and profile admission are PENDING; 95 full 2.1.295 signatures are NOT_VERIFIABLE because baseline bytes are absent.",
+  "capabilities": {
+    "profileId": "CLAUDE_NATIVE_OBSERVER",
+    "testedVersions": [
+      "2.1.318"
+    ],
+    "stableSessionIdentity": null,
+    "nativeTurnIdentity": null,
+    "nativeTurnOutcome": null,
+    "acceptedInputProvenance": null,
+    "automaticHumanFollowupResolution": false,
+    "exactRequestIdentity": false,
+    "aggregateHumanWait": false,
+    "liveInventory": null,
+    "replayableTurnHistory": false,
+    "immediateParentIdentity": null,
+    "currentSessionProcessLookup": null,
+    "supportedSurfaces": []
+  },
+  "capabilityEvidence": {
+    "stableSessionIdentity": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "nativeTurnIdentity": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "nativeTurnOutcome": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "acceptedInputProvenance": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "automaticHumanFollowupResolution": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "basis": "Current profile contract remains unavailable; no new capability is claimed.",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "exactRequestIdentity": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "basis": "Current profile contract remains unavailable; no new capability is claimed.",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "aggregateHumanWait": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "basis": "Current profile contract remains unavailable; no new capability is claimed.",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "liveInventory": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "replayableTurnHistory": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "basis": "Current profile contract remains unavailable; no new capability is claimed.",
+      "classes": [
+        "declaration"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "immediateParentIdentity": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "currentSessionProcessLookup": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    },
+    "supportedSurfaces": {
+      "value": [],
+      "status": "PENDING_NATIVE",
+      "basis": "Native acceptance is pending; declaration/kit evidence alone does not admit this capability.",
+      "classes": [
+        "declaration",
+        "engine test kit"
+      ],
+      "refs": [
+        "evidence/M2/provider/claude-2.1.318/README.md"
+      ]
+    }
+  },
+  "facets": {
+    "acceptedInputProvenance": {
+      "value": null,
+      "status": "PENDING_NATIVE",
+      "basis": "Kit provenance controls pass; native composer/bridge input, acceptance and dispatch evidence is pending."
+    },
+    "automaticHumanFollowupResolution": {
+      "value": false,
+      "status": "NOT_SUPPORTED",
+      "basis": "Current PromptSubmitInput carries no original-submission order witness; no automatic follow-up authority is added."
+    }
+  },
+  "unavailableCapabilities": [
+    {
+      "capability": "automaticHumanFollowupResolution",
+      "uiMeaning": "A previous-output attention item stays until the owner presses Mark handled; replying to the session does not clear it."
+    },
+    {
+      "capability": "exactRequestIdentity",
+      "uiMeaning": "An approval or input wait is shown as a session-level category episode, not as one named pending request."
+    },
+    {
+      "capability": "aggregateHumanWait",
+      "uiMeaning": "No waiting badge comes from this profile; the session shows reported activity until the inventory waitingFor mapping is qualified."
+    },
+    {
+      "capability": "replayableTurnHistory",
+      "uiMeaning": "Turns before observation began, or records lost across a mod reload or host exit, are not reconstructed; the timeline shows a coverage gap."
+    }
+  ],
+  "classicLimitedFallback": {
+    "profileId": "CLAUDE_CLASSIC_LIMITED",
+    "when": "The mod is absent, fails to load or validate, or the build's generated declarations name another version.",
+    "behaviour": "Safe command hooks plus native inventory: sessions are still discovered and native reported activity/waits shown, but no definitive per-turn outcome and no accepted-human provenance is inferred from weaker fields (SPEC \u00a711.1).",
+    "qualifiedHere": false
+  },
+  "observedSemantics": {
+    "dispatchOrigin": "PASS in kit: exact provenance preserved; mocked tool bottom is engine/core in 2.1.318, generic prompt mock remains test/builtin. Native interactive stamping PENDING.",
+    "pluginRaisedLifecycle": "PASS in kit: lifecycle raises unavailable; forged plugin-origin input cannot establish native ownership.",
+    "hostReads": "PASS in kit: agent.list and session.id remain middleware-interceptable.",
+    "sessionStartOrder": "PASS for initialization-only loading: classic.SessionStart before session.start. Interactive startup PENDING.",
+    "reload": "PASS for isolated fresh registration/state fixtures; native hot reload/ownership recovery PENDING.",
+    "toolTurnLink": "Declaration: tool.call has tool_use_id and optional agentId; no native Turn ownership inferred from a current Session.",
+    "spawn": "PASS for engine-kit settled-core versus shortcut provenance; native spawn/child-wait PENDING."
+  },
+  "requiredFields": {
+    "prompt.submit": [
+      "origin",
+      "turnId?",
+      "wait",
+      "attachments?.length",
+      "next.origin",
+      "next.trace"
+    ],
+    "turn.start": [
+      "turnId"
+    ],
+    "turn.step": [
+      "turnId",
+      "index",
+      "agentId?",
+      "model",
+      "messageCount",
+      "result.stopReason",
+      "result.toolUses.length"
+    ],
+    "turn.complete": [
+      "turnId",
+      "agentId?",
+      "reason",
+      "isAborted",
+      "durationMs",
+      "refusal.category?"
+    ],
+    "tool.call": [
+      "tool",
+      "tool_use_id",
+      "agentId?",
+      "result.deny|isError|isReadOnly"
+    ],
+    "tool.check": [
+      "tool",
+      "tool_use_id",
+      "agentId?",
+      "ceiling?",
+      "result.decision"
+    ],
+    "agent.spawn": [
+      "tool_use_id",
+      "parentAgentId?",
+      "subagentType",
+      "provider",
+      "background",
+      "fork",
+      "isTeammate?",
+      "result.agentId",
+      "result.teammateId?",
+      "next.trace"
+    ],
+    "session.end": [
+      "reason",
+      "sessionId",
+      "resume.id"
+    ],
+    "classic.SessionStart": [
+      "session_id",
+      "source",
+      "agent_type?"
+    ],
+    "session.start": [
+      "isInteractive",
+      "surface"
+    ],
+    "session.attach": [
+      "surface",
+      "clientId"
+    ],
+    "session.detach": [
+      "surface",
+      "clientId",
+      "reason"
+    ]
+  },
+  "limits": {
+    "queueRecords": 2048,
+    "queueBytes": 8388608,
+    "batchRecords": 128,
+    "batchBytes": 65536,
+    "receiptBytes": 16384,
+    "retryBackoffMs": [
+      250,
+      5000
+    ],
+    "drainTimeoutMs": 250,
+    "endDrainTimeoutMs": 100,
+    "identifierChars": 256,
+    "hookBudgetMs": 10000
+  },
+  "installation": {
+    "mod": "packages/provider-mod (plugin threadspace-observer 0.1.0, tier user)",
+    "capturedArgvFrom": "userConfig captureArgv (settings pluginConfigs[\"threadspace-observer\" | \"threadspace-observer@inline\"].options, read from user, --settings or managed settings; never project settings)",
+    "neverInstalled": [
+      "classic.WorktreeCreate",
+      "classic.WorktreeRemove",
+      "tool.call/tool.check for EnterWorktree and ExitWorktree"
+    ],
+    "loadSideEffect": "Noninteractive initialize loads the observer without writing types by default. CLAUDE_CODE_PLUGIN_DIR_WATCH=1 writes .claude-plugin/types/ and root tsconfig.json on a disposable mod. Interactive default behavior PENDING.",
+    "ownedCopy": "Only disposable copies under ignored artifacts were loaded by this worker; live installation/setup was NOT_RUN."
+  },
+  "declarations": {
+    "bundledSkill": {
+      "status": "NOT_RUN",
+      "reason": "Bundled authoring invocation requires login in disposable config; no authentication changes made."
+    },
+    "generatedBesideMod": {
+      "path": ".claude-plugin/types/claude-code/index.d.ts",
+      "firstLine": "// Written by Claude Code 2.1.318.",
+      "sha256": "042ff9743dc3fee570ff699e51ebc1071252c3eec6116294a72bf0568e5aed37",
+      "lines": 17421,
+      "writtenAlso": [
+        ".claude-plugin/types/claude-code-mcp/",
+        ".claude-plugin/types/claude-code-tools/",
+        ".claude-plugin/types/tsconfig.json",
+        "tsconfig.json"
+      ],
+      "observedIn": "Initialization control request on disposable copy, with CLAUDE_CODE_PLUGIN_DIR_WATCH=1"
+    },
+    "committed": false,
+    "comparison": "evidence/M2/provider/claude-2.1.318/declarations.json",
+    "comparedWith2_1_295": {
+      "named": 97,
+      "present318": 97,
+      "identicalVerified": 2,
+      "changedVerified": 0,
+      "removed": 0,
+      "notVerifiable": 95
+    },
+    "comparedWith2_1_310": {
+      "compared": 97,
+      "identical": 97,
+      "changed": 0,
+      "removed": 0
+    }
+  },
+  "modFiles": {
+    "source": "packages/provider-mod at worker source; production mod files unchanged",
+    "files": {
+      "types/index.d.ts": "fa0319eeefe9182811395aa92bd9c8c88ad59eccd5d17f590daa896392eaff79",
+      "tests/latency.node.mjs": "bee9b815eb408ef507a6c1faeabc7005bf620e42194a4d83225f1107aa26247e",
+      "tests/ownership.node.mjs": "7463d6804b9ac09e1fd8872384a85b860bacd09390b0c55399ccae426a19621d",
+      "tests/middleware.test.ts": "9b62da34bf7211c8e12803941286bc718dfd1d235d4baa7d6286c80b0602ee00",
+      "tests/kit-behavior.test.ts": "ba9bb714d714d9d3ebb0eb875470657ccada96628f6eca258fc4261474857de8",
+      "tests/delivery.test.ts": "99dad272c85d79e569a05b59d75e4968a5d03d373a9d9e7e22d4ef719b585cc8",
+      "tests/kit.ts": "9cd76ea902aaaeb5fdad7c5ae012f353383af54ce65a4891c36d17fdb9f06969",
+      "tests/provenance.test.ts": "5d468e99877608373df244223ed32b9bb705ea2f18debe3a799ecb99f8e6010c",
+      "hooks/hooks.json": "c835c92d8e1159d20a40ca78ad654da7433942c3694ffeda0b376b0c4dfd52cf",
+      "hooks/register.ts": "beafadb37e112212934e47697bb6261e7824e66c1a1a05594c370ea5f47bd3ab",
+      "hooks/delivery.ts": "07a610f98f3777fe5c8564a76161d95ba0145fbabfb092c66d0075841245dc3d",
+      "hooks/ownership.ts": "ce486de2cc977a922e4695cd7aca83ff2120bbb1dd426933291a22c41d499275",
+      "hooks/latency.ts": "ba8deb1751f9f9a6d969489d138a53b02923a8832b442c8d8f433284b574c8bc",
+      ".claude-plugin/plugin.json": "40fa9f5d6202a2ae042f43f8dc64088c7c676fc9d5f3776abd3b9ebcb51ee9fc"
+    }
+  },
+  "nativeAcceptance": {
+    "engineTestKit": "PASS 41/41 (38 original plus 3 controls), CLI exit 0",
+    "validate": "PASS (local validation, exit 0); directory/catalog README, license and icon diagnostics are non-gating and do not establish compatibility.",
+    "verticalSlice": "PENDING_NATIVE",
+    "routes": "PENDING_NATIVE",
+    "humanTypedOrigins": "PENDING_NATIVE",
+    "faults": {
+      "stop-continuation": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "interrupted": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "failed": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "blocked-submission": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "incompatible-profile": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "mod-reload": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "parent-completed-child-waiting": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "delayed-submission": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "forged-and-nonengine": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "mod-batch-partial": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "mod-batch-malformed": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "mod-batch-exit1": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "relay-unavailable": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      },
+      "terminal-negatives": {
+        "pass": null,
+        "status": "PENDING_NATIVE",
+        "run": null
+      }
+    }
+  },
+  "evidenceHashes": {
+    "evidence/M2/provider/claude-2.1.318/test-qualified-kit.txt": "01f824f25bc22a044b1bb0bb3c00041d634eaefea5ae7414b5ba135945857181",
+    "evidence/M2/provider/claude-2.1.318/mutation-forged-core-settlement.txt": "54076eb1486fb346d0a94b68018a56c943b9ccb8903a790081b37186bd834409",
+    "evidence/M2/provider/claude-2.1.318/controls.json": "69b632cb3df767d00d344570feac2f9e09b99d21db8262a3616e3848fee3b7a9",
+    "evidence/M2/provider/claude-2.1.318/mutation-changed-provider-result.txt": "f5d4fa494cc253c09651151a1f94afbf0badb52d450e27ce7624584639b46744",
+    "evidence/M2/provider/claude-2.1.318/control-late-session-context.txt": "7fbb25cc041b8da120c0b0dbae4cef599da18bce9a28e9f14f214f041e283a84",
+    "evidence/M2/provider/claude-2.1.318/trace-probe-no-observer-endpoints.txt": "ca89d4b330bdeba335fc7d90c0ce4c3586d002a94fa4f26bb1d3db3a8a59a792",
+    "evidence/M2/provider/claude-2.1.318/mutation-late-session-context.txt": "36bd35a19a598ceeadbd399de4a2427cc9d4d6295ba7ddf51fc144a8d92e2f6e",
+    "evidence/M2/provider/claude-2.1.318/probe-no-observer.txt": "345b1aa2690663a2a9982643a43497e8142a70174685b6a57621fb9f401abe6b",
+    "evidence/M2/provider/claude-2.1.318/control-forged-core-settlement.txt": "e933109b6cea9da3572932aa4945db06876c1158806aa0730b895f7d338680c5",
+    "evidence/M2/provider/claude-2.1.318/inventory-schema.json": "a21319cf62cd6e9d6fe660d4b9d97207da1cb159b9be5df41d2e252ab2c9ca8b",
+    "evidence/M2/provider/claude-2.1.318/control-no-observer.txt": "aac364c44d95ddced9a1ff874cf42918e0ef38630073b47abf54f6b3c4c4b7e3",
+    "evidence/M2/provider/claude-2.1.318/trace-probe-endpoints.txt": "97166974d8893063c26f152d37be68a3c3f1a16a731eb0b0e6c4eeea2c940aa6",
+    "evidence/M2/provider/claude-2.1.318/test-after-final.txt": "d86d2c35cbe92d14f273dd5f2b7816d0bdfd9ec7d02123161d5c8588c23bd372",
+    "evidence/M2/provider/claude-2.1.318/rust-provider-tests.txt": "2b3325d1c89c3367ac8b0beaf64b2b257de7e9304ff478884ded6ca9c5e54d66",
+    "evidence/M2/provider/claude-2.1.318/test-before.txt": "b4470416c7eb59ba5a90316641f3d81f56f878b60164f73af87b33b3d32dd1af",
+    "evidence/M2/provider/claude-2.1.318/control-changed-provider-result.txt": "db778036f1c26d410d102b38eb9a828a1a6e376cad187b43398ef32d8b45bc04",
+    "evidence/M2/provider/claude-2.1.318/control-unchanged.txt": "c6ce75b872190b0663f6cd4421040bd4c679eded9ef03f8e5257d5969b3272a6",
+    "evidence/M2/provider/claude-2.1.318/commands.json": "88f8a3aa639e02dbc7784a66b0798d64fbb794a13e161de463f79c9630a81316",
+    "evidence/M2/provider/claude-2.1.318/README.md": "fdbc4744ab0a46261f1e8e3a2815a56a62f2447b01b1cc0c82f0f943db473e6c",
+    "evidence/M2/provider/claude-2.1.318/identity.json": "cb6fbefc40b14cd72e7dada47354625a1d246613700c3ed1df27937f0ccc5f58",
+    "evidence/M2/provider/claude-2.1.318/mutation-duplicated-observations.txt": "81627a7188860709e5d77199718a7b0c7dd162ee171c22244229a9a3fe8970a4",
+    "evidence/M2/provider/claude-2.1.318/mutation-duplicate-observer.txt": "ba61848f64c0d6ea684ab8a68c4ab243f793e0d5f2465ab386488dad5b894271",
+    "evidence/M2/provider/claude-2.1.318/settings-schema-output.txt": "6cfc52446fe148112045ebcddd5a82975d2d1637586fd1fdaa0b9f152a5cd6b6",
+    "evidence/M2/provider/claude-2.1.318/loading.txt": "d19a8d0b4c0d2a7950fbc0d5cbdaa41eb893cf540d5602f762dc3eb3b5f32232",
+    "evidence/M2/provider/claude-2.1.318/validate-after.txt": "04a9d6db0c8ade1002021fa6afa51c950d436f7e308db46c891e03b73cabe09e",
+    "evidence/M2/provider/claude-2.1.318/replay-controls.txt": "a2aca563c3bbf35b41f4f05b8af1a1bdafbaa59fe65743abfe820d4bc5785024",
+    "evidence/M2/provider/claude-2.1.318/portable-ownership.txt": "9cdd980236a0539471981c6b958f15d911c3388933f574f48d1af45f797ba467",
+    "evidence/M2/provider/claude-2.1.318/declarations.json": "2010987451f427c3ed17778b16e2e23382067a4095b0bd9fd5ec26c3f7f69c30",
+    "evidence/M2/provider/claude-2.1.318/run-controls.py": "dd06bd93a8383f02e2b88d580c29299cd08c5529ec56929d115f1e41751ca20c",
+    "evidence/M2/provider/claude-2.1.318/test-after.txt": "9c48d63954c0977138fa86b3a12842328cb2027bbaeaefe52de2ccd664e498e1",
+    "evidence/M2/provider/claude-2.1.318/portable-latency.txt": "20641f8e806a7a3a6c27d7f8f490760dcacb38ef34e7416f051d3c0a7687c0d7",
+    "evidence/M2/provider/claude-2.1.318/settings-schema.json": "fb950be1fd5ecd03df4bc585082ad3ffb245e9e15488bb918dea63d2ffa0cddd",
+    "evidence/M2/provider/claude-2.1.318/rust-provider-lib-tests.txt": "bee31d9940071e66e7a3acd7f529bd2d9ec07cbd96fda098915701f11e138e54",
+    "evidence/M2/provider/claude-2.1.318/compare-declarations.py": "92496a85341ece2daef146caaa4b4d40ff2f3ef5fe39fc7b6ba3f88905a284e5",
+    "evidence/M2/provider/claude-2.1.318/validate-before.txt": "9f24c0bda1ffe4994959d0c48e2984b15542e0d7f767f0a6054ff9b1c218550f",
+    "evidence/M2/provider/claude-2.1.318/control-duplicated-observations.txt": "4eca810e48cd0dda7ae0bfaa6ece8a51c31039de2a120c9a358444603763f8f7",
+    "evidence/M2/provider/claude-2.1.318/probe-observer.txt": "f48e830ce19581a1081c6fc040fc362948b826ab7a721e2f2534fee7dda0a34a"
+  },
+  "requalification": {
+    "from": "2.1.295 (D-0009); 2.1.310 is an unqualified nearest-prior declaration baseline only",
+    "decision": "PENDING_PARENT_NATIVE_QUALIFICATION",
+    "basis": [
+      "97/97 names present; 2 complete retained 2.1.295 signatures identical, 95 equality checks NOT_VERIFIABLE",
+      "97/97 named signatures identical to retained 2.1.310 generated API declarations",
+      "41/41 kit tests; 3 observer-free controls; 4 semantic mutation controls rejected",
+      "Production observer semantics and qualified-version list unchanged"
+    ],
+    "unqualifiedVersions": "2.1.318 remains lower-tier; QUALIFIED_OBSERVER_VERSIONS is unchanged.",
+    "recommendedProfileChange": "Do not admit yet. After parent native qualification passes and the missing-2.1.295-baseline limitation is explicitly settled, append exactly \"2.1.318\" to QUALIFIED_OBSERVER_VERSIONS, preserving the existing 2.1.291/2.1.295 entries and acceptedInputProvenance=true / automaticHumanFollowupResolution=false."
+  }
+}

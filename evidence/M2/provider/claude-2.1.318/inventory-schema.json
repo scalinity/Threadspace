@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "workerRead": {
+    "command": "/Users/danny/.local/share/claude/versions/2.1.318 agents --json --all",
+    "exitStatus": 0,
+    "rootType": "array",
+    "rows": 0,
+    "config": "disposable",
+    "rawOutputPublished": false
+  },
+  "parentRead": {
+    "source": "Parent NativePeers message 2b758511-f024-40cd-bdbd-2d0be7fd15db; parent-reported, not independently repeated by this worker",
+    "command": "claude agents --json --all",
+    "rootType": "array",
+    "rows": 7,
+    "kinds": [
+      "interactive"
+    ],
+    "fields": {
+      "cwd": "string",
+      "kind": "string",
+      "name": "string",
+      "pid": "integer",
+      "sessionId": "string",
+      "startedAt": "integer",
+      "status": "string",
+      "waitingFor": "string"
+    },
+    "statuses": [
+      "busy",
+      "waiting"
+    ],
+    "rawOutputPublished": false
+  },
+  "parser": "crates/provider-claude/src/inventory.rs::parse_rows, InventoryRow, interpret_status",
+  "comparison": "PASS: all reported field names/types and statuses are supported; no parser/fixture change needed.",
+  "backgroundRows": "NOT_RUN: no native background row observed; existing synthetic coverage does not establish 2.1.318 native shape."
+}

@@ -1,0 +1,1213 @@
+{
+  "schema": 1,
+  "milestone": "M2",
+  "purpose": "Same 97 declarations as D-0009; explicit missing-baseline limits and an actual nearest-prior comparison.",
+  "source": "Installed 2.1.318 generated API declarations beside a disposable mod with CLAUDE_CODE_PLUGIN_DIR_WATCH=1. Bundled authoring skill extraction could not run without login; no authentication was changed.",
+  "method": "Strip comments preserving quoted literals; compare declaration tokens ignoring formatting; module-scope boundaries prevent aliases absorbing the next declaration.",
+  "baseline295": {
+    "version": "2.1.295",
+    "sha256": "e2e13b2ceb80ff3cde49d8427ebe19c782a24caa817c7b20c56f91925a06f9cb",
+    "lines": 21463,
+    "firstLine": "// Written by Claude Code 2.1.295."
+  },
+  "candidate318": {
+    "version": "2.1.318",
+    "sha256": "042ff9743dc3fee570ff699e51ebc1071252c3eec6116294a72bf0568e5aed37",
+    "lines": 17421,
+    "firstLine": "// Written by Claude Code 2.1.318."
+  },
+  "prior310": {
+    "version": "2.1.310",
+    "sha256": "95bd52583669d28e8fefb0675fe48630a4f7cc42a1d3ee22aa445d7998a45334",
+    "lines": 16981,
+    "firstLine": "// Written by Claude Code 2.1.310.",
+    "source": "Retired worker disposable mod API declarations; not a qualified build."
+  },
+  "counts295": {
+    "named": 97,
+    "present318": 97,
+    "identicalVerified": 2,
+    "changedVerified": 0,
+    "removed": 0,
+    "notVerifiable": 95
+  },
+  "counts310": {
+    "compared": 97,
+    "identical": 97,
+    "changed": 0,
+    "removed": 0
+  },
+  "baselineFragmentNotes": [
+    "AgentSpawnInput still has optional workflow { runId: string; agentIndex: number }; this fragment does not establish full equality.",
+    "AgentSpawnArgs is a Pick/Partial alias; the retained workflow diff cannot establish its full signature.",
+    "The ToolCallEnvelope retained diff names ToolCallInput; no full ToolCallEnvelope baseline signature survives.",
+    "No additive/breaking conclusion can be made for the 95 unverified 2.1.295 signatures. There are no changes of either kind against 2.1.310."
+  ],
+  "duplicateNames": [],
+  "declarations": [
+    {
+      "name": "AgentSpawnArgs",
+      "candidate": {
+        "line": 251,
+        "signature": "export type AgentSpawnArgs = Pick<AgentSpawnInput, 'prompt'> & Partial<Pick<AgentSpawnInput, 'description' | 'subagentType' | 'model' | 'name' | 'cwd'>>;",
+        "normalizedSha256": "e30bda75bfb7f10434ccf9c54af7f056c171ea0fe45dfa8514bd3c0fcd9d0b8e"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "e30bda75bfb7f10434ccf9c54af7f056c171ea0fe45dfa8514bd3c0fcd9d0b8e"
+    },
+    {
+      "name": "AgentSpawnInput",
+      "candidate": {
+        "line": 261,
+        "signature": "export type AgentSpawnInput = {\n      tool_use_id: string;\n      prompt: string;\n      description: string;\n      subagentType: string;\n      provider: Origin;\n      model?: string;\n      parentModel: string;\n      parentAgentId?: string;\n      permissionMode?: string;\n      background: boolean;\n      fork: boolean;\n      isTeammate?: true;\n      workflow?: {\n          runId: string;\n          agentIndex: number;\n      };\n      resume?: {\n          agentId: string;\n      };\n      name?: string;\n      cwd?: string;\n  };",
+        "normalizedSha256": "b52fe13081895231e30505492bd05e775364bc1883eeec60deda3d6decba9d50"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "b52fe13081895231e30505492bd05e775364bc1883eeec60deda3d6decba9d50"
+    },
+    {
+      "name": "AgentSpawnResult",
+      "candidate": {
+        "line": 422,
+        "signature": "export type AgentSpawnResult = {\n      model: string;\n      agentId?: string;\n      teammateId?: string;\n      deny?: undefined;\n  } | {\n      deny: string;\n      model?: undefined;\n      agentId?: undefined;\n      teammateId?: undefined;\n  };",
+        "normalizedSha256": "265c16a8d139980cc612a56ed91805ab03af4b1ef37b42c2c986dfdb3dd60390"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "265c16a8d139980cc612a56ed91805ab03af4b1ef37b42c2c986dfdb3dd60390"
+    },
+    {
+      "name": "BuiltinToolCallInput",
+      "candidate": {
+        "line": 1029,
+        "signature": "export type BuiltinToolCallInput = [BuiltinToolName] extends [never] ? BuiltinToolCallInputFallback : {\n      [N in BuiltinToolName]: ToolInputOf<N, BuiltinToolInputs[N]>;\n  }[BuiltinToolName];",
+        "normalizedSha256": "43d729aa6bf7ac44472db9703c4953a45d21489485890cb158e237f6c6bd3303"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "43d729aa6bf7ac44472db9703c4953a45d21489485890cb158e237f6c6bd3303"
+    },
+    {
+      "name": "ClassicEvent",
+      "candidate": {
+        "line": 16350,
+        "signature": "export type ClassicEvent = Exclude<ClassicEventName, 'classic.PreToolUse'> extends `classic.${infer E}` ? E : never;",
+        "normalizedSha256": "ef55661fd44a33044713f2447492aa10288fdb73919204991563232740ed6b5a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "ef55661fd44a33044713f2447492aa10288fdb73919204991563232740ed6b5a"
+    },
+    {
+      "name": "ClassicEventName",
+      "candidate": {
+        "line": 1274,
+        "signature": "export type ClassicEventName = `classic.${ClassicHookEvent}`;",
+        "normalizedSha256": "ddda2708995d1f957572ea1f908a7ac3b04fc246f7455b23e16344627169a8ac"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "ddda2708995d1f957572ea1f908a7ac3b04fc246f7455b23e16344627169a8ac"
+    },
+    {
+      "name": "ClassicEventOf",
+      "candidate": {
+        "line": 1287,
+        "signature": "export type ClassicEventOf = {\n      [E in ClassicHookEvent as `classic.${E}`]: E extends 'PreToolUse' ? ToolCallEnvelope : ClassicHookInputs[E];\n  };",
+        "normalizedSha256": "26cab486c9976dec1ce7a3025feef15ce1b580363525c9a5efcca1703c0394e7"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "26cab486c9976dec1ce7a3025feef15ce1b580363525c9a5efcca1703c0394e7"
+    },
+    {
+      "name": "ClassicFields",
+      "candidate": {
+        "line": 16360,
+        "signature": "export type ClassicFields<E extends ClassicEvent> = Omit<ClassicEventOf[`classic.${E}`], 'hook_event_name' | 'session_id' | 'transcript_path' | 'cwd'> & Partial<Pick<ClassicEventOf[`classic.${E}`], 'session_id' | 'transcript_path' | 'cwd'>>;",
+        "normalizedSha256": "67a1bc767d5e0f9ab3e5291c52061c77ef0beb53dee8d791e57dd3389eb63772"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "67a1bc767d5e0f9ab3e5291c52061c77ef0beb53dee8d791e57dd3389eb63772"
+    },
+    {
+      "name": "ClassicHookEvent",
+      "candidate": {
+        "line": 1294,
+        "signature": "export type ClassicHookEvent = HookInput['hook_event_name'];",
+        "normalizedSha256": "2e04e8cd9b4ea6c933dcf64c1290a591ba2570e9d92b307e789256644958d5e0"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2e04e8cd9b4ea6c933dcf64c1290a591ba2570e9d92b307e789256644958d5e0"
+    },
+    {
+      "name": "ClassicHookInputs",
+      "candidate": {
+        "line": 1300,
+        "signature": "export type ClassicHookInputs = {\n      [I in HookInput as I['hook_event_name']]: I;\n  };",
+        "normalizedSha256": "525a5fbddc6cf5c507397187826f52e9e29c0d40c01bc2bd38bcdcbeb4777f2c"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "525a5fbddc6cf5c507397187826f52e9e29c0d40c01bc2bd38bcdcbeb4777f2c"
+    },
+    {
+      "name": "ClassicResult",
+      "candidate": {
+        "line": 1312,
+        "signature": "export type ClassicResult = {\n      block?: string;\n      preventContinuation?: true;\n      stopReason?: string;\n      additionalContext?: string[];\n      sessionTitle?: string;\n      suppressOriginalPrompt?: true;\n      initialUserMessage?: string;\n      watchPaths?: string[];\n      reloadSkills?: true;\n      permissionDecision?: 'allow' | 'deny' | 'ask';\n      permissionDecisionReason?: string;\n      decision?: PermissionRequestDecision;\n      updatedToolOutput?: unknown;\n      updatedMCPToolOutput?: unknown;\n      retry?: true;\n      displayContent?: string;\n      worktreePath?: string;\n  };",
+        "normalizedSha256": "6e9a3f5ba6584a70520494bc70a1ea4658dc4f5a7a4d920184b4f9eb9831ae3a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "6e9a3f5ba6584a70520494bc70a1ea4658dc4f5a7a4d920184b4f9eb9831ae3a"
+    },
+    {
+      "name": "ClassicResultFields",
+      "candidate": {
+        "line": 1396,
+        "signature": "export type ClassicResultFields = {\n      UserPromptSubmit: 'additionalContext' | 'sessionTitle' | 'suppressOriginalPrompt';\n      UserPromptExpansion: 'additionalContext' | 'suppressOriginalPrompt';\n      SessionStart: 'additionalContext' | 'initialUserMessage' | 'sessionTitle' | 'watchPaths' | 'reloadSkills';\n      Setup: 'additionalContext';\n      PreModelSwitch: 'permissionDecision' | 'permissionDecisionReason';\n      PostModelSwitch: 'additionalContext';\n      SubagentStart: 'additionalContext';\n      PostToolUse: 'additionalContext' | 'updatedToolOutput' | 'updatedMCPToolOutput';\n      PostToolUseFailure: 'additionalContext';\n      PostToolBatch: 'additionalContext';\n      Stop: 'additionalContext';\n      SubagentStop: 'additionalContext';\n      PermissionDenied: 'retry';\n      PermissionRequest: 'decision';\n      MessageDisplay: 'displayContent';\n      WorktreeCreate: 'worktreePath';\n  };",
+        "normalizedSha256": "71fe875d4d6650b366dcd6090b405df194105702c74136144b83d02b6ba4713b"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "71fe875d4d6650b366dcd6090b405df194105702c74136144b83d02b6ba4713b"
+    },
+    {
+      "name": "ClassicResultOf",
+      "candidate": {
+        "line": 1422,
+        "signature": "export type ClassicResultOf = {\n      [E in ClassicHookEvent as `classic.${E}`]: E extends 'PreToolUse' ? PreToolUseResult : Pick<ClassicResult, 'block' | 'preventContinuation' | 'stopReason' | (E extends keyof ClassicResultFields ? ClassicResultFields[E] : never)>;\n  };",
+        "normalizedSha256": "c062aea8537ac23eacc0faa0974543b992ce699cc4e5b680148499b3268a639a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "c062aea8537ac23eacc0faa0974543b992ce699cc4e5b680148499b3268a639a"
+    },
+    {
+      "name": "ConfigOrigin",
+      "candidate": {
+        "line": 2001,
+        "signature": "export type ConfigOrigin = {\n      kind: 'composer';\n  } | {\n      kind: 'bridge';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "8e7cf0378d4f4761c168fcca100aa7bb240b8867eeb6c457200d7b8b0b1cda01"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "8e7cf0378d4f4761c168fcca100aa7bb240b8867eeb6c457200d7b8b0b1cda01"
+    },
+    {
+      "name": "EngineClassic",
+      "candidate": {
+        "line": 16455,
+        "signature": "export type EngineClassic = {\n      [E in ClassicEvent]: (e: ClassicFields<E>) => Promise<ClassicResultOf[`classic.${E}`]>;\n  };",
+        "normalizedSha256": "e63c76eb678a9c67794b534bf37fb192d816a60aa3926fbbf260d02d481f0992"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "e63c76eb678a9c67794b534bf37fb192d816a60aa3926fbbf260d02d481f0992"
+    },
+    {
+      "name": "EventCalls",
+      "candidate": {
+        "line": 4940,
+        "signature": "export type EventCalls = {\n      tool: {\n          call: ToolCallOverloads;\n          check: (input: ToolCheckArgs) => Promise<ToolCheckResult>;\n          describe: (input: ToolDescribeInput) => Promise<ToolDescribeResult>;\n      };\n      command: {\n          run: (input: CommandRunArgs) => Promise<CommandRunResult>;\n          describe: (input: CommandDescribeInput) => Promise<CommandDescribeResult>;\n      };\n      config: {\n          set: (input: ConfigSetArgs) => Promise<ConfigSetResult>;\n          describe: (input: ConfigDescribeInput) => Promise<ConfigDescribeResult>;\n      };\n      prompt: {\n          submit: (input: PromptSubmitArgs) => Promise<PromptSubmitResult>;\n          fill: (input: PromptFillArgs) => Promise<PromptFillResult>;\n          suggest: (input: PromptSuggestArgs) => Promise<PromptSuggestResult>;\n          section: (input: PromptSectionInput) => Promise<PromptSectionResult>;\n          context: (input: PromptContextInput) => Promise<PromptContextResult>;\n          attachment: (input: PromptAttachmentInput) => Promise<PromptAttachmentResult>;\n          mention: (input: PromptMentionInput) => Promise<PromptMentionResult>;\n          compose: (input?: PromptComposeArgs) => Promise<PromptComposeResult>;\n      };\n      skill: {\n          prompt: (input: SkillPromptArgs) => Promise<SkillPromptResult>;\n      };\n      attribution: {\n          text: (input: AttributionTextInput) => Promise<AttributionTextResult>;\n      };\n      agent: {\n          offer: (input: AgentOfferInput) => Promise<AgentOfferResult>;\n          spawn: (input: AgentSpawnArgs) => Promise<AgentSpawnResult>;\n      };\n      session: {\n          start: (input: SessionStartInput) => Promise<SessionStartResult>;\n          receive: (input: SessionReceiveInput) => Promise<SessionReceiveResult>;\n          append: (input: SessionAppendInput) => Promise<SessionAppendResult>;\n          send: (input: SessionSendArgs) => Promise<SessionSendResult>;\n          compact: (input?: SessionCompactArgs) => Promise<SessionCompactResult>;\n          attach: (input: SessionAttachInput) => Promise<SessionAttachResult>;\n          detach: (input: SessionDetachInput) => Promise<SessionDetachResult>;\n          measure: (input: SessionMeasureInput) => Promise<SessionMeasureResult>;\n          end: (input: SessionEndInput) => Promise<SessionEndResult>;\n      };\n      telemetry: {\n          log: (input: TelemetryLogArgs) => Promise<TelemetryLogResult>;\n          mark: (input: TelemetryMarkInput) => Promise<TelemetryMarkResult>;\n      };\n      turn: {\n          start: (input: TurnStartInput) => Promise<TurnStartResult>;\n          step: (input: TurnStepInput) => HookStream<TurnStepChunk, TurnStepResult>;\n          complete: (input: TurnCompleteInput) => Promise<TurnCompleteResult>;\n      };\n      ui: {\n          render: <C extends RenderComponent>(input: RenderInput<C>) => Promise<RenderElement>;\n          resolve: <E extends ResolveInput>(e: E) => Elements[E['surface']];\n          scroll: (input: UiScrollArgs) => Promise<UiScrollResult>;\n          focus: (input: UiFocusArgs) => Promise<UiFocusResult>;\n      };\n  };",
+        "normalizedSha256": "0475bfabac0a3553678d8c5cc490cbc86bf54c20b35477ae04c8320205e48751"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "0475bfabac0a3553678d8c5cc490cbc86bf54c20b35477ae04c8320205e48751"
+    },
+    {
+      "name": "GlobNext",
+      "candidate": {
+        "line": 5295,
+        "signature": "export type GlobNext<P extends Pattern, N extends EventName = Selected<P>> = OrderedOverloads<N> & {\n      (e: Args<N>): Promise<GlobNextResult<N>>;\n      readonly to: (e: Args<N>, tier: TargetTier) => Promise<GlobNextResult<N>>;\n      readonly signal: AbortSignal;\n      readonly is: <M extends PatternOver<N>>(pattern: M, e: unknown) => e is Frozen<Args<Extract<N, Selected<M>>>>;\n      readonly event: N;\n      readonly origin: Origin;\n      readonly trace: readonly TraceEntry<N, Args<N>, GlobNextResult<N>>[];\n      readonly budget: NextBudget;\n  };",
+        "normalizedSha256": "ce306825bb2f43f1dcaf41ab827584f5b4b407a0dc7465135f37d45f380a1ca7"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "ce306825bb2f43f1dcaf41ab827584f5b4b407a0dc7465135f37d45f380a1ca7"
+    },
+    {
+      "name": "McpToolCallInput",
+      "candidate": {
+        "line": 6214,
+        "signature": "export type McpToolCallInput = [keyof McpToolInputs] extends [never] ? McpToolCallInputFallback : {\n      [N in keyof McpToolInputs & string]: ToolInputOf<N, McpToolInputs[N] & Record<string, unknown>>;\n  }[keyof McpToolInputs & string];",
+        "normalizedSha256": "1ab04258c43240adae6b492805d33fe75068e86b4400454ecd9b91417afa6229"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "1ab04258c43240adae6b492805d33fe75068e86b4400454ecd9b91417afa6229"
+    },
+    {
+      "name": "MockSession",
+      "candidate": {
+        "line": 16992,
+        "signature": "export type MockSession = {\n      appended: () => readonly SessionAppendInput[];\n  };",
+        "normalizedSha256": "d0ca9659968f32fc5b61f6b144667fe82b2f25979464119757c3e82483c127f0"
+      },
+      "against2_1_295": "IDENTICAL",
+      "reason2_1_295": "Complete declaration retained as added/replacement lines in the 2.1.295 record.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "d0ca9659968f32fc5b61f6b144667fe82b2f25979464119757c3e82483c127f0"
+    },
+    {
+      "name": "Next",
+      "candidate": {
+        "line": 6859,
+        "signature": "export type Next<N extends EventName = EventName, E = Args<N>, O = NextResult<N>, S extends {\n      [K in N]?: unknown;\n  } = {\n      [K in N]: Args<K>;\n  }> = {\n      <T extends string>(e: E & ToolNamed<T>): Promise<NextResultFor<N, O, T>>;\n      (e: E): Promise<O>;\n      readonly to: {\n          <T extends string>(e: E & ToolNamed<T>, tier: TargetTier): Promise<NextResultFor<N, O, T>>;\n          (e: E, tier: TargetTier): Promise<O>;\n      };\n      readonly signal: AbortSignal;\n      readonly is: <M extends PatternOver<N>>(pattern: M, e: unknown) => e is Frozen<S[Extract<N, Selected<M>>]>;\n      readonly event: N;\n      readonly origin: Origin;\n      readonly trace: readonly TraceEntry<N, E, O>[];\n      readonly budget: NextBudget;\n  };",
+        "normalizedSha256": "cc28bc01657dfe980215bcecb060dab8b44c768c84c71cc9463540383ced360a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "cc28bc01657dfe980215bcecb060dab8b44c768c84c71cc9463540383ced360a"
+    },
+    {
+      "name": "Origin",
+      "candidate": {
+        "line": 7692,
+        "signature": "export type Origin = {\n      readonly plugin: string;\n      readonly tier: Tier;\n  };",
+        "normalizedSha256": "df5e3a5591c9c60d09d889cd75400297c340897fb841ab54fe3417aa479e6c22"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "df5e3a5591c9c60d09d889cd75400297c340897fb841ab54fe3417aa479e6c22"
+    },
+    {
+      "name": "PaneCloseOrigin",
+      "candidate": {
+        "line": 7741,
+        "signature": "export type PaneCloseOrigin = {\n      kind: 'plugin' | 'person' | 'unload';\n  };",
+        "normalizedSha256": "db8a4e70b8f9ef745150025fb5d6394d63b69ce2c3fe7850b110fd2aae2bb2a8"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "db8a4e70b8f9ef745150025fb5d6394d63b69ce2c3fe7850b110fd2aae2bb2a8"
+    },
+    {
+      "name": "PressedLink",
+      "candidate": {
+        "line": 8315,
+        "signature": "export type PressedLink = {\n      href: string;\n  };",
+        "normalizedSha256": "fb40067b172a0415f8d8f7669e9c9fbc783ee264e666b908719aeb6904227537"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "fb40067b172a0415f8d8f7669e9c9fbc783ee264e666b908719aeb6904227537"
+    },
+    {
+      "name": "PromptAttachmentOrigin",
+      "candidate": {
+        "line": 8566,
+        "signature": "export type PromptAttachmentOrigin = {\n      kind: 'engine';\n  } | {\n      kind: 'hook';\n      event: string;\n  } | {\n      kind: 'plugin';\n      event: string;\n  };",
+        "normalizedSha256": "6fa5ba07dbd00e7d90565e4b333c546775e9f113b701ee2e934708e1869a801b"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "6fa5ba07dbd00e7d90565e4b333c546775e9f113b701ee2e934708e1869a801b"
+    },
+    {
+      "name": "PromptEditOrigin",
+      "candidate": {
+        "line": 9086,
+        "signature": "export type PromptEditOrigin = {\n      kind: 'composer';\n  };",
+        "normalizedSha256": "65ebeca3887e2993fadeede895212fe109af582c0ca779eed661e4bd7d59d7eb"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "65ebeca3887e2993fadeede895212fe109af582c0ca779eed661e4bd7d59d7eb"
+    },
+    {
+      "name": "PromptFillOrigin",
+      "candidate": {
+        "line": 9249,
+        "signature": "export type PromptFillOrigin = {\n      kind: 'engine';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "d3b3a9759ece87722dbc1ab632681efb479f1277eb10d74a47772e3cc85de901"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "d3b3a9759ece87722dbc1ab632681efb479f1277eb10d74a47772e3cc85de901"
+    },
+    {
+      "name": "PromptOrigin",
+      "candidate": {
+        "line": 9470,
+        "signature": "export type PromptOrigin = {\n      kind: 'composer';\n  } | {\n      kind: 'bridge';\n  } | {\n      kind: 'sdk';\n  } | {\n      kind: 'task-notification';\n  } | {\n      kind: 'scheduled-trigger';\n  } | {\n      kind: 'peer';\n  } | {\n      kind: 'peer-send-message';\n  } | {\n      kind: 'projects-relay';\n  } | {\n      kind: 'channel';\n      server: string;\n  } | {\n      kind: 'coordinator';\n  } | {\n      kind: 'observer';\n  } | {\n      kind: 'observer-activity';\n  } | {\n      kind: 'auto-continuation';\n  } | {\n      kind: 'unclassified';\n  } | {\n      kind: 'slack-ping';\n  } | {\n      kind: 'plugin';\n      name: string;\n      asUser?: true;\n  };",
+        "normalizedSha256": "61fc6e08a6e4a2231ebcdb9adf7a3b86eb8d73149092ccd9956d345a277af3aa"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "61fc6e08a6e4a2231ebcdb9adf7a3b86eb8d73149092ccd9956d345a277af3aa"
+    },
+    {
+      "name": "PromptSubmitArgs",
+      "candidate": {
+        "line": 9670,
+        "signature": "export type PromptSubmitArgs = Omit<PromptSubmitInput, 'origin' | 'turnId' | 'wait' | 'context' | 'command' | 'isMeta'> & {\n      asUser?: true;\n  };",
+        "normalizedSha256": "779788da6b040cb9a08033d968f2a9a3af8e6ccad9a86446765125f970ba5afd"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "779788da6b040cb9a08033d968f2a9a3af8e6ccad9a86446765125f970ba5afd"
+    },
+    {
+      "name": "PromptSubmitAttachment",
+      "candidate": {
+        "line": 9689,
+        "signature": "export type PromptSubmitAttachment = {\n      type: 'image' | 'audio' | 'document';\n      mediaType?: string;\n      filename?: string;\n      id?: string;\n  };",
+        "normalizedSha256": "5766279a53a5117f19cbd0d6a8c89c7f51fd48ed77b641f3a169ff751a6590e5"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "5766279a53a5117f19cbd0d6a8c89c7f51fd48ed77b641f3a169ff751a6590e5"
+    },
+    {
+      "name": "PromptSubmitInput",
+      "candidate": {
+        "line": 9736,
+        "signature": "export type PromptSubmitInput = {\n      text: string;\n      command?: PromptSubmitCommand;\n      isMeta?: true;\n      attachments?: readonly PromptSubmitAttachment[];\n      context?: readonly string[];\n      turnId?: string;\n      wait: boolean;\n      origin: PromptOrigin;\n  };",
+        "normalizedSha256": "a964a82ebb1fc11b5985b6317cf1ace3b2cc928d77bea7abe01af1b2b7460d64"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a964a82ebb1fc11b5985b6317cf1ace3b2cc928d77bea7abe01af1b2b7460d64"
+    },
+    {
+      "name": "PromptSubmitResult",
+      "candidate": {
+        "line": 9814,
+        "signature": "export type PromptSubmitResult = {\n      text: string;\n      context?: readonly string[];\n      origin?: PromptOrigin;\n      drop?: undefined;\n  } | {\n      drop: string;\n      text?: undefined;\n      context?: undefined;\n      origin?: undefined;\n  };",
+        "normalizedSha256": "f5d2955e2d1a6908464210ec77a68e41a73574e4a150a527b960b09df658c18a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "f5d2955e2d1a6908464210ec77a68e41a73574e4a150a527b960b09df658c18a"
+    },
+    {
+      "name": "PromptSuggestOrigin",
+      "candidate": {
+        "line": 9881,
+        "signature": "export type PromptSuggestOrigin = {\n      kind: 'suggestion';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "d2edb9278fb3f2b0448bc8a4010737559809bb0d3d79552b8ed11c262668cf45"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "d2edb9278fb3f2b0448bc8a4010737559809bb0d3d79552b8ed11c262668cf45"
+    },
+    {
+      "name": "SessionAttachInput",
+      "candidate": {
+        "line": 11581,
+        "signature": "export type SessionAttachInput = {\n      surface: RenderSurface;\n      clientId: string;\n      viewport?: RenderViewport;\n  };",
+        "normalizedSha256": "7ebff7407c25f97df25ffb4942204571e76dfdfe54d08975f6d25d62ed47e94a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "7ebff7407c25f97df25ffb4942204571e76dfdfe54d08975f6d25d62ed47e94a"
+    },
+    {
+      "name": "SessionAttachResult",
+      "candidate": {
+        "line": 11602,
+        "signature": "export type SessionAttachResult = {\n      clientId: string;\n  };",
+        "normalizedSha256": "00f5ea7b8b8c63d55d00c346469349ede625005b3ef4c2305a417f5c5dc9ae1d"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "00f5ea7b8b8c63d55d00c346469349ede625005b3ef4c2305a417f5c5dc9ae1d"
+    },
+    {
+      "name": "SessionAuthorization",
+      "candidate": {
+        "line": 11613,
+        "signature": "export type SessionAuthorization = {\n      handle: string;\n      kind: 'bearer' | 'api-key';\n  } | null;",
+        "normalizedSha256": "8252001cf6c0850f6d952bedae7e581f24cf3eae85f8d4fac3bbfc3e82acba4a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "8252001cf6c0850f6d952bedae7e581f24cf3eae85f8d4fac3bbfc3e82acba4a"
+    },
+    {
+      "name": "SessionCompactArgs",
+      "candidate": {
+        "line": 11622,
+        "signature": "export type SessionCompactArgs = {\n      instructions?: string;\n  };",
+        "normalizedSha256": "4145a5fdeba10f3d92c3004a2472e8ebb2b2f04e7c88104bc21bd6d98e571270"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "4145a5fdeba10f3d92c3004a2472e8ebb2b2f04e7c88104bc21bd6d98e571270"
+    },
+    {
+      "name": "SessionCompactInput",
+      "candidate": {
+        "line": 11673,
+        "signature": "export type SessionCompactInput = {\n      trigger: SessionCompactTrigger;\n      agentId?: string;\n      instructions?: string;\n      messages: readonly SessionMessage[];\n  };",
+        "normalizedSha256": "f81d24593d91ed1d676d6fb1f18dd1e4cad1c06adc3a8e4d0001a5704ce50d78"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "f81d24593d91ed1d676d6fb1f18dd1e4cad1c06adc3a8e4d0001a5704ce50d78"
+    },
+    {
+      "name": "SessionCompactResult",
+      "candidate": {
+        "line": 11711,
+        "signature": "export type SessionCompactResult = SessionCompacted | SessionCompactSkipped;",
+        "normalizedSha256": "2e085182d75251a57ce5976e6a373f04110bcacbf2e3c321ba70ea4ffd501ca2"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2e085182d75251a57ce5976e6a373f04110bcacbf2e3c321ba70ea4ffd501ca2"
+    },
+    {
+      "name": "SessionCompactSkipped",
+      "candidate": {
+        "line": 11719,
+        "signature": "export type SessionCompactSkipped = {\n      skip: string;\n      messages?: undefined;\n  };",
+        "normalizedSha256": "c2d4a856b274da227be0735def0731f85ac64202a671587f6d0e0a55c80f9de6"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "c2d4a856b274da227be0735def0731f85ac64202a671587f6d0e0a55c80f9de6"
+    },
+    {
+      "name": "SessionCompactTrigger",
+      "candidate": {
+        "line": 11734,
+        "signature": "export type SessionCompactTrigger = 'manual' | 'auto' | 'plugin' | 'precompute';",
+        "normalizedSha256": "620390db874652ad7039c835ebfbddec381402b02635c5fd1b68eabfd728eb83"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "620390db874652ad7039c835ebfbddec381402b02635c5fd1b68eabfd728eb83"
+    },
+    {
+      "name": "SessionCompacted",
+      "candidate": {
+        "line": 11634,
+        "signature": "export type SessionCompacted = {\n      messages: readonly SessionMessage[];\n      tokensBefore?: number;\n      tokensAfter?: number;\n      usage?: ModelUsage;\n      skip?: undefined;\n  };",
+        "normalizedSha256": "de21e1b4062bf067edd0389c51023cd6d23bf161c9a74894ea424750cd278e79"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "de21e1b4062bf067edd0389c51023cd6d23bf161c9a74894ea424750cd278e79"
+    },
+    {
+      "name": "SessionContextBreakdown",
+      "candidate": {
+        "line": 11744,
+        "signature": "export type SessionContextBreakdown = {\n      categories: ContextCategory[];\n      totalTokens: number;\n      maxTokens: number;\n      rawMaxTokens: number;\n      autocompactSource: ContextWindowSource;\n      percentage: number;\n      gridRows: ContextGridSquare[][];\n      model: string;\n      memoryFiles: ContextMemoryFile[];\n      mcpTools: ContextMcpTool[];\n      agents: ContextAgent[];\n      slashCommands?: ContextSlashCommands;\n      skills?: ContextSkills;\n      autoCompactThreshold?: number;\n      isAutoCompactEnabled: boolean;\n      apiUsage: ModelUsage | null;\n  };",
+        "normalizedSha256": "667568622a02eded0ff4e35da0722d6261520979e53db09df33763139a84d273"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "667568622a02eded0ff4e35da0722d6261520979e53db09df33763139a84d273"
+    },
+    {
+      "name": "SessionContextUsage",
+      "candidate": {
+        "line": 11828,
+        "signature": "export type SessionContextUsage = {\n      tokens?: number;\n      window: number;\n      percent?: number;\n      breakdown?: SessionContextBreakdown;\n  };",
+        "normalizedSha256": "9caf9ba28f7a909bbdd294c27fdf34fae9c4cb0ed7bb6e0dcfed91ce48c67367"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "9caf9ba28f7a909bbdd294c27fdf34fae9c4cb0ed7bb6e0dcfed91ce48c67367"
+    },
+    {
+      "name": "SessionCost",
+      "candidate": {
+        "line": 11858,
+        "signature": "export type SessionCost = {\n      usd: number;\n  };",
+        "normalizedSha256": "970b2623976d162b000f8d5ba9d02af5ee5489d1f5a0299ecb1a312b953c877d"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "970b2623976d162b000f8d5ba9d02af5ee5489d1f5a0299ecb1a312b953c877d"
+    },
+    {
+      "name": "SessionDetachInput",
+      "candidate": {
+        "line": 11885,
+        "signature": "export type SessionDetachInput = {\n      surface: RenderSurface;\n      clientId: string;\n      reason: SessionDetachReason;\n  };",
+        "normalizedSha256": "15863face1a69de067c42a62c45a48a7f12042dd74239b84ebd4df7614ad7fb1"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "15863face1a69de067c42a62c45a48a7f12042dd74239b84ebd4df7614ad7fb1"
+    },
+    {
+      "name": "SessionDetachReason",
+      "candidate": {
+        "line": 11904,
+        "signature": "export type SessionDetachReason = 'detach' | 'end';",
+        "normalizedSha256": "23f37abd87c710243b7763d7d4064587d5192c6454a5e0218c8ca747418b11c6"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "23f37abd87c710243b7763d7d4064587d5192c6454a5e0218c8ca747418b11c6"
+    },
+    {
+      "name": "SessionDetachResult",
+      "candidate": {
+        "line": 11910,
+        "signature": "export type SessionDetachResult = {\n      clientId: string;\n  };",
+        "normalizedSha256": "b5b4f58278232df51324334bb72c6583b75e0fbf7d030f0c863d013d1ba6bb76"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "b5b4f58278232df51324334bb72c6583b75e0fbf7d030f0c863d013d1ba6bb76"
+    },
+    {
+      "name": "SessionEndInput",
+      "candidate": {
+        "line": 11927,
+        "signature": "export type SessionEndInput = {\n      reason: SessionEndReason;\n      sessionId: string;\n      resume: SessionResume;\n  };",
+        "normalizedSha256": "01d5c0ce4715a4deddf3198f543a61c4906bbc8e6a5bf8803709a9e150d1735c"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "01d5c0ce4715a4deddf3198f543a61c4906bbc8e6a5bf8803709a9e150d1735c"
+    },
+    {
+      "name": "SessionEndReason",
+      "candidate": {
+        "line": 11955,
+        "signature": "export type SessionEndReason = ClassicHookInputs['SessionEnd']['reason'];",
+        "normalizedSha256": "2f173632324d6ce383c5e9dc1b1d25377f22e193cd306c96d85697cbdb6ff361"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2f173632324d6ce383c5e9dc1b1d25377f22e193cd306c96d85697cbdb6ff361"
+    },
+    {
+      "name": "SessionEndResult",
+      "candidate": {
+        "line": 11961,
+        "signature": "export type SessionEndResult = {\n      sessionId: string;\n  };",
+        "normalizedSha256": "3df74d5991908bff0b7862fa0fa6103a2e1dff1944062ca5c459477c4f1708b4"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "3df74d5991908bff0b7862fa0fa6103a2e1dff1944062ca5c459477c4f1708b4"
+    },
+    {
+      "name": "SessionMeasureInput",
+      "candidate": {
+        "line": 12033,
+        "signature": "export type SessionMeasureInput = {\n      context: SessionContextUsage;\n      rateLimits: SessionRateLimit[];\n      cost?: SessionCost;\n      changed: UsageUnit[];\n  };",
+        "normalizedSha256": "b6babc4d9e31b514abcb9d75f2fef4e035e9540f5e69a72c53067ac57c0fd96a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "b6babc4d9e31b514abcb9d75f2fef4e035e9540f5e69a72c53067ac57c0fd96a"
+    },
+    {
+      "name": "SessionMeasureResult",
+      "candidate": {
+        "line": 12065,
+        "signature": "export type SessionMeasureResult = {\n      changed: UsageUnit[];\n  };",
+        "normalizedSha256": "1c5d52c6b3649a096b7fdaaf309c3b79617a070bc9d633760737a72c7373058c"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "1c5d52c6b3649a096b7fdaaf309c3b79617a070bc9d633760737a72c7373058c"
+    },
+    {
+      "name": "SessionMessage",
+      "candidate": {
+        "line": 12072,
+        "signature": "export type SessionMessage = {\n      role: 'user' | 'assistant';\n      text: string;\n      toolUses: ToolUseSummary[];\n      toolResults?: ToolResultSummary[];\n      handle?: string;\n  };",
+        "normalizedSha256": "a3b421794197d709b62c71499bf18cf473b45decdc638bb5270f1e4c07787c85"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a3b421794197d709b62c71499bf18cf473b45decdc638bb5270f1e4c07787c85"
+    },
+    {
+      "name": "SessionRateLimit",
+      "candidate": {
+        "line": 12220,
+        "signature": "export type SessionRateLimit = {\n      kind: string;\n      percentUsed: number;\n      resetsAt?: string;\n  };",
+        "normalizedSha256": "a30c698742e376ee18ce7cd119a255248ba7c0dee31acba19d7cfee624766f6d"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a30c698742e376ee18ce7cd119a255248ba7c0dee31acba19d7cfee624766f6d"
+    },
+    {
+      "name": "SessionReceiveEvent",
+      "candidate": {
+        "line": 12241,
+        "signature": "export type SessionReceiveEvent = {\n      source: string;\n      kind: string;\n      from?: string;\n      data: Record<string, unknown>;\n      untrustedKeys: readonly string[];\n  };",
+        "normalizedSha256": "9ffb839c8d25107724073b369c03d47e866f2868b76c4fe35c7c71800223fd56"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "9ffb839c8d25107724073b369c03d47e866f2868b76c4fe35c7c71800223fd56"
+    },
+    {
+      "name": "SessionReceiveInput",
+      "candidate": {
+        "line": 12277,
+        "signature": "export type SessionReceiveInput = {\n      origin: SessionReceiveOrigin;\n      text: string;\n      event?: SessionReceiveEvent;\n      agentId?: string;\n  };",
+        "normalizedSha256": "ac7052ce57bf52a310c3c2384e734f6ca7b92944b73f06fc21723f9bd0773697"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "ac7052ce57bf52a310c3c2384e734f6ca7b92944b73f06fc21723f9bd0773697"
+    },
+    {
+      "name": "SessionReceiveOrigin",
+      "candidate": {
+        "line": 12315,
+        "signature": "export type SessionReceiveOrigin = {\n      kind: 'bridge' | 'task-notification' | 'scheduled-trigger' | 'peer-send-message' | 'projects-relay' | 'slack-ping' | 'unclassified';\n  } | {\n      kind: 'peer' | 'coordinator';\n      plugin?: string;\n  } | {\n      kind: 'peer' | 'coordinator';\n      plugin?: string;\n      teammate: string;\n      isVerified: boolean;\n  };",
+        "normalizedSha256": "a458bf76dc2786dee6129c133838a26dd42dbf0c5974b3c442b47b4fc66c5ba1"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a458bf76dc2786dee6129c133838a26dd42dbf0c5974b3c442b47b4fc66c5ba1"
+    },
+    {
+      "name": "SessionReceiveResult",
+      "candidate": {
+        "line": 12377,
+        "signature": "export type SessionReceiveResult = {\n      text: string;\n      consumed?: undefined;\n  } | {\n      consumed: string;\n      text?: undefined;\n  };",
+        "normalizedSha256": "6fef62d02b669a6bb2e21fdc7affd813c50c990a6e3e4ef8a4e7ce90207f93dc"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "6fef62d02b669a6bb2e21fdc7affd813c50c990a6e3e4ef8a4e7ce90207f93dc"
+    },
+    {
+      "name": "SessionRepo",
+      "candidate": {
+        "line": 12401,
+        "signature": "export type SessionRepo = {\n      root: string;\n      remote: string | null;\n      internal: boolean;\n      name: string | null;\n  };",
+        "normalizedSha256": "d28d7496601bec482ffed6b70a70a3f8081e3eeda0d5e3df27053a7d7f16b43a"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "d28d7496601bec482ffed6b70a70a3f8081e3eeda0d5e3df27053a7d7f16b43a"
+    },
+    {
+      "name": "SessionResume",
+      "candidate": {
+        "line": 12433,
+        "signature": "export type SessionResume = {\n      id: string;\n  };",
+        "normalizedSha256": "789e39ef6ff31af030219428ff797c8facf08866f249a4deaca997f1f4c1f20d"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "789e39ef6ff31af030219428ff797c8facf08866f249a4deaca997f1f4c1f20d"
+    },
+    {
+      "name": "SessionSendAddress",
+      "candidate": {
+        "line": 12451,
+        "signature": "export type SessionSendAddress = string | {\n      sessionId: string;\n  } | {\n      agentId: string;\n  };",
+        "normalizedSha256": "06699aea0d1574a4d72350fdfba860bcdd9d7602ca9163649063b36149a166b5"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "06699aea0d1574a4d72350fdfba860bcdd9d7602ca9163649063b36149a166b5"
+    },
+    {
+      "name": "SessionSendArgs",
+      "candidate": {
+        "line": 12475,
+        "signature": "export type SessionSendArgs = {\n      to: SessionSendAddress;\n      text: string;\n  };",
+        "normalizedSha256": "e2d4d666039c0b841a2448b9304860240833a2c54b274b97bd98dcaac5dc70b5"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "e2d4d666039c0b841a2448b9304860240833a2c54b274b97bd98dcaac5dc70b5"
+    },
+    {
+      "name": "SessionSendInput",
+      "candidate": {
+        "line": 12491,
+        "signature": "export type SessionSendInput = {\n      to: string;\n      text: string;\n      origin: SessionSendOrigin;\n      agentId?: string;\n  };",
+        "normalizedSha256": "33bf0bd2f0bbd348527ca30290faf0768d38247e5f7ec580fe06ccbbb78837b6"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "33bf0bd2f0bbd348527ca30290faf0768d38247e5f7ec580fe06ccbbb78837b6"
+    },
+    {
+      "name": "SessionSendOrigin",
+      "candidate": {
+        "line": 12529,
+        "signature": "export type SessionSendOrigin = {\n      kind: 'model';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "08e01bbb43034846b80f74d13f6205476e0f76e9068952ef9aab361107f3f164"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "08e01bbb43034846b80f74d13f6205476e0f76e9068952ef9aab361107f3f164"
+    },
+    {
+      "name": "SessionSendResult",
+      "candidate": {
+        "line": 12559,
+        "signature": "export type SessionSendResult = {\n      isDelivered: true;\n      reason?: undefined;\n  } | {\n      isDelivered: false;\n      reason: string;\n  };",
+        "normalizedSha256": "2355cd493502d4ad566ace367f5b46d25ec2c979807ace6b6638bab67b47e322"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2355cd493502d4ad566ace367f5b46d25ec2c979807ace6b6638bab67b47e322"
+    },
+    {
+      "name": "SessionStartInput",
+      "candidate": {
+        "line": 12609,
+        "signature": "export type SessionStartInput = {\n      cwd: string;\n      surface: RenderSurface | null;\n      isInteractive: boolean;\n  };",
+        "normalizedSha256": "787d13368b7e22322c294928874aa0133d670a5dd1d83f777d53ec0ad7ac5adf"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "787d13368b7e22322c294928874aa0133d670a5dd1d83f777d53ec0ad7ac5adf"
+    },
+    {
+      "name": "SessionStartResult",
+      "candidate": {
+        "line": 12630,
+        "signature": "export type SessionStartResult = {\n      cwd: string;\n  };",
+        "normalizedSha256": "b4759ea69af3bf03dd90a0511f68e0c236977f0c3d919b8c9ec2ad8fd900020b"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "b4759ea69af3bf03dd90a0511f68e0c236977f0c3d919b8c9ec2ad8fd900020b"
+    },
+    {
+      "name": "SessionUsage",
+      "candidate": {
+        "line": 12642,
+        "signature": "export type SessionUsage = {\n      startedAt: number;\n      context: SessionContextUsage;\n      rateLimits: SessionRateLimit[];\n      cost?: SessionCost;\n  };",
+        "normalizedSha256": "38bfa448f2d06f46a9ffd3941442346728b7de1afab63388aea65240afb006e4"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "38bfa448f2d06f46a9ffd3941442346728b7de1afab63388aea65240afb006e4"
+    },
+    {
+      "name": "SessionUsageArgs",
+      "candidate": {
+        "line": 12675,
+        "signature": "export type SessionUsageArgs = {\n      breakdown?: ContextBreakdownDetail;\n      columns?: number;\n  };",
+        "normalizedSha256": "7a8a95670bf0190779ff1d4ba73b4ced8048c372c9f9ceb802a63ab5b7c5c96d"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "7a8a95670bf0190779ff1d4ba73b4ced8048c372c9f9ceb802a63ab5b7c5c96d"
+    },
+    {
+      "name": "SessionVersion",
+      "candidate": {
+        "line": 12702,
+        "signature": "export type SessionVersion = {\n      version: string;\n      base?: string;\n      builtAt?: string;\n  };",
+        "normalizedSha256": "2ebd449349c3e14a4f923ab5ea1227d1df1eb7d6c24527a221f148c35b9b50cc"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2ebd449349c3e14a4f923ab5ea1227d1df1eb7d6c24527a221f148c35b9b50cc"
+    },
+    {
+      "name": "StarNext",
+      "candidate": {
+        "line": 13080,
+        "signature": "export type StarNext = OrderedOverloads<EventName> & {\n      (e: unknown): Promise<unknown>;\n      readonly to: (e: unknown, tier: TargetTier) => Promise<unknown>;\n      readonly signal: AbortSignal;\n      readonly is: <M extends Pattern>(pattern: M, e: unknown) => e is Frozen<Args<Selected<M>>>;\n      readonly event: EventName;\n      readonly origin: Origin;\n      readonly trace: readonly TraceEntry<EventName, unknown, unknown>[];\n      readonly budget: NextBudget;\n  };",
+        "normalizedSha256": "513605db6a89a828a51458bacb080dd248cc66a154cd8a0f66c2aab7db3188fe"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "513605db6a89a828a51458bacb080dd248cc66a154cd8a0f66c2aab7db3188fe"
+    },
+    {
+      "name": "StreamNext",
+      "candidate": {
+        "line": 13300,
+        "signature": "export type StreamNext<N extends StreamingEventName = StreamingEventName, E = Args<N>, O = EventResult<N>, S extends {\n      [K in N]?: unknown;\n  } = {\n      [K in N]: Args<K>;\n  }> = Pick<Next<N, E, O, S>, 'signal' | 'is' | 'event' | 'origin' | 'budget'> & {\n      (e: E): HookStream<Chunk<N>, O>;\n      readonly to: (e: E, tier: TargetTier) => HookStream<Chunk<N>, O>;\n      readonly trace: readonly TraceEntry<N, E, O>[];\n  };",
+        "normalizedSha256": "6b3a180c797d9fb446f038b7ca34495bfc4ac1dab3b3c7cd2eba97b7d23024b2"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "6b3a180c797d9fb446f038b7ca34495bfc4ac1dab3b3c7cd2eba97b7d23024b2"
+    },
+    {
+      "name": "ToolCallArgs",
+      "candidate": {
+        "line": 13819,
+        "signature": "export type ToolCallArgs = ToolCallEnvelope extends infer I ? I extends ToolCallEnvelope ? Omit<I, 'tool_use_id'> & ToolCallReserved<I['tool']> : never : never;",
+        "normalizedSha256": "a1cfaf3b5d3772458a79748b521e877507895419776bace366eedf17b7a1c6dc"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a1cfaf3b5d3772458a79748b521e877507895419776bace366eedf17b7a1c6dc"
+    },
+    {
+      "name": "ToolCallEnvelope",
+      "candidate": {
+        "line": 13829,
+        "signature": "export type ToolCallEnvelope = BuiltinToolCallInput | McpToolCallInput;",
+        "normalizedSha256": "775ffa19b1fcaefba37690792334b6255ad3a83bc0a7d74c8d73684234646587"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "775ffa19b1fcaefba37690792334b6255ad3a83bc0a7d74c8d73684234646587"
+    },
+    {
+      "name": "ToolCallInput",
+      "candidate": {
+        "line": 13840,
+        "signature": "export type ToolCallInput = ToolCallEnvelope & AgentLoop & ToolRequestMeta;",
+        "normalizedSha256": "064afd6b1de41aa1b38fb2f1031a85f38bed2bc7a0004d6e63ea2a681f9c05d4"
+      },
+      "against2_1_295": "IDENTICAL",
+      "reason2_1_295": "Complete declaration retained as added/replacement lines in the 2.1.295 record.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "064afd6b1de41aa1b38fb2f1031a85f38bed2bc7a0004d6e63ea2a681f9c05d4"
+    },
+    {
+      "name": "ToolCallReserved",
+      "candidate": {
+        "line": 13859,
+        "signature": "export type ToolCallReserved<T> = {\n      tool: T;\n      tool_use_id?: string;\n      consent?: string;\n  };",
+        "normalizedSha256": "00eca81df28b3679d4aa45ed8c049551d4d7a870a6723405edb3d3b48ec19071"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "00eca81df28b3679d4aa45ed8c049551d4d7a870a6723405edb3d3b48ec19071"
+    },
+    {
+      "name": "ToolCallResult",
+      "candidate": {
+        "line": 13876,
+        "signature": "export type ToolCallResult<Name extends string = string> = {\n      deny: string;\n      result?: undefined;\n      context?: undefined;\n      ref?: undefined;\n      text?: undefined;\n      isError?: undefined;\n      isReadOnly?: undefined;\n  } | {\n      result: ToolResultOf<Name>;\n      context?: readonly string[];\n      ref?: number;\n      text?: string;\n      isReadOnly?: true;\n      isError?: undefined;\n      deny?: undefined;\n  } | {\n      isError: true;\n      result: unknown;\n      text?: string;\n      ref?: number;\n      context?: readonly string[];\n      isReadOnly?: true;\n      deny?: undefined;\n  };",
+        "normalizedSha256": "906e324ee70a415fbfc841ea6513ccef9b55a213575404f4c60f0bd5e4c982c4"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "906e324ee70a415fbfc841ea6513ccef9b55a213575404f4c60f0bd5e4c982c4"
+    },
+    {
+      "name": "TurnCompleteInput",
+      "candidate": {
+        "line": 14554,
+        "signature": "export type TurnCompleteInput = TurnCompleteFields & (TurnCompleteRefused | TurnCompleteUnrefused);",
+        "normalizedSha256": "5821cd09e033c5e19cc2d49f1b246b7501682401a0f846723b26a4a64fb70992"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "5821cd09e033c5e19cc2d49f1b246b7501682401a0f846723b26a4a64fb70992"
+    },
+    {
+      "name": "TurnCompleteReason",
+      "candidate": {
+        "line": 14560,
+        "signature": "export type TurnCompleteReason = 'answer' | 'aborted' | 'refusal' | 'error';",
+        "normalizedSha256": "e214ac4a11a527c3cd27dcc9eb7e98fa5333d4ab84643c370dc1eb0222f96ffa"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "e214ac4a11a527c3cd27dcc9eb7e98fa5333d4ab84643c370dc1eb0222f96ffa"
+    },
+    {
+      "name": "TurnCompleteResult",
+      "candidate": {
+        "line": 14578,
+        "signature": "export type TurnCompleteResult = {\n      text: string;\n      usage?: TurnUsage;\n  };",
+        "normalizedSha256": "5a67e72bfec019f2af1d27f0202b487e366aea0b6f9f59c58890687e5edbffdd"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "5a67e72bfec019f2af1d27f0202b487e366aea0b6f9f59c58890687e5edbffdd"
+    },
+    {
+      "name": "TurnRefusal",
+      "candidate": {
+        "line": 14595,
+        "signature": "export type TurnRefusal = {\n      category: string | null;\n      explanation: string | null;\n  };",
+        "normalizedSha256": "a2f73281d6fccc546abfedd8a930f34387a0a52b64c5dffff1338b9073a5aa88"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "a2f73281d6fccc546abfedd8a930f34387a0a52b64c5dffff1338b9073a5aa88"
+    },
+    {
+      "name": "TurnStartInput",
+      "candidate": {
+        "line": 14608,
+        "signature": "export type TurnStartInput = {\n      text: string;\n      turnId: string;\n      agentId?: string;\n  };",
+        "normalizedSha256": "76a6136a93af71f813fd90c05f368459bf027bda1c560dacf4fd697afa58dc7e"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "76a6136a93af71f813fd90c05f368459bf027bda1c560dacf4fd697afa58dc7e"
+    },
+    {
+      "name": "TurnStartResult",
+      "candidate": {
+        "line": 14638,
+        "signature": "export type TurnStartResult = {\n      turnId: string;\n  };",
+        "normalizedSha256": "3fc0f84dd80c845aa1db6ec764ab084add79b8740f98b2ad84e99cf73550fdc6"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "3fc0f84dd80c845aa1db6ec764ab084add79b8740f98b2ad84e99cf73550fdc6"
+    },
+    {
+      "name": "TurnStepChunk",
+      "candidate": {
+        "line": 14650,
+        "signature": "export type TurnStepChunk = TurnStepTextChunk | TurnStepThinkingChunk | TurnStepToolChunk | TurnStepInputChunk | TurnStepStopChunk | TurnStepEngineChunk;",
+        "normalizedSha256": "2632f3926ad2f0ad4aa23a1a887380b1b56607d1edb190ec22f5f5d6a4af63ed"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2632f3926ad2f0ad4aa23a1a887380b1b56607d1edb190ec22f5f5d6a4af63ed"
+    },
+    {
+      "name": "TurnStepEngineChunk",
+      "candidate": {
+        "line": 14660,
+        "signature": "export type TurnStepEngineChunk = {\n      kind: 'engine';\n      ref: number;\n  };",
+        "normalizedSha256": "1f3b70e972eb674d20cc1870a4fd51a8eb49e40751350f50685a711077416286"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "1f3b70e972eb674d20cc1870a4fd51a8eb49e40751350f50685a711077416286"
+    },
+    {
+      "name": "TurnStepInput",
+      "candidate": {
+        "line": 14677,
+        "signature": "export type TurnStepInput = {\n      turnId: string;\n      index: number;\n      model: string;\n      effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max' | number;\n      messageCount: number;\n      agentId?: string;\n  };",
+        "normalizedSha256": "df6f8bdc86712ee1d9aa73d5062b4b9df49c74ff592f382589d63fd996b8afbd"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "df6f8bdc86712ee1d9aa73d5062b4b9df49c74ff592f382589d63fd996b8afbd"
+    },
+    {
+      "name": "TurnStepInputChunk",
+      "candidate": {
+        "line": 14726,
+        "signature": "export type TurnStepInputChunk = ChunkRef & {\n      kind: 'input';\n      index: number;\n      json: string;\n  };",
+        "normalizedSha256": "7b4373b83ab9580b0698f69e5a5af92aa76071e8c9d4561666e2f6d4c6f804c8"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "7b4373b83ab9580b0698f69e5a5af92aa76071e8c9d4561666e2f6d4c6f804c8"
+    },
+    {
+      "name": "TurnStepResult",
+      "candidate": {
+        "line": 14742,
+        "signature": "export type TurnStepResult = {\n      turnId: string;\n      index: number;\n      answer: string;\n      toolUses: readonly TurnStepToolUse[];\n      serverToolUses?: readonly TurnStepServerToolUse[];\n      stopReason: TurnStopReason;\n      usage: TurnUsage | null;\n  };",
+        "normalizedSha256": "fa48a712fef8b7858ad0f6b3ea6f12569282f5593018711e9f5c3143ae519fe5"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "fa48a712fef8b7858ad0f6b3ea6f12569282f5593018711e9f5c3143ae519fe5"
+    },
+    {
+      "name": "TurnStepServerToolUse",
+      "candidate": {
+        "line": 14793,
+        "signature": "export type TurnStepServerToolUse = {\n      id: string;\n      name: string;\n      input: unknown;\n      startedAt: number;\n      endedAt?: number;\n  };",
+        "normalizedSha256": "25270093c8e23ef4a724e93045ea63f28aa1f46b9504432cb28870a78b10e252"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "25270093c8e23ef4a724e93045ea63f28aa1f46b9504432cb28870a78b10e252"
+    },
+    {
+      "name": "TurnStepStopChunk",
+      "candidate": {
+        "line": 14825,
+        "signature": "export type TurnStepStopChunk = ChunkRef & {\n      kind: 'stop';\n      stopReason: TurnStopReason;\n      usage: TurnUsage | null;\n  };",
+        "normalizedSha256": "5b90dab793e1d48f256c8ada0c3b60a4a49654b7ee1c0f976cc05883255860d1"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "5b90dab793e1d48f256c8ada0c3b60a4a49654b7ee1c0f976cc05883255860d1"
+    },
+    {
+      "name": "TurnStepTextChunk",
+      "candidate": {
+        "line": 14838,
+        "signature": "export type TurnStepTextChunk = ChunkRef & {\n      kind: 'text';\n      index: number;\n      text: string;\n  };",
+        "normalizedSha256": "cf8ff3119c4798db2a651548554f4887b2a88453576d3e87b92bf0f76df4375c"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "cf8ff3119c4798db2a651548554f4887b2a88453576d3e87b92bf0f76df4375c"
+    },
+    {
+      "name": "TurnStepThinkingChunk",
+      "candidate": {
+        "line": 14855,
+        "signature": "export type TurnStepThinkingChunk = ChunkRef & {\n      kind: 'thinking';\n      index: number;\n      text: string;\n  };",
+        "normalizedSha256": "55749a73a27b0d6eb5fe51e4da7549df09f3bd876edb6979c7da9c582b08c210"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "55749a73a27b0d6eb5fe51e4da7549df09f3bd876edb6979c7da9c582b08c210"
+    },
+    {
+      "name": "TurnStepToolChunk",
+      "candidate": {
+        "line": 14868,
+        "signature": "export type TurnStepToolChunk = ChunkRef & {\n      kind: 'tool';\n      index: number;\n      id: string;\n      name: string;\n  };",
+        "normalizedSha256": "6b7243b14f241a7627e33162a734c02f70e489a2cc6de79f9b7cf79d4c02e750"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "6b7243b14f241a7627e33162a734c02f70e489a2cc6de79f9b7cf79d4c02e750"
+    },
+    {
+      "name": "TurnStepToolUse",
+      "candidate": {
+        "line": 14885,
+        "signature": "export type TurnStepToolUse = {\n      name: string;\n      input: unknown;\n  };",
+        "normalizedSha256": "ccc9c13490b5addb893c9f85fccbea33b2a6f1694a5de4d1123ad30d3b8b625e"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "ccc9c13490b5addb893c9f85fccbea33b2a6f1694a5de4d1123ad30d3b8b625e"
+    },
+    {
+      "name": "TurnUsage",
+      "candidate": {
+        "line": 14908,
+        "signature": "export type TurnUsage = ModelUsage & {\n      model: string;\n  };",
+        "normalizedSha256": "2b95cece43a2233c81b95219f71758783f6bdc64d272987c49d58625e2b526c5"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "2b95cece43a2233c81b95219f71758783f6bdc64d272987c49d58625e2b526c5"
+    },
+    {
+      "name": "UiFocusOrigin",
+      "candidate": {
+        "line": 15240,
+        "signature": "export type UiFocusOrigin = {\n      kind: 'person';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "d94be8848178318521c4140876874cbb53f90392b9e164891430a4800cdc855f"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "d94be8848178318521c4140876874cbb53f90392b9e164891430a4800cdc855f"
+    },
+    {
+      "name": "UiScrollOrigin",
+      "candidate": {
+        "line": 15756,
+        "signature": "export type UiScrollOrigin = {\n      kind: 'person';\n  } | {\n      kind: 'plugin';\n      name: string;\n  };",
+        "normalizedSha256": "0bb2b8a4dda3df7931527d7d402cf78aef9d5276a3dc6d7de3823cb941e40365"
+      },
+      "against2_1_295": "NOT_VERIFIABLE",
+      "reason2_1_295": "Baseline bytes/signature absent; retained name is not equality evidence.",
+      "against2_1_310": "IDENTICAL",
+      "prior310NormalizedSha256": "0bb2b8a4dda3df7931527d7d402cf78aef9d5276a3dc6d7de3823cb941e40365"
+    }
+  ]
+}

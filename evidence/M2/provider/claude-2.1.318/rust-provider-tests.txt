@@ -1,0 +1,50 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling serde v1.0.229
+   Compiling getrandom v0.4.3
+   Compiling ref-cast v1.0.27
+   Compiling thiserror v2.0.21
+   Compiling termcolor v1.4.1
+   Compiling dyn-clone v1.0.20
+   Compiling const-oid v0.10.2
+   Compiling hybrid-array v0.4.15
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling digest v0.11.3
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling cpufeatures v0.3.1
+   Compiling sha2 v0.11.0
+   Compiling uuid v1.27.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling ref-cast-impl v1.0.27
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling schemars_derive v1.2.2
+   Compiling ts-rs-macros v12.0.1
+   Compiling ts-rs v12.0.1
+   Compiling schemars v1.2.2
+   Compiling threadspace-contracts v0.1.0 (<worktree>/crates/contracts)
+   Compiling threadspace-surfaces-macos v0.1.0 (<worktree>/crates/surfaces-macos)
+   Compiling threadspace-state-engine v0.1.0 (<worktree>/crates/state-engine)
+error[E0583]: file not found for module `ghostty`
+ --> crates/surfaces-macos/src/lib.rs:9:1
+  |
+9 | pub mod ghostty;
+  | ^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `ghostty`, create file "crates/surfaces-macos/src/ghostty.rs" or "crates/surfaces-macos/src/ghostty/mod.rs"
+  = note: if there is a `mod ghostty` elsewhere in the crate already, import it with `use crate::...` instead
+
+For more information about this error, try `rustc --explain E0583`.
+error: could not compile `threadspace-surfaces-macos` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

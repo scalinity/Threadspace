@@ -1,0 +1,92 @@
+
+running 83 tests
+test inventory::tests::qualification_is_the_versions_directory_not_a_name ... ok
+test inventory::tests::rejects_non_arrays_and_malformed_ids ... ok
+test inventory::tests::parses_the_installed_shape_and_tolerates_unknown_fields ... ok
+test inventory::tests::interpret_status_maps_session_waits ... ok
+test inventory::tests::wait_detail_is_bounded_and_printable ... ok
+test observer::tests::a_host_read_identity_marks_its_outcome_for_corroboration ... ok
+test hooks::tests::unknown_hooks_drive_nothing_and_bodies_are_not_retained ... ok
+test hooks::tests::stop_is_a_response_boundary_never_an_outcome_or_end ... ok
+test discovery::tests::a_failed_or_absent_confirmation_never_joins ... ok
+test discovery::tests::executable_replacement_within_the_same_pid_and_birth_is_rejected ... ok
+test observer::tests::a_bootstrap_after_the_engine_identity_keeps_it ... ok
+test discovery::tests::same_pid_with_a_different_birth_across_the_bracket_is_rejected ... ok
+test discovery::tests::background_missing_duplicate_and_new_rows_never_join ... ok
+test discovery::tests::unqualified_executables_and_missing_terminals_stay_provisional ... ok
+test discovery::tests::pid_reused_before_the_first_sample_cannot_inherit_the_old_row ... ok
+test discovery::tests::three_same_cwd_sessions_join_independently ... ok
+test discovery::tests::one_session_in_two_processes_is_two_joins ... ok
+test discovery::tests::device_change_vanishing_and_denial_are_explicit ... ok
+test discovery::tests::background_state_describes_its_session_and_an_interactive_row_wins ... ok
+test observer::tests::a_reload_bootstrap_follows_its_predecessor_load ... ok
+test observer::tests::delayed_result_keeps_entry_session ... ok
+test observer::tests::only_allowlisted_payload_is_retained ... ok
+test observer::tests::nonengine_turn_complete_creates_no_outcome ... ok
+test ownership::tests::actual_295_image_qualifies_but_a_switch_between_two_qualified_images_does_not ... ok
+test observer::tests::forged_spawn_creates_no_actor ... ok
+test ownership::tests::same_pid_wrong_birth_or_executable_has_no_proof ... ok
+test profiles::tests::only_qualified_builds_have_a_profile ... ok
+test ownership::tests::session_switch_during_probe_is_not_continuous_ownership ... ok
+test profiles::tests::the_version_comes_from_the_versions_directory_layout ... ok
+test observer::tests::session_end_disconnects_except_for_logical_changes ... ok
+test observer::tests::submissions_record_origin_acceptance_and_drops ... ok
+test observer::tests::a_settled_engine_completion_is_a_native_outcome ... ok
+test ownership::tests::current_native_join_can_prove_unchanged_session_but_not_historical_claim ... ok
+test reconcile::tests::an_unbound_continuing_activation_needs_a_surface ... ok
+test reconcile::tests::a_still_joined_activation_continues_without_a_new_activation ... ok
+test observer::tests::tools_are_activity_and_attachments_are_not_executions ... ok
+test reconcile::tests::missing_rows_and_unreadable_processes_prove_nothing ... ok
+test observer::tests::an_unqualified_build_yields_only_an_unqualified_link ... ok
+test reconcile::tests::executable_replacement_ends_and_requalifies ... ok
+test reconcile::tests::an_in_place_switch_is_proven_only_by_a_bracketed_join ... ok
+test setup::ordered_json::tests::invalid_documents_are_refused ... ok
+test setup::ordered_json::tests::compact_input_prints_two_space_indent_with_trailing_newline ... ok
+test reconcile::tests::process_exit_and_pid_reuse_end_the_old_activation ... ok
+test setup::ordered_json::tests::empty_containers_print_inline ... ok
+test setup::ordered_json::tests::map_edits_keep_order ... ok
+test setup::ordered_json::tests::duplicate_keys_are_refused_at_any_depth ... ok
+test setup::ordered_json::tests::numbers_keep_their_text ... ok
+test setup::ordered_json::tests::unicode_escapes_decode_and_reprint ... ok
+test setup::settings::tests::empty_plugin_dirs_value_is_restored_as_empty ... ok
+test setup::ordered_json::tests::nested_objects_keep_document_order ... ok
+test setup::settings::tests::group_holding_a_foreign_hook_is_kept ... ok
+test setup::settings::tests::plugin_dirs_append_once_preserving_existing_elements ... ok
+test setup::settings::tests::removal_reports_entries_no_longer_found ... ok
+test setup::settings::tests::wrong_container_types_stop_the_edit ... ok
+test setup::tests::invalid_targets_and_missing_sources_are_refused ... ok
+test setup::tests::hook_command_quotes_the_owned_path ... ok
+test setup::tests::install_into_empty_config_then_uninstall_removes_the_created_file ... ok
+test setup::tests::backups_are_owner_only_under_the_owned_dir ... ok
+test setup::tests::f2::f2_09_wrong_scope_refuses_with_every_fixture_byte_unchanged ... ok
+test setup::tests::f2::f2_03_changed_timeout_is_a_conflict_and_survives ... ok
+test setup::tests::f2::f2_04_changed_hook_type_is_a_conflict_and_survives ... ok
+test setup::tests::f2::f2_05_changed_command_retains_its_helper_and_record ... ok
+test setup::tests::install_twice_keeps_one_owned_set ... ok
+test setup::tests::f2::f2_02_changed_matcher_is_a_conflict_and_survives ... ok
+test setup::tests::f2::f2_11_wrong_config_or_copied_owned_root_refuses_without_mutation ... ok
+test setup::tests::install_into_complex_settings_keeps_foreign_configuration ... ok
+test setup::tests::f2::f2_06_changed_plugin_reference_keeps_the_referenced_copy ... ok
+test setup::tests::f2::f2_07_foreign_siblings_and_their_order_survive_removal ... ok
+test setup::tests::f2::f2_12_legitimately_resolved_conflict_finishes_on_retry ... ok
+test setup::tests::f2::f2_08_repeated_partial_uninstall_has_no_double_removal_or_foreign_loss ... ok
+test setup::tests::plan_writes_nothing_and_matches_the_install ... ok
+test setup::tests::a_new_mod_replaces_the_old_copy_and_still_restores_the_original ... ok
+test setup::tests::settings_changed_between_read_and_write_are_refused ... ok
+test setup::tests::session_scope_writes_only_owned_files ... ok
+test setup::tests::the_real_observer_mod_copies_without_tests ... ok
+test setup::tests::status_reports_owned_entries_no_longer_installed ... ok
+test setup::tests::uninstall_after_foreign_edit_removes_only_owned_entries ... ok
+test setup::tests::symlinked_settings_are_written_through_to_their_target ... ok
+test setup::tests::uninstall_keeps_owner_edit_as_conflict ... ok
+test setup::tests::settings_that_cannot_be_merged_are_left_alone ... ok
+test setup::tests::worktree_hooks_are_never_installed ... ok
+test setup::tests::f2::f2_01_unchanged_install_reinstall_remove_is_byte_exact_for_ten_cycles ... ok
+test setup::tests::ten_cycles_restore_the_original_bytes_exactly ... ok
+
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.78s
+
+   Compiling threadspace-surfaces-macos v0.1.0 (<worktree>/crates/surfaces-macos)
+   Compiling threadspace-provider-claude v0.1.0 (<worktree>/crates/provider-claude)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.43s
+     Running unittests src/lib.rs (target/aarch64-apple-darwin/debug/deps/threadspace_provider_claude-d7589cf4d3f3c1bf)

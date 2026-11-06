@@ -1,0 +1,74 @@
+[
+  {
+    "variant": "unchanged",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/unchanged"
+    ],
+    "exitStatus": 0,
+    "expectedRejection": null,
+    "controlPassed": true
+  },
+  {
+    "variant": "no-observer",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/no-observer"
+    ],
+    "exitStatus": 0,
+    "expectedRejection": null,
+    "controlPassed": true
+  },
+  {
+    "variant": "duplicated-observations",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/duplicated-observations"
+    ],
+    "exitStatus": 1,
+    "expectedRejection": "(fail) tool call preflight is one nested check in one observer epoch",
+    "controlPassed": true
+  },
+  {
+    "variant": "changed-provider-result",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/changed-provider-result"
+    ],
+    "exitStatus": 1,
+    "expectedRejection": "(fail) middleware contract > provider result returned unchanged",
+    "controlPassed": true
+  },
+  {
+    "variant": "late-session-context",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/late-session-context"
+    ],
+    "exitStatus": 1,
+    "expectedRejection": "(fail) provenance and identity > delayed result uses original identity across a logical session change",
+    "controlPassed": true
+  },
+  {
+    "variant": "forged-core-settlement",
+    "command": [
+      "/Users/danny/.local/share/claude/versions/2.1.318",
+      "plugin",
+      "test",
+      "<worktree>/artifacts/claude-2.1.318-controls-503b01e3/forged-core-settlement"
+    ],
+    "exitStatus": 1,
+    "expectedRejection": "(fail) provenance and identity > engine dispatch origin alone does not prove downstream core execution",
+    "controlPassed": true
+  }
+]

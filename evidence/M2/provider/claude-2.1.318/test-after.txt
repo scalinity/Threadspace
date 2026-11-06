@@ -1,0 +1,68 @@
+
+tests/delivery.test.ts:
+(pass) mod delivery > mod batch receipts: a valid receipt removes the records [49.26ms]
+(pass) mod delivery > partial commit followed by timeout retries with the original UUIDs [29.37ms]
+(pass) mod delivery > malformed receipt is not acceptance [29.15ms]
+(pass) mod delivery > stable UUID replay of unaccepted records [24.93ms]
+(pass) mod delivery > queue bounds (2,048 records) and batch bounds (128 records, 64 KiB) [549.49ms]
+(pass) mod delivery > batches are as full as both bounds allow (128 records, 64 KiB) [50.47ms]
+(pass) mod delivery > queue byte bound (8 MiB) with long escaped identifiers [182.42ms]
+(pass) mod delivery > retry backoff runs 250 ms to 5 s and resets on success [21.70ms]
+(pass) mod delivery > one pending retry timer during backoff [40.31ms]
+(pass) mod delivery > no timer while idle [24.77ms]
+(pass) mod delivery > one in-flight drain per module [176.80ms]
+(pass) mod delivery > module load runs register afresh with a new source epoch [18.80ms]
+(pass) mod delivery > module load in a second test has another source epoch and sequence restarts [23.39ms]
+(pass) mod delivery > module retirement/reload: the kit cannot hot-reload a module (config.set) [17.64ms]
+(pass) mod delivery > budget argv is appended [21.90ms]
+
+tests/kit-behavior.test.ts:
+(pass) tool call preflight is one nested check in one observer epoch [52.33ms]
+(pass) ask preflight prevents the mocked call, allow reaches it [26.59ms]
+
+tests/middleware.test.ts:
+(pass) middleware contract > observer calls next(e) exactly once [59.34ms]
+(pass) middleware contract > result records carry what an adapter needs on their own [27.36ms]
+(pass) middleware contract > event passed unchanged [23.80ms]
+(pass) middleware contract > provider result returned unchanged [26.30ms]
+(pass) middleware contract > provider exceptions propagate [21.20ms]
+(pass) middleware contract > async-generator chunks forwarded correctly (order, count, final value) [27.63ms]
+(pass) middleware contract > async-generator early close is forwarded and recorded as abandoned [28.30ms]
+(pass) middleware contract > observations carry no prompt text, tool input or output, or assistant text [27.26ms]
+
+tests/provenance.test.ts:
+(pass) provenance and identity > callback-entry context frozen [64.74ms]
+(pass) provenance and identity > delayed result uses original identity across a logical session change [40.40ms]
+(pass) provenance and identity > plugin-raised lifecycle-shaped events cannot forge a native outcome [29.59ms]
+(fail) provenance and identity > engine dispatch origin alone does not prove downstream core execution [30.24ms]
+  AssertionError: expect(received).toEqual()
+  
+  Expected: {
+    links: 2,
+    endPlugin: "test",
+    endTier: "builtin",
+    endOutcome: "returned",
+    coreSettled: false
+  }
+  Received: {
+    links: 1,
+    endPlugin: "engine",
+    endTier: "core",
+    endOutcome: "returned",
+    coreSettled: true
+  }
+(pass) provenance and identity > short-circuiting downstream middleware is passed through unchanged [31.27ms]
+(pass) provenance and identity > accepted-human core-acceptance proof for prompt.submit [38.04ms]
+(pass) provenance and identity > upstream middleware cannot rewrite prompt origin [27.49ms]
+(pass) provenance and identity > agent.spawn provenance requires a settled core trace [24.72ms]
+(pass) provenance and identity > host reads $.agent.list() and $.session.id() are middleware-interceptable [40.88ms]
+(pass) provenance and identity > first load records a null predecessor epoch and leaves its own in session state [27.15ms]
+(pass) provenance and identity > reload records predecessor epoch [22.19ms]
+(pass) provenance and identity > a failed session state read or write records a null predecessor epoch [22.78ms]
+(pass) provenance and identity > logical session changes (session.end clear, classic.SessionStart clear and resume) [32.56ms]
+(pass) provenance and identity > a normal session end runs one bounded drain; a clear does not [26.66ms]
+(pass) provenance and identity > no worktree handlers or worktree tool interception [19.90ms]
+
+ 39 pass
+ 1 fail
+Ran 40 tests across 4 files. [1.41s]

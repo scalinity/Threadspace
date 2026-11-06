@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "environment": {
+    "CLAUDE_CONFIG_DIR": "<worktree>/artifacts/claude-2.1.318/config",
+    "TMPDIR": "<worktree>/artifacts/claude-2.1.318/tmp",
+    "XDG_CACHE_HOME": "<worktree>/artifacts/claude-2.1.318/cache",
+    "XDG_STATE_HOME": "<worktree>/artifacts/claude-2.1.318/state (from load-owned onward; prior writes outside sandbox were denied)",
+    "DISABLE_AUTOUPDATER": "1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "commands": [
+    {
+      "label": "version",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --version",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:01.779804-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/version.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/version.stderr"
+    },
+    {
+      "label": "help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:01.827560-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/help.stderr"
+    },
+    {
+      "label": "plugin-help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:01.931879-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/plugin-help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/plugin-help.stderr"
+    },
+    {
+      "label": "test-help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:02.027512-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/test-help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/test-help.stderr"
+    },
+    {
+      "label": "validate-before",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin validate <worktree>/artifacts/claude-2.1.318/before",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:11.370935-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/validate-before.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/validate-before.stderr"
+    },
+    {
+      "label": "test-before",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/before",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:11.506123-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/test-before.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/test-before.stderr"
+    },
+    {
+      "label": "inventory",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 agents --json --all",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:46:12.924922-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/inventory.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/inventory.stderr"
+    },
+    {
+      "label": "load-initialize",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print --input-format stream-json --output-format stream-json --verbose --no-session-persistence --plugin-dir <worktree>/artifacts/claude-2.1.318/load --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --no-chrome",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:47:05.345244-05:00",
+      "exitStatus": 0,
+      "stdin": "initialize control request, request_id=threadspace-qualification; EOF; no model prompt",
+      "stdoutArtifact": "artifacts/claude-2.1.318/load-initialize.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/load-initialize.stderr"
+    },
+    {
+      "label": "init-help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin init --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:47:06.707865-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/init-help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/init-help.stderr"
+    },
+    {
+      "label": "load-debug",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print --input-format stream-json --output-format stream-json --verbose --no-session-persistence --plugin-dir <worktree>/artifacts/claude-2.1.318/load --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --debug-file <worktree>/artifacts/claude-2.1.318/load-debug.log",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:47:55.311274-05:00",
+      "exitStatus": 0,
+      "stdin": "initialize control request, request_id=threadspace-qualification; EOF; no model prompt",
+      "stdoutArtifact": "artifacts/claude-2.1.318/load-debug.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/load-debug.stderr"
+    },
+    {
+      "label": "probe-observer",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/probe-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:49:31.836765-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/probe-observer.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/probe-observer.stderr"
+    },
+    {
+      "label": "probe-no-observer",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/probe-no-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:49:32.201940-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/probe-no-observer.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/probe-no-observer.stderr"
+    },
+    {
+      "label": "load-held",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print --input-format stream-json --output-format stream-json --verbose --no-session-persistence --plugin-dir <worktree>/artifacts/claude-2.1.318/load --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --debug-file <worktree>/artifacts/claude-2.1.318/load-held-debug.log",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "exitStatus": 0,
+      "stdin": "initialize control request, request_id=threadspace-qualification; EOF; no model prompt",
+      "stdoutArtifact": "artifacts/claude-2.1.318/load-held.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/load-held.stderr"
+    },
+    {
+      "label": "load-owned",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print --input-format stream-json --output-format stream-json --verbose --no-session-persistence --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --debug-file <worktree>/artifacts/claude-2.1.318/load-owned-debug.log",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:50:17.779914-05:00",
+      "exitStatus": 0,
+      "extraEnv": {
+        "CLAUDE_CODE_PLUGIN_DIRS": "<worktree>/artifacts/claude-2.1.318/load"
+      },
+      "stdin": "initialize control request, request_id=threadspace-qualification; EOF; no model prompt",
+      "stdoutArtifact": "artifacts/claude-2.1.318/load-owned.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/load-owned.stderr"
+    },
+    {
+      "label": "load-watch",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print --input-format stream-json --output-format stream-json --verbose --no-session-persistence --plugin-dir <worktree>/artifacts/claude-2.1.318/load --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --debug-file <worktree>/artifacts/claude-2.1.318/load-watch-debug.log",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:50:43.177672-05:00",
+      "exitStatus": 0,
+      "extraEnv": {
+        "CLAUDE_CODE_PLUGIN_DIR_WATCH": "1"
+      },
+      "stdin": "initialize control request, request_id=threadspace-qualification; EOF; no model prompt",
+      "stdoutArtifact": "artifacts/claude-2.1.318/load-watch.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/load-watch.stderr"
+    },
+    {
+      "label": "authoring",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print /plugin-authoring --max-budget-usd 0 --no-session-persistence --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}'",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:51:05.545628-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/authoring.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/authoring.stderr"
+    },
+    {
+      "label": "validate-after",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin validate <worktree>/artifacts/claude-2.1.318/after",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:51:55.312261-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/validate-after.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/validate-after.stderr"
+    },
+    {
+      "label": "test-after",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/after",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:51:55.469338-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/test-after.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/test-after.stderr"
+    },
+    {
+      "label": "authoring-max-turns-zero",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --print /plugin-authoring --max-turns 0 --no-session-persistence --setting-sources '' --strict-mcp-config --mcp-config '{\"mcpServers\":{}}'",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:51:56.976536-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/authoring-max-turns-zero.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/authoring-max-turns-zero.stderr"
+    },
+    {
+      "label": "test-after-final",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/after",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:52:26.506370-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/test-after-final.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/test-after-final.stderr"
+    },
+    {
+      "label": "portable-ownership",
+      "command": "node <worktree>/packages/provider-mod/tests/ownership.node.mjs",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:52:27.994645-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/portable-ownership.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/portable-ownership.stderr"
+    },
+    {
+      "label": "portable-latency",
+      "command": "node <worktree>/packages/provider-mod/tests/latency.node.mjs",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:52:28.128831-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/portable-latency.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/portable-latency.stderr"
+    },
+    {
+      "label": "trace-probe",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:19.790121-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe.stderr"
+    },
+    {
+      "label": "trace-probe-no-observer",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe-no-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:20.067990-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer.stderr"
+    },
+    {
+      "label": "doctor-help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 doctor --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:20.345207-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/doctor-help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/doctor-help.stderr"
+    },
+    {
+      "label": "agents-help",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 agents --help",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:20.435028-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/agents-help.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/agents-help.stderr"
+    },
+    {
+      "label": "trace-probe-literal",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:31.490576-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe-literal.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe-literal.stderr"
+    },
+    {
+      "label": "trace-probe-no-observer-literal",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe-no-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:31.762289-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer-literal.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer-literal.stderr"
+    },
+    {
+      "label": "trace-probe-endpoints",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:43.999577-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe-endpoints.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe-endpoints.stderr"
+    },
+    {
+      "label": "trace-probe-no-observer-endpoints",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/trace-probe-no-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:53:44.339869-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer-endpoints.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/trace-probe-no-observer-endpoints.stderr"
+    },
+    {
+      "label": "test-qualified-kit",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/after",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:00.729896-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/test-qualified-kit.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/test-qualified-kit.stderr"
+    },
+    {
+      "label": "settings-schema-valid",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --settings <worktree>/artifacts/claude-2.1.318/settings-valid.json --setting-sources '' doctor",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:32.939889-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/settings-schema-valid.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/settings-schema-valid.stderr"
+    },
+    {
+      "label": "settings-schema-invalid-event",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --settings <worktree>/artifacts/claude-2.1.318/settings-invalid-event.json --setting-sources '' doctor",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:33.168244-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/settings-schema-invalid-event.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/settings-schema-invalid-event.stderr"
+    },
+    {
+      "label": "mutation-duplicate-observer",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/duplicate-observer",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:47.031328-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/mutation-duplicate-observer.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/mutation-duplicate-observer.stderr"
+    },
+    {
+      "label": "mutation-changed-provider-result",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/changed-provider-result",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:47.509719-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/mutation-changed-provider-result.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/mutation-changed-provider-result.stderr"
+    },
+    {
+      "label": "mutation-late-session-context",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/late-session-context",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:48.668602-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/mutation-late-session-context.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/mutation-late-session-context.stderr"
+    },
+    {
+      "label": "mutation-forged-core-settlement",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/forged-core-settlement",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:49.892593-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/mutation-forged-core-settlement.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/mutation-forged-core-settlement.stderr"
+    },
+    {
+      "label": "mutation-duplicated-observations",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 plugin test <worktree>/artifacts/claude-2.1.318/duplicated-observations",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:55:24.201084-05:00",
+      "exitStatus": 1,
+      "stdoutArtifact": "artifacts/claude-2.1.318/mutation-duplicated-observations.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/mutation-duplicated-observations.stderr"
+    },
+    {
+      "label": "rust-provider-tests",
+      "command": "cargo test --offline -p threadspace-provider-claude",
+      "cwd": "<worktree>",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:56:04.432587-05:00",
+      "exitStatus": 101,
+      "stdoutArtifact": "artifacts/claude-2.1.318/rust-provider-tests.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/rust-provider-tests.stderr"
+    },
+    {
+      "label": "declarations-compare",
+      "command": "python3 <worktree>/evidence/M2/provider/claude-2.1.318/compare-declarations.py --candidate <worktree>/artifacts/claude-2.1.318/load/.claude-plugin/types/claude-code/index.d.ts --prior-310 <retained-310>/discovery/provider-mod/.claude-plugin/types/claude-code/index.d.ts --baseline-record <worktree>/evidence/M2/provider/claude/declarations.json --output <worktree>/evidence/M2/provider/claude-2.1.318/declarations.json",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:58:06.649492-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/declarations-compare.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/declarations-compare.stderr"
+    },
+    {
+      "label": "replay-controls",
+      "command": "python3 <worktree>/evidence/M2/provider/claude-2.1.318/run-controls.py",
+      "cwd": "<worktree>",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:58:49.817019-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/replay-controls.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/replay-controls.stderr"
+    },
+    {
+      "label": "rust-provider-lib-tests",
+      "command": "cargo test --offline -p threadspace-provider-claude --lib",
+      "cwd": "<worktree>",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:59:50.618698-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/rust-provider-lib-tests.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/rust-provider-lib-tests.stderr"
+    }
+  ],
+  "ancillaryCommands": [
+    {
+      "command": "npx --offline ctx7@latest library \"Claude Code\" \"Plugin authoring generated TypeScript declarations plugin test kit module loading hooks.json register\"",
+      "exitStatus": 1,
+      "observation": "ENOTCACHED; no dependency installed"
+    },
+    {
+      "command": "ctx7 library \"Claude Code\" \"Plugin authoring generated TypeScript declarations plugin test kit hooks modules tool.call permission preflight\"",
+      "exitStatus": 1,
+      "observation": "fetch failed; used installed declarations/help/schema instead"
+    },
+    {
+      "command": "/Users/danny/.local/bin/npeer whoami --json",
+      "exitStatus": 2,
+      "observation": "Sandbox denied schema-lock access; bound MCP task_status and peer_list verified worker UUID/owner/incarnation; no borrowed identity"
+    },
+    {
+      "command": "codegraph init --yes <worktree>",
+      "exitStatus": 0
+    },
+    {
+      "command": "codegraph explore --path <worktree> \"How does the provider-mod test kit load hooks/register.ts, and how do provider-claude inventory parsing and conventional hook setup consume Claude CLI schemas? Show the relevant files and tests.\"",
+      "exitStatus": 0
+    },
+    {
+      "command": "codegraph affected packages/provider-mod/tests/delivery.test.ts packages/provider-mod/tests/middleware.test.ts packages/provider-mod/tests/provenance.test.ts packages/provider-mod/tests/kit-behavior.test.ts",
+      "exitStatus": 0
+    },
+    {
+      "command": "codegraph sync <worktree>",
+      "exitStatus": 0,
+      "runs": 2
+    },
+    {
+      "command": "node --version",
+      "exitStatus": 0,
+      "observation": "v26.13.0"
+    },
+    {
+      "command": "git diff --check",
+      "exitStatus": 0
+    },
+    {
+      "command": "git worktree list",
+      "exitStatus": 0,
+      "observation": "No worker-created additional worktree; current worktree remains controller-owned"
+    },
+    {
+      "command": "git branch --merged",
+      "exitStatus": 0,
+      "observation": "No branch created, merged or deleted by worker"
+    }
+  ]
+}

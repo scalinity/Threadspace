@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "commands": [
+    {
+      "label": "settings-schema-valid",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --settings <worktree>/artifacts/claude-2.1.318/settings-valid.json --setting-sources '' doctor",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:32.939889-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/settings-schema-valid.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/settings-schema-valid.stderr"
+    },
+    {
+      "label": "settings-schema-invalid-event",
+      "command": "/Users/danny/.local/share/claude/versions/2.1.318 --settings <worktree>/artifacts/claude-2.1.318/settings-invalid-event.json --setting-sources '' doctor",
+      "cwd": "<worktree>/artifacts/claude-2.1.318",
+      "config": "<worktree>/artifacts/claude-2.1.318/config",
+      "startedEastern": "2026-11-05T20:54:33.168244-05:00",
+      "exitStatus": 0,
+      "stdoutArtifact": "artifacts/claude-2.1.318/settings-schema-invalid-event.stdout",
+      "stderrArtifact": "artifacts/claude-2.1.318/settings-schema-invalid-event.stderr"
+    }
+  ],
+  "validFixture": {
+    "hooks": {
+      "SessionStart": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "UserPromptSubmit": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "Stop": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "SubagentStop": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "SubagentStart": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PreToolUse": [
+        {
+          "matcher": "*",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PostToolUse": [
+        {
+          "matcher": "*",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PostToolUseFailure": [
+        {
+          "matcher": "*",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PermissionRequest": [
+        {
+          "matcher": "*",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "SessionEnd": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "Notification": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "StopFailure": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PermissionDenied": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PreCompact": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ],
+      "PostCompact": [
+        {
+          "matcher": "",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "/usr/bin/true"
+            }
+          ]
+        }
+      ]
+    },
+    "env": {
+      "CLAUDE_CODE_PLUGIN_DIRS": "<disposable-mod>"
+    }
+  },
+  "installedSchemaEventNames": [
+    "PreToolUse",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "PostToolBatch",
+    "Notification",
+    "UserPromptSubmit",
+    "UserPromptExpansion",
+    "SessionStart",
+    "SessionEnd",
+    "Stop",
+    "StopFailure",
+    "SubagentStart",
+    "SubagentStop",
+    "PreCompact",
+    "PostCompact",
+    "PreModelSwitch",
+    "PostModelSwitch",
+    "PermissionRequest",
+    "PermissionDenied",
+    "Setup",
+    "TeammateIdle",
+    "TaskCreated",
+    "TaskCompleted",
+    "Elicitation",
+    "ElicitationResult",
+    "ConfigChange",
+    "WorktreeCreate",
+    "WorktreeRemove",
+    "InstructionsLoaded",
+    "CwdChanged",
+    "FileChanged",
+    "DirectoryAdded",
+    "MessageDisplay"
+  ],
+  "normalizedHookEventNames": [
+    "CwdChanged",
+    "DirectoryAdded",
+    "Elicitation",
+    "ElicitationResult",
+    "Notification",
+    "PermissionDenied",
+    "PermissionRequest",
+    "PostCompact",
+    "PostToolBatch",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "PreCompact",
+    "PreToolUse",
+    "SessionEnd",
+    "SessionStart",
+    "Stop",
+    "StopFailure",
+    "SubagentStart",
+    "SubagentStop",
+    "TaskCompleted",
+    "TaskCreated",
+    "TeammateIdle",
+    "UserPromptSubmit"
+  ],
+  "setupEventNames": [
+    "SessionStart",
+    "UserPromptSubmit",
+    "Stop",
+    "SubagentStop",
+    "SubagentStart",
+    "PreToolUse",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "PermissionRequest",
+    "SessionEnd",
+    "Notification",
+    "StopFailure",
+    "PermissionDenied",
+    "PreCompact",
+    "PostCompact"
+  ],
+  "allNamesAccepted": true,
+  "control": "Unknown event is explicitly diagnosed while exact production-shaped fixture has no Invalid settings diagnostic. doctor exits 0 for BOTH; exit code alone is not acceptance.",
+  "liveSettingsEdited": false,
+  "scope": "Schema/readback only; no conventional hook execution claimed."
+}
