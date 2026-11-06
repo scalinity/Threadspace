@@ -822,8 +822,10 @@ pub fn route<N: RouteNative>(
                     let denied = error.contains("-1743");
                     focus_evidence.error = Some(error);
                     run.evidence.focus = Some(focus_evidence);
-                    // A timed-out or failed script may have acted: uncertain, not success.
-                    run.focus_performed = !denied;
+                    // A timed-out or failed script may have acted: uncertain,
+                    // not success. A denial does not say which event failed,
+                    // and the script selects and activates before reading back.
+                    run.focus_performed = true;
                     let reason = if denied {
                         "AUTOMATION_DENIED"
                     } else {
@@ -1233,8 +1235,11 @@ fn focus_ghostty<N: RouteNative>(
             let denied = error.contains("-1743");
             evidence.error = Some(error);
             run.evidence.ghostty_focus = Some(evidence);
-            // A timed-out or failed script may have acted: uncertain, not success.
-            run.focus_performed = !denied;
+            // The script activates and focuses before it reads back, and an
+            // error does not say which event failed, so a failed script may
+            // have acted. Denial before any event was sent is the route's
+            // earlier authorization check, which never reaches the script.
+            run.focus_performed = true;
             let reason = if denied {
                 "AUTOMATION_DENIED"
             } else {

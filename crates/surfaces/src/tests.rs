@@ -797,7 +797,9 @@ fn automation_denial_and_script_errors_are_explicit() {
     mock.focus_result = Some(Err("execution error: Not authorized (-1743)".into()));
     let refused_at_focus = go(&mock, &target(vec![bound(PID, "b1")]));
     assert_eq!(refused_at_focus.reason_code, "AUTOMATION_DENIED");
-    assert!(!refused_at_focus.focus_performed);
+    // A denial inside the script does not say which event failed; the
+    // effect is possible. Only the earlier check proves no event was sent.
+    assert!(refused_at_focus.focus_performed);
 
     let mut mock = Mock::healthy();
     mock.focus_result = Some(Ok((FocusOutcome::Gone, 9002, 10)));
@@ -1132,11 +1134,13 @@ fn ghostty_permission_denial_sends_no_events() {
     refused(&result, &mock, "AUTOMATION_DENIED");
     assert_eq!(mock.calls("ghostty_enumerate"), 0);
 
+    // Denied while the script runs: it may already have activated or
+    // focused, so the effect is reported as possible.
     let mut mock = Mock::healthy_ghostty();
     mock.ghostty_focus_result = Some(Err("osascript failed: -1743 not authorized".into()));
     let result = go(&mock, &target(vec![bound_ghostty("term-b")]));
     assert_eq!(result.reason_code, "AUTOMATION_DENIED");
-    assert!(!result.focus_performed);
+    assert!(result.focus_performed, "an error cannot prove that no focus event was sent");
     assert_ne!(result.surface_result, SurfaceResult::ExactNativeSurface);
 }
 
