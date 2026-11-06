@@ -4,7 +4,12 @@
 //! returned to by the companion's Return and the packaged UI's Return.
 //!
 //! The copy runs at its own private bundle path, so PID-addressed events
-//! reach exactly it; the owner's Ghostty receives no event. Every Return is
+//! reach exactly it, and no harness step sends an event to the owner's
+//! Ghostty. The companion under test observes the owner's ordinary sessions as
+//! it does in normal use: its discovery joins them, and its integration
+//! status (asked by the packaged UI when it hydrates) reads every scriptable
+//! Ghostty's inventory, an owner's included. Those reads move nothing; every
+//! Return the harness requests targets a fixture pane. Every Return is
 //! checked against independent readback: the copy's front window, selected
 //! tab and focused terminal, and NSWorkspace's frontmost PID from a separate
 //! process. Focus-moving steps wait for the owner to be idle.
