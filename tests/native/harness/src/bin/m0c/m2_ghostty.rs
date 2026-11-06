@@ -39,19 +39,23 @@ pub struct Observed {
     pub session_id: String,
 }
 
+/// The companion's Apple-event consent for Ghostty, asked through the
+/// consent-only request: it sends no event to any Ghostty process (the
+/// integration status would inventory every scriptable one, an owner's
+/// included). Consent already decided returns at once; an undecided one shows
+/// the system prompt, which is the owner's step.
 fn ghostty_authorized(ctx: &Ctx) -> Result<Value, String> {
-    match ctx.companion().request(ControlRequestBody::IntegrationStatus, Duration::from_secs(30))? {
-        ControlResponseBody::IntegrationStatus { report } => {
-            let ghostty = report.ghostty.ok_or("integration status has no Ghostty report")?;
-            if ghostty.automation != AutomationPermission::Authorized {
+    match ctx.companion().request(ControlRequestBody::RequestGhosttyAutomation, Duration::from_secs(200))? {
+        ControlResponseBody::TerminalAutomation { automation, status_code } => {
+            if automation != AutomationPermission::Authorized {
                 return Err(format!(
-                    "BLOCKED: Ghostty automation is {:?} ({}) for the {} channel; `threadspace-qualify {} request-ghostty` asks the owner once",
-                    ghostty.automation, ghostty.automation_status_code, ctx.channel_name(), ctx.channel_name()
+                    "BLOCKED: Ghostty automation is {automation:?} ({status_code}) for the {} channel; the owner must allow it in the system prompt or System Settings › Privacy & Security › Automation",
+                    ctx.channel_name()
                 ));
             }
-            serde_json::to_value(&ghostty).map_err(|e| e.to_string())
+            Ok(json!({ "automation": automation, "statusCode": status_code }))
         }
-        other => Err(format!("integration status: unexpected {other:?}")),
+        other => Err(format!("Ghostty automation request: unexpected {other:?}")),
     }
 }
 
