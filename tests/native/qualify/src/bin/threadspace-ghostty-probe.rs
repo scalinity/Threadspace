@@ -28,19 +28,29 @@ fn run() -> Result<Value, String> {
     {
         return Err("application image mismatch".into());
     }
-    // Apple events addressed to a PID reach the application registered at
-    // its bundle path: a second process from the same path could answer.
+    // The dictionary on disk describes only the executable installed now;
+    // its identity must be unchanged across the probe.
     let image_path = expected_image.display().to_string();
+    let installed = process::path_file_id(&image_path).ok_or("installed executable unreadable")?;
+    let dictionary = ghostty::probe_dictionary(&app).map_err(|e| e.to_string())?;
+    // Immediately before any event: Apple events addressed to a PID reach the
+    // application registered at its bundle path, so the process must be the
+    // only one running that path; it must map the installed image the
+    // dictionary describes; and it must be the same incarnation.
     let sharing = process::pids_with_executable(&image_path).map_err(|e| e.to_string())?;
     if sharing != [pid] {
         return Err(format!("{} processes run {image_path}; events cannot address one exactly", sharing.len()));
     }
-    // The dictionary on disk describes only the image the process maps.
     let mapped = process::mapped_image_file_id(pid).map_err(|e| e.to_string())?;
-    if mapped.is_none() || mapped != process::path_file_id(&image_path) {
-        return Err("running image is not the installed executable".into());
+    if mapped.as_deref() != Some(installed.as_str())
+        || process::path_file_id(&image_path).as_deref() != Some(installed.as_str())
+    {
+        return Err("running image is not the installed executable the dictionary describes".into());
     }
-    let dictionary = ghostty::probe_dictionary(&app).map_err(|e| e.to_string())?;
+    let now = process::sample_incarnation(pid).map_err(|e| e.to_string())?;
+    if !now.same_process_and_image(&before) {
+        return Err("application incarnation changed".into());
+    }
     let budget = Duration::from_secs(2);
     let result = match args[3].as_str() {
         "inventory" if args.len() == 4 => {
