@@ -17,12 +17,12 @@
 //! and only when Apple-event automation is already authorized (never
 //! prompting). Each Ghostty process is addressed by its own PID.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender, SyncSender};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
 use threadspace_contracts::canonical::fact::SnapshotRow;
@@ -300,6 +300,9 @@ pub fn ghostty_still_scriptable(app: &GhosttyApplication) -> Result<(), String> 
     }
 }
 
+/// How long a no-match or several-match surface answer stands.
+const JOIN_RETRY: Duration = Duration::from_secs(60);
+
 /// Unavailable-surface reasons that can change only with an application
 /// generation or image, so a no-match answer under them is final for the
 /// same fingerprint.
@@ -313,9 +316,12 @@ const STABLE_LIMITATIONS: [&str; 5] = [
 
 struct State {
     context: DiscoveryContext,
-    /// (pid, birth s, birth µs, surface-application fingerprint) whose
-    /// surface join gave a final answer; retried only on a forced pass.
-    attempted: HashSet<(i32, u64, u32, String)>,
+    /// (pid, birth s, birth µs, controlling device, surface-application
+    /// fingerprint) whose surface join answered no or several surfaces, and
+    /// when. Surfaces change without a new application generation (a TTY
+    /// becomes readable, a duplicate closes), so such an answer is retried
+    /// after [`JOIN_RETRY`], on a forced pass, or on a fingerprint change.
+    attempted: HashMap<(i32, u64, u32, u32, String), Instant>,
     versions: HashMap<PathBuf, Option<String>>,
     /// Passes applied by this companion incarnation; the sequence of each
     /// pass's inventory causal point (the epoch is the core generation the
@@ -549,13 +555,15 @@ fn surface_join(
             join.pid,
             join.after.sample.start_seconds,
             join.after.sample.start_microseconds,
+            join.device,
             fingerprint.clone(),
         )
     };
+    state.attempted.retain(|_, at| at.elapsed() < JOIN_RETRY);
     let pending: Vec<&Join> = joins
         .iter()
         .copied()
-        .filter(|join| force || !state.attempted.contains(&key(join)))
+        .filter(|join| force || !state.attempted.contains_key(&key(join)))
         .collect();
     if pending.is_empty() {
         return out;
@@ -634,7 +642,7 @@ fn surface_join(
             }
             ([], true) => {
                 if stable {
-                    state.attempted.insert(key(join));
+                    state.attempted.insert(key(join), Instant::now());
                 }
                 Err(unavailable
                     .first()
@@ -642,7 +650,7 @@ fn surface_join(
                     .unwrap_or_else(|| "NO_MATCHING_SURFACE".to_owned()))
             }
             (_, true) => {
-                state.attempted.insert(key(join));
+                state.attempted.insert(key(join), Instant::now());
                 Err("MULTIPLE_MATCHING_SURFACES".to_owned())
             }
         };
@@ -885,7 +893,7 @@ pub fn spawn(context: DiscoveryContext) -> std::io::Result<SyncSender<Trigger>> 
         .spawn(move || {
             let mut state = State {
                 context,
-                attempted: HashSet::new(),
+                attempted: HashMap::new(),
                 versions: HashMap::new(),
                 passes: 0,
             };
