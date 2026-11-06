@@ -23,12 +23,13 @@ function run(argv) {
   }
   function pane(window, surface) {
     const tab = window.tabs().filter(t => t.terminals().some(s => s.id() === surface.id()));
-    return {windowId: window.id(), tabId: tab.length === 1 ? tab[0].id() : null, terminalId: surface.id(), tty: surface.tty()};
+    return {windowId: window.id(), tabId: tab.length === 1 ? tab[0].id() : null,
+      tabIndex: tab.length === 1 ? tab[0].index() : null, terminalId: surface.id(), tty: surface.tty()};
   }
   function locate(id) {
     const found = [];
     app.windows().forEach(w => w.tabs().forEach(t => t.terminals().forEach(s => {
-      if (s.id() === id) found.push({windowId: w.id(), tabId: t.id(), terminalId: s.id(), tty: s.tty()});
+      if (s.id() === id) found.push({windowId: w.id(), tabId: t.id(), tabIndex: t.index(), terminalId: s.id(), tty: s.tty()});
     })));
     if (found.length !== 1) throw Error("terminal not found");
     return found[0];
@@ -106,6 +107,14 @@ function run(argv) {
       if (tabs.length !== 1) throw Error("tab not found");
       app.selectTab(tabs[0]);
       return "{}";
+    }
+    case "title": {
+      // Names the tab holding the terminal, so its window can be found by title.
+      const tabs = [];
+      app.windows().forEach(w => w.tabs().forEach(t => { if (t.terminals().some(s => s.id() === argv[2])) tabs.push(t); }));
+      if (tabs.length !== 1) throw Error("tab not found");
+      tabs[0].nameOverride = argv[3];
+      return JSON.stringify({titled: argv[3]});
     }
     case "readback": {
       const window = app.frontWindow(), tab = window.selectedTab();

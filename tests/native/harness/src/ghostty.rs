@@ -41,6 +41,8 @@ const LAUNCH_FLAGS: [&str; 7] = [
 pub struct Pane {
     pub window_id: String,
     pub tab_id: String,
+    /// The tab's position in its window when last located.
+    pub tab_index: i64,
     pub terminal_id: String,
     pub tty: String,
     pub dir: PathBuf,
@@ -75,6 +77,7 @@ fn pane_of(value: &Value, dir: &Path) -> Result<Pane, String> {
     Ok(Pane {
         window_id: field("windowId")?,
         tab_id: field("tabId")?,
+        tab_index: value["tabIndex"].as_i64().unwrap_or(-1),
         terminal_id: field("terminalId")?,
         tty: field("tty")?,
         dir: dir.to_path_buf(),
@@ -266,6 +269,11 @@ impl Fixture {
     /// A Ghostty keybinding action (`toggle_fullscreen`, `move_tab:1`).
     pub fn action(&self, pane: &Pane, action: &str) -> Result<Value, String> {
         self.call("action", &[&pane.terminal_id, action])
+    }
+
+    /// Gives the pane's tab a unique title, so Accessibility can find its window.
+    pub fn title(&self, pane: &Pane, marker: &str) -> Result<(), String> {
+        self.call("title", &[&pane.terminal_id, marker]).map(|_| ())
     }
 
     pub fn select_tab(&self, pane: &Pane) -> Result<(), String> {

@@ -215,12 +215,16 @@ pub fn press_return(ctx: &Ctx, fixture: &Fixture, observed: &Observed) -> Value 
     value
 }
 
-/// Puts another pane in front so the next Return has to move focus.
+/// Puts another pane in front so the next Return has to move focus; `ok`
+/// only when independent readback shows that pane focused and frontmost.
 fn front_other(ctx: &Ctx, fixture: &Fixture, other: &Pane) -> Value {
     let _gui = ctx.gui("m2 ghostty front another pane");
     let focused = fixture.focus(other);
     threadspace_harness::pause_ms(400);
-    json!({ "focused": focused.as_ref().ok(), "error": focused.as_ref().err() })
+    let readback = fixture.readback();
+    let ok = readback.as_ref().is_ok_and(|r| r["terminalId"] == json!(other.terminal_id) && r["frontmost"] == json!(true))
+        && frontmost_pid() == Some(fixture.app.pid);
+    json!({ "ok": ok, "focused": focused.as_ref().ok(), "error": focused.as_ref().err(), "readback": readback.as_ref().ok() })
 }
 
 fn session_count(ctx: &Ctx, native: &str) -> usize {
@@ -255,7 +259,7 @@ pub fn smoke(ctx: &Ctx, returns: u32) -> Result<Value, String> {
                 let _gui = ctx.gui("m2 ghostty smoke Return");
                 companion_return(ctx, &fixture, observed)
             };
-            pass &= route_ok(&returned);
+            pass &= fronted["ok"] == json!(true) && route_ok(&returned);
             results.push(json!({ "index": index, "ownerIdle": idle, "fronted": fronted, "return": returned }));
         }
         let _ = fixture.submit(&observed.pane, "/exit");
@@ -337,6 +341,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
             && again.as_ref().is_ok_and(|v| v.session_id == observed.session_id)
             && sessions == 1
             && workers == 1
+            && fronted["ok"] == json!(true)
             && route_ok(&returned);
         pass &= ok;
         run_dir
@@ -433,7 +438,7 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
                 let _gui = ctx.gui("m2 ghostty route");
                 if index % 3 == 0 { press_return(ctx, &fixture, target) } else { companion_return(ctx, &fixture, target) }
             };
-            if route_ok(&returned) {
+            if fronted["ok"] == json!(true) && route_ok(&returned) {
                 exact += 1;
             }
             if returned["wrongTarget"] == json!(true) {
@@ -476,49 +481,78 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     Ok(summary)
 }
 
-/// Rearranged and failing surfaces: a moved tab, a fullscreen window, a
-/// closed pane whose session is gone (no focus may land elsewhere).
+/// Rearranged and failing surfaces. Each case proves its setup by
+/// independent readback before its Return counts: a moved tab's index
+/// changed, the window is fullscreen or minimized by Accessibility, another
+/// pane is in front. A setup that did not happen fails its case.
 fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &Pane, run_dir: &Run) -> Value {
     let mut cases = Vec::new();
     let mut pass = true;
-    let mut case = |name: &str, setup: Value, returned: Value, expect_exact: bool| {
-        let ok = if expect_exact {
-            route_ok(&returned)
-        } else {
-            returned["exact"] == json!(false) && returned["route"]["focusPerformed"] == json!(false)
-        };
+    let mut record = |name: &str, setup_ok: bool, setup: Value, returned: Value, ok: bool| {
+        let ok = setup_ok && ok;
         pass &= ok;
-        let record = json!({ "case": name, "ok": ok, "setup": setup, "return": returned });
-        let _ = run_dir.append("scenarios.jsonl", &record);
-        cases.push(json!({ "case": name, "ok": ok }));
+        let _ = run_dir.append("scenarios.jsonl", &json!({ "case": name, "ok": ok, "setupOk": setup_ok, "setup": setup, "return": returned }));
+        cases.push(json!({ "case": name, "ok": ok, "setupOk": setup_ok }));
     };
-    // The second window's session tab moves after the spare tab.
+    let pid = fixture.app.pid as u32;
+
+    // A tab moves within its window.
     let target = &sessions[2];
+    let before = fixture.locate(&target.pane);
     let moved = fixture.action(&target.pane, "move_tab:1");
-    let located = fixture.locate(&target.pane);
+    let after = fixture.locate(&target.pane);
     owner_idle(ctx);
     let fronted = front_other(ctx, fixture, spare);
+    let setup_ok = moved.as_ref().is_ok_and(|m| m["performed"] == json!(true))
+        && matches!((&before, &after), (Ok(b), Ok(a)) if a.tab_index >= 0 && a.tab_index != b.tab_index)
+        && fronted["ok"] == json!(true);
     let returned = {
         let _gui = ctx.gui("m2 ghostty moved tab");
         companion_return(ctx, fixture, target)
     };
-    case("tab-moved", json!({ "moved": moved.as_ref().ok(), "error": moved.as_ref().err(), "located": located.as_ref().ok(), "fronted": fronted }), returned, true);
-    // A split session's window enters fullscreen, then another pane fronts.
+    let ok = route_ok(&returned);
+    record("tab-moved", setup_ok, json!({ "before": before.as_ref().ok(), "moved": moved.as_ref().ok(), "movedError": moved.as_ref().err(), "after": after.as_ref().ok(), "fronted": fronted }), returned, ok);
+
+    // A split session's window is fullscreen; another window is in front.
     let full = &sessions[0];
-    let entered = fixture.action(&full.pane, "toggle_fullscreen");
-    threadspace_harness::pause_ms(1500);
+    let marker = format!("ts-full-{}", uuid::Uuid::new_v4());
+    let titled = fixture.title(&full.pane, &marker);
     owner_idle(ctx);
+    let _ = fixture.focus(&full.pane);
+    let entered = ctx.native.ax_action(pid, "fullscreen", Some(&marker));
+    threadspace_harness::pause_ms(1500);
+    let state = ctx.native.ax_window(pid, Some(&marker));
     let fronted = front_other(ctx, fixture, &sessions[2].pane);
-    threadspace_harness::pause_ms(800);
+    let setup_ok = titled.is_ok() && state["fullScreen"] == json!(true) && fronted["ok"] == json!(true);
     let returned = {
         let _gui = ctx.gui("m2 ghostty fullscreen");
         companion_return(ctx, fixture, full)
     };
-    let left = fixture.action(&full.pane, "toggle_fullscreen");
+    let ok = route_ok(&returned);
+    let exited = ctx.native.ax_action(pid, "exit-fullscreen", Some(&marker));
     threadspace_harness::pause_ms(1500);
-    case("fullscreen", json!({ "entered": entered.as_ref().ok(), "error": entered.as_ref().err(), "left": left.as_ref().ok(), "fronted": fronted }), returned, true);
+    record("fullscreen", setup_ok, json!({ "titled": titled.is_ok(), "entered": entered, "state": state, "exited": exited, "fronted": fronted }), returned, ok);
+
+    // The second window is minimized; Return must restore and focus it.
+    let mini = &sessions[2];
+    let marker = format!("ts-mini-{}", uuid::Uuid::new_v4());
+    let titled = fixture.title(&mini.pane, &marker);
+    owner_idle(ctx);
+    let _ = fixture.focus(&mini.pane);
+    let minimized = ctx.native.ax_action(pid, "minimize", Some(&marker));
+    threadspace_harness::pause_ms(1000);
+    let state = ctx.native.ax_window(pid, Some(&marker));
+    let setup_ok = titled.is_ok() && state["minimized"] == json!(true);
+    let returned = {
+        let _gui = ctx.gui("m2 ghostty minimized");
+        companion_return(ctx, fixture, mini)
+    };
+    let restored = ctx.native.ax_window(pid, Some(&marker));
+    let ok = route_ok(&returned) && restored["minimized"] == json!(false);
+    record("minimized", setup_ok, json!({ "titled": titled.is_ok(), "minimized": minimized, "state": state, "restored": restored }), returned, ok);
+
     // The split's right session exits and its pane closes: Return is refused
-    // and no focus moves.
+    // and focus does not move.
     let gone = &sessions[1];
     let _ = fixture.submit(&gone.pane, "/exit");
     let ended = wait_view(ctx, &gone.native_session_id, Duration::from_secs(60), |v| format!("{:?}", v.execution_presence) == "Ended");
@@ -531,10 +565,9 @@ fn rearrangements(ctx: &Ctx, fixture: &Fixture, sessions: &[Observed], spare: &P
         companion_return(ctx, fixture, gone)
     };
     let after = fixture.readback();
-    let unmoved = before.as_ref().ok() == after.as_ref().ok();
-    let mut returned = returned;
-    returned["focusUnmoved"] = json!(unmoved);
-    let refused = returned["exact"] == json!(false) && unmoved;
-    case("closed-pane", json!({ "ended": ended.is_ok(), "closed": closed.as_ref().ok(), "fronted": fronted, "before": before.as_ref().ok(), "after": after.as_ref().ok() }), returned, false);
-    json!({ "pass": pass && refused, "cases": cases })
+    let unmoved = before.as_ref().ok().is_some() && before.as_ref().ok() == after.as_ref().ok();
+    let setup_ok = ended.is_ok() && closed.is_ok() && fronted["ok"] == json!(true);
+    let ok = returned["exact"] == json!(false) && returned["route"]["focusPerformed"] == json!(false) && unmoved;
+    record("closed-pane", setup_ok, json!({ "ended": ended.is_ok(), "closed": closed.as_ref().ok(), "fronted": fronted, "before": before.as_ref().ok(), "after": after.as_ref().ok() }), returned, ok);
+    json!({ "pass": pass, "cases": cases })
 }
