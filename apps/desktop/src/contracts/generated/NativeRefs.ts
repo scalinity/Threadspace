@@ -11,7 +11,7 @@ import type { ProcessKey } from "./ProcessKey";
  * Native-keyed references of a draft. Only an explicit reconciler reference
  * (`NativeExecutionRef::Canonical`, `attention`) names a canonical record.
  */
-export type NativeRefs = { activation: NativeActivation | null, session: NativeSessionRef | null, actor: NativeActorRef | null, relatedActor: NativeActorRef | null, 
+export type NativeRefs = { activation?: NativeActivation | null, session: NativeSessionRef | null, actor: NativeActorRef | null, relatedActor: NativeActorRef | null, 
 /**
  * Endpoint may be empty for a local capture; admission fills it.
  */

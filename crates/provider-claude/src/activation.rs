@@ -44,9 +44,9 @@ pub fn attach(
     refs.actor = None;
     refs.turn = None;
     refs.execution = Some(NativeExecutionRef::Activation {
-        activation_ref: envelope
-            .activation_ref
-            .clone()
+        activation_ref: generation.as_ref().zip(envelope.callback_entry_sequence.as_ref())
+            .map(|(generation,entry)|format!("observer:{generation}:{entry}"))
+            .or_else(||envelope.activation_ref.clone())
             .unwrap_or_else(|| format!("claude-start:{}", envelope.observation_id)),
     });
     refs.activation = Some(evidence(

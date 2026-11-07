@@ -521,7 +521,7 @@ pub enum ActivationEvidenceKind { Start, Inventory, End, Turn }
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct NativeRefs {
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub activation: Option<NativeActivation>,
     pub session: Option<NativeSessionRef>,
     pub actor: Option<NativeActorRef>,

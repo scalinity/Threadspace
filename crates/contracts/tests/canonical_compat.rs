@@ -38,3 +38,12 @@ fn an_earlier_journal_entry_defaults_to_its_original_admission_version() {
     assert_eq!(entry.payload_version, 1);
     assert_eq!(serde_json::to_value(entry).expect("explicit retained version")["payloadVersion"], 1);
 }
+
+#[test]
+fn absent_native_activation_keeps_legacy_fact_bytes() {
+    let refs = threadspace_contracts::canonical::fact::NativeRefs::default();
+    let json = serde_json::to_value(&refs).unwrap();
+    assert!(json.get("activation").is_none());
+    let restored: threadspace_contracts::canonical::fact::NativeRefs = serde_json::from_value(json.clone()).unwrap();
+    assert_eq!(serde_json::to_value(restored).unwrap(),json);
+}

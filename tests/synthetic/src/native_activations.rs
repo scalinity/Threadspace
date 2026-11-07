@@ -610,6 +610,20 @@ mod tests {
         assert_eq!(engine.state.turns.len(), 2000);
     }
     #[test]
+    fn pre_change_helper_retry_is_already_committed() {
+        use threadspace_contracts::canonical::{capture::RecordStatus, fact::Delivery};
+        use threadspace_journal::EnvelopeAdmission;
+        let current = start("A",10,1,"startup");
+        let mut old = current.clone();
+        old.activation_ref = None; // Pre-M3 modbatch::envelope wire representation.
+        let mut runner = SqliteRunner::open(TempStore::new("m3-helper-retry"),42).unwrap();
+        runner.journal.admit_batch(&[EnvelopeAdmission {envelope:&old,normalized:observer::normalize(&old)}],Delivery::Live,1010).unwrap();
+        let receipt = runner.observe(&current);
+        assert_eq!(receipt.status,RecordStatus::AlreadyCommitted,"helper upgrade preserves the stored envelope bytes");
+        count(runner.state(),1,1).unwrap();
+        assert_journal(&runner);
+    }
+    #[test]
     fn each_real_opening_source_establishes_an_activation() {
         for source in ["startup", "resume", "clear"] {
             for event in [hook("SessionStart", "A", 10, source), start("A", 10, 1, source)] {
