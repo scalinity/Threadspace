@@ -319,23 +319,47 @@ impl OwnedTab {
                     return json!({"closed":false,"refused":error.to_string(),"ownership":initial});
                 }
             };
-            let cwd = procs::cwd(pid).and_then(|path| PathBuf::from(path).canonicalize().ok());
-            if directory.is_none()
-                || cwd != directory
-                || incarnation.sample.controlling_device != Some(self.device)
-            {
+            if incarnation.sample.controlling_device != Some(self.device) || directory.is_none() {
                 return json!({"closed":false,"refused":"current TTY job is not proven owned; no close sent","pid":pid,"ownership":initial});
             }
-            captured.push(incarnation);
+            let in_directory = procs::cwd(pid).and_then(|path| PathBuf::from(path).canonicalize().ok()) == directory;
+            captured.push((incarnation, in_directory));
         }
-        for before in &captured {
+        // A job runs in the owned directory, or descends from such a job on the
+        // owned device: a provider's MCP servers may change directory. A parent
+        // born after its child is a reused PID and proves nothing.
+        let mut owned: Vec<i32> = captured.iter().filter(|(_, by_directory)| *by_directory).map(|(i, _)| i.sample.pid).collect();
+        loop {
+            let found = captured
+                .iter()
+                .filter(|(child, _)| !owned.contains(&child.sample.pid))
+                .filter(|(child, _)| {
+                    captured.iter().any(|(parent, _)| {
+                        owned.contains(&parent.sample.pid)
+                            && parent.sample.pid == child.sample.ppid
+                            && (parent.sample.start_seconds, parent.sample.start_microseconds)
+                                <= (child.sample.start_seconds, child.sample.start_microseconds)
+                    })
+                })
+                .map(|(child, _)| child.sample.pid)
+                .collect::<Vec<_>>();
+            if found.is_empty() {
+                break;
+            }
+            owned.extend(found);
+        }
+        if let Some((stray, _)) = captured.iter().find(|(job, _)| !owned.contains(&job.sample.pid)) {
+            return json!({"closed":false,"refused":"current TTY job is not proven owned; no close sent","pid":stray.sample.pid,"ownership":initial});
+        }
+        for (before, by_directory) in &captured {
             match process::sample_incarnation(before.sample.pid) {
                 Ok(now)
                     if before.same_process_and_image(&now)
                         && now.sample.controlling_device == Some(self.device)
-                        && procs::cwd(now.sample.pid)
-                            .and_then(|path| PathBuf::from(path).canonicalize().ok())
-                            == directory => {}
+                        && (!by_directory
+                            || procs::cwd(now.sample.pid)
+                                .and_then(|path| PathBuf::from(path).canonicalize().ok())
+                                == directory) => {}
                 Err(process::ProcessError::Vanished { .. }) => {}
                 _ => {
                     return json!({"closed":false,"refused":"job changed before owned-window close","ownership":initial});
@@ -371,7 +395,7 @@ impl OwnedTab {
         json!({"closed":closed.ok && closed.stdout.trim() == "CLOSED" && after["missing"] == true
             && remaining.0.as_ref().is_some_and(Vec::is_empty) && stable,
             "directPidSignals":[],"ownership":initial,"pidInventory":pid_inventory,
-            "verifiedJobs":captured.iter().map(sample).collect::<Vec<_>>(),"unsignalledTerminalWrappers":wrappers,
+            "verifiedJobs":captured.iter().map(|(job, by_directory)| json!({"job": sample(job), "provenBy": if *by_directory { "directory" } else { "ancestry" }})).collect::<Vec<_>>(),"unsignalledTerminalWrappers":wrappers,
             "close":output(&closed),"after":after,"remainingPidInventory":remaining.1,"stableTerminalIncarnation":stable})
     }
 }

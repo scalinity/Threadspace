@@ -1,0 +1,19 @@
+{
+  "completedBy": "parent session after the runner refused to close its owned target window",
+  "refusal": "current TTY job is not proven owned; no close sent (pid 28253: a CodeGraph MCP server started by the owned Claude session, working directory outside the owned target directory)",
+  "freshProof": {
+    "pid": 27844,
+    "executable": "~/.local/share/claude/versions/2.1.318",
+    "cwd": "<run scratch>/target (the owned target directory)",
+    "tty": "/dev/ttys012 (the recorded owned tab)",
+    "started": "Nov 6, 2026 8:18:51 PM EST, during the run",
+    "window": "28984, one tab on /dev/ttys012"
+  },
+  "actions": [
+    "SIGTERM to pid 27844; it and every descendant (Playwright, uv/Python, ssh, rea-agents and CodeGraph MCP servers) exited and /dev/ttys012 was released",
+    "window 28984 closed itself when its login exited; only the session's own startup window 28691 remained",
+    "session integration removed with `Threadspace --integration uninstall --config-dir <run scratch>/session-config --scope session`: ok, complete",
+    "retained run scratch directory (0 B, no open files) removed"
+  ],
+  "harnessFix": "the owned-window cleanup now also accepts jobs that descend, on the owned device and in birth order, from a job proven by the owned directory"
+}
