@@ -82,9 +82,15 @@ tell application "Terminal" to close (window id ((item 1 of argv) as integer))
 return "closed"
 end run"#;
 
+// The window's state can lag the command; read it back for up to two seconds.
 const SET_MINIATURIZED: &str = r#"on run argv
 tell application "Terminal"
-  set miniaturized of window id ((item 1 of argv) as integer) to ((item 2 of argv) is "true")
+  set wanted to ((item 2 of argv) is "true")
+  set miniaturized of window id ((item 1 of argv) as integer) to wanted
+  repeat 20 times
+    if (miniaturized of window id ((item 1 of argv) as integer)) is wanted then exit repeat
+    delay 0.1
+  end repeat
   return (miniaturized of window id ((item 1 of argv) as integer)) as text
 end tell
 end run"#;
