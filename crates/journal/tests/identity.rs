@@ -577,23 +577,33 @@ fn inventory_facts_carry_the_pass_point_and_kernel_facts_do_not() {
     let second = pass(&mut journal, vec![reporting("A", "busy", None)], vec![start("B", 12, 1001, "/dev/ttys012", 6)]);
     let third = pass(&mut journal, vec![], vec![]);
     let mut snapshots = Vec::new();
+    let mut joins = Vec::new();
     for fact in journal.journal_entries(0).expect("entries").into_iter().flat_map(|e| e.facts) {
         match &fact.payload {
             FactPayload::ProviderSnapshotObserved { present, .. } => {
                 let point = fact.causal.clone().expect("a snapshot is ordered");
                 snapshots.push((*present, point));
             }
+            FactPayload::ExecutionAttached { .. } => {
+                if fact.native.activation.as_ref().is_some_and(|a| a.kind == threadspace_contracts::canonical::fact::ActivationEvidenceKind::Inventory) {
+                    joins.push(fact.causal.clone().expect("inventory joins retain their pass order"));
+                } else {
+                    assert_eq!(fact.causal,None,"bootstrap fixture attaches have no inventory pass");
+                }
+            }
+            FactPayload::ExecutionEnded { .. } => {
+                assert!(fact.causal.is_some(), "exact reconcile ends retain their pass order");
+            }
             FactPayload::ProcessObserved { .. }
-            | FactPayload::ExecutionAttached { .. }
             | FactPayload::SurfaceBindingRecorded { .. }
-            | FactPayload::SurfaceBindingUnproven { .. }
-            | FactPayload::ExecutionEnded { .. } => {
+            | FactPayload::SurfaceBindingUnproven { .. } => {
                 assert_eq!(fact.causal, None, "kernel and binding drafts are unchanged");
             }
             _ => {}
         }
     }
     let epoch = "core-generation-1";
+    assert_eq!(joins, vec![inventory_point(epoch,first),inventory_point(epoch,second)]);
     assert_eq!(
         snapshots,
         vec![
