@@ -7,8 +7,11 @@
 //
 // Each read asks for one property of every element at one level in a single
 // Apple event, answered from one state of the application; per-element reads
-// cost one event each. The structure is read twice and must match, so a
-// change between reads fails the inventory.
+// cost one event each. The structure is read from the windows down, each level
+// bounded before its children are asked for, then again from the terminals up
+// and must match: a change to any level after its first read is seen by the
+// second read of that level or of a parent, and the answer describes the
+// application as it was at one instant.
 
 function uniqueIds(ids) {
     return new Set(ids).size === ids.length;
@@ -25,16 +28,44 @@ function changed() {
     return Error('Ghostty application changed during inventory');
 }
 
-function structure(app) {
+function nested(level, parents) {
+    return Array.isArray(level) && level.length === parents.length && level.every(Array.isArray);
+}
+
+function total(lists) {
+    return lists.reduce((sum, list) => sum + list.length, 0);
+}
+
+function structure(app, maxWindows, maxTabs, maxTerminals) {
+    const windows = app.windows.id();
+    if (windows.length > maxWindows) throw Error('Ghostty inventory exceeds limit');
+    const tabs = app.windows.tabs.id();
+    if (!nested(tabs, windows)) throw changed();
+    if (total(tabs) > maxTabs) throw Error('Ghostty inventory exceeds limit');
+    const terminals = app.windows.tabs.terminals.id();
+    if (!nested(terminals, windows) || !terminals.every((lists, w) => nested(lists, tabs[w]))) throw changed();
+    if (total(terminals.flat()) > maxTerminals) throw Error('Ghostty inventory exceeds limit');
     return {
-        windows: app.windows.id(),
+        windows,
         selectedTabs: app.windows.selectedTab.id(),
-        tabs: app.windows.tabs.id(),
+        tabs,
         selected: app.windows.tabs.selected(),
         focused: app.windows.tabs.focusedTerminal.id(),
-        terminals: app.windows.tabs.terminals.id(),
+        terminals,
         appTerminals: app.terminals.id(),
     };
+}
+
+// The same properties read from the terminals up, in the same key order.
+function reread(app) {
+    const appTerminals = app.terminals.id();
+    const terminals = app.windows.tabs.terminals.id();
+    const focused = app.windows.tabs.focusedTerminal.id();
+    const selected = app.windows.tabs.selected();
+    const tabs = app.windows.tabs.id();
+    const selectedTabs = app.windows.selectedTab.id();
+    const windows = app.windows.id();
+    return { windows, selectedTabs, tabs, selected, focused, terminals, appTerminals };
 }
 
 // The same nesting as `terminals`: one list per window, one per tab.
@@ -112,13 +143,13 @@ function run(argv) {
     // dictionary. Neither a bundle ID nor /Applications chooses the recipient.
     const app = Application(appPid);
     if (!app.running()) throw Error('Ghostty is not running');
-    const s = structure(app);
+    const s = structure(app, maxWindows, maxTabs, maxTerminals);
     validate(s, maxWindows, maxTabs, maxTerminals);
     const ttys = optionalValues(app, ttyProperty, s.terminals);
     const pids = optionalValues(app, pidProperty, s.terminals);
     // Equal-count replacements, split moves, selection changes and
-    // focused-terminal changes between any two reads invalidate the snapshot.
-    if (JSON.stringify(structure(app)) !== JSON.stringify(s)) throw changed();
+    // focused-terminal changes after the first read invalidate the snapshot.
+    if (JSON.stringify(reread(app)) !== JSON.stringify(s)) throw changed();
 
     const rows = [['I', '1', s.windows.length, s.appTerminals.length]];
     s.windows.forEach((windowId, w) => {

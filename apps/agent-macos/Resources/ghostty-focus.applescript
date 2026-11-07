@@ -22,15 +22,40 @@ function nativeId(object) {
     return checkId(object.id());
 }
 
+function nested(level, parents) {
+    return Array.isArray(level) && level.length === parents.length && level.every(Array.isArray);
+}
+
+function total(lists) {
+    return lists.reduce((sum, list) => sum + list.length, 0);
+}
+
 // One Apple event per level: every window's, tab's and terminal's ID, each
-// read answered from one state of the application.
-function structure(app) {
-    return {
-        windows: app.windows.id(),
-        tabs: app.windows.tabs.id(),
-        terminals: app.windows.tabs.terminals.id(),
-        appTerminals: app.terminals.id(),
-    };
+// read answered from one state of the application, read from the windows
+// down and each level bounded before its children are asked for. Null when
+// separately read levels do not line up, which means the application changed.
+function structure(app, maxWindows, maxTabs, maxTerminals) {
+    const windows = app.windows.id();
+    if (windows.length > maxWindows) throw Error('Ghostty inventory exceeds limit');
+    const tabs = app.windows.tabs.id();
+    if (!nested(tabs, windows)) return null;
+    if (total(tabs) > maxTabs) throw Error('Ghostty inventory exceeds limit');
+    const terminals = app.windows.tabs.terminals.id();
+    if (!nested(terminals, windows) || !terminals.every((lists, w) => nested(lists, tabs[w]))) return null;
+    if (total(terminals.flat()) > maxTerminals) throw Error('Ghostty inventory exceeds limit');
+    const appTerminals = app.terminals.id();
+    if (appTerminals.length > maxTerminals) throw Error('Ghostty inventory exceeds limit');
+    return { windows, tabs, terminals, appTerminals };
+}
+
+// The same IDs read from the terminals up, so a change to any level after its
+// first read is seen by the second read of that level or of a parent.
+function reread(app) {
+    const appTerminals = app.terminals.id();
+    const terminals = app.windows.tabs.terminals.id();
+    const tabs = app.windows.tabs.id();
+    const windows = app.windows.id();
+    return { windows, tabs, terminals, appTerminals };
 }
 
 function run(argv) {
@@ -47,19 +72,13 @@ function run(argv) {
     const maxTerminals = Number(argv[8]);
     const app = Application(appPid);
     if (!app.running()) return 'GONE';
-    const s = structure(app);
+    const s = structure(app, maxWindows, maxTabs, maxTerminals);
+    if (s === null) return 'CHANGED';
     const windowIds = s.windows;
     const appTerminalIds = s.appTerminals;
-    if (windowIds.length > maxWindows || appTerminalIds.length > maxTerminals) throw Error('Ghostty inventory exceeds limit');
     windowIds.forEach(checkId);
     appTerminalIds.forEach(checkId);
     if (!uniqueIds(windowIds) || !uniqueIds(appTerminalIds)) return 'CHANGED';
-    // Window, tab and terminal lists read in separate events line up only if
-    // nothing changed between them.
-    if (!Array.isArray(s.tabs) || s.tabs.length !== windowIds.length ||
-        !Array.isArray(s.terminals) || s.terminals.length !== windowIds.length ||
-        !s.tabs.every((tabIds, w) => Array.isArray(tabIds) && Array.isArray(s.terminals[w]) &&
-            s.terminals[w].length === tabIds.length && s.terminals[w].every(Array.isArray))) return 'CHANGED';
     const seenTabs = [];
     const seenTerminals = [];
     const matches = [];
@@ -72,14 +91,12 @@ function run(argv) {
             });
         });
     });
-    if (seenTabs.length > maxTabs || seenTerminals.length > maxTerminals) throw Error('Ghostty inventory exceeds limit');
     if (!matches.length) return 'GONE';
     if (matches.length > 1) return ['AMBIGUOUS', matches.length].join('\t');
     if (!uniqueIds(seenTabs) || !uniqueIds(seenTerminals) ||
         seenTerminals.length !== appTerminalIds.length ||
         !appTerminalIds.every(id => seenTerminals.includes(id))) return 'CHANGED';
-    // A change between any two reads invalidates the snapshot.
-    if (JSON.stringify(structure(app)) !== JSON.stringify(s)) return 'CHANGED';
+    if (JSON.stringify(reread(app)) !== JSON.stringify(s)) return 'CHANGED';
     if (matches[0].windowId !== targetWindowId || matches[0].tabId !== targetTabId) return 'CHANGED';
 
     const targetWindow = app.windows.byId(targetWindowId);

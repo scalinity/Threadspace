@@ -1061,16 +1061,37 @@ mod tests {
           }
           const focused = [];
           const activated = [];
+          // Uneven on purpose: window 1 holds a one-terminal tab and a
+          // two-terminal tab, window 2 one tab, so a transposed or dropped
+          // level changes the rows.
           function makeApp(pid) {
             let active = false;
-            const surface = {id: () => 's' + pid, tty: () => '/dev/ttys123', pid: () => 123};
-            const tab = {id: () => 't' + pid, selected: () => true,
-                         focusedTerminal: () => surface, terminals: collection([surface])};
-            const window = {id: () => 'w' + pid, selectedTab: () => tab, tabs: collection([tab])};
-            return {running: () => true, windows: collection([window]), terminals: collection([surface]),
+            const surface = n => ({id: () => 's' + pid + n, tty: () => '/dev/ttys10' + n, pid: () => 100 + n});
+            const [s1, s2, s3, s4] = [1, 2, 3, 4].map(surface);
+            const tab = (n, terminals, focus) => {
+              const t = {id: () => 't' + pid + n, focus, terminals: collection(terminals)};
+              t.focusedTerminal = () => t.focus;
+              return t;
+            };
+            const tabs = [tab(1, [s1], s1), tab(2, [s2, s3], s3), tab(3, [s4], s4)];
+            const window = (n, own, selected) => {
+              const w = {id: () => 'w' + pid + n, current: selected, tabs: collection(own)};
+              w.selectedTab = () => w.current;
+              return w;
+            };
+            const windows = [window(1, tabs.slice(0, 2), tabs[1]), window(2, tabs.slice(2), tabs[2])];
+            tabs.forEach(t => { t.selected = () => windows.some(w => w.current === t); });
+            let front = windows[0];
+            return {running: () => true, windows: collection(windows), terminals: collection([s1, s2, s3, s4]),
                     activate: () => { active = true; activated.push(pid); },
-                    focus: surface => { if (!active) throw Error('Focus preceded activation'); focused.push(surface.id()); },
-                    frontWindow: () => window, frontmost: () => active};
+                    focus: target => {
+                      if (!active) throw Error('Focus preceded activation');
+                      windows.forEach(w => w.tabs().forEach(t => {
+                        if (t.terminals().includes(target)) { front = w; w.current = t; t.focus = target; }
+                      }));
+                      focused.push(target.id());
+                    },
+                    frontWindow: () => front, frontmost: () => active};
           }
           const apps = {1234: makeApp(1234), 5678: makeApp(5678)};
           const requested = [];
@@ -1084,16 +1105,26 @@ mod tests {
             (
                 include_str!("../../../apps/agent-macos/Resources/ghostty-inventory.applescript"),
                 "['5678','tty','pid','128','1024','4096']",
-                "I\t1\t1\t1\nW\tw5678\tt5678\t1\nT\tw5678\tt5678\ttrue\ts5678\t1\nS\tw5678\tt5678\ts5678\t/dev/ttys123\t123\nE\t1\t1\nPID=5678;ACTIVATE=;FOCUS=",
+                "I\t1\t2\t4\n\
+                 W\tw56781\tt56782\t2\n\
+                 T\tw56781\tt56781\tfalse\ts56781\t1\n\
+                 S\tw56781\tt56781\ts56781\t/dev/ttys101\t101\n\
+                 T\tw56781\tt56782\ttrue\ts56783\t2\n\
+                 S\tw56781\tt56782\ts56782\t/dev/ttys102\t102\n\
+                 S\tw56781\tt56782\ts56783\t/dev/ttys103\t103\n\
+                 W\tw56782\tt56783\t1\n\
+                 T\tw56782\tt56783\ttrue\ts56784\t1\n\
+                 S\tw56782\tt56783\ts56784\t/dev/ttys104\t104\n\
+                 E\t2\t4\nPID=5678;ACTIVATE=;FOCUS=",
             ),
             (
                 include_str!("../../../apps/agent-macos/Resources/ghostty-focus.applescript"),
-                "['5678','w5678','t5678','s5678','100','true','128','1024','4096']",
-                "FOCUSED\tw5678\tt5678\ts5678\tw5678\tt5678\ts5678\ttrue\ttrue\t5678\nPID=5678;ACTIVATE=5678;FOCUS=s5678",
+                "['5678','w56781','t56782','s56782','100','true','128','1024','4096']",
+                "FOCUSED\tw56781\tt56782\ts56782\tw56781\tt56782\ts56782\ttrue\ttrue\t5678\nPID=5678;ACTIVATE=5678;FOCUS=s56782",
             ),
             (
                 include_str!("../../../apps/agent-macos/Resources/ghostty-focus.applescript"),
-                "['5678','w1234','t1234','s1234','100','true','128','1024','4096']",
+                "['5678','w12341','t12341','s12341','100','true','128','1024','4096']",
                 "GONE\nPID=5678;ACTIVATE=;FOCUS=",
             ),
         ] {
@@ -1114,5 +1145,92 @@ mod tests {
                 expected
             );
         }
+    }
+
+    #[test]
+    fn bundled_scripts_detect_a_replaced_parent_and_bound_each_level() {
+        // An inert application counts whole-level reads and can replace the
+        // only window (keeping its tab and terminal IDs) after any read. Every
+        // replacement before the last read must fail the inventory and make
+        // focus answer CHANGED without activating. Each limit must stop the
+        // reads at its own level.
+        let program = r#"
+          let reads = 0, switchAt = Infinity, activations = 0, state;
+          function every(read, extra = {}) {
+            const target = Object.assign(function () {
+              const value = read();
+              if (++reads === switchAt) state = after;
+              return value;
+            }, extra);
+            const map = (value, f) => Array.isArray(value) ? value.map(item => map(item, f)) : f(value);
+            return new Proxy(target, {
+              get: (own, name) => name in own ? own[name] : every(() => map(read(), element => element[name]())),
+            });
+          }
+          const listed = items => Object.assign(() => items, { byId: id => items.find(item => item.id() === id) });
+          function hierarchy(windowId) {
+            const s1 = { id: () => 's1', tty: () => '/dev/ttys101', pid: () => 101 };
+            const t1 = { id: () => 't1', selected: () => true, focusedTerminal: () => s1, terminals: listed([s1]) };
+            return { windows: [{ id: () => windowId, selectedTab: () => t1, tabs: listed([t1]) }], terminals: [s1] };
+          }
+          const before = hierarchy('w1'), after = hierarchy('w-new');
+          const app = {
+            running: () => true,
+            windows: every(() => state.windows, { byId: id => state.windows.find(w => w.id() === id) }),
+            terminals: every(() => state.terminals),
+            activate: () => { activations++; }, focus: () => {},
+            frontWindow: () => state.windows[0], frontmost: () => true,
+          };
+          const stub = { NSWorkspace: { sharedWorkspace: { frontmostApplication: { processIdentifier: 42 } } },
+                         NSThread: { sleepForTimeInterval: () => {} } };
+          const inventory = (function (Application, $) { __INVENTORY__
+            return run; })(() => app, stub);
+          const focus = (function (Application, $) { __FOCUS__
+            return run; })(() => app, stub);
+          function attempt(script, args, at) {
+            reads = 0; switchAt = at; state = before;
+            try { return { out: script(args), reads }; } catch (error) { return { out: 'ERROR ' + error.message, reads }; }
+          }
+          function run(argv) {
+            const inventoryArgs = limits => ['42', 'tty', '-', ...limits];
+            const focusArgs = limits => ['42', 'w1', 't1', 's1', '100', 'true', ...limits];
+            const open = ['8', '8', '8'];
+            const failures = [];
+            const inventoryReads = attempt(inventory, inventoryArgs(open), Infinity).reads;
+            for (let at = 1; at < inventoryReads; at++) {
+              const result = attempt(inventory, inventoryArgs(open), at);
+              if (!result.out.startsWith('ERROR')) failures.push('inventory after read ' + at + ': ' + result.out.split('\n')[1]);
+            }
+            const focusReads = attempt(focus, focusArgs(open), Infinity).reads;
+            for (let at = 1; at < focusReads; at++) {
+              activations = 0;
+              const result = attempt(focus, focusArgs(open), at);
+              if (result.out !== 'CHANGED' || activations) failures.push('focus after read ' + at + ': ' + result.out);
+            }
+            const bounded = [['0', '8', '8'], ['8', '0', '8'], ['8', '8', '0']].map(limits => [
+              attempt(inventory, inventoryArgs(limits), Infinity), attempt(focus, focusArgs(limits), Infinity),
+            ].map(result => (result.out.includes('exceeds limit') ? 'limit' : result.out) + '@' + result.reads).join(' '));
+            return [inventoryReads >= 8 && focusReads >= 8 ? 'reads ok' : 'reads ' + inventoryReads + ' ' + focusReads,
+                    'failures ' + (failures.join('; ') || 'none'), 'bounded ' + bounded.join(', ')].join('\n');
+          }
+        "#
+        .replace(
+            "__INVENTORY__",
+            include_str!("../../../apps/agent-macos/Resources/ghostty-inventory.applescript"),
+        )
+        .replace(
+            "__FOCUS__",
+            include_str!("../../../apps/agent-macos/Resources/ghostty-focus.applescript"),
+        );
+        let mut command = BoundedCommand::new("/usr/bin/osascript", Duration::from_secs(5), 4096)
+            .arg("-l")
+            .arg("JavaScript")
+            .arg("-");
+        command.stdin = Some(program.into_bytes());
+        let output = checked("osascript", &command).expect("inert replacement fixture");
+        assert_eq!(
+            std::str::from_utf8(&output.stdout).expect("text").trim_end(),
+            "reads ok\nfailures none\nbounded limit@1 limit@1, limit@2 limit@2, limit@3 limit@3"
+        );
     }
 }
