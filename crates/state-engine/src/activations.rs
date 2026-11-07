@@ -63,6 +63,9 @@ impl Group<'_> {
     fn first(&self) -> &ResolvedFact {
         self.starts[0]
     }
+    fn precedes(&self, state: &CanonicalState, sessions: &BTreeSet<String>, later: &Self) -> bool {
+        same_runtime(self.first(),later.first()) && self.starts.iter().any(|a|later.starts.iter().any(|b|ordered_before(state,sessions,a,b)))
+    }
     fn representative(&self, state: &CanonicalState) -> Option<String> {
         self.starts
             .iter()
@@ -231,7 +234,7 @@ pub fn derive(
         }
         if groups.iter().any(|later| {
             same_runtime(group.first(), later.first())
-                && ordered_before(state, sessions, group.first(), later.first())
+                && group.precedes(state, sessions, later)
                 && group.members.is_disjoint(&later.members)
         }) {
             execution
@@ -259,7 +262,7 @@ pub fn derive(
                     .collect();
                 let newest: Vec<_> = owners
                     .iter()
-                    .filter(|g| !owners.iter().any(|later| before(g.first(), later.first())))
+                    .filter(|g| !owners.iter().any(|later| g.precedes(state, sessions, later)))
                     .collect();
                 newest.len() == 1 && newest[0].members == group.members
             } else {
@@ -310,7 +313,7 @@ pub fn derive(
             .filter(|g| {
                 !matching
                     .iter()
-                    .any(|later| ordered_before(state, sessions, g.first(), later.first()))
+                    .any(|later| g.precedes(state, sessions, later))
             })
             .collect();
         if newest.len() == 1

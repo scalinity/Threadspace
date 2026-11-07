@@ -470,6 +470,9 @@ pub fn catalog() -> Vec<Scenario> {
             start("A",10,1,"startup"), turn("A",20,1,"old"),
             start("A",30,3,"resume"), turn("A",40,3,"new"),
             observer_record("session.end","A",None,50,1,"entry",json!({"reason":"resume"}))], same_generation_expected),
+        scenario("claude-engine-only-hook-switch",vec![
+            observer_record("session.start","A",None,12,1,"result",settled()),
+            hook("SessionStart","A",10,"startup"),hook("SessionStart","B",30,"clear")], |s|count(s,2,1)),
         inventory_resume_scenario("claude-inventory-a-b-resume-a", false),
         inventory_resume_scenario("claude-legacy-end-before-native", true),
     ]
@@ -533,6 +536,14 @@ mod tests {
         assert!(runner.journal.projection_differences().unwrap().is_empty());
         assert_eq!(threadspace_state_engine::hash::state_hash(runner.state()),
             threadspace_state_engine::hash::state_hash(&runner.journal.replay_from_genesis().unwrap()));
+    }
+    #[test]
+    fn engine_only_corroboration_keeps_hook_startup_order() {
+        let mut runner = PureRunner::new(1);
+        runner.observe(&observer_record("session.start","A",None,12,1,"result",settled()));
+        runner.observe(&hook("SessionStart","A",10,"startup"));
+        runner.observe(&hook("SessionStart","B",30,"clear"));
+        count(runner.state(),2,1).expect("corroborated startup still precedes a hook clear");
     }
     #[test]
     fn ended_inventory_does_not_poison_resume_or_depend_on_admission_order() {
