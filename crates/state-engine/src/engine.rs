@@ -20,6 +20,12 @@ use crate::REDUCER_VERSION;
 /// Secondary indexes over the state, all derived from it.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Index {
+    // Derived lookup only: persisted facts retain their version-4 JSON shape.
+    pub activation_evidence: BTreeMap<(String, String), BTreeSet<String>>,
+    pub activation_turns: BTreeMap<(String, String), BTreeSet<String>>,
+    pub activation_executions: BTreeMap<String, BTreeSet<String>>,
+    pub activation_bindings: BTreeMap<String, BTreeSet<String>>,
+    pub process_sessions: BTreeMap<String, BTreeSet<String>>,
     pub session_executions: BTreeMap<String, BTreeSet<String>>,
     pub session_turns: BTreeMap<String, BTreeSet<String>>,
     pub session_bindings: BTreeMap<String, BTreeSet<String>>,
@@ -38,9 +44,25 @@ fn link(map: &mut BTreeMap<String, BTreeSet<String>>, from: &str, to: &str) {
     map.entry(from.to_owned()).or_default().insert(to.to_owned());
 }
 
+fn unlink(map: &mut BTreeMap<String,BTreeSet<String>>, from: &str, to: &str) {
+    if let Some(ids) = map.get_mut(from) {
+        ids.remove(to);
+        if ids.is_empty() { map.remove(from); }
+    }
+}
+
 impl Index {
     pub fn build(state: &CanonicalState) -> Self {
         let mut index = Self::default();
+        for (id, fact) in &state.activation_facts { index.add_activation_fact(id, fact); }
+        for binding in state.activation_bindings.values() {
+            index.add_activation_binding(state, binding);
+        }
+        for session in state.sessions.values() {
+            for process in session.links.iter().filter_map(|l|l.process_id.as_ref()).chain(session.ownership_proofs.iter().map(|p|&p.process_id)) {
+                link(&mut index.process_sessions,process,&session.id);
+            }
+        }
         for execution in state.executions.values() {
             index.add_execution(execution);
         }
@@ -72,10 +94,44 @@ impl Index {
         index
     }
 
+    pub(crate) fn add_activation_fact(&mut self, id: &str, fact: &ResolvedFact) {
+        let (Some(process), Some(session)) = (&fact.refs.process_id, &fact.refs.session_id) else { return };
+        link(&mut self.process_sessions,process,session);
+        let turn = fact.native.activation.as_ref().is_some_and(|a|a.kind == threadspace_contracts::canonical::fact::ActivationEvidenceKind::Turn);
+        let map = if turn { &mut self.activation_turns } else { &mut self.activation_evidence };
+        map.entry((process.clone(),session.clone())).or_default().insert(id.to_owned());
+        if let Some(execution) = &fact.refs.execution_id { link(&mut self.activation_executions,process,execution); }
+    }
+
+    pub(crate) fn add_activation_binding(&mut self, state: &CanonicalState, binding: &SurfaceBindingRecord) {
+        let source = state.binding_executions.get(&binding.id).unwrap_or(&binding.execution_id);
+        if let Some(process) = state.activation_candidates.get(source).or_else(||state.executions.get(source)).and_then(|e|e.process_id.as_ref()) {
+            link(&mut self.activation_bindings, process, &binding.id);
+        }
+    }
+
+    pub(crate) fn activation_ids(&self, process: &str, turns: bool) -> BTreeSet<String> {
+        let map = if turns { &self.activation_turns } else { &self.activation_evidence };
+        map.range((process.to_owned(),String::new())..)
+            .take_while(|((p,_),_)| p == process)
+            .flat_map(|(_,ids)|ids.iter().cloned()).collect()
+    }
+
+    pub(crate) fn remove_execution(&mut self, record: &ExecutionRecord) {
+        unlink(&mut self.session_executions,&record.session_id,&record.id);
+        if let Some(process) = &record.process_id { unlink(&mut self.process_executions,process,&record.id); }
+    }
+
+    pub(crate) fn remove_binding(&mut self, record: &SurfaceBindingRecord) {
+        unlink(&mut self.session_bindings,&record.session_id,&record.id);
+        unlink(&mut self.execution_bindings,&record.execution_id,&record.id);
+    }
+
     pub(crate) fn add_execution(&mut self, execution: &ExecutionRecord) {
         link(&mut self.session_executions, &execution.session_id, &execution.id);
         if let Some(process) = &execution.process_id {
             link(&mut self.process_executions, process, &execution.id);
+            link(&mut self.process_sessions,process,&execution.session_id);
         }
     }
 
@@ -156,6 +212,8 @@ pub struct Note {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ReduceOutput {
+    #[cfg(feature = "synthetic")]
+    pub activation_facts_visited: usize,
     pub changed: Changed,
     /// Outbox intents created PENDING by this entry: post-commit effects.
     pub new_outbox: Vec<String>,
@@ -204,7 +262,10 @@ pub(crate) fn settle<T: Clone + PartialEq>(
     keep_revision: bool,
 ) {
     for (id, old) in before {
-        let Some(new) = map.get_mut(id) else { continue };
+        let Some(new) = map.get_mut(id) else {
+            if old.is_some() { changed.insert(id.clone()); }
+            continue
+        };
         let differs = match old {
             None => true,
             Some(old) => {

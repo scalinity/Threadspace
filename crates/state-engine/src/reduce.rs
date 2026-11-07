@@ -51,6 +51,9 @@ struct Tx<'a> {
     entry: &'a JournalEntry,
     before: Before,
     relations_changed: bool,
+    activation_processes: BTreeSet<String>,
+    #[cfg(feature = "synthetic")]
+    activation_facts_visited: usize,
     commands: BTreeSet<String>,
     /// The first fact of this entry that touched each record.
     trigger: BTreeMap<String, String>,
@@ -65,12 +68,15 @@ pub(crate) fn apply(engine: &mut Engine, entry: &JournalEntry) -> ReduceOutput {
         entry,
         before: Before::default(),
         relations_changed: false,
+        activation_processes: BTreeSet::new(),
+        #[cfg(feature = "synthetic")]
+        activation_facts_visited: 0,
         commands: BTreeSet::new(),
         trigger: BTreeMap::new(),
         notes: Vec::new(),
         new_outbox: Vec::new(),
     };
-    tx.restore_activations();
+    tx.restore_activations(false);
     tx.coverage();
     for fact in &entry.facts {
         tx.fact(fact);
@@ -104,6 +110,9 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, deli
         entry: &entry,
         before: Before::default(),
         relations_changed: false,
+        activation_processes: BTreeSet::new(),
+        #[cfg(feature = "synthetic")]
+        activation_facts_visited: 0,
         commands: BTreeSet::new(),
         trigger: BTreeMap::new(),
         notes: Vec::new(),
@@ -134,7 +143,7 @@ pub(crate) fn rederive(engine: &mut Engine, cursor: i64, endpoint_id: &str, deli
     for id in ids(tx.state.sessions.keys().collect()) {
         tx.touch_session(&id);
     }
-    tx.restore_activations();
+    tx.restore_activations(true);
     tx.derive();
     tx.state.through_cursor = tx.state.through_cursor.max(cursor);
     tx.finish()
@@ -958,11 +967,17 @@ impl Tx<'_> {
     #[allow(clippy::too_many_lines)]
     fn fact(&mut self, fact: &ResolvedFact) {
         if fact.native.activation.is_some() {
-            self.state.activation_facts.insert(format!("{}:{}", fact.observation_id, fact.fact_index), fact.clone());
+            let id = format!("{}:{}",fact.observation_id,fact.fact_index);
+            self.index.add_activation_fact(&id,fact);
+            self.state.activation_facts.insert(id, fact.clone());
         }
         if !self.state.activation_facts.is_empty()
             && let (Some(binding), Some(execution)) = (&fact.refs.binding_id, &fact.refs.execution_id) {
             self.state.binding_executions.insert(binding.clone(), execution.clone());
+        }
+        if matches!(fact.payload,FactPayload::ObservationLinkChanged {..} | FactPayload::ObserverOwnershipCorroborated {..})
+            && let (Some(process),Some(session)) = (&fact.refs.process_id,&fact.refs.session_id) {
+            self.index.process_sessions.entry(process.clone()).or_default().insert(session.clone());
         }
         self.ensure_records(fact);
         let refs = &fact.refs;
@@ -1474,35 +1489,90 @@ impl Tx<'_> {
 
     // ------------------------------------------------------------ deriving
 
-    fn restore_activations(&mut self) {
-        let ids: Vec<_> = self.state.activation_candidates.keys().cloned().collect();
-        for id in ids { self.touch_execution(&id); }
-        let bindings:Vec<_>=self.state.activation_bindings.keys().cloned().collect();
-        for id in bindings { self.touch_binding(&id); }
-        crate::activations::restore(self.state);
-        *self.index = Index::build(self.state);
+    fn restore_activations(&mut self, all: bool) {
+        if all {
+            self.activation_processes.extend(self.index.activation_evidence.keys().map(|(p,_)|p.clone()));
+        } else {
+            for fact in &self.entry.facts {
+                if matches!(fact.payload, FactPayload::ExecutionAttached {..} | FactPayload::ExecutionEnded {..}
+                    | FactPayload::ProcessObserved {..} | FactPayload::ProcessExitObserved {..}
+                    | FactPayload::SurfaceBindingRecorded {..} | FactPayload::SurfaceBindingUnproven {..}
+                    | FactPayload::SurfaceBindingInvalidated {..} | FactPayload::ObservationLinkChanged {..}
+                    | FactPayload::ObserverOwnershipCorroborated {..})
+                    && let Some(process) = &fact.refs.process_id {
+                    self.activation_processes.insert(process.clone());
+                }
+            }
+        }
+        for process in self.activation_processes.clone() {
+            for id in self.index.activation_executions.get(&process).cloned().unwrap_or_default() {
+                self.touch_execution(&id);
+                if let Some(raw) = self.state.activation_candidates.get(&id) {
+                    self.state.executions.insert(id, raw.clone());
+                }
+            }
+            for id in self.index.activation_bindings.get(&process).cloned().unwrap_or_default() {
+                self.touch_binding(&id);
+                if let Some(raw) = self.state.activation_bindings.get(&id) {
+                    self.state.bindings.insert(id, raw.clone());
+                }
+            }
+        }
     }
 
     fn derive(&mut self) {
         let cursor = self.cursor();
         if !self.state.activation_facts.is_empty() {
-            crate::activations::promote_inventory(self.state);
-            let ids: Vec<_> = self.state.activation_facts.values().filter_map(|f| f.refs.execution_id.clone()).collect();
-            for id in ids {
-                self.touch_execution(&id);
-                if let Some(record) = self.state.executions.get(&id) {
-                    self.state.activation_candidates.insert(id, record.clone());
+            let mut processes = self.activation_processes.clone();
+            processes.extend(self.entry.facts.iter().filter(|f| f.native.activation.is_some()).filter_map(|f|f.refs.process_id.clone()));
+            for process in processes {
+                let structural = self.activation_processes.contains(&process);
+                let executions = self.index.process_executions.get(&process).cloned().unwrap_or_default();
+                let mut bindings = self.index.activation_bindings.get(&process).cloned().unwrap_or_default();
+                for id in &executions {
+                    bindings.extend(self.index.execution_bindings.get(id).into_iter().flatten().cloned());
+                }
+                if structural {
+                    for fact in crate::activations::promote_inventory(self.state,&executions,&bindings) {
+                        self.index.add_activation_fact(&format!("{}:{}",fact.observation_id,fact.fact_index),&fact);
+                    }
+                }
+                let facts = self.index.activation_ids(&process,false);
+                let turns: BTreeSet<_> = if structural { self.index.activation_ids(&process,true) } else {
+                    self.entry.facts.iter().filter(|f|f.refs.process_id.as_ref()==Some(&process) && f.native.activation.as_ref().is_some_and(|a|a.kind==threadspace_contracts::canonical::fact::ActivationEvidenceKind::Turn)).map(|f|format!("{}:{}",f.observation_id,f.fact_index)).collect()
+                };
+                let candidates = self.index.activation_executions.get(&process).cloned().unwrap_or_default();
+                if structural {
+                    for id in &candidates {
+                        self.touch_execution(id);
+                        if let Some(record) = self.state.executions.get(id) { self.state.activation_candidates.insert(id.clone(),record.clone()); }
+                    }
+                    for id in &bindings {
+                        self.touch_binding(id);
+                        if let Some(binding) = self.state.bindings.get(id) {
+                            self.state.activation_bindings.insert(id.clone(),binding.clone());
+                            self.index.add_activation_binding(self.state,binding);
+                        }
+                    }
+                }
+                let turn_records: Vec<_> = turns.iter().filter_map(|id|self.state.activation_facts.get(id)?.refs.turn_id.clone()).collect();
+                for id in turn_records { self.touch_turn(&id); }
+                #[cfg(feature = "synthetic")]
+                { self.activation_facts_visited += facts.len()+turns.len(); }
+                let sessions = self.index.process_sessions.get(&process).cloned().unwrap_or_default();
+                crate::activations::derive(self.state,&facts,&turns,&candidates,&bindings,&sessions,structural);
+                if structural {
+                    for id in &candidates {
+                        if let Some(raw) = self.state.activation_candidates.get(id) { self.index.remove_execution(raw); }
+                        if let Some(record) = self.state.executions.get(id) { self.index.add_execution(record); }
+                    }
+                    for id in &bindings {
+                        if let Some(Some(old)) = self.before.bindings.get(id) { self.index.remove_binding(old); }
+                        if let Some(raw) = self.state.activation_bindings.get(id) { self.index.remove_binding(raw); }
+                        if let Some(record) = self.state.bindings.get(id) { self.index.add_binding(record); }
+                    }
                 }
             }
-            let turns: Vec<_> = self.state.activation_facts.values().filter_map(|f| f.refs.turn_id.clone()).collect();
-            for id in turns { self.touch_turn(&id); }
-            let bindings: Vec<_> = self.state.binding_executions.keys().cloned().collect();
-            for id in bindings {
-                self.touch_binding(&id);
-                if let Some(binding)=self.state.bindings.get(&id) { self.state.activation_bindings.insert(id,binding.clone()); }
-            }
-            crate::activations::derive(self.state);
-            *self.index = Index::build(self.state);
         }
 
         // Processes reach their executions.
@@ -2530,6 +2600,8 @@ impl Tx<'_> {
     fn finish(self) -> ReduceOutput {
         let cursor = self.entry.cursor;
         let mut output = ReduceOutput {
+            #[cfg(feature = "synthetic")]
+            activation_facts_visited: self.activation_facts_visited,
             new_outbox: self.new_outbox,
             notes: self.notes,
             ..ReduceOutput::default()

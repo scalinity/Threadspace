@@ -567,6 +567,49 @@ mod tests {
         assert_journal(&runner);
     }
     #[test]
+    fn activation_work_is_scoped_to_touched_runtime() {
+        use threadspace_state_engine::engine::{Engine, Index};
+        let mut runner = PureRunner::new(1);
+        runner.observe(&start("A",10,1,"startup"));
+        let mut other = start("other",10,1,"startup");
+        other.evidence[0].key = process(5100,2000);
+        runner.observe(&other);
+        for i in 0..100 {
+            let mut e = turn("other",20+i,1,&format!("other-{i}"));
+            e.evidence[0].key = process(5100,2000);
+            runner.observe(&e);
+        }
+        let mut engine = Engine::new(runner.engine.state.clone());
+        runner.observe(&turn("A",20,1,"current"));
+        let output = engine.apply(runner.entries.last().unwrap());
+        assert_eq!(output.activation_facts_visited,2,"one A opening and the new A turn; unrelated history is untouched");
+        assert_eq!(engine.index(), &Index::build(&engine.state));
+        runner.observe(&start("A",30,1,"resume"));
+        let output = engine.apply(runner.entries.last().unwrap());
+        assert_eq!(output.activation_facts_visited,3,"two A openings and its one turn");
+        assert_eq!(engine.index(), &Index::build(&engine.state));
+    }
+    #[test]
+    #[ignore = "explicit 2000-turn debug/release measurement"]
+    fn activation_apply_scaling() {
+        use std::time::Instant;
+        let mut prep = PureRunner::new(1);
+        prep.observe(&start("A", 1, 1, "startup"));
+        let mut engine = threadspace_state_engine::Engine::empty();
+        engine.apply(&prep.entries[0]);
+        let mut samples = Vec::new();
+        for i in 0..2000 {
+            prep.observe(&turn("A", 10+i, 1, &format!("turn-{i}")));
+            let entry = prep.entries.last().unwrap();
+            let began = Instant::now();
+            engine.apply(entry);
+            samples.push(began.elapsed().as_secs_f64()*1000.0);
+        }
+        let mean = |slice: &[f64]|slice.iter().sum::<f64>()/slice.len() as f64;
+        println!("R4_MEASUREMENT turns=2000 first100_ms={:.6} last100_ms={:.6}", mean(&samples[..100]),mean(&samples[1900..]));
+        assert_eq!(engine.state.turns.len(), 2000);
+    }
+    #[test]
     fn each_real_opening_source_establishes_an_activation() {
         for source in ["startup", "resume", "clear"] {
             for event in [hook("SessionStart", "A", 10, source), start("A", 10, 1, source)] {

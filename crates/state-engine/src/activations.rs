@@ -77,17 +77,16 @@ impl Group<'_> {
     }
 }
 
-pub fn restore(state: &mut CanonicalState) {
-    for (id, record) in &state.activation_candidates {
-        state.executions.insert(id.clone(), record.clone());
-    }
-    for (id, record) in &state.activation_bindings {
-        state.bindings.insert(id.clone(), record.clone());
-    }
-}
-
-pub fn derive(state: &mut CanonicalState) {
-    let facts: Vec<_> = state.activation_facts.values().cloned().collect();
+pub fn derive(
+    state: &mut CanonicalState,
+    fact_ids: &BTreeSet<String>,
+    turn_ids: &BTreeSet<String>,
+    execution_ids: &BTreeSet<String>,
+    binding_ids: &BTreeSet<String>,
+    sessions: &BTreeSet<String>,
+    structural: bool,
+) {
+    let facts: Vec<_> = fact_ids.iter().chain(turn_ids).filter_map(|id|state.activation_facts.get(id)).cloned().collect();
     let starts: Vec<_> = facts.iter().filter(|f| kind(f) == Some(K::Start)).collect();
     let mut groups: Vec<Group<'_>> = Vec::new();
     // An observer reference is frozen per callback opening, not callback result.
@@ -206,10 +205,11 @@ pub fn derive(state: &mut CanonicalState) {
         // Multiple native openings: keep the join as pending evidence. It is
         // neither an extra live execution nor a guessed historical opening.
     }
-    for id in state.activation_candidates.keys() {
+    if structural {
+    for id in execution_ids {
         state.executions.remove(id);
+        state.execution_aliases.remove(id);
     }
-    state.execution_aliases.clear();
     for group in &groups {
         let Some(id) = group.representative(state) else {
             continue;
@@ -226,7 +226,7 @@ pub fn derive(state: &mut CanonicalState) {
         }
         if groups.iter().any(|later| {
             same_runtime(group.first(), later.first())
-                && ordered_before(state, group.first(), later.first())
+                && ordered_before(state, sessions, group.first(), later.first())
                 && group.members.is_disjoint(&later.members)
         }) {
             execution
@@ -270,6 +270,7 @@ pub fn derive(state: &mut CanonicalState) {
         }
         state.executions.insert(id, execution);
     }
+    }
     let mut owners: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for turn in facts.iter().filter(|f| kind(f) == Some(K::Turn)) {
         let Some(turn_id) = &turn.refs.turn_id else {
@@ -288,7 +289,7 @@ pub fn derive(state: &mut CanonicalState) {
                     && g.starts.iter().any(|s| {
                         generation(s).is_some()
                             && (generation(s) == generation(turn) && before(s, turn)
-                                || inherited && ordered_before(state, s, turn))
+                                || inherited && ordered_before(state, sessions, s, turn))
                     })
             })
             .collect();
@@ -297,7 +298,7 @@ pub fn derive(state: &mut CanonicalState) {
             .filter(|g| {
                 !matching
                     .iter()
-                    .any(|later| ordered_before(state, g.first(), later.first()))
+                    .any(|later| ordered_before(state, sessions, g.first(), later.first()))
             })
             .collect();
         if newest.len() == 1
@@ -311,7 +312,8 @@ pub fn derive(state: &mut CanonicalState) {
             turn.execution_ids = ids;
         }
     }
-    for (id, raw) in &state.activation_bindings {
+    for id in binding_ids {
+        let Some(raw) = state.activation_bindings.get(id) else { continue };
         let source = state
             .binding_executions
             .get(id)
@@ -354,7 +356,7 @@ fn verified_turn(state: &CanonicalState, fact: &ResolvedFact) -> bool {
 
 /// Reload bootstraps explicitly name predecessor epochs. Follow only those
 /// native relations, including several reloads; a new UUID is not a start.
-fn ordered_before(state: &CanonicalState, a: &ResolvedFact, b: &ResolvedFact) -> bool {
+fn ordered_before(state: &CanonicalState, sessions: &BTreeSet<String>, a: &ResolvedFact, b: &ResolvedFact) -> bool {
     if before(a, b) {
         return true;
     }
@@ -367,9 +369,7 @@ fn ordered_before(state: &CanonicalState, a: &ResolvedFact, b: &ResolvedFact) ->
     let mut epochs = BTreeSet::from([b_point.source_epoch.clone()]);
     loop {
         let mut predecessors = BTreeSet::new();
-        for session in state
-            .sessions
-            .values()
+        for session in sessions.iter().filter_map(|id|state.sessions.get(id))
             .filter(|s| Some(&s.namespace_id) == b.refs.namespace_id.as_ref())
         {
             for link in session
@@ -406,12 +406,11 @@ fn ordered_before(state: &CanonicalState, a: &ResolvedFact, b: &ResolvedFact) ->
 
 /// Existing journals already contain inventory openings. Recover their
 /// original attach evidence instead of creating a parallel native opening.
-pub fn promote_inventory(state: &mut CanonicalState) {
+pub fn promote_inventory(state: &mut CanonicalState, execution_ids: &BTreeSet<String>, binding_ids: &BTreeSet<String>) -> Vec<ResolvedFact> {
+    let mut added = Vec::new();
     use threadspace_contracts::canonical::fact::{CanonicalRefs, NativeActivation, NativeRefs};
     use threadspace_contracts::canonical::keys::{NativeExecutionRef, NativeSessionRef};
-    let records: Vec<_> = state
-        .executions
-        .values()
+    let records: Vec<_> = execution_ids.iter().filter_map(|id|state.executions.get(id))
         .filter(|e| {
             e.activation_ref.starts_with("process:")
                 && !state.activation_candidates.contains_key(&e.id)
@@ -478,13 +477,9 @@ pub fn promote_inventory(state: &mut CanonicalState) {
                 controlling_device: attach.controlling_device,
             },
         };
-        state
-            .activation_facts
-            .insert(format!("{}:{}", fact.observation_id, fact.fact_index), fact);
-        for binding in state
-            .bindings
-            .values()
-            .filter(|b| b.execution_id == record.id)
+        added.push(fact.clone());
+        state.activation_facts.insert(format!("{}:{}", fact.observation_id, fact.fact_index), fact);
+        for binding in binding_ids.iter().filter_map(|id|state.bindings.get(id)).filter(|b|b.execution_id == record.id)
         {
             state
                 .binding_executions
@@ -499,4 +494,5 @@ pub fn promote_inventory(state: &mut CanonicalState) {
             .activation_candidates
             .insert(record.id.clone(), record);
     }
+    added
 }
