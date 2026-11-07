@@ -170,6 +170,17 @@ mod tests {
     }
 
     #[test]
+    fn a_lagging_positive_row_can_end_a_fresh_native_opening() {
+        let kernel = Kernel::new(vec![(11, vec![Ok(claude(11, 1000, Some(5)))])]);
+        let pass = pass_with(vec![row(11, "B")], &kernel);
+        let stored = vec![live("fresh-native-A", "A", 11, 1000)];
+        let liveness = HashMap::from([("fresh-native-A".to_owned(), Ok(claude(11, 1000, Some(5))))]);
+        let plan = plan(&stored, &liveness, &pass);
+        assert_eq!(plan.ends, vec![("fresh-native-A".to_owned(), EndReason::SessionSwitched)]);
+        assert_eq!(plan.new_activations, vec![0]);
+    }
+
+    #[test]
     fn a_still_joined_activation_continues_without_a_new_activation() {
         let kernel = Kernel::new(vec![(11, vec![Ok(claude(11, 1000, Some(5)))])]);
         let pass = pass_with(vec![row(11, "A")], &kernel);

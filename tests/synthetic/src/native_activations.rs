@@ -99,10 +99,20 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
     match envelope.adapter_id.as_str() {
         hooks::ADAPTER_ID => hooks::normalize(envelope),
         observer::ADAPTER_ID => observer::normalize(envelope),
+        "m3.inventory-end" => Normalized {
+            retained: envelope.payload.clone(), unsupported: None,
+            drafts: vec![NativeFactDraft {
+                refs: NativeRefs { session: envelope.session_key.clone(), process: Some(envelope.evidence[0].key.clone()),
+                    execution: envelope.activation_ref.clone().map(|activation_ref| NativeExecutionRef::Activation { activation_ref }),
+                    ..NativeRefs::default() },
+                provenance: EvidenceClass::Kernel, causal: None,
+                payload: FactPayload::ExecutionEnded { reason: "SESSION_SWITCHED".into() },
+            }],
+        },
         "m3.inventory-fixture" => {
             let process = envelope.evidence[0].clone();
             Normalized {
-                retained: json!({}),
+                retained: envelope.payload.clone(),
                 unsupported: None,
                 drafts: vec![
                     NativeFactDraft {
@@ -123,7 +133,7 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
                             execution: envelope.activation_ref.clone().map(|activation_ref| {
                                 NativeExecutionRef::Activation { activation_ref }
                             }),
-                            activation: Some(NativeActivation {
+                            activation: (!envelope.payload["legacy"].as_bool().unwrap_or(false)).then_some(NativeActivation {
                                 kind: ActivationEvidenceKind::Inventory,
                                 entry_sequence: None,
                                 start_source: None,
@@ -146,6 +156,38 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
         _ => threadspace_state_engine::synthetic::normalize_envelope(envelope),
     }
 }
+
+fn legacy_inventory() -> ObservationEnvelope {
+    let mut e = inventory("A", 2);
+    e.activation_ref = Some("process:4100:1000.0#old-join".into());
+    e.payload = json!({"legacy":true});
+    e
+}
+fn inventory_end() -> ObservationEnvelope {
+    let mut e = legacy_inventory();
+    e.adapter_id = "m3.inventory-end".into();
+    e.observation_id = threadspace_state_engine::ids::derived_id("m3:exact-inventory-end");
+    e
+}
+fn inventory_resume_scenario(name: &str, end_first: bool) -> Scenario {
+    let b = start("B", 30, 3, "clear");
+    let mut s = scenario(name, vec![legacy_inventory(),
+        if end_first { inventory_end() } else { b.clone() },
+        if end_first { b } else { inventory_end() },
+        start("A", 50, 5, "resume"), turn("A", 60, 5, "resumed")],
+        |s| {
+            count(s, 3, 1)?;
+            let t = s.turns.values().find(|t|t.native_turn_id.as_deref()==Some("resumed")).ok_or("resumed turn")?;
+            if t.execution_ids.len()!=1 || s.executions[t.execution_ids.first().unwrap()].presence!=ExecutionPresence::Live {
+                return Err("ended inventory poisoned resumed A".into());
+            }
+            Ok(())
+        });
+    // The old attach is already committed when the M3 evidence is admitted.
+    s.constraints = vec![(0,1),(0,2),(0,3),(0,4)];
+    s
+}
+
 fn settled() -> Value {
     json!({ "core":{"coreSettled":true} })
 }
@@ -406,6 +448,8 @@ pub fn catalog() -> Vec<Scenario> {
                 Ok(())
             },
         ),
+        inventory_resume_scenario("claude-inventory-a-b-resume-a", false),
+        inventory_resume_scenario("claude-legacy-end-before-native", true),
     ]
 }
 
@@ -444,6 +488,83 @@ mod tests {
             count(runner.state(), 1, 0).expect("hook and engine opening are one ended activation");
             assert!(runner.state().executions.values().next().unwrap().end_reasons.contains("SESSION_END"));
         }
+    }
+    fn discovery(pass: u64, session: &str) -> threadspace_journal::DiscoveryApplication {
+        use threadspace_journal::{ActivationChange, DiscoveryApplication, ProcessRecord};
+        DiscoveryApplication {
+            provider: "claude".into(), profile_ref: context().profile_ref, sessions: vec![], payload: json!({}), pass,
+            wait_of: |_|None,
+            changes: vec![ActivationChange::Start { native_session_id: session.into(),
+                process: ProcessRecord { boot_id: "boot-A".into(), pid:4100,start_seconds:1000,start_microseconds:0,executable:IMAGE.into() },
+                device:77, surface:Err("QUALIFICATION_UNBOUND".into()) }],
+        }
+    }
+    fn end_live(runner: &mut SqliteRunner, pass: u64, session: &str) {
+        use threadspace_journal::ActivationChange;
+        let session_id = runner.state().sessions.values().find(|s|s.native_session_id==session).unwrap().id.clone();
+        let id = runner.state().executions.values().find(|e|e.session_id==session_id && e.presence==ExecutionPresence::Live).unwrap().id.clone();
+        let mut app = discovery(pass, session);
+        app.changes = vec![ActivationChange::End {execution_id:id,reason:"SESSION_SWITCHED".into()}];
+        runner.journal.apply_discovery(&app, 1000+pass as i64).unwrap();
+    }
+    fn assert_journal(runner: &SqliteRunner) {
+        assert!(runner.journal.projection_differences().unwrap().is_empty());
+        assert_eq!(threadspace_state_engine::hash::state_hash(runner.state()),
+            threadspace_state_engine::hash::state_hash(&runner.journal.replay_from_genesis().unwrap()));
+    }
+    #[test]
+    fn ended_inventory_does_not_poison_resume_or_depend_on_admission_order() {
+        let mut failures = Vec::new();
+        for first in [false, true] {
+            let scenario = inventory_resume_scenario("regression", first);
+            let order: Vec<_> = (0..scenario.steps.len()).collect();
+            let mut runner = PureRunner::new(1);
+            run(&scenario, &order, &mut runner);
+            if let Err(e) = (scenario.expect)(runner.state()) { failures.push((first,e)); }
+        }
+        assert!(failures.is_empty(), "both R3 orders: {failures:?}");
+        let mut runner = SqliteRunner::open(TempStore::new("m3-resume-polls"),42).unwrap();
+        runner.journal.apply_discovery(&discovery(1,"A"),1001).unwrap();
+        runner.observe(&start("B",30,3,"clear"));
+        end_live(&mut runner,2,"A");
+        runner.observe(&start("A",50,5,"resume"));
+        count(runner.state(),3,1).expect("resumed A is live");
+        let candidates = runner.state().activation_candidates.len();
+        for pass in 3..6 {
+            let outcome = runner.journal.apply_discovery(&discovery(pass,"A"),1000+pass as i64).unwrap();
+            assert_eq!(outcome.executions_started,0);
+            assert_eq!(runner.state().activation_candidates.len(),candidates);
+            count(runner.state(),3,1).unwrap();
+        }
+        assert_journal(&runner);
+    }
+    #[test]
+    fn late_native_opening_is_ended_by_next_reconcile() {
+        let mut runner = SqliteRunner::open(TempStore::new("m3-late-native"),42).unwrap();
+        runner.journal.apply_discovery(&discovery(1,"A"),1001).unwrap();
+        end_live(&mut runner,2,"A");
+        runner.observe(&start("A",10,1,"startup"));
+        count(runner.state(),2,1).unwrap();
+        end_live(&mut runner,3,"A");
+        count(runner.state(),2,0).unwrap();
+        assert_journal(&runner);
+    }
+    #[test]
+    fn lagging_inventory_switch_does_not_poison_later_positive_join() {
+        let mut runner = SqliteRunner::open(TempStore::new("m3-lagging-row"),42).unwrap();
+        runner.observe(&start("A",50,5,"resume"));
+        // The reconcile planner accepts the lagging B join as a switch and
+        // addresses its end to the fresh A ID. That end stays authoritative.
+        end_live(&mut runner,2,"A");
+        count(runner.state(),1,0).unwrap();
+        runner.journal.apply_discovery(&discovery(3,"A"),1003).unwrap();
+        count(runner.state(),2,1).expect("later positive inventory is a separate live attachment");
+        let candidates = runner.state().activation_candidates.len();
+        for pass in 4..7 {
+            assert_eq!(runner.journal.apply_discovery(&discovery(pass,"A"),1000+pass as i64).unwrap().executions_started,0);
+            assert_eq!(runner.state().activation_candidates.len(),candidates);
+        }
+        assert_journal(&runner);
     }
     #[test]
     fn each_real_opening_source_establishes_an_activation() {

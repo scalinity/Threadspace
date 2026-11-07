@@ -183,6 +183,13 @@ pub fn derive(state: &mut CanonicalState) {
             .filter(|(_, g)| {
                 same_runtime(g.first(), inventory)
                     && g.first().refs.session_id == inventory.refs.session_id
+                    // Exact inventory ends belong to the old attachment.
+                    && inventory.refs.execution_id.as_ref().and_then(|id|state.activation_candidates.get(id)).is_none_or(|e|e.end_reasons.is_empty())
+                    // A later positive inventory pass can recover from a
+                    // lagging switch row without reviving the ended native ID.
+                    && !facts.iter().any(|end| matches!(end.payload, FactPayload::ExecutionEnded { .. })
+                        && end.refs.execution_id.as_ref().is_some_and(|id|g.members.contains(id))
+                        && before(end, inventory))
             })
             .map(|(i, _)| i)
             .collect();
@@ -408,7 +415,6 @@ pub fn promote_inventory(state: &mut CanonicalState) {
         .filter(|e| {
             e.activation_ref.starts_with("process:")
                 && !state.activation_candidates.contains_key(&e.id)
-                && e.end_reasons.is_empty()
         })
         .cloned()
         .collect();

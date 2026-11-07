@@ -407,13 +407,16 @@ impl Journal {
                     outcome.bindings_invalidated += valid_bindings(execution_id);
                     drafts.push(NativeFactDraft {
                         refs: NativeRefs {
+                            session: state.executions.get(execution_id).and_then(|e|state.sessions.get(&e.session_id)).map(|s|session_ref(&s.native_session_id)),
+                            process: state.executions.get(execution_id).and_then(|e|e.process_id.as_ref()).and_then(|id|state.processes.get(id)).map(|p|p.key.clone()),
+                            activation: Some(NativeActivation { kind: ActivationEvidenceKind::End, entry_sequence: None, start_source: None, generation: None }),
                             execution: Some(NativeExecutionRef::Canonical {
                                 execution_id: execution_id.clone(),
                             }),
                             ..NativeRefs::default()
                         },
                         provenance: EvidenceClass::ProviderSnapshot,
-                        causal: None,
+                        causal: Some(point.clone()),
                         payload: FactPayload::ExecutionEnded {
                             reason: reason.clone(),
                         },
@@ -485,7 +488,7 @@ impl Journal {
                             ..session_refs.clone()
                         },
                         provenance: EvidenceClass::ProviderSnapshot,
-                        causal: None,
+                        causal: Some(point.clone()),
                         payload: FactPayload::ExecutionAttached {
                             mode: ExecutionMode::TerminalEmbedded,
                             presence: AttachedPresence::Live,
