@@ -1,0 +1,82 @@
+{
+  "attempts": 30,
+  "count": 30,
+  "disturbedAttempts": 0,
+  "exact": 30,
+  "fixture": {
+    "dictionarySha256": "8695d2feff757e8aec077648fe8f3481b8b39c596c5279813627792f0860b85f",
+    "image": "16777232:233198433",
+    "pid": 3210
+  },
+  "fixtureClosed": {
+    "copyRemoved": true,
+    "error": null,
+    "exitedMs": 0,
+    "ok": true,
+    "result": {
+      "closed": [
+        "6F1829EF-C3B5-436C-90AE-B48988FA3435",
+        "9AA3F011-4AD9-49D9-BB44-18C48D986519",
+        "BF2AB074-08FB-4645-9C39-990E3F0E92F2",
+        "EC348B6E-9ED9-4D79-B60A-548826EE5165"
+      ]
+    }
+  },
+  "integration": {
+    "automation": "AUTHORIZED",
+    "statusCode": 0
+  },
+  "integrationRemoved": true,
+  "pass": true,
+  "scenarios": {
+    "cases": [
+      {
+        "case": "tab-moved",
+        "ok": true,
+        "setupOk": true
+      },
+      {
+        "case": "fullscreen",
+        "ok": true,
+        "setupOk": true
+      },
+      {
+        "case": "minimized",
+        "ok": true,
+        "setupOk": true
+      },
+      {
+        "case": "closed-pane",
+        "ok": true,
+        "setupOk": true
+      }
+    ],
+    "control": "9AA3F011-4AD9-49D9-BB44-18C48D986519",
+    "pass": true
+  },
+  "sessions": [
+    {
+      "nativeSessionId": "6f7a24d5-0329-4c0c-b544-d354c549bdcd",
+      "sessionId": "14094add-15ff-40ef-827d-6fce4b06a080",
+      "terminalId": "6F1829EF-C3B5-436C-90AE-B48988FA3435",
+      "tty": "/dev/ttys000"
+    },
+    {
+      "nativeSessionId": "4703928c-c533-4391-87d1-64055409d188",
+      "sessionId": "6d224870-e87b-415a-aec8-f5ecb94fc21c",
+      "terminalId": "C375553B-14B9-47A3-8918-5EB65495C80C",
+      "tty": "/dev/ttys012"
+    },
+    {
+      "nativeSessionId": "ec9fbb79-78fe-4bb8-a686-82c364bc44ed",
+      "sessionId": "54345732-d5c2-4e8d-9c31-fc11e4ee98c7",
+      "terminalId": "EC348B6E-9ED9-4D79-B60A-548826EE5165",
+      "tty": "/dev/ttys015"
+    }
+  ],
+  "startErrors": [],
+  "ui": {
+    "reused": true
+  },
+  "wrongTargets": 0
+}
