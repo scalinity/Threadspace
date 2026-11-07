@@ -30,8 +30,8 @@ use crate::bridge_gates::companion_snapshot;
 use crate::ctx::Ctx;
 use crate::m2::{
     Activation, Recording, Scratch, claude_command, completed_turns, disposable, ensure_ui,
-    journal_cursor, latency, launcher, mark_handled, session_view, submitted_inputs, trace, ui,
-    view, wait_inventory, wait_view,
+    journal_cursor, latency, launcher, mark_handled, provenance, session_view, submitted_inputs,
+    trace, ui, view, wait_inventory, wait_view,
 };
 
 const TURN_TIMEOUT: Duration = Duration::from_secs(150);
@@ -312,6 +312,7 @@ pub fn smoke(ctx: &Ctx, returns: u32) -> Result<Value, String> {
 pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "ghostty-vertical", ctx.channel_name()).map_err(|e| e.to_string())?;
     let integration = ghostty_authorized(ctx)?;
+    let provenance = provenance(ctx);
     let mut scratch = Scratch::new(ctx, "ghostty-vertical")?;
     let activation = activate(ctx, &mut scratch)?;
     let ui_state = ensure_ui(ctx)?;
@@ -416,6 +417,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let summary = json!({
         "pass": pass,
         "cycles": cycles,
+        "provenance": provenance,
         "integration": integration,
         "fixture": { "pid": fixture.app.pid, "image": fixture.image, "dictionarySha256": fixture.dictionary_sha256 },
         "recording": recording,
@@ -443,6 +445,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
 pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "ghostty-routes", ctx.channel_name()).map_err(|e| e.to_string())?;
     let integration = ghostty_authorized(ctx)?;
+    let provenance = provenance(ctx);
     let mut scratch = Scratch::new(ctx, "ghostty-routes")?;
     let activation = activate(ctx, &mut scratch)?;
     // Every third Return is the packaged UI's own button.
@@ -526,6 +529,7 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let summary = json!({
         "pass": pass,
         "count": count,
+        "provenance": provenance,
         "exact": exact,
         "attempts": attempts,
         "disturbedAttempts": disturbed_attempts,

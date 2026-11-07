@@ -114,6 +114,25 @@ pub fn launcher() -> Result<PathBuf, String> {
     Ok(threadspace_relay::paths::home_dir().ok_or("no home")?.join(".local/bin/claude"))
 }
 
+/// The exact provider executable a runner launches and the installed
+/// Threadspace build: every native qualification record names both.
+/// Build-info is the build directory's claim; the installed hashes are what ran.
+pub fn provenance(ctx: &Ctx) -> Value {
+    let provider = launcher().ok().and_then(|path| path.canonicalize().ok());
+    let build_info = std::fs::read(ctx.repo.join("apps/agent-macos/build/dev/build-info.json"))
+        .ok()
+        .and_then(|bytes| serde_json::from_slice::<Value>(&bytes).ok());
+    json!({
+        "provider": provider.as_ref().map(|path| json!({
+            "executable": redact_home(&path.display().to_string()),
+            "sha256": sha256_file(path),
+        })),
+        "executableSha256": sha256_file(&ctx.id.executable),
+        "companionSha256": sha256_file(&ctx.id.companion_executable),
+        "devBuildInfo": build_info.map(|info| json!({ "sourceCommit": info["sourceCommit"], "sourceTreeDirty": info["sourceTreeDirty"] })),
+    })
+}
+
 /// An observed Claude session in its own disposable window.
 pub struct Observed {
     pub tab: Tab,
