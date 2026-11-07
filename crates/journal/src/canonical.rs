@@ -1400,7 +1400,7 @@ mod tests {
     fn reducer_four_checkpoint_json_needs_no_rewrite() {
         let mut json = serde_json::json!({"reducerVersion":4,"activationFacts":{},"bindings":{}});
         let before = json.clone();
-        upgrade_json(4, &mut json);
+        super::upgrade_json(4, &mut json);
         assert_eq!(json,before);
     }
 
