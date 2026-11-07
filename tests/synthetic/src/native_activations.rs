@@ -277,6 +277,19 @@ fn aba_expected(state: &CanonicalState) -> Result<(), String> {
     }
     Ok(())
 }
+fn same_generation_expected(s: &CanonicalState) -> Result<(),String> {
+    count(s,2,1)?;
+    let old = s.turns.values().find(|t|t.native_turn_id.as_deref()==Some("old")).ok_or("old turn")?;
+    let new = s.turns.values().find(|t|t.native_turn_id.as_deref()==Some("new")).ok_or("new turn")?;
+    if old.execution_ids.len()!=1 || new.execution_ids.len()!=1 || old.execution_ids==new.execution_ids {
+        return Err("callback result replaced the originating turn owner".into());
+    }
+    if !s.executions[old.execution_ids.first().unwrap()].end_reasons.contains("SESSION_END")
+        || s.executions[new.execution_ids.first().unwrap()].presence!=ExecutionPresence::Live {
+        return Err("end ignored its frozen generation or entry".into());
+    }
+    Ok(())
+}
 pub fn catalog() -> Vec<Scenario> {
     let mut completion = observer_record(
         "turn.complete",
@@ -448,6 +461,15 @@ pub fn catalog() -> Vec<Scenario> {
                 Ok(())
             },
         ),
+        scenario("claude-same-generation-delayed-turn-entry", vec![
+            start("A",10,1,"startup"),
+            { let mut e = turn("A",20,1,"old"); e.source_sequence=Some("99".into()); e.callback_result_sequence=Some("99".into()); e },
+            observer_record("session.end","A",None,25,1,"entry",json!({"reason":"resume"})),
+            start("A",30,1,"resume"), turn("A",40,1,"new")], same_generation_expected),
+        scenario("claude-delayed-generation-end", vec![
+            start("A",10,1,"startup"), turn("A",20,1,"old"),
+            start("A",30,3,"resume"), turn("A",40,3,"new"),
+            observer_record("session.end","A",None,50,1,"entry",json!({"reason":"resume"}))], same_generation_expected),
         inventory_resume_scenario("claude-inventory-a-b-resume-a", false),
         inventory_resume_scenario("claude-legacy-end-before-native", true),
     ]
@@ -521,6 +543,7 @@ mod tests {
             let mut runner = PureRunner::new(1);
             run(&scenario, &order, &mut runner);
             if let Err(e) = (scenario.expect)(runner.state()) { failures.push((first,e)); }
+            assert!(runner.state().activation_candidates.values().any(|e|e.activation_ref.starts_with("process:")),"ended legacy inventory is promoted in both R3 admission orders");
         }
         assert!(failures.is_empty(), "both R3 orders: {failures:?}");
         let mut runner = SqliteRunner::open(TempStore::new("m3-resume-polls"),42).unwrap();

@@ -37,10 +37,16 @@ def inventory_unmatched(text):
 CONTROLS = [
     ("legacy-binding-replay", ROOT / "crates/state-engine/src/reduce.rs", lambda s: replace_once(s, "if !self.state.activation_facts.is_empty()\n            && let", "if let")),
     ("native-supersession", ENGINE, lambda s: replace_once(s, 'execution\n                .end_reasons\n                .insert("NATIVE_SESSION_SWITCHED".into());', 'let _ = &execution;')),
-    ("exact-generation-end", ENGINE, lambda s: replace_once(s, "if matched", "if false && matched")),
+    ("exact-generation-end", ENGINE, lambda s: replace_once(s, "generation(s) == Some(expected_generation) && before(s, end)", "before(s, end)")),
     ("ambiguous-legacy-end", ENGINE, legacy_naive),
     ("inventory-convergence", ENGINE, inventory_unmatched),
-    ("originating-turn", ENGINE, lambda s: replace_once(s, "turn.execution_ids = ids;", "turn.execution_ids = BTreeSet::new(); let _ = ids;")),
+    ("originating-turn", ENGINE, lambda s: replace_once(s, "if let Some(entry) = b", "if kind(b) != Some(K::Turn) && let Some(entry) = b")),
+    ("ended-inventory-join", ENGINE, lambda s: replace_once(s, "inventory.refs.execution_id.as_ref().and_then(|id|state.activation_candidates.get(id)).is_none_or(|e|e.end_reasons.is_empty())", "true")),
+    ("legacy-promotion-order", ENGINE, lambda s: replace_once(s, "&& !state.activation_candidates.contains_key(&e.id)", "&& !state.activation_candidates.contains_key(&e.id) && e.end_reasons.is_empty()")),
+    ("hook-engine-corroboration", ENGINE, lambda s: replace_once(s, "(source(g.first()).is_none() || signature(g.first(), hook))", "signature(g.first(), hook)")),
+    ("engine-is-corroboration", ENGINE, lambda s: replace_once(s, 'source(s).is_some_and(|source|source!="startup")', 'source(s)!=Some("startup")')),
+    ("runtime-scope", ROOT / "crates/state-engine/src/reduce.rs", lambda s: replace_once(s, "let mut processes = self.activation_processes.clone();", "let mut processes = self.activation_processes.clone(); processes.extend(self.index.activation_evidence.keys().map(|(p,_)|p.clone()));")),
+    ("later-inventory-recovery", ENGINE, lambda s: replace_once(s, "&& before(end, inventory)", "&& false && before(end, inventory)")),
     ("compaction", ADAPTER, lambda s: replace_once(s, 'Some("startup" | "resume" | "clear")', 'Some("startup" | "resume" | "clear" | "compact")')),
     ("reload-is-not-opening", OBSERVER, lambda s: replace_once(s, "if starts && record.engine_identity && generation.is_some()", 'if (starts && record.engine_identity || event == "session.start" && record.phase == "bootstrap") && generation.is_some()')),
 ]
