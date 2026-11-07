@@ -412,6 +412,10 @@ fn checksum(sql: &str) -> String {
 /// checkpoint is newer than this binary's (SPEC §9.4). Tables the store
 /// does not have yet count as version 0.
 pub(crate) fn refuse_newer(conn: &Connection) -> Result<(), JournalError> {
+    refuse_newer_at(conn, REDUCER_VERSION)
+}
+
+fn refuse_newer_at(conn: &Connection, reducer_version: u32) -> Result<(), JournalError> {
     let has = |table: &str| -> Result<bool, rusqlite::Error> {
         conn.query_row(
             "SELECT COUNT(*) > 0 FROM sqlite_schema WHERE type = 'table' AND name = ?1",
@@ -437,7 +441,7 @@ pub(crate) fn refuse_newer(conn: &Connection) -> Result<(), JournalError> {
                 |row| row.get(0),
             )
             .optional()?;
-        if let Some(found) = reducer.filter(|version| *version > REDUCER_VERSION) {
+        if let Some(found) = reducer.filter(|version| *version > reducer_version) {
             return Err(JournalError::SchemaTooNew { found });
         }
     }
@@ -541,4 +545,18 @@ pub(crate) fn verify_applied(conn: &Connection) -> Result<u32, String> {
         }
     }
     Ok(found)
+}
+
+#[cfg(test)]
+mod reducer_version_tests {
+    use super::*;
+    #[test]
+    fn reducer_four_refuses_reducer_five_checkpoint_without_writes() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch("CREATE TABLE projection_checkpoints(id INTEGER PRIMARY KEY, reducer_version INTEGER); INSERT INTO projection_checkpoints VALUES(1,5);").unwrap();
+        let changes = conn.total_changes();
+        assert!(matches!(refuse_newer_at(&conn,4),Err(JournalError::SchemaTooNew {found:5})));
+        assert_eq!(conn.total_changes(),changes);
+        assert!(refuse_newer(&conn).is_ok());
+    }
 }

@@ -433,7 +433,7 @@ fn f1b_genuine_reducer3_upgrade_preserves_owner_receipts_and_converges_at_three_
         drop(conn);
         let mut journal = open(&store);
         let state = journal.canonical_state().clone();
-        assert_eq!(state.reducer_version, 4);
+        assert_eq!(state.reducer_version, REDUCER_VERSION);
         assert_eq!(state.commands, previous.commands, "committed owner decision survives checkpoint {checkpoint}");
         assert_eq!(state.sessions.keys().collect::<Vec<_>>(), previous.sessions.keys().collect::<Vec<_>>(), "stable Session IDs");
         assert_eq!(state.turns.keys().collect::<Vec<_>>(), previous.turns.keys().collect::<Vec<_>>(), "stable Turn IDs");

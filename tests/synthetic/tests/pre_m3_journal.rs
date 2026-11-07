@@ -9,7 +9,8 @@ fn pre_m3_journal_checkpoint_and_genesis_preserve_state() {
     let old_json: serde_json::Value =
         serde_json::from_slice(&std::fs::read(fixture.join("state.json")).unwrap()).unwrap();
     assert!(old_json.get("activationCandidates").is_none());
-    let expected: CanonicalState = serde_json::from_value(old_json).unwrap();
+    let mut expected: CanonicalState = serde_json::from_value(old_json).unwrap();
+    expected.reducer_version = threadspace_state_engine::REDUCER_VERSION;
     assert_eq!(expected.executions.len(), 1);
     assert_eq!(expected.bindings.len(), 1);
     for use_checkpoint in [true, false] {

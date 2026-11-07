@@ -523,6 +523,9 @@ fn latest_checkpoint(conn: &rusqlite::Connection) -> Result<Option<(CanonicalSta
 /// many the decision covered. `true` becomes 1, the fewest it can have
 /// covered, so a later such positive is never taken as handled.
 fn upgrade_json(version: u32, state: &mut Value) {
+    // Reducer 5 adds activation bookkeeping with serde defaults. Version 4
+    // already records the same evidence representation; no JSON rewrite.
+    if version == 4 { return; }
     if version >= 2 {
         return;
     }
@@ -1393,6 +1396,14 @@ mod tests {
 
     /// Read-only adjudication of a preserved legacy backup. The alternate
     /// checkpoint selection exists only in an acquired in-memory copy.
+    #[test]
+    fn reducer_four_checkpoint_json_needs_no_rewrite() {
+        let mut json = serde_json::json!({"reducerVersion":4,"activationFacts":{},"bindings":{}});
+        let before = json.clone();
+        upgrade_json(4, &mut json);
+        assert_eq!(json,before);
+    }
+
     #[test]
     #[ignore = "requires an explicit privately preserved legacy Dev backup"]
     fn retained_legacy_checkpoint_suffix_matches_full_state_without_genesis() {
