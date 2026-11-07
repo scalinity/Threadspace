@@ -18,7 +18,7 @@ use threadspace_relay::paths::redact_home;
 use crate::ctx::Ctx;
 use crate::m2::{
     Activation, Observed, Scratch, activate, claude_command, completed_turns, disposable, finish, journal_query,
-    launcher, session_view, start_observed, submit, submit_unconfirmed, wait_view,
+    launcher, provenance, session_view, start_observed, submit, submit_unconfirmed, wait_view,
 };
 
 fn rows(ctx: &Ctx, sql: &str) -> Vec<Value> {
@@ -390,6 +390,7 @@ fn partial_receipt(ctx: &Ctx, a: &Activation, kind: &str) -> Result<Value, Strin
 
 pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "faults", ctx.channel_name()).map_err(|e| e.to_string())?;
+    let provenance = provenance(ctx);
     let mut scratch = Scratch::new(ctx, "faults")?;
     crate::m2::terminal_authorized(ctx)?;
     let activation = activate(ctx, &mut scratch)?;
@@ -425,6 +426,7 @@ pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     let pass = verdicts.iter().all(|v| v["pass"] == json!(true));
     let summary = json!({
         "pass": pass,
+        "provenance": provenance,
         "cases": verdicts.iter().map(|v| json!({ "case": v["case"], "pass": v["pass"] })).collect::<Vec<_>>(),
         "integrationRemoved": removed.ok().map(|r| r["ok"].clone()),
         "activation": redact_home(&activation.plugin_dir),
