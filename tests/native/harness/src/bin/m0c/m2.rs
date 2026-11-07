@@ -49,22 +49,25 @@ pub struct Activation {
     pub record: Value,
 }
 
-pub fn activate(ctx: &Ctx, scratch: &mut Scratch<'_>) -> Result<Activation, String> {
-    // Without Terminal consent no session can bind to its tab; name that
-    // blocker instead of timing out on the first binding.
-    match ctx.companion().request(ControlRequestBody::IntegrationStatus, Duration::from_secs(20))? {
-        ControlResponseBody::IntegrationStatus { report } if report.terminal.automation == AutomationPermission::Authorized => {}
-        ControlResponseBody::IntegrationStatus { report } => {
-            return Err(format!(
-                "BLOCKED: Terminal automation is {:?} ({}) for the {} channel; `threadspace-qualify {} request-terminal` asks the owner once",
-                report.terminal.automation,
-                report.terminal.automation_status_code,
-                ctx.channel_name(),
-                ctx.channel_name()
-            ));
-        }
-        other => return Err(format!("integration status: unexpected {other:?}")),
+/// The companion's Apple-event consent for Terminal, asked through the
+/// consent-only request, which sends no event to any terminal application
+/// (the integration status would also inventory every scriptable Ghostty).
+/// Without it no session can bind to its tab; name that blocker instead of
+/// timing out on the first binding. An undecided consent shows the system
+/// prompt, which is the owner's step.
+pub fn terminal_authorized(ctx: &Ctx) -> Result<(), String> {
+    match ctx.companion().request(ControlRequestBody::RequestTerminalAutomation, Duration::from_secs(200))? {
+        ControlResponseBody::TerminalAutomation { automation, .. } if automation == AutomationPermission::Authorized => Ok(()),
+        ControlResponseBody::TerminalAutomation { automation, status_code } => Err(format!(
+            "BLOCKED: Terminal automation is {automation:?} ({status_code}) for the {} channel; Terminal must be running and the owner must allow it in the system prompt or System Settings › Privacy & Security › Automation",
+            ctx.channel_name()
+        )),
+        other => Err(format!("Terminal automation request: unexpected {other:?}")),
     }
+}
+
+/// Installs the session-scope integration a runner's sessions start with.
+pub fn activate(_ctx: &Ctx, scratch: &mut Scratch<'_>) -> Result<Activation, String> {
     let installed = scratch.install_session()?;
     let detail = &installed["detail"];
     let plugin_dir = detail["pluginDir"].as_str().ok_or("no plugin dir in the install record")?.to_owned();
@@ -516,6 +519,7 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
 pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "vertical", ctx.channel_name()).map_err(|e| e.to_string())?;
     let mut scratch = Scratch::new(ctx, "vertical")?;
+    terminal_authorized(ctx)?;
     let activation = activate(ctx, &mut scratch)?;
     let ui_state = ensure_ui(ctx)?;
     let recording = Recording::start()?;
@@ -836,6 +840,7 @@ pub(crate) fn mark_handled(ctx: &Ctx, session_id: &str) -> Value {
 pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "routes", ctx.channel_name()).map_err(|e| e.to_string())?;
     let mut scratch = Scratch::new(ctx, "routes")?;
+    terminal_authorized(ctx)?;
     let activation = activate(ctx, &mut scratch)?;
     ensure_ui(ctx)?;
     let mut sessions = Vec::new();

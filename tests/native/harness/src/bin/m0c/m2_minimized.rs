@@ -604,6 +604,7 @@ pub fn qualify(ctx: &Ctx, repetitions: u32) -> Result<Value, String> {
         .to_owned();
 
     let operation = (|| -> Result<(), String> {
+        m2::terminal_authorized(ctx)?;
         let activation = m2::activate(ctx, &mut scratch)?;
         write(&run, "integration-acquisition.json", &activation.record)?;
         let idle = wait_for_idle(&ctx.native, 10.0, Duration::from_secs(180));

@@ -94,6 +94,7 @@ fn execute(ctx: &Ctx, latency: bool) -> Result<Value, String> {
         return Err("bounded Terminal prerequisite failed; no fixture launched".into());
     }
     let mut scratch = m2::Scratch::new(ctx, "observer-native")?;
+    m2::terminal_authorized(ctx)?;
     let activation = m2::activate(ctx, &mut scratch)?;
     write(
         &evidence,

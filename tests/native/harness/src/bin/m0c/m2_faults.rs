@@ -391,6 +391,7 @@ fn partial_receipt(ctx: &Ctx, a: &Activation, kind: &str) -> Result<Value, Strin
 pub fn faults(ctx: &Ctx, which: &str) -> Result<Value, String> {
     let run_dir = Run::create(&ctx.evidence_root(), "faults", ctx.channel_name()).map_err(|e| e.to_string())?;
     let mut scratch = Scratch::new(ctx, "faults")?;
+    crate::m2::terminal_authorized(ctx)?;
     let activation = activate(ctx, &mut scratch)?;
     let all = which == "all";
     let mut verdicts = Vec::new();
