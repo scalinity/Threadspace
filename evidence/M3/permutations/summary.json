@@ -1,6 +1,6 @@
 {
   "area": "permutations",
-  "durationMs": 147454,
+  "durationMs": 186924,
   "failures": 0,
   "families": {
     "activation-changes": {
@@ -172,7 +172,7 @@
       ]
     },
     "native-activation-ownership": {
-      "duplicateDeliveriesInjected": 6899,
+      "duplicateDeliveriesInjected": 6985,
       "failures": 0,
       "permutations": 7000,
       "scenarios": [
@@ -180,33 +180,63 @@
         "claude-inventory-native-convergence",
         "claude-exact-native-end",
         "claude-compaction-reload",
-        "claude-same-generation-reopen"
+        "claude-same-generation-reopen",
+        "claude-same-generation-delayed-turn-entry",
+        "claude-delayed-generation-end",
+        "claude-engine-only-hook-switch",
+        "claude-inventory-a-b-resume-a",
+        "claude-legacy-end-before-native"
       ],
       "seedRanges": [
         {
           "from": 15700000,
           "scenario": "claude-native-a-b-a",
-          "to": 15701399
+          "to": 15700699
         },
         {
           "from": 15800000,
           "scenario": "claude-inventory-native-convergence",
-          "to": 15801399
+          "to": 15800699
         },
         {
           "from": 15900000,
           "scenario": "claude-exact-native-end",
-          "to": 15901399
+          "to": 15900699
         },
         {
           "from": 16000000,
           "scenario": "claude-compaction-reload",
-          "to": 16001399
+          "to": 16000699
         },
         {
           "from": 16100000,
           "scenario": "claude-same-generation-reopen",
-          "to": 16101399
+          "to": 16100699
+        },
+        {
+          "from": 16200000,
+          "scenario": "claude-same-generation-delayed-turn-entry",
+          "to": 16200699
+        },
+        {
+          "from": 16300000,
+          "scenario": "claude-delayed-generation-end",
+          "to": 16300699
+        },
+        {
+          "from": 16400000,
+          "scenario": "claude-engine-only-hook-switch",
+          "to": 16400699
+        },
+        {
+          "from": 16500000,
+          "scenario": "claude-inventory-a-b-resume-a",
+          "to": 16500699
+        },
+        {
+          "from": 16600000,
+          "scenario": "claude-legacy-end-before-native",
+          "to": 16600699
         }
       ]
     },
