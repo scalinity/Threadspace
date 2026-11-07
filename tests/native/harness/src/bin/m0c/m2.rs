@@ -506,7 +506,7 @@ pub fn cycles(ctx: &Ctx, count: u32) -> Result<Value, String> {
         }
         fixtures.push(json!({ "fixture": label, "originalSha256": original_sha, "finalSha256": sha256_file(&settings) }));
     }
-    let summary = json!({ "pass": all_ok, "cycles": count, "fixtures": fixtures });
+    let summary = json!({ "pass": all_ok, "cycles": count, "provenance": provenance(ctx), "fixtures": fixtures });
     run_dir.write_json("summary.json", &summary).map_err(|e| e.to_string())?;
     Ok(summary)
 }
@@ -602,6 +602,7 @@ pub fn vertical(ctx: &Ctx, cycles: u32) -> Result<Value, String> {
     let summary = json!({
         "pass": pass,
         "cycles": cycles,
+        "provenance": provenance(ctx),
         "recording": recording,
         "nativeSessionId": observed.native_session_id,
         "sessionId": observed.session_id,
@@ -883,6 +884,7 @@ pub fn routes(ctx: &Ctx, count: u32) -> Result<Value, String> {
     let removed = scratch.remove_integration();
     let summary = json!({
         "pass": exact == count && wrong == 0,
+        "provenance": provenance(ctx),
         "requested": count, "exactVerified": exact, "wrongTargets": wrong,
         "routeLatencyP95Ms": p95, "routeLatencyMaxMs": latencies.last(),
         "windowsClosed": closed,
