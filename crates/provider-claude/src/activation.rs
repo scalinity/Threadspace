@@ -1,5 +1,5 @@
 //! Capture-scoped activation evidence shared by the two real Claude adapters.
-use threadspace_contracts::canonical::envelope::{ObservationEnvelope, ProcessRole};
+use threadspace_contracts::canonical::envelope::{ObservationEnvelope, ProcessSample};
 use threadspace_contracts::canonical::fact::{
     ActivationEvidenceKind, AttachedPresence, EvidenceClass, ExecutionMode, FactPayload,
     NativeActivation, NativeFactDraft, NativeRefs,
@@ -32,12 +32,9 @@ pub fn attach(
     envelope: &ObservationEnvelope,
     mut refs: NativeRefs,
     generation: Option<String>,
+    provider: Option<&ProcessSample>,
 ) -> Vec<NativeFactDraft> {
-    let Some(provider) = envelope
-        .evidence
-        .iter()
-        .find(|p| p.role == ProcessRole::Provider)
-    else {
+    let Some(provider) = provider else {
         return Vec::new();
     };
     let Some(executable) = &provider.executable else {

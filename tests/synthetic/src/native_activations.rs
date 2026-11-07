@@ -61,32 +61,34 @@ pub fn observer_record(
     modbatch::envelope(&record, EPOCH, &context()).expect("real mod-batch envelope")
 }
 pub fn hook(event: &str, session: &str, seq: u64, source: &str) -> ObservationEnvelope {
-    let mut envelope = observer_record(
-        "classic.SessionStart",
-        session,
-        None,
-        seq,
-        1,
-        "entry",
-        json!({}),
-    );
-    envelope.native_event = event.into();
-    envelope.observation_id =
-        threadspace_state_engine::ids::derived_id(&format!("m3-hook:{event}:{session}:{seq}"));
-    envelope.adapter_id = hooks::ADAPTER_ID.into();
-    envelope.source_id = "claude.hook".into();
-    envelope.source_epoch = "hook".into();
-    envelope.source_sequence = None;
-    envelope.sequence_meaning = None;
-    envelope.callback_entry_sequence = None;
-    envelope.callback_result_sequence = None;
-    envelope.activation_ref = None;
-    envelope.payload = json!({"source":source});
-    envelope.captured_at = clock(seq as i64);
-    envelope
+    use threadspace_relay::capture::{claude_hook_envelope, HookCapture};
+    let mut provider = context().evidence.remove(0);
+    provider.role = ProcessRole::Ancestor;
+    let capture = ProcessSample {
+        role: ProcessRole::Capture,
+        key: process(4102, 1002),
+        parent_pid: Some(4101),
+        executable: Some("/qualification/threadspace-hook#1:2".into()),
+        controlling_device: Some(77),
+    };
+    let shell = ProcessSample {
+        role: ProcessRole::Ancestor,
+        key: process(4101, 1001),
+        parent_pid: Some(4100),
+        executable: Some("/bin/zsh#1:3".into()),
+        controlling_device: Some(77),
+    };
+    claude_hook_envelope(&json!({"hook_event_name":event,"session_id":session,"source":source}), HookCapture {
+        observation_id: threadspace_state_engine::ids::derived_id(&format!("m3-hook:{event}:{session}:{seq}")),
+        profile_ref: context().profile_ref,
+        clock: clock(seq as i64),
+        evidence: vec![capture, shell, provider],
+    }).expect("production conventional-hook envelope")
 }
+
 pub fn inventory(session: &str, seq: u64) -> ObservationEnvelope {
     let mut envelope = hook("SessionStart", session, seq, "startup");
+    envelope.evidence = context().evidence;
     envelope.adapter_id = "m3.inventory-fixture".into();
     envelope.native_event = "inventory.join".into();
     envelope.source_id = "claude.inventory".into();
@@ -412,6 +414,37 @@ mod tests {
     use super::*;
     use crate::runner::{Admit, PureRunner, run};
     use crate::sqlite::{SqliteRunner, TempStore};
+    #[test]
+    fn hook_uses_nearest_validated_claude_ancestor() {
+        let mut e = hook("SessionStart", "A", 10, "startup");
+        let bytes = serde_json::to_vec(&e).unwrap();
+        let mut outer = e.evidence[2].clone();
+        outer.key = process(4000, 900);
+        e.evidence[2].parent_pid = Some(4000);
+        e.evidence.push(outer);
+        let facts = hooks::normalize(&e).drafts;
+        let attach = facts.iter().find(|f|matches!(f.payload, FactPayload::ExecutionAttached {..})).expect("production hook opening");
+        assert_eq!(attach.refs.process.as_ref(), Some(&process(4100, 1000)));
+        let end = hook("SessionEnd", "A", 20, "");
+        assert!(hooks::normalize(&end).drafts.iter().any(|f|matches!(f.payload, FactPayload::ExecutionEnded {..})));
+        let original = hook("SessionStart", "A", 10, "startup");
+        let _ = hooks::normalize(&original);
+        assert_eq!(serde_json::to_vec(&original).unwrap(), bytes, "normalization preserves stored bytes");
+        e.evidence.truncate(2);
+        assert!(!hooks::normalize(&e).drafts.iter().any(|f|matches!(f.payload, FactPayload::ExecutionAttached {..})));
+    }
+    #[test]
+    fn hook_and_engine_only_opening_corroborate_and_legacy_end_matches() {
+        let events = [hook("SessionStart", "A", 10, "startup"),
+            observer_record("session.start", "A", None, 12, 1, "result", settled()),
+            hook("SessionEnd", "A", 30, "")];
+        for order in [[0,1,2], [1,0,2], [2,1,0]] {
+            let mut runner = PureRunner::new(1);
+            for i in order { runner.observe(&events[i]); }
+            count(runner.state(), 1, 0).expect("hook and engine opening are one ended activation");
+            assert!(runner.state().executions.values().next().unwrap().end_reasons.contains("SESSION_END"));
+        }
+    }
     #[test]
     fn each_real_opening_source_establishes_an_activation() {
         for source in ["startup", "resume", "clear"] {

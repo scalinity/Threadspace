@@ -152,7 +152,10 @@ pub fn derive(state: &mut CanonicalState) {
         let matches: Vec<_> = groups
             .iter()
             .enumerate()
-            .filter(|(_, g)| generation(g.first()).is_some() && signature(g.first(), hook))
+             .filter(|(_, g)| generation(g.first()).is_some()
+                && same_runtime(g.first(), hook)
+                && g.first().refs.session_id == hook.refs.session_id
+                && (source(g.first()).is_none() || signature(g.first(), hook)))
             .map(|(i, _)| i)
             .collect();
         let unique_hook = starts
@@ -164,6 +167,7 @@ pub fn derive(state: &mut CanonicalState) {
             if let Some(id) = &hook.refs.execution_id {
                 groups[matches[0]].members.insert(id.clone());
             }
+            groups[matches[0]].starts.push(hook);
         } else if matches.is_empty() {
             groups.push(Group {
                 starts: vec![hook],
@@ -251,7 +255,7 @@ pub fn derive(state: &mut CanonicalState) {
                     && group.starts.iter().any(|s|source(s)==Some("startup"))
                     // A legacy end has no provider order. Only an initial
                     // startup uniquely identifies the opening in this runtime.
-                    && !starts.iter().any(|s|same_runtime(s,end) && s.refs.session_id==end.refs.session_id && source(s)!=Some("startup"))
+                    && !starts.iter().any(|s|same_runtime(s,end) && s.refs.session_id==end.refs.session_id && source(s).is_some_and(|source|source!="startup"))
             };
             if matched && let FactPayload::ExecutionEnded { reason } = &end.payload {
                 execution.end_reasons.insert(reason.clone());

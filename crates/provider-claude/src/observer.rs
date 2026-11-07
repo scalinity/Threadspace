@@ -352,7 +352,7 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
             && crate::activation::source_starts(text(detail, "source")))
             || (event == "session.start" && record.phase == "result" && record.settled && record.engine_identity);
         if starts && record.engine_identity && generation.is_some() {
-            let mut attached = crate::activation::attach(envelope, refs.clone(), generation.clone());
+            let mut attached = crate::activation::attach(envelope, refs.clone(), generation.clone(), provider);
             for fact in &mut attached { fact.causal = record.point(envelope.callback_entry_sequence.as_ref(), None); }
             drafts.extend(attached);
         }

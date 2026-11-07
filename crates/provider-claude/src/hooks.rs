@@ -91,18 +91,24 @@ pub fn normalize(envelope: &ObservationEnvelope) -> Normalized {
         activity: envelope.native_occurrence_id.clone(),
         ..refs.clone()
     };
+    // Capture supplies the validated ancestry in nearest-first order. Resolve
+    // the provider here so persisted envelopes and retried bytes stay unchanged.
+    let provider = envelope.evidence.iter().find(|sample| {
+        sample.role == threadspace_contracts::canonical::envelope::ProcessRole::Ancestor
+            && sample.executable.as_deref().and_then(crate::profiles::version_from_executable).is_some()
+    });
     let drafts = match envelope.native_event.as_str() {
         "SessionStart" => {
             let source = text(&retained, "source");
             let mut facts = vec![identified(source.clone())];
             if actor.is_none() && crate::activation::source_starts(source.as_deref()) {
-                facts.extend(crate::activation::attach(envelope, refs.clone(), None));
+                facts.extend(crate::activation::attach(envelope, refs.clone(), None, provider));
             }
             facts
         }
         "SessionEnd" => {
             let mut facts = vec![identified(None)];
-            if actor.is_none() && let Some(provider) = envelope.evidence.iter().find(|p| p.role == threadspace_contracts::canonical::envelope::ProcessRole::Provider) {
+            if actor.is_none() && let Some(provider) = provider {
                 facts.push(draft(NativeRefs {
                     process: Some(provider.key.clone()),
                     activation: Some(crate::activation::evidence(envelope, ActivationEvidenceKind::End, None)),
