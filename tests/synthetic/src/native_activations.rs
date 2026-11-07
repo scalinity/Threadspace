@@ -633,6 +633,35 @@ mod tests {
         assert_eq!(engine.state.turns.len(), 2000);
     }
     #[test]
+    fn pending_inventory_keeps_invalid_binding_lineage() {
+        use threadspace_journal::{ActivationChange, SurfaceRecord};
+        let mut app = discovery(1,"A");
+        if let ActivationChange::Start {surface,..} = &mut app.changes[0] {
+            *surface = Ok(SurfaceRecord {surface_kind:"terminal.app".into(),locator:"/dev/ttys077".into(),tty:"/dev/ttys077".into(),device:77,
+                terminal_generation:"qualification".into(),window_hint:Some(1),tab_hint:Some(1),proof:json!({})});
+        }
+        let mut runner = SqliteRunner::open(TempStore::new("m3-pending-binding"),42).unwrap();
+        runner.journal.apply_discovery(&app,1001).unwrap();
+        let id = runner.state().bindings.keys().next().unwrap().clone();
+        let raw = runner.state().bindings[&id].clone();
+        runner.observe(&start("A",10,1,"startup"));
+        runner.observe(&start("A",30,3,"resume"));
+        let pending = runner.state().bindings.get(&id).expect("pending inventory retains its binding row");
+        assert!(!pending.valid);
+        assert_eq!(pending.invalidation_reason.as_deref(),Some("PENDING_ACTIVATION"));
+        assert_eq!(pending.execution_id,raw.execution_id);
+        assert_eq!(pending.surface_id,raw.surface_id);
+        assert_eq!(pending.proof,raw.proof);
+        assert!(pending.invalidations.is_empty(),"pending is not permanent proof loss");
+        assert_eq!(runner.state().executions[&raw.execution_id].presence,ExecutionPresence::Unknown);
+        count(runner.state(),3,1).unwrap();
+        assert_journal(&runner);
+        runner.journal.checkpoint("M3_PENDING_BINDING",2000).unwrap();
+        let runner = runner.restart(43).unwrap();
+        assert_eq!(runner.state().bindings[&id].invalidation_reason.as_deref(),Some("PENDING_ACTIVATION"));
+        assert_journal(&runner);
+    }
+    #[test]
     fn pre_change_helper_retry_is_already_committed() {
         use threadspace_contracts::canonical::{capture::RecordStatus, fact::Delivery};
         use threadspace_journal::EnvelopeAdmission;

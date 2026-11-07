@@ -5,11 +5,12 @@ Run from the repository root. Uses only Python's standard library and cargo;
 all output goes beneath the existing ignored target/ directory.
 """
 import json
+import os
 from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "target/m3-verification"
+OUT = Path(os.environ.get("THREADSPACE_ACTIVATION_CONTROL_OUT", ROOT / "target/m3-verification"))
 OUT.mkdir(parents=True, exist_ok=True)
 ENGINE = ROOT / "crates/state-engine/src/activations.rs"
 ADAPTER = ROOT / "crates/provider-claude/src/activation.rs"
@@ -47,6 +48,9 @@ CONTROLS = [
     ("engine-is-corroboration", ENGINE, lambda s: replace_once(s, 'source(s).is_some_and(|source|source!="startup")', 'source(s)!=Some("startup")')),
     ("runtime-scope", ROOT / "crates/state-engine/src/reduce.rs", lambda s: replace_once(s, "let mut processes = self.activation_processes.clone();", "let mut processes = self.activation_processes.clone(); processes.extend(self.index.activation_evidence.keys().map(|(p,_)|p.clone()));")),
     ("later-inventory-recovery", ENGINE, lambda s: replace_once(s, "&& before(end, inventory)", "&& false && before(end, inventory)")),
+    ("pending-binding-lineage", ENGINE, lambda s: replace_once(s, 'binding.execution_id = source.clone();\n            binding.valid = false;\n            binding.invalidation_reason = Some("PENDING_ACTIVATION".into());', 'state.bindings.remove(id);')),
+    ("legacy-activation-bytes", ROOT / "crates/contracts/src/canonical/fact.rs", lambda s: replace_once(s, '#[serde(default, skip_serializing_if = "Option::is_none")]\n    pub activation:', '#[serde(default)]\n    pub activation:')),
+    ("checkpoint-version", ROOT / "crates/state-engine/src/lib.rs", lambda s: replace_once(s, 'REDUCER_VERSION: u32 = 5', 'REDUCER_VERSION: u32 = 4')),
     ("compaction", ADAPTER, lambda s: replace_once(s, 'Some("startup" | "resume" | "clear")', 'Some("startup" | "resume" | "clear" | "compact")')),
     ("reload-is-not-opening", OBSERVER, lambda s: replace_once(s, "if starts && record.engine_identity && generation.is_some()", 'if (starts && record.engine_identity || event == "session.start" && record.phase == "bootstrap") && generation.is_some()')),
 ]
@@ -58,7 +62,11 @@ for name, path, mutate in CONTROLS:
         if changed == original:
             raise RuntimeError("mutation did not change source")
         path.write_text(changed)
-        command = ["cargo", "test", "-p", "threadspace-synthetic", "--test", "pre_m3_journal"] if name == "legacy-binding-replay" else COMMAND
+        command = {
+            "legacy-binding-replay": ["cargo", "test", "-p", "threadspace-synthetic", "--test", "pre_m3_journal"],
+            "legacy-activation-bytes": ["cargo", "test", "-p", "threadspace-contracts", "--test", "canonical_compat"],
+            "checkpoint-version": ["cargo", "test", "-p", "threadspace-journal", "--features", "qualification", "-p", "threadspace-contracts", "reducer_four"],
+        }.get(name, COMMAND)
         result = subprocess.run(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         (OUT / f"control-{name}.log").write_text(result.stdout)
         discriminated = result.returncode != 0 and "test result: FAILED" in result.stdout

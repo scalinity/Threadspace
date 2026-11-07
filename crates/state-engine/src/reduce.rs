@@ -1603,6 +1603,8 @@ impl Tx<'_> {
                 && execution.mode == Some(ExecutionMode::TerminalEmbedded);
             let presence = if !execution.end_reasons.is_empty() || exited {
                 ExecutionPresence::Ended
+            } else if self.state.activation_candidates.contains_key(id) && !self.state.execution_aliases.contains_key(id) {
+                ExecutionPresence::Unknown
             } else {
                 match execution.attached {
                     Some(AttachedPresence::Live) => ExecutionPresence::Live,
@@ -1674,6 +1676,9 @@ impl Tx<'_> {
                 )
             } else if replaced {
                 Some("EXECUTABLE_REPLACED".to_owned())
+            } else if self.state.activation_candidates.contains_key(&binding.execution_id)
+                && !self.state.execution_aliases.contains_key(&binding.execution_id) {
+                Some("PENDING_ACTIVATION".to_owned())
             } else if binding.method.is_none() {
                 Some("UNPROVEN".to_owned())
             } else {
@@ -1683,7 +1688,7 @@ impl Tx<'_> {
             let execution_id = binding.execution_id.clone();
             if let Some(binding) = self.state.bindings.get_mut(id) {
                 binding.valid = reason.is_none();
-                if reason.is_some() && binding.recorded_cursor.is_some() {
+                if reason.as_deref().is_some_and(|r|r != "PENDING_ACTIVATION") && binding.recorded_cursor.is_some() {
                     binding.invalidated_cursor.get_or_insert(cursor);
                 }
                 binding.invalidation_reason = reason;

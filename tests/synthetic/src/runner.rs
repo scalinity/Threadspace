@@ -317,7 +317,7 @@ impl Monitor {
             if binding
                 .invalidation_reason
                 .as_deref()
-                .is_some_and(|reason| reason != "UNPROVEN")
+                .is_some_and(|reason| reason != "UNPROVEN" && reason != "PENDING_ACTIVATION")
             {
                 self.lost_bindings.insert(binding.id.clone());
             }

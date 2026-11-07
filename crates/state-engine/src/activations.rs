@@ -175,6 +175,7 @@ pub fn derive(
         }
     }
     let native_count = groups.len();
+    let mut pending_inventory = BTreeSet::new();
     for inventory in facts.iter().filter(|f| kind(f) == Some(K::Inventory)) {
         let matches: Vec<_> = groups[..native_count]
             .iter()
@@ -202,8 +203,12 @@ pub fn derive(
                 members: inventory.refs.execution_id.clone().into_iter().collect(),
             });
         }
-        // Multiple native openings: keep the join as pending evidence. It is
-        // neither an extra live execution nor a guessed historical opening.
+        if matches.len() > 1 && let Some(id) = &inventory.refs.execution_id
+            && binding_ids.iter().any(|binding| state.binding_executions.get(binding) == Some(id)) {
+            pending_inventory.insert(id.clone());
+        }
+        // A pending binding retains its original inventory row as an UNKNOWN
+        // foreign-key anchor, never another live attachment.
     }
     if structural {
     for id in execution_ids {
@@ -270,6 +275,13 @@ pub fn derive(
         }
         state.executions.insert(id, execution);
     }
+    for id in pending_inventory {
+        if let Some(raw) = state.activation_candidates.get(&id) {
+            let mut pending = raw.clone();
+            pending.presence = threadspace_contracts::projection::ExecutionPresence::Unknown;
+            state.executions.insert(id, pending);
+        }
+    }
     }
     let mut owners: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for turn in facts.iter().filter(|f| kind(f) == Some(K::Turn)) {
@@ -322,8 +334,11 @@ pub fn derive(
             if let Some(binding) = state.bindings.get_mut(id) {
                 binding.execution_id = target.clone();
             }
-        } else if state.activation_candidates.contains_key(source) {
-            state.bindings.remove(id);
+        } else if state.activation_candidates.contains_key(source)
+            && let Some(binding) = state.bindings.get_mut(id) {
+            binding.execution_id = source.clone();
+            binding.valid = false;
+            binding.invalidation_reason = Some("PENDING_ACTIVATION".into());
         }
     }
 }
