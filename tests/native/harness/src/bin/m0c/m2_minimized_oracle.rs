@@ -59,8 +59,10 @@ pub fn same_identity(left: &Value, right: &Value) -> bool {
         && left["rdev"] == right["rdev"]
         && present(&left["tty"])
         && left["tty"] == right["tty"]
-        && left["runningVersion"] == "2.1.295"
-        && right["runningVersion"] == "2.1.295"
+        && left["runningVersion"] == right["runningVersion"]
+        && left["runningVersion"]
+            .as_str()
+            .is_some_and(|version| threadspace_provider_claude::profiles::observer_profile(version).is_some())
 }
 
 /// Every meaningful positive assertion has an explicit witness. Missing or

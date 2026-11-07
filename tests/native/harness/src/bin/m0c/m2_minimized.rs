@@ -18,7 +18,7 @@ use threadspace_harness::run::{Output, osascript, run};
 use threadspace_harness::terminal::{self, Tab};
 use threadspace_provider_claude::discovery::discover;
 use threadspace_provider_claude::inventory::{ClaudeCli, ClaudeInstall};
-use threadspace_provider_claude::profiles::version_from_executable;
+use threadspace_provider_claude::profiles::{observer_profile, version_from_executable};
 use threadspace_surfaces_macos::ancestry::KernelSampler;
 use threadspace_surfaces_macos::{process, tty};
 
@@ -187,8 +187,9 @@ pub(super) fn native_witness(tab: &Tab, endpoint: &str, expected_session: Option
         let device = tty::character_device(&tab.tty).map_err(|error| error.to_string())?;
         let boot = process::boot_session_id().map_err(|error| error.to_string())?;
         let inventory = cli()?;
+        // The observer profile table decides which running builds qualify.
         let pass = discover(&inventory, &KernelSampler, |image| {
-            version_from_executable(image).as_deref() == Some("2.1.295")
+            version_from_executable(image).is_some_and(|version| observer_profile(&version).is_some())
         })
         .map_err(|error| error.to_string())?;
         let joins: Vec<_> = pass
